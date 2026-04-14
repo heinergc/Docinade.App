@@ -1,0 +1,107 @@
+@model RubricasApp.Web.ViewModels.Conducta.ReporteMasivoProgramasViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte Masivo - Programas de Acciones</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        @@page { size: landscape; }
+        body { font-family: 'Arial', sans-serif; font-size: 9pt; line-height: 1.3; color: #333; padding: 20px; }
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2c3e50; padding-bottom: 10px; }
+        .header h1 { color: #2c3e50; font-size: 18pt; margin-bottom: 5px; }
+        .header h2 { color: #7f8c8d; font-size: 12pt; font-weight: normal; }
+        .filters { background-color: #ecf0f1; padding: 10px; margin-bottom: 15px; border-left: 4px solid #3498db; }
+        .filters strong { color: #2c3e50; }
+        .summary { background-color: #3498db; color: white; padding: 10px; margin-bottom: 15px; text-align: center; font-size: 12pt; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background-color: #34495e; color: white; padding: 8px; text-align: left; font-size: 9pt; font-weight: bold; }
+        td { padding: 7px; border: 1px solid #ddd; font-size: 9pt; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #e8f4f8; }
+        .estado-pendiente { color: #e67e22; font-weight: bold; }
+        .estado-proceso { color: #3498db; font-weight: bold; }
+        .estado-completado { color: #27ae60; font-weight: bold; }
+        .estado-nocompletado { color: #e74c3c; font-weight: bold; }
+        .footer { margin-top: 20px; padding-top: 10px; border-top: 1px solid #bdc3c7; text-align: center; font-size: 8pt; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>REPORTE MASIVO: PROGRAMAS DE ACCIONES INSTITUCIONAL</h1>
+        <h2>@Model.NombreInstitucion</h2>
+    </div>
+
+    <div class="filters">
+        <strong>Período Académico:</strong> @Model.PeriodoAcademico &nbsp;|&nbsp;
+        <strong>Estado:</strong> @Model.EstadoFiltro &nbsp;|&nbsp;
+        <strong>Fecha de Generación:</strong> @Model.FechaGeneracion.ToString("dd/MM/yyyy HH:mm")
+    </div>
+
+    <div class="summary">
+        Total de Programas: @Model.TotalRegistros
+    </div>
+
+    @if (Model.Programas.Any())
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 8%;">N° Programa</th>
+                    <th style="width: 10%;">Fecha</th>
+                    <th style="width: 25%;">Estudiante</th>
+                    <th style="width: 10%;">Carnet</th>
+                    <th style="width: 12%;">Grado/Sección</th>
+                    <th style="width: 10%;">Estado</th>
+                    <th style="width: 15%;">Autorizado Por</th>
+                    <th style="width: 10%;">Fecha Autoriz.</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var programa in Model.Programas)
+                {
+                    var estadoClass = programa.Estado switch
+                    {
+                        "Pendiente" => "estado-pendiente",
+                        "En Proceso" => "estado-proceso",
+                        "Completado" => "estado-completado",
+                        "No Completado" => "estado-nocompletado",
+                        _ => ""
+                    };
+
+                    <tr>
+                        <td>@programa.NumeroPrograma</td>
+                        <td>@programa.FechaElaboracion.ToString("dd/MM/yyyy")</td>
+                        <td>@programa.NombreEstudiante</td>
+                        <td>@programa.Carnet</td>
+                        <td>@programa.GradoSeccion</td>
+                        <td class="@estadoClass">@programa.Estado</td>
+                        <td style="font-size: 8pt;">@programa.AutorizadoPor</td>
+                        <td>@(programa.FechaAutorizacion?.ToString("dd/MM/yyyy") ?? "-")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div style="text-align: center; padding: 30px; color: #7f8c8d; font-size: 12pt;">
+            No se encontraron programas con los filtros aplicados.
+        </div>
+    }
+
+    <div class="footer">
+        <strong>Leyenda de Estados:</strong>
+        <span class="estado-pendiente">Pendiente</span> |
+        <span class="estado-proceso">En Proceso</span> |
+        <span class="estado-completado">Completado</span> |
+        <span class="estado-nocompletado">No Completado</span>
+        <br/>
+        Conforme al Art. 132 del Reglamento de Evaluación de los Aprendizajes
+    </div>
+</body>
+</html>

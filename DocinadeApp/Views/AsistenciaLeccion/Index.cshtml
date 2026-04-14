@@ -1,0 +1,349 @@
+@model List<RubricasApp.Web.Models.Leccion>
+@{
+    ViewData["Title"] = "Asistencia por Lección";
+    var grupoSeleccionado = ViewBag.GrupoSeleccionado as int?;
+    var fechaSeleccionada = ViewBag.FechaSeleccionada as DateTime? ?? DateTime.Today;
+    var grupo = ViewBag.Grupo as RubricasApp.Web.Models.GrupoEstudiante;
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-calendar-check text-primary me-2"></i>
+                    Asistencia por Lección
+                </h2>
+                <a asp-controller="Horarios" asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-calendar-alt me-1"></i>
+                    Ver Horarios
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Filtros -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <i class="fas fa-filter me-2"></i>Filtros
+        </div>
+        <div class="card-body">
+            <form asp-action="Index" method="get" class="row g-3">
+                <div class="col-md-5">
+                    <label for="grupoId" class="form-label">Grupo</label>
+                    <select name="grupoId" id="grupoId" class="form-select" required>
+                        <option value="">Seleccione un grupo...</option>
+                        @foreach (var item in ViewBag.Grupos as List<SelectListItem>)
+                        {
+                            <option value="@item.Value" selected="@(item.Value == grupoSeleccionado?.ToString())">
+                                @item.Text
+                            </option>
+                        }
+                    </select>
+                </div>
+                
+                <div class="col-md-4">
+                    <label for="fecha" class="form-label">Fecha</label>
+                    <input type="date" name="fecha" id="fecha" class="form-control" 
+                           value="@fechaSeleccionada.ToString("yyyy-MM-dd")" required />
+                </div>
+                
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-1"></i>Buscar Lecciones
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (grupoSeleccionado.HasValue && grupo != null)
+    {
+        <!-- Información del grupo y fecha -->
+        <div class="alert alert-info mb-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <strong><i class="fas fa-users me-2"></i>Grupo:</strong> @grupo.Nombre
+                </div>
+                <div class="col-md-6">
+                    <strong><i class="fas fa-calendar me-2"></i>Fecha:</strong> 
+                    @fechaSeleccionada.ToString("dddd, dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-ES"))
+                    <span class="badge bg-secondary ms-2">@fechaSeleccionada.ToString("dddd", new System.Globalization.CultureInfo("es-ES"))</span>
+                </div>
+            </div>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <!-- Lista de lecciones del día -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <span>
+                        <i class="fas fa-clock me-2"></i>
+                        Lecciones del Día (@Model.Count())
+                    </span>
+                    <span class="badge bg-light text-dark">
+                        @fechaSeleccionada.ToString("dddd", new System.Globalization.CultureInfo("es-ES"))
+                    </span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 12%">
+                                        <i class="fas fa-clock text-primary"></i> Horario
+                                    </th>
+                                    <th style="width: 8%">
+                                        <i class="fas fa-hashtag text-info"></i> Bloque
+                                    </th>
+                                    <th style="width: 30%">
+                                        <i class="fas fa-book text-success"></i> Materia
+                                    </th>
+                                    <th style="width: 8%" class="text-center">
+                                        <i class="fas fa-hourglass-half text-warning"></i> Duración
+                                    </th>
+                                    <th style="width: 12%" class="text-center">
+                                        <i class="fas fa-clipboard-check text-info"></i> Estado
+                                    </th>
+                                    <th style="width: 12%" class="text-center">
+                                        <i class="fas fa-users text-secondary"></i> Asistencias
+                                    </th>
+                                    <th style="width: 18%" class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var leccion in Model)
+                                {
+                                    var horaActual = DateTime.Now.TimeOfDay;
+                                    var esHoraActual = fechaSeleccionada.Date == DateTime.Today && 
+                                                      horaActual >= leccion.HoraInicio && 
+                                                      horaActual <= leccion.HoraFin;
+                                    var yaTermino = fechaSeleccionada.Date == DateTime.Today && 
+                                                   horaActual > leccion.HoraFin;
+                                    var tieneAsistencias = leccion.AsistenciasRegistradas > 0;
+                                    
+                                    <tr class="@(esHoraActual ? "table-warning" : "") @(yaTermino && !tieneAsistencias ? "table-light" : "")">
+                                        <td>
+                                            <strong class="text-primary">@leccion.HorarioFormateado</strong>
+                                            @if (esHoraActual)
+                                            {
+                                                <span class="badge bg-warning text-dark ms-1" title="Lección en curso">
+                                                    <i class="fas fa-circle-notch fa-spin"></i> Ahora
+                                                </span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">Bloque @leccion.NumeroBloque</span>
+                                        </td>
+                                        <td>
+                                            <strong>@leccion.Materia?.Nombre</strong>
+                                            <br />
+                                            <small class="text-muted">@leccion.Materia?.Codigo</small>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-secondary">
+                                                @leccion.DuracionMinutos min
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            @if (leccion.Activa)
+                                            {
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check-circle"></i> Activa
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">
+                                                    <i class="fas fa-times-circle"></i> Inactiva
+                                                </span>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            @if (tieneAsistencias)
+                                            {
+                                                <span class="badge bg-success" title="Asistencias registradas">
+                                                    <i class="fas fa-check-double"></i> @leccion.AsistenciasRegistradas
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary" title="Sin registros">
+                                                    <i class="fas fa-minus"></i> Sin registros
+                                                </span>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                @if (leccion.Activa)
+                                                {
+                                                    @if (tieneAsistencias)
+                                                    {
+                                                        <a asp-action="TomarAsistencia" 
+                                                           asp-route-idLeccion="@leccion.IdLeccion"
+                                                           asp-route-fecha="@fechaSeleccionada.ToString("yyyy-MM-dd")"
+                                                           class="btn btn-warning" 
+                                                           title="Editar asistencia">
+                                                            <i class="fas fa-edit"></i> Editar
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a asp-action="TomarAsistencia" 
+                                                           asp-route-idLeccion="@leccion.IdLeccion"
+                                                           asp-route-fecha="@fechaSeleccionada.ToString("yyyy-MM-dd")"
+                                                           class="btn btn-primary" 
+                                                           title="Tomar asistencia">
+                                                            <i class="fas fa-clipboard-check"></i> Tomar
+                                                        </a>
+                                                    }
+                                                    
+                                                    <a asp-action="Historial" 
+                                                       asp-route-idLeccion="@leccion.IdLeccion"
+                                                       class="btn btn-info" 
+                                                       title="Ver historial">
+                                                        <i class="fas fa-history"></i>
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-secondary" disabled title="Lección inactiva">
+                                                        <i class="fas fa-ban"></i> Inactiva
+                                                    </button>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer text-muted">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <i class="fas fa-info-circle me-1"></i>
+                            <strong>Total de lecciones:</strong> @Model.Count()
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <i class="fas fa-check-double me-1"></i>
+                            <strong>Con asistencia registrada:</strong> @Model.Count(l => l.AsistenciasRegistradas > 0)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accesos rápidos -->
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card border-primary">
+                        <div class="card-body text-center">
+                            <i class="fas fa-chart-bar fa-3x text-primary mb-3"></i>
+                            <h5>Estadísticas</h5>
+                            <p class="text-muted small">Ver estadísticas de asistencia del grupo</p>
+                            <a asp-action="Estadisticas" asp-route-grupoId="@grupoSeleccionado" class="btn btn-primary btn-sm">
+                                <i class="fas fa-eye me-1"></i>Ver Estadísticas
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-warning">
+                        <div class="card-body text-center">
+                            <i class="fas fa-user-times fa-3x text-warning mb-3"></i>
+                            <h5>Ausencias</h5>
+                            <p class="text-muted small">Ver reporte de ausencias del grupo</p>
+                            <a asp-action="Ausencias" asp-route-grupoId="@grupoSeleccionado" class="btn btn-warning btn-sm">
+                                <i class="fas fa-eye me-1"></i>Ver Ausencias
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-info">
+                        <div class="card-body text-center">
+                            <i class="fas fa-calendar-alt fa-3x text-info mb-3"></i>
+                            <h5>Horarios</h5>
+                            <p class="text-muted small">Ver horario semanal del grupo</p>
+                            <a asp-controller="Horarios" asp-action="HorarioSemanal" asp-route-grupoId="@grupoSeleccionado" class="btn btn-info btn-sm">
+                                <i class="fas fa-eye me-1"></i>Ver Horario
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>No hay lecciones programadas</strong> para el grupo <strong>@grupo.Nombre</strong> 
+                el día <strong>@fechaSeleccionada.ToString("dddd", new System.Globalization.CultureInfo("es-ES"))</strong>.
+                <br />
+                <small class="text-muted">
+                    Puede crear lecciones desde el módulo de 
+                    <a asp-controller="Horarios" asp-action="Index" asp-route-grupoId="@grupoSeleccionado">Horarios</a>.
+                </small>
+            </div>
+        }
+    }
+    else if (grupoSeleccionado.HasValue)
+    {
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            No se encontró el grupo seleccionado.
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-hand-pointer fa-4x text-muted mb-4"></i>
+                <h4 class="text-muted">Seleccione un grupo y una fecha</h4>
+                <p class="text-muted">Use los filtros arriba para ver las lecciones programadas y tomar asistencia</p>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-submit del formulario cuando cambian los filtros
+        $(document).ready(function() {
+            $('#grupoId, #fecha').on('change', function() {
+                $(this).closest('form').submit();
+            });
+            
+            // Resaltar la hora actual
+            setInterval(function() {
+                $('.table-warning').removeClass('table-warning');
+                var ahora = new Date();
+                var horaActual = ahora.getHours() * 60 + ahora.getMinutes();
+                
+                $('table tbody tr').each(function() {
+                    var badge = $(this).find('.badge:contains("Ahora")');
+                    if (badge.length > 0) {
+                        $(this).addClass('table-warning');
+                    }
+                });
+            }, 60000); // Actualizar cada minuto
+        });
+    </script>
+}

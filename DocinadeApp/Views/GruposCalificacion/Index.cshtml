@@ -1,0 +1,278 @@
+﻿@model IEnumerable<RubricasApp.Web.Models.GrupoCalificacion>
+
+@{
+    ViewData["Title"] = "Grupos de Calificación";
+}
+
+<form id="form-antiforgery" style="display:none;">
+    @Html.AntiForgeryToken()
+</form>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-layer-group me-2"></i>
+                            Grupos de Calificación
+                        </h3>
+                        <a asp-action="Create" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>
+                            Nuevo Grupo
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            @TempData["Success"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            @TempData["Error"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.NombreGrupo)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Descripcion)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Estado)
+                                    </th>
+                                    <th>
+                                        Niveles
+                                    </th>
+                                    <th>
+                                        Rúbricas
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.FechaCreacion)
+                                    </th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@Html.DisplayFor(modelItem => item.NombreGrupo)</strong>
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Descripcion)
+                                        </td>
+                                        <td>
+                                            @if (item.Estado == "ACTIVO")
+                                            {
+                                                <span class="badge bg-success">@item.Estado</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">@item.Estado</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">
+                                                @item.NivelesCalificacion.Count niveles
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-warning text-dark">
+                                                @item.Rubricas.Count rúbricas
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @item.FechaCreacion.ToString("dd/MM/yyyy")
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group" role="group">
+                                                <a asp-action="Details" asp-route-id="@item.IdGrupo" 
+                                                   class="btn btn-outline-info btn-sm" title="Ver detalles">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a asp-action="AssignLevels" asp-route-id="@item.IdGrupo" 
+                                                   class="btn btn-outline-success btn-sm" title="Asignar niveles">
+                                                    <i class="fas fa-users-cog"></i>
+                                                </a>
+                                                <a asp-action="Edit" asp-route-id="@item.IdGrupo" 
+                                                   class="btn btn-outline-primary btn-sm" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-outline-danger btn-sm" 
+                                                        title="Eliminar"
+                                                        onclick="confirmarEliminar(@item.IdGrupo, '@item.NombreGrupo', @item.NivelesCalificacion.Count, @item.Rubricas.Count)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        @if (!Model.Any())
+                        {
+                            <div class="text-center py-4">
+                                <i class="fas fa-layer-group fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No hay grupos de calificación registrados</h5>
+                                <p class="text-muted">Agregue el primer grupo para comenzar.</p>
+                                <a asp-action="Create" class="btn btn-primary">
+                                    <i class="fas fa-plus me-1"></i>
+                                    Crear Primer Grupo
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación de Eliminación -->
+<div class="modal fade" id="modalEliminarGrupo" tabindex="-1" aria-labelledby="modalEliminarGrupoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalEliminarGrupoLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger" id="mensajeDependencias" style="display: none;">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <strong>¡Atención!</strong>
+                    <div id="detallesDependencias"></div>
+                </div>
+                <p>¿Está seguro de que desea eliminar el grupo de calificación:</p>
+                <p class="text-center"><strong id="nombreGrupoEliminar"></strong></p>
+                <div id="infoDependencias"></div>
+                <p class="text-muted"><small><i class="fas fa-info-circle me-1"></i>Esta acción no se puede deshacer.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">
+                    <i class="fas fa-trash me-1"></i>
+                    Sí, Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let grupoIdEliminar = 0;
+
+        function confirmarEliminar(grupoId, nombreGrupo, nivelesCount, rubricasCount) {
+            grupoIdEliminar = grupoId;
+            document.getElementById('nombreGrupoEliminar').textContent = nombreGrupo;
+            
+            const infoDependencias = document.getElementById('infoDependencias');
+            const mensajeDependencias = document.getElementById('mensajeDependencias');
+            const btnConfirmar = document.getElementById('btnConfirmarEliminar');
+            
+            if (nivelesCount > 0 || rubricasCount > 0) {
+                infoDependencias.innerHTML = `
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Dependencias encontradas:</strong><br>
+                        <ul class="mb-0 mt-2">
+                            ${nivelesCount > 0 ? `<li>${nivelesCount} nivel(es) de calificación</li>` : ''}
+                            ${rubricasCount > 0 ? `<li>${rubricasCount} rúbrica(s) asociada(s)</li>` : ''}
+                        </ul>
+                    </div>
+                `;
+                btnConfirmar.disabled = true;
+                btnConfirmar.innerHTML = '<i class="fas fa-ban me-1"></i> No se puede eliminar';
+            } else {
+                infoDependencias.innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Este grupo no tiene dependencias y puede ser eliminado de forma segura.
+                    </div>
+                `;
+                btnConfirmar.disabled = false;
+                btnConfirmar.innerHTML = '<i class="fas fa-trash me-1"></i> Sí, Eliminar';
+            }
+            
+            mensajeDependencias.style.display = 'none';
+            
+            const modal = new bootstrap.Modal(document.getElementById('modalEliminarGrupo'));
+            modal.show();
+        }
+
+        document.getElementById('btnConfirmarEliminar').addEventListener('click', async function() {
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Eliminando...';
+            
+            try {
+                const response = await fetch('/GruposCalificacion/EliminarGrupoAjax', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    },
+                    body: JSON.stringify(grupoIdEliminar)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Cerrar modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('modalEliminarGrupo'));
+                    modal.hide();
+                    
+                    // Mostrar mensaje de éxito
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                    alertDiv.innerHTML = `
+                        <i class="fas fa-check-circle me-2"></i>
+                        ${result.message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    document.querySelector('.card-body').insertBefore(alertDiv, document.querySelector('.table-responsive'));
+                    
+                    // Recargar página después de 1 segundo
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    // Mostrar error en el modal
+                    const mensajeDependencias = document.getElementById('mensajeDependencias');
+                    const detallesDependencias = document.getElementById('detallesDependencias');
+                    detallesDependencias.innerHTML = result.message;
+                    mensajeDependencias.style.display = 'block';
+                    
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-trash me-1"></i> Sí, Eliminar';
+                }
+            } catch (error) {
+                alert('Error al eliminar el grupo: ' + error.message);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-trash me-1"></i> Sí, Eliminar';
+            }
+        });
+    </script>
+}

@@ -1,0 +1,33 @@
+﻿@model RubricasApp.Web.Models.InstrumentoEvaluacion
+@{ViewData["Title"] = "Eliminar Instrumento";}
+<div class="container mt-4">
+<div class="row justify-content-center">
+<div class="col-md-8">
+<div class="card">
+<div class="card-header bg-danger text-white">
+<h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>¿Está seguro de eliminar este instrumento?</h5>
+</div>
+<div class="card-body">
+<div class="alert alert-warning">
+<strong>Advertencia:</strong> Esta acción no se puede deshacer.
+</div>
+<table class="table">
+<tr><td><strong>Nombre:</strong></td><td>@Model.Nombre</td></tr>
+<tr><td><strong>Estado:</strong></td><td>@(Model.Activo ? "Activo" : "Inactivo")</td></tr>
+<tr><td><strong>Rúbricas asociadas:</strong></td><td>@Model.InstrumentoRubricas.Count</td></tr>
+<tr><td><strong>Materias asociadas:</strong></td><td>@Model.InstrumentoMaterias.Count</td></tr>
+</table>
+<form asp-action="Delete" method="post" class="mt-3">
+<input type="hidden" asp-for="InstrumentoId" />
+<button type="submit" class="btn btn-danger me-2">
+<i class="fas fa-trash me-2"></i>Confirmar Eliminación
+</button>
+<a asp-action="Index" class="btn btn-secondary">
+<i class="fas fa-arrow-left me-2"></i>Cancelar
+</a>
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>

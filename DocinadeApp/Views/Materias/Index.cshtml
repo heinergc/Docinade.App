@@ -1,0 +1,201 @@
+﻿@model RubricasApp.Web.ViewModels.Academic.PagedResult<RubricasApp.Web.ViewModels.Academic.MateriaListVm>
+
+@{
+    ViewData["Title"] = "Gestión de Materias";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-book"></i> Gestión de Materias</h2>
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Nueva Materia
+                </a>
+            </div>
+
+
+            <!-- Filtros y búsqueda -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="searchTerm" class="form-label">Buscar</label>
+                            <input type="text" class="form-control" id="searchTerm" name="searchTerm" 
+                                   value="@ViewBag.CurrentFilter" placeholder="Código, nombre o descripción...">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="tipoFiltro" class="form-label">Tipo de Materia</label>
+                            <select class="form-select" id="tipoFiltro" name="tipoFiltro">
+                                <option value="">-- Todos los tipos --</option>
+                                @if (ViewBag.TiposDisponibles != null)
+                                {
+                                    @foreach (string tipo in ViewBag.TiposDisponibles)
+                                    {
+                                        <option value="@tipo" selected="@(ViewBag.TipoFiltro == tipo)">@tipo</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="pageSize" class="form-label">Registros por página</label>
+                            <select class="form-select" id="pageSize" name="pageSize">
+                                <option value="10" selected="@(ViewBag.PageSize == 10)">10</option>
+                                <option value="25" selected="@(ViewBag.PageSize == 25)">25</option>
+                                <option value="50" selected="@(ViewBag.PageSize == 50)">50</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-outline-primary me-2">
+                                <i class="fas fa-search"></i> Filtrar
+                            </button>
+                            <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Limpiar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tabla de resultados -->
+            <div class="card">
+                <div class="card-body">
+                    @if (Model.Items.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Nombre</th>
+                                        <th>Tipo</th>
+                                        <th>Créditos</th>
+                                        <th>Estado</th>
+                                        <th>Instrumentos</th>
+                                        <th width="200">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var materia in Model.Items)
+                                    {
+                                        <tr>
+                                            <td><strong>@materia.Codigo</strong></td>
+                                            <td>@materia.Nombre</td>
+                                            <td>
+                                                <span class="badge bg-info">@materia.Tipo</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary">@materia.Creditos</span>
+                                            </td>
+                                            <td>
+                                                @if (materia.Activa)
+                                                {
+                                                    <span class="badge bg-success">Activa</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">Inactiva</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-primary">@materia.NumeroInstrumentos</span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a asp-action="Details" asp-route-id="@materia.MateriaId" 
+                                                       class="btn btn-sm btn-outline-info" title="Ver detalles">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a asp-action="Edit" asp-route-id="@materia.MateriaId" 
+                                                       class="btn btn-sm btn-outline-warning" title="Editar">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a asp-action="AsignarInstrumentos" asp-route-id="@materia.MateriaId" 
+                                                       class="btn btn-sm btn-outline-success" title="Gestionar instrumentos">
+                                                        <i class="fas fa-tools"></i>
+                                                    </a>
+                                                    <a asp-action="Instrumentos" asp-route-id="@materia.MateriaId" 
+                                                       class="btn btn-sm btn-outline-primary" title="Ver instrumentos">
+                                                        <i class="fas fa-list"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Paginación -->
+                        @if (Model.TotalPages > 1)
+                        {
+                            <nav aria-label="Paginación">
+                                <ul class="pagination justify-content-center mt-4">
+                                    @if (Model.Page > 1)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="@Url.Action("Index", new { page = Model.Page - 1, pageSize = ViewBag.PageSize, searchTerm = ViewBag.CurrentFilter, tipoFiltro = ViewBag.TipoFiltro })">
+                                                Anterior
+                                            </a>
+                                        </li>
+                                    }
+
+                                    @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
+                                    {
+                                        <li class="page-item @(i == Model.Page ? "active" : "")">
+                                            <a class="page-link" href="@Url.Action("Index", new { page = i, pageSize = ViewBag.PageSize, searchTerm = ViewBag.CurrentFilter, tipoFiltro = ViewBag.TipoFiltro })">
+                                                @i
+                                            </a>
+                                        </li>
+                                    }
+
+                                    @if (Model.Page < Model.TotalPages)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="@Url.Action("Index", new { page = Model.Page + 1, pageSize = ViewBag.PageSize, searchTerm = ViewBag.CurrentFilter, tipoFiltro = ViewBag.TipoFiltro })">
+                                                Siguiente
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </nav>
+                        }
+
+                        <div class="mt-3 text-muted">
+                            Mostrando @((Model.Page - 1) * Model.PageSize + 1) - @Math.Min(Model.Page * Model.PageSize, Model.TotalCount) 
+                            de @Model.TotalCount registros
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <div class="mb-3">
+                                <i class="fas fa-search fa-3x text-muted"></i>
+                            </div>
+                            <h5 class="text-muted">No se encontraron materias</h5>
+                            <p class="text-muted">Intenta con otros criterios de búsqueda o crea una nueva materia.</p>
+                            <a asp-action="Create" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Crear Nueva Materia
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto submit form on page size change
+        document.getElementById('pageSize').addEventListener('change', function() {
+            this.form.submit();
+        });
+        
+        // Auto submit form on tipo filtro change
+        document.getElementById('tipoFiltro').addEventListener('change', function() {
+            this.form.submit();
+        });
+    </script>
+}

@@ -1,0 +1,315 @@
+﻿@model List<RubricasApp.Web.ViewModels.Grupos.TipoGrupoListViewModel>
+
+@{
+    ViewData["Title"] = "Tipos de Grupo";
+}
+
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="page-title">
+                <i class="fas fa-tags text-primary me-2"></i>
+                Catálogo de Tipos de Grupo
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-white">
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index", "Home")" class="text-white">
+                            <i class="fas fa-home"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index", "GruposEstudiantes")" class="text-white">
+                            <i class="fas fa-users-cog"></i> Grupos
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active text-white">Tipos de Grupo</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-auto">
+            <a href="@Url.Action("Create")" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nuevo Tipo
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="modern-card stat-card">
+            <div class="card-body text-center">
+                <div class="stat-icon mb-2">
+                    <i class="fas fa-tags fa-2x text-primary"></i>
+                </div>
+                <h3 class="stat-number">@Model.Count</h3>
+                <p class="stat-label">Total Tipos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="modern-card stat-card">
+            <div class="card-body text-center">
+                <div class="stat-icon mb-2">
+                    <i class="fas fa-check-circle fa-2x text-success"></i>
+                </div>
+                <h3 class="stat-number">@Model.Count(t => t.EsActivo)</h3>
+                <p class="stat-label">Activos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="modern-card stat-card">
+            <div class="card-body text-center">
+                <div class="stat-icon mb-2">
+                    <i class="fas fa-users fa-2x text-info"></i>
+                </div>
+                <h3 class="stat-number">@Model.Sum(t => t.CantidadGrupos)</h3>
+                <p class="stat-label">Grupos Totales</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="modern-card stat-card">
+            <div class="card-body text-center">
+                <div class="stat-icon mb-2">
+                    <i class="fas fa-clock fa-2x text-warning"></i>
+                </div>
+                <h3 class="stat-number">@(Model.Any() ? Model.Min(t => t.FechaRegistro).ToString("yyyy") : "N/A")</h3>
+                <p class="stat-label">Desde</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modern-card">
+    <div class="card-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    Lista de Tipos de Grupo
+                </h5>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Estado</th>
+                            <th>Grupos</th>
+                            <th>Fecha Registro</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var tipo in Model.OrderBy(t => t.Nombre))
+                        {
+                            <tr>
+                                <td>
+                                    <span class="badge bg-secondary">@tipo.IdTipoGrupo</span>
+                                </td>
+                                <td>
+                                    <strong>@tipo.Nombre</strong>
+                                </td>
+                                <td>
+                                    <button type="button"
+                                            class="btn btn-sm btn-toggle-estado @(tipo.EsActivo ? "btn-success" : "btn-secondary")"
+                                            data-id="@tipo.IdTipoGrupo"
+                                            data-estado="@tipo.Estado.ToLower()">
+                                        <i class="fas fa-@(tipo.EsActivo ? "check" : "times")"></i>
+                                        @tipo.Estado
+                                    </button>
+                                </td>
+                                <td>
+                                    @if (tipo.CantidadGrupos > 0)
+                                    {
+                                        <span class="badge bg-info">@tipo.CantidadGrupos grupos</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted-black">Sin grupos</span>
+                                    }
+                                </td>
+                                <td>
+                                    <small class="text-muted-black">
+                                        @tipo.FechaRegistro.ToString("dd/MM/yyyy HH:mm")
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="@Url.Action("Details", new { id = tipo.IdTipoGrupo })"
+                                           class="btn btn-sm btn-outline-info"
+                                           title="Ver detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="@Url.Action("Edit", new { id = tipo.IdTipoGrupo })"
+                                           class="btn btn-sm btn-outline-warning"
+                                           title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        @if (tipo.PuedeEliminar)
+                                        {
+                                            <a href="@Url.Action("Delete", new { id = tipo.IdTipoGrupo })"
+                                               class="btn btn-sm btn-outline-danger"
+                                               title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-secondary"
+                                                    title="No se puede eliminar (tiene grupos asociados)"
+                                                    disabled>
+                                                <i class="fas fa-lock"></i>
+                                            </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-tags fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No hay tipos de grupo configurados</h5>
+                <p class="text-muted">Comience creando el primer tipo de grupo para el sistema.</p>
+                <a href="@Url.Action("Create")" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Crear Primer Tipo
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Toggle estado
+            $('.btn-toggle-estado').click(function() {
+                const id = $(this).data('id');
+                const button = $(this);
+
+                $.ajax({
+                    url: '@Url.Action("ToggleEstado")',
+                    type: 'POST',
+                    data: { id: id },
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            if (response.nuevoEstado === 'Activo') {
+                                button.removeClass('btn-secondary').addClass('btn-success');
+                                button.html('<i class="fas fa-check"></i> Activo');
+                            } else {
+                                button.removeClass('btn-success').addClass('btn-secondary');
+                                button.html('<i class="fas fa-times"></i> Inactivo');
+                            }
+
+                            Swal.fire('¡Éxito!', response.mensaje, 'success');
+                        } else {
+                            Swal.fire('Error', response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Error al cambiar el estado', 'error');
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        /* Cambiar text-muted a color blanco */
+        .text-muted {
+            color: white !important;
+        }
+
+        .breadcrumb-white {
+            background-color: rgba(0,0,0,0.1);
+            border-radius: 6px;
+            padding: 8px 15px;
+        }
+
+        .breadcrumb-white .breadcrumb-item + .breadcrumb-item::before {
+            color: rgba(255,255,255,0.7);
+            content: ">";
+        }
+
+        .breadcrumb-white .breadcrumb-item a {
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb-white .breadcrumb-item a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        .breadcrumb-white .breadcrumb-item.active {
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .stat-card {
+            transition: transform 0.2s;
+            border: none;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+            .stat-card:hover {
+                transform: translateY(-2px);
+            }
+
+        .stat-icon {
+            opacity: 0.8;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .stat-label {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .modern-card {
+            border: none;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        .btn-toggle-estado {
+            min-width: 80px;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #495057;
+        }
+    </style>
+}
+
+<!-- Token CSRF para AJAX -->
+@Html.AntiForgeryToken()

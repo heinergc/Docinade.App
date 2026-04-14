@@ -1,0 +1,13 @@
+Changed database context to 'RubricasDb'.
+Msg 102, Level 15, State 1, Server DESKTOP-2TN7P3A\SQLEXPRESS, Line 28
+Incorrect syntax near '±'.
+Msg 102, Level 15, State 1, Server DESKTOP-2TN7P3A\SQLEXPRESS, Line 34
+Incorrect syntax near '±'.
+Msg 102, Level 15, State 1, Server DESKTOP-2TN7P3A\SQLEXPRESS, Line 40
+Incorrect syntax near '±'.
+Msg 102, Level 15, State 1, Server DESKTOP-2TN7P3A\SQLEXPRESS, Line 46
+Incorrect syntax near '±'.
+Msg 102, Level 15, State 1, Server DESKTOP-2TN7P3A\SQLEXPRESS, Line 52
+Incorrect syntax near '±'.
+Msg 102, Level 15, State 1, Server DESKTOP-2TN7P3A\SQLEXPRESS, Line 58
+Incorrect syntax near '±'.

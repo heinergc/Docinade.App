@@ -1,0 +1,53 @@
+@{
+    ViewData["Title"] = "Empadronamiento de Estudiantes";
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h2><i class="fas fa-user-graduate"></i> Empadronamiento Estudiantil</h2>
+                    <p class="mb-0">Sistema de Registro Público</p>
+                </div>
+                <div class="card-body p-5">
+                    
+                    <h4 class="mb-4">Bienvenido al Proceso de Empadronamiento</h4>
+                    
+                    <p class="lead">
+                        Complete el siguiente formulario para iniciar su proceso de empadronamiento. 
+                        El proceso consta de <strong>5 pasos sencillos</strong> que le tomarán aproximadamente <strong>10 minutos</strong>.
+                    </p>
+                    
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-info-circle"></i> Información Requerida:</h5>
+                        <ul class="mb-0">
+                            <li>Datos personales (nombre, cédula, fecha de nacimiento)</li>
+                            <li>Información de contacto y residencia</li>
+                            <li>Datos de responsables y contacto de emergencia</li>
+                            <li>Historial académico</li>
+                            <li>Información de salud (opcional pero recomendada)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <strong><i class="fas fa-exclamation-triangle"></i> Importante:</strong>
+                        Asegúrese de tener su cédula de identidad a mano. Los datos ingresados 
+                        serán verificados antes de la aprobación final.
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <a asp-action="Iniciar" class="btn btn-primary btn-lg">
+                            <i class="fas fa-play-circle"></i> Iniciar Empadronamiento
+                        </a>
+                    </div>
+                    
+                    <p class="text-muted text-center mt-4 small">
+                        Al continuar, acepta que sus datos serán procesados de acuerdo con nuestra política de privacidad.
+                        <br>Sus datos estarán protegidos y serán utilizados únicamente para fines académicos y administrativos.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

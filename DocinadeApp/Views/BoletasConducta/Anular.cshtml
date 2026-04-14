@@ -1,0 +1,179 @@
+@{
+    ViewData["Title"] = "Anular Boleta de Conducta";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index">Boletas de Conducta</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@ViewBag.IdBoleta">Boleta #@ViewBag.IdBoleta</a></li>
+                    <li class="breadcrumb-item active">Anular</li>
+                </ol>
+            </nav>
+            <h2><i class="fas fa-ban text-danger"></i> Anular Boleta de Conducta</h2>
+            <p class="text-muted">Esta acción recalculará automáticamente la nota de conducta del estudiante</p>
+        </div>
+    </div>
+
+    <!-- Advertencia -->
+    <div class="alert alert-danger border-danger">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle fa-3x me-3"></i>
+            <div>
+                <h5 class="alert-heading">¡Atención!</h5>
+                <p class="mb-0">
+                    Está a punto de anular una boleta de conducta. Esta acción:
+                </p>
+                <ul class="mb-0 mt-2">
+                    <li>Marcará la boleta como "Anulada"</li>
+                    <li>Eliminará el rebajo de puntos de la nota de conducta</li>
+                    <li>Recalculará automáticamente la nota final del estudiante</li>
+                    <li><strong>Esta acción NO se puede deshacer</strong></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información de la boleta -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información de la Boleta</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-2">
+                        <strong>Estudiante:</strong> @ViewBag.NombreEstudiante
+                    </div>
+                    <div class="mb-2">
+                        <strong>Tipo de Falta:</strong>
+                        <span class="badge bg-warning">@ViewBag.TipoFalta</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-2">
+                        <strong>Fecha de Emisión:</strong> @ViewBag.FechaEmision.ToString("dd/MM/yyyy HH:mm")
+                    </div>
+                    <div class="mb-2">
+                        <strong>Boleta #:</strong> @ViewBag.IdBoleta
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de anulación -->
+    <form asp-action="Anular" method="post">
+        <input type="hidden" name="id" value="@ViewBag.IdBoleta" />
+        
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fas fa-edit"></i> Motivo de Anulación</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="motivoAnulacion" class="form-label required">
+                        Especifique el motivo por el cual se anula esta boleta
+                    </label>
+                    <textarea class="form-control" id="motivoAnulacion" name="motivoAnulacion" 
+                              rows="4" required 
+                              placeholder="Ingrese una justificación clara y detallada del motivo de anulación..."></textarea>
+                    <div class="form-text">
+                        Es obligatorio proporcionar un motivo. Esta información quedará registrada permanentemente.
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-lightbulb"></i>
+                    <strong>Ejemplos de motivos válidos:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>Error en la identificación del estudiante</li>
+                        <li>Duplicación de registro por error del sistema</li>
+                        <li>Resolución favorable en apelación del estudiante</li>
+                        <li>Corrección por decisión del comité de convivencia</li>
+                        <li>Error en la clasificación del tipo de falta</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirmación -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="confirmarAnulacion" required>
+                    <label class="form-check-label" for="confirmarAnulacion">
+                        <strong>Confirmo que he revisado la información y deseo proceder con la anulación de esta boleta</strong>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Details" asp-route-id="@ViewBag.IdBoleta" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-danger btn-lg" id="btnAnular" disabled>
+                        <i class="fas fa-ban"></i> Anular Boleta
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Habilitar botón solo si se marca el checkbox
+            $('#confirmarAnulacion').on('change', function() {
+                $('#btnAnular').prop('disabled', !$(this).is(':checked'));
+            });
+
+            // Validar y confirmar antes de enviar
+            $('form').on('submit', function(e) {
+                const motivo = $('#motivoAnulacion').val().trim();
+                
+                if (motivo.length < 10) {
+                    e.preventDefault();
+                    toastr.error('El motivo debe tener al menos 10 caracteres');
+                    return false;
+                }
+
+                if (!confirm('¿Está completamente seguro de anular esta boleta?\n\nEsta acción NO se puede deshacer.')) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                $('#btnAnular')
+                    .prop('disabled', true)
+                    .html('<i class="fas fa-spinner fa-spin"></i> Anulando...');
+            });
+
+            // Validación del motivo mientras escribe
+            $('#motivoAnulacion').on('input', function() {
+                const length = $(this).val().trim().length;
+                if (length > 0 && length < 10) {
+                    $(this).addClass('is-invalid');
+                } else if (length >= 10) {
+                    $(this).removeClass('is-invalid').addClass('is-valid');
+                } else {
+                    $(this).removeClass('is-invalid is-valid');
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .required::after {
+        content: " *";
+        color: red;
+    }
+</style>

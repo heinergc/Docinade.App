@@ -1,0 +1,308 @@
+@model RubricasApp.Web.ViewModels.ResumenAsistenciaViewModel
+
+@{
+    Layout = null; // No layout for PDF generation
+    ViewData["Title"] = $"Resumen de Asistencia - {Model.Grupo.Nombre}";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #007bff;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .header .subtitle {
+            color: #6c757d;
+            font-size: 14px;
+            margin: 5px 0 0 0;
+        }
+
+        .info-section {
+            display: table;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .info-row {
+            display: table-row;
+        }
+
+        .info-label {
+            display: table-cell;
+            font-weight: bold;
+            width: 150px;
+            padding: 5px 0;
+        }
+
+        .info-value {
+            display: table-cell;
+            padding: 5px 0;
+        }
+
+        .stats-grid {
+            display: table;
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        .stats-row {
+            display: table-row;
+        }
+
+        .stat-card {
+            display: table-cell;
+            width: 20%;
+            text-align: center;
+            padding: 15px;
+            margin: 5px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #6c757d;
+            text-transform: uppercase;
+        }
+
+        .stat-presentes { color: #28a745; }
+        .stat-ausentes { color: #dc3545; }
+        .stat-tardanzas { color: #ffc107; }
+        .stat-justificadas { color: #17a2b8; }
+        .stat-porcentaje { color: #6f42c1; }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .table th,
+        .table td {
+            border: 1px solid #dee2e6;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .table td {
+            font-size: 11px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            border-radius: 3px;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .badge-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .text-muted {
+            color: #6c757d;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #dee2e6;
+            text-align: center;
+            font-size: 10px;
+            color: #6c757d;
+        }
+
+        @@page {
+            size: A4;
+            margin: 1cm;
+        }
+
+        @@media print {
+            body {
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Encabezado -->
+    <div class="header">
+        <h1>Resumen de Asistencia</h1>
+        <div class="subtitle">
+            Grupo: @Model.Grupo.Nombre
+            @if (!string.IsNullOrEmpty(Model.Grupo.Codigo))
+            {
+                <span>(@Model.Grupo.Codigo)</span>
+            }
+        </div>
+    </div>
+
+    <!-- Información general -->
+    <div class="info-section">
+        <div class="info-row">
+            <div class="info-label">Fecha:</div>
+            <div class="info-value">@Model.Fecha.ToString("dddd, dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-ES"))</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Período Académico:</div>
+            <div class="info-value">@Model.Grupo.PeriodoAcademico</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Fecha de Generación:</div>
+            <div class="info-value">@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</div>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="stats-grid">
+        <div class="stats-row">
+            <div class="stat-card">
+                <span class="stat-number stat-presentes">@Model.TotalEstudiantes</span>
+                <span class="stat-label">Total</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number stat-presentes">@Model.EstudiantesPresentes</span>
+                <span class="stat-label">Presentes</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number stat-ausentes">@Model.EstudiantesAusentes</span>
+                <span class="stat-label">Ausentes</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number stat-tardanzas">@Model.EstudiantesTardanza</span>
+                <span class="stat-label">Tardanzas</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number stat-porcentaje">@Model.PorcentajeAsistencia.ToString("F1")%</span>
+                <span class="stat-label">Asistencia</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detalle de estudiantes -->
+    @if (Model.DetalleEstudiantes != null && Model.DetalleEstudiantes.Any())
+    {
+        <h3 style="margin-top: 25px; margin-bottom: 15px; color: #495057; border-bottom: 1px solid #dee2e6; padding-bottom: 5px;">
+            Detalle por Estudiante
+        </h3>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th style="width: 50px;">#</th>
+                    <th>Estudiante</th>
+                    <th class="text-center" style="width: 100px;">Estado</th>
+                    <th>Justificación</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.DetalleEstudiantes.Count; i++)
+                {
+                    var estudiante = Model.DetalleEstudiantes[i];
+                    <tr>
+                        <td class="text-center">@(i + 1)</td>
+                        <td>
+                            <strong>@estudiante.NombreCompleto</strong>
+                            @if (!string.IsNullOrEmpty(estudiante.NumeroId))
+                            {
+                                <br><span class="text-muted" style="font-size: 10px;">ID: @estudiante.NumeroId</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @switch (estudiante.Estado)
+                            {
+                                case "P":
+                                    <span class="badge badge-success">Presente</span>
+                                    break;
+                                case "A":
+                                    <span class="badge badge-danger">Ausente</span>
+                                    break;
+                                case "T":
+                                    <span class="badge badge-warning">Tardanza</span>
+                                    break;
+                                case "AJ":
+                                    <span class="badge" style="background-color: #d1ecf1; color: #0c5460;">Justificada</span>
+                                    break;
+                                default:
+                                    <span class="badge" style="background-color: #e2e3e5; color: #383d41;">@estudiante.Estado</span>
+                                    break;
+                            }
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(estudiante.Justificacion))
+                            {
+                                @estudiante.Justificacion
+                            }
+                            else
+                            {
+                                <span class="text-muted">Sin justificación</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <!-- Pie de página -->
+    <div class="footer">
+        <p>Reporte generado por RubricasApp.Web - @DateTime.Now.Year</p>
+        <p>Grupo: @Model.Grupo.Nombre | Fecha: @Model.Fecha.ToString("dd/MM/yyyy") | Total estudiantes: @Model.TotalEstudiantes</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,455 @@
+@model RubricasApp.Web.ViewModels.TomarAsistenciaViewModel
+@{
+    ViewData["Title"] = "Tomar Asistencia";
+    ViewData["Subtitle"] = "Registro de asistencia por grupo y materia";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">@ViewData["Title"]</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Inicio</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index")">Asistencias</a></li>
+                        <li class="breadcrumb-item active">Tomar Asistencia</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <!-- Panel de Selección -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-calendar-check mr-2"></i>
+                        Seleccionar Grupo, Materia y Fecha
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form id="formSeleccion" method="get">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="GrupoId">Grupo:</label>
+                                    <select class="form-control select2" id="GrupoId" name="grupoId" required>
+                                        <option value="">-- Seleccionar Grupo --</option>
+                                        @foreach (var grupo in ViewBag.Grupos as List<SelectListItem>)
+                                        {
+                                            <option value="@grupo.Value" selected="@(Model.GrupoId?.ToString() == grupo.Value)">@grupo.Text</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="MateriaId">Materia:</label>
+                                    <select class="form-control select2" id="MateriaId" name="materiaId" required>
+                                        <option value="">-- Seleccionar Materia --</option>
+                                        @foreach (var materia in ViewBag.Materias as List<SelectListItem>)
+                                        {
+                                            <option value="@materia.Value" selected="@(Model.MateriaId?.ToString() == materia.Value)">@materia.Text</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="Fecha">Fecha:</label>
+                                    <input type="date" class="form-control" id="Fecha" name="fecha" value="@Model.Fecha.ToString("yyyy-MM-dd")" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search mr-1"></i>
+                                    Cargar Estudiantes
+                                </button>
+                                <a href="@Url.Action("Index")" class="btn btn-secondary ml-2">
+                                    <i class="fas fa-arrow-left mr-1"></i>
+                                    Volver al Listado
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            @if (Model.Estudiantes.Any())
+            {
+                <!-- Panel de Asistencia -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-users mr-2"></i>
+                            Lista de Estudiantes
+                        </h3>
+                        <div class="card-tools">
+                            <span class="badge badge-info">
+                                Total: @Model.Estudiantes.Count estudiantes
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="GuardarAsistencia" method="post" id="formAsistencia">
+                            <input type="hidden" asp-for="GrupoId" />
+                            <input type="hidden" asp-for="MateriaId" />
+                            <input type="hidden" asp-for="Fecha" />
+
+                            <!-- Información del contexto -->
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                <strong>Información:</strong>
+                                Fecha: <strong>@Model.Fecha.ToString("dddd, dd/MM/yyyy")</strong>
+                                @if (!string.IsNullOrEmpty(Model.NombreGrupo))
+                                {
+                                    <span> | Grupo: <strong>@Model.NombreGrupo</strong></span>
+                                }
+                                @if (!string.IsNullOrEmpty(Model.NombreMateria))
+                                {
+                                    <span> | Materia: <strong>@Model.NombreMateria</strong></span>
+                                }
+                            </div>
+
+                            <!-- Acciones rápidas -->
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <button type="button" class="btn btn-success btn-sm" onclick="marcarTodos('P')">
+                                        <i class="fas fa-check-circle mr-1"></i>
+                                        Marcar Todos Presentes
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="marcarTodos('A')">
+                                        <i class="fas fa-times-circle mr-1"></i>
+                                        Marcar Todos Ausentes
+                                    </button>
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="limpiarTodos()">
+                                        <i class="fas fa-eraser mr-1"></i>
+                                        Limpiar Todo
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Tabla de estudiantes -->
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped">
+                                    <thead class="bg-primary text-white">
+                                        <tr>
+                                            <th style="width: 5%">#</th>
+                                            <th style="width: 15%">ID</th>
+                                            <th style="width: 35%">Nombre Completo</th>
+                                            <th style="width: 25%">Estado de Asistencia</th>
+                                            <th style="width: 20%">Justificación</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (int i = 0; i < Model.Estudiantes.Count; i++)
+                                        {
+                                            <tr>
+                                                <td class="text-center">@(i + 1)</td>
+                                                <td>
+                                                    <input type="hidden" asp-for="Estudiantes[i].EstudianteId" />
+                                                    <input type="hidden" asp-for="Estudiantes[i].AsistenciaId" />
+                                                    <strong>@Model.Estudiantes[i].NumeroId</strong>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <strong>@Model.Estudiantes[i].NombreCompleto</strong>
+                                                        @if (!string.IsNullOrEmpty(Model.Estudiantes[i].Estado))
+                                                        {
+                                                            <span class="badge badge-@Model.Estudiantes[i].EstadoCssClass ml-2">
+                                                                @Model.Estudiantes[i].EstadoDescripcion
+                                                            </span>
+                                                        }
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-check-inline">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" 
+                                                                   name="Estudiantes[@i].Estado" 
+                                                                   id="presente_@i" 
+                                                                   value="P" 
+                                                                   checked="@Model.Estudiantes[i].EsPresente">
+                                                            <label class="form-check-label text-success" for="presente_@i">
+                                                                <i class="fas fa-check-circle"></i> Presente
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-check-inline">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" 
+                                                                   name="Estudiantes[@i].Estado" 
+                                                                   id="ausente_@i" 
+                                                                   value="A" 
+                                                                   checked="@Model.Estudiantes[i].EsAusente">
+                                                            <label class="form-check-label text-danger" for="ausente_@i">
+                                                                <i class="fas fa-times-circle"></i> Ausente
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-check-inline">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" 
+                                                                   name="Estudiantes[@i].Estado" 
+                                                                   id="tarde_@i" 
+                                                                   value="T" 
+                                                                   checked="@Model.Estudiantes[i].EsTarde">
+                                                            <label class="form-check-label text-warning" for="tarde_@i">
+                                                                <i class="fas fa-clock"></i> Tarde
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-check-inline">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" 
+                                                                   name="Estudiantes[@i].Estado" 
+                                                                   id="justificada_@i" 
+                                                                   value="AJ" 
+                                                                   checked="@Model.Estudiantes[i].EsAusenciaJustificada">
+                                                            <label class="form-check-label text-info" for="justificada_@i">
+                                                                <i class="fas fa-file-alt"></i> Justificada
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <textarea asp-for="Estudiantes[i].Justificacion" 
+                                                              class="form-control form-control-sm" 
+                                                              rows="2" 
+                                                              placeholder="Justificación (opcional)"></textarea>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Botones de acción -->
+                            <div class="row mt-3">
+                                <div class="col-md-12">
+                                    <button type="submit" class="btn btn-success btn-lg">
+                                        <i class="fas fa-save mr-2"></i>
+                                        Guardar Asistencia
+                                    </button>
+                                    <button type="button" class="btn btn-warning btn-lg ml-2" onclick="mostrarResumen()">
+                                        <i class="fas fa-eye mr-2"></i>
+                                        Ver Resumen
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+            else if (Model.GrupoId.HasValue && Model.MateriaId.HasValue)
+            {
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    <strong>Atención:</strong> No se encontraron estudiantes para el grupo y materia seleccionados, 
+                    o la materia no está asignada a este grupo.
+                </div>
+            }
+        </div>
+    </section>
+</div>
+
+<!-- Modal de Resumen -->
+<div class="modal fade" id="modalResumen" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-chart-bar mr-2"></i>
+                    Resumen de Asistencia
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="resumenContent">
+                <!-- El contenido se genera dinámicamente con JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Inicializar Select2
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%'
+            });
+
+            // Cargar estudiantes automáticamente cuando cambian los selectores
+            $('#GrupoId, #MateriaId, #Fecha').change(function() {
+                var grupoId = $('#GrupoId').val();
+                var materiaId = $('#MateriaId').val();
+                var fecha = $('#Fecha').val();
+
+                if (grupoId && materiaId && fecha) {
+                    window.location.href = '@Url.Action("TomarAsistencia")' + 
+                        '?grupoId=' + grupoId + 
+                        '&materiaId=' + materiaId + 
+                        '&fecha=' + fecha;
+                }
+            });
+
+            // Validación del formulario
+            $('#formAsistencia').submit(function(e) {
+                var confirmacion = confirm('¿Está seguro de guardar la asistencia? Esta acción actualizará los registros existentes.');
+                if (!confirmacion) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // Función para marcar todos los estudiantes con el mismo estado
+        function marcarTodos(estado) {
+            $('input[name$=".Estado"][value="' + estado + '"]').prop('checked', true);
+        }
+
+        // Función para limpiar todas las selecciones
+        function limpiarTodos() {
+            $('input[name$=".Estado"]').prop('checked', false);
+            $('textarea[name$=".Justificacion"]').val('');
+        }
+
+        // Función para mostrar resumen de asistencia
+        function mostrarResumen() {
+            var presentes = $('input[name$=".Estado"][value="P"]:checked').length;
+            var ausentes = $('input[name$=".Estado"][value="A"]:checked').length;
+            var tardes = $('input[name$=".Estado"][value="T"]:checked').length;
+            var justificadas = $('input[name$=".Estado"][value="AJ"]:checked').length;
+            var sinMarcar = @Model.Estudiantes.Count - presentes - ausentes - tardes - justificadas;
+            var total = @Model.Estudiantes.Count;
+
+            var html = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-box bg-success">
+                            <span class="info-box-icon"><i class="fas fa-check-circle"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Presentes</span>
+                                <span class="info-box-number">${presentes}</span>
+                                <span class="progress-description">${((presentes/total)*100).toFixed(1)}% del total</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-box bg-danger">
+                            <span class="info-box-icon"><i class="fas fa-times-circle"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Ausentes</span>
+                                <span class="info-box-number">${ausentes}</span>
+                                <span class="progress-description">${((ausentes/total)*100).toFixed(1)}% del total</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-box bg-warning">
+                            <span class="info-box-icon"><i class="fas fa-clock"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Tardanzas</span>
+                                <span class="info-box-number">${tardes}</span>
+                                <span class="progress-description">${((tardes/total)*100).toFixed(1)}% del total</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-box bg-info">
+                            <span class="info-box-icon"><i class="fas fa-file-alt"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Justificadas</span>
+                                <span class="info-box-number">${justificadas}</span>
+                                <span class="progress-description">${((justificadas/total)*100).toFixed(1)}% del total</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="info-box bg-secondary">
+                            <span class="info-box-icon"><i class="fas fa-minus-circle"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Sin Marcar</span>
+                                <span class="info-box-number">${sinMarcar}</span>
+                                <span class="progress-description">${((sinMarcar/total)*100).toFixed(1)}% del total</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-info">
+                    <strong>Total de estudiantes:</strong> ${total}
+                </div>
+            `;
+
+            $('#resumenContent').html(html);
+            $('#modalResumen').modal('show');
+        }
+    </script>
+}
+
+@section Styles {
+    <style>
+        .form-check-inline .form-check {
+            margin-right: 15px;
+            margin-bottom: 5px;
+        }
+        
+        .form-check-label {
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .table th {
+            vertical-align: middle;
+            text-align: center;
+        }
+        
+        .table td {
+            vertical-align: middle;
+        }
+        
+        .info-box {
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .alert {
+            border-radius: 8px;
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .btn {
+            border-radius: 6px;
+        }
+        
+        @@media (max-width: 768px) {
+            .form-check-inline {
+                display: block;
+            }
+            
+            .form-check-inline .form-check {
+                margin-bottom: 8px;
+            }
+        }
+    </style>
+}

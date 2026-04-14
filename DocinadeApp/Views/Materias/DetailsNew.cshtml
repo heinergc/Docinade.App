@@ -1,0 +1,312 @@
+@model RubricasApp.Web.ViewModels.Academic.MateriaVm
+
+@{
+    ViewData["Title"] = "Detalles de Materia";
+}
+
+<div class="main-container">
+    <!-- Sección de Encabezado -->
+    <div class="header-section">
+        <div>
+            <h2><i class="fas fa-book-open"></i> Detalles de Materia</h2>
+            <p class="text-muted mb-0">Información completa de la materia <strong>@Model.Codigo</strong></p>
+        </div>
+        <div class="header-actions">
+            <a asp-action="Edit" asp-route-id="@Model.MateriaId" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-list"></i> Volver a la Lista
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Información Principal -->
+            <div class="card card-primary mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-info-circle"></i> Información de la Materia
+                    </h5>
+                    <span class="badge bg-light text-dark">@Model.Codigo</span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-code"></i> Código
+                                </label>
+                                <div class="p-3 border rounded bg-light">
+                                    <span class="badge badge-primary fs-6">@Model.Codigo</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-book-open"></i> Nombre
+                                </label>
+                                <div class="p-3 border rounded bg-light">
+                                    <span class="fw-bold fs-5">@Model.Nombre</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-graduation-cap"></i> Créditos
+                                </label>
+                                <div class="p-3 border rounded bg-light">
+                                    <span class="badge badge-info fs-6">@Model.Creditos créditos</span>
+                                </div>
+                            </div>
+                            
+                            @if (!string.IsNullOrEmpty(Model.Tipo))
+                            {
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-tag"></i> Tipo
+                                    </label>
+                                    <div class="p-3 border rounded bg-light">
+                                        <span class="badge @(Model.Tipo == "Teórica" ? "badge-secondary" : 
+                                                             Model.Tipo == "Práctica" ? "badge-success" : 
+                                                             Model.Tipo == "Virtual" ? "badge-info" : "badge-warning") fs-6">
+                                            @Model.Tipo
+                                        </span>
+                                    </div>
+                                </div>
+                            }
+                            
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-toggle-on"></i> Estado
+                                </label>
+                                <div class="p-3 border rounded bg-light">
+                                    <span class="status-badge @(Model.Activa ? "" : "inactive") fs-6">
+                                        @(Model.Activa ? "Activa" : "Inactiva")
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    @if (!string.IsNullOrEmpty(Model.Descripcion))
+                    {
+                        <hr class="my-4" />
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-file-text"></i> Descripción
+                            </label>
+                            <div class="card border-secondary">
+                                <div class="card-body">
+                                    <p class="mb-0">@Model.Descripcion</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <hr class="my-4" />
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Sin descripción:</strong> Esta materia no tiene descripción adicional.
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Sección de Instrumentos -->
+            <div class="card card-success mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-tools"></i> Instrumentos de Evaluación
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <p class="text-muted mb-0">
+                            Gestiona los instrumentos de evaluación asignados a esta materia.
+                        </p>
+                        <a asp-action="AsignarInstrumentos" asp-route-id="@Model.MateriaId" class="btn btn-outline-primary btn-small">
+                            <i class="fas fa-plus"></i> Gestionar
+                        </a>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <a asp-action="Instrumentos" asp-route-id="@Model.MateriaId" class="btn btn-info w-100">
+                                <i class="fas fa-list me-2"></i> Ver Instrumentos Asignados
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a asp-action="AsignarInstrumentos" asp-route-id="@Model.MateriaId" class="btn btn-success w-100">
+                                <i class="fas fa-plus-circle me-2"></i> Asignar Nuevos Instrumentos
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar con información adicional -->
+        <div class="col-md-4">
+            <!-- Información Resumida -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-chart-bar"></i> Resumen
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">
+                                <i class="fas fa-book me-1"></i> Materia:
+                            </span>
+                            <strong>@Model.Nombre</strong>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">
+                                <i class="fas fa-graduation-cap me-1"></i> Créditos:
+                            </span>
+                            <strong>@Model.Creditos</strong>
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.Tipo))
+                    {
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">
+                                    <i class="fas fa-tag me-1"></i> Tipo:
+                                </span>
+                                <strong>@Model.Tipo</strong>
+                            </div>
+                        </div>
+                    }
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">
+                                <i class="fas fa-toggle-on me-1"></i> Estado:
+                            </span>
+                            <strong class="@(Model.Activa ? "text-success" : "text-secondary")">
+                                @(Model.Activa ? "Activa" : "Inactiva")
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones Adicionales -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-cogs"></i> Acciones Adicionales
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a asp-action="Details" asp-route-id="@Model.MateriaId" class="btn btn-outline-info">
+                            <i class="fas fa-eye me-2"></i> Ver Detalles Completos
+                        </a>
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-list me-2"></i> Volver a Lista
+                        </a>
+                        
+                        <hr class="my-2" />
+                        
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="fas fa-trash me-2"></i> Eliminar Materia
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ayuda -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <i class="fas fa-question-circle"></i> Ayuda
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="fas fa-info-circle text-primary mt-1"></i>
+                            <div>
+                                <strong>Código:</strong>
+                                <small class="text-muted d-block">Identificador único de la materia (ej: MAT101)</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="fas fa-graduation-cap text-primary mt-1"></i>
+                            <div>
+                                <strong>Créditos:</strong>
+                                <small class="text-muted d-block">Valor académico entre 0 y 10 créditos</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-0">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="fas fa-tag text-primary mt-1"></i>
+                            <div>
+                                <strong>Tipo:</strong>
+                                <small class="text-muted d-block">Modalidad de enseñanza de la materia</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación para eliminar -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar la materia <strong>@Model.Codigo - @Model.Nombre</strong>?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Advertencia:</strong> Esta acción no se puede deshacer.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <a asp-action="Delete" asp-route-id="@Model.MateriaId" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Eliminar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar tooltips si está disponible Bootstrap
+            if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            }
+        });
+    </script>
+}

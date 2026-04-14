@@ -1,0 +1,439 @@
+@model RubricasApp.Web.ViewModels.Admin.GeneralSettingsViewModel
+
+@{
+    ViewData["Title"] = "Configuración General";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Home", new { area = "" })">
+                    <i class="fas fa-home"></i> Inicio
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index")">
+                    <i class="fas fa-cogs"></i> Configuración
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-cog"></i> General
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="mb-0">
+                <i class="fas fa-cog text-primary"></i>
+                Configuración General
+            </h2>
+            <p class="text-muted mt-2">Configurar parámetros generales del sistema de rúbricas</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    <form asp-action="General" method="post">
+        @Html.AntiForgeryToken()
+        
+        <div class="row">
+            <!-- Configuración del Sistema -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle"></i>
+                            Información del Sistema
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group mb-3">
+                            <label asp-for="NombreInstitucion" class="form-label required">Nombre de la Institución</label>
+                            <input asp-for="NombreInstitucion" class="form-control" placeholder="Ej: Universidad Nacional" />
+                            <span asp-validation-for="NombreInstitucion" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="SitioWeb" class="form-label">Sitio Web Institucional</label>
+                            <input asp-for="SitioWeb" type="url" class="form-control" placeholder="https://www.miuniversidad.edu" />
+                            <span asp-validation-for="SitioWeb" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="LogoInstitucion" class="form-label">Logo de la Institución (URL)</label>
+                            <input asp-for="LogoInstitucion" type="url" class="form-control" placeholder="https://ejemplo.com/logo.png" />
+                            <span asp-validation-for="LogoInstitucion" class="text-danger"></span>
+                            <small class="form-text text-muted">URL del logo que aparecerá en los reportes y encabezados</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Descripcion" class="form-label">Descripción del Sistema</label>
+                            <textarea asp-for="Descripcion" class="form-control" rows="3" 
+                                placeholder="Sistema de gestión de rúbricas académicas..."></textarea>
+                            <span asp-validation-for="Descripcion" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configuración de Contacto -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-envelope"></i>
+                            Información de Contacto
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group mb-3">
+                            <label asp-for="EmailSoporte" class="form-label required">Email de Soporte</label>
+                            <input asp-for="EmailSoporte" type="email" class="form-control" 
+                                placeholder="soporte@miuniversidad.edu" />
+                            <span asp-validation-for="EmailSoporte" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="TelefonoSoporte" class="form-label">Teléfono de Soporte</label>
+                            <input asp-for="TelefonoSoporte" class="form-control" placeholder="+506 2277-3000" />
+                            <span asp-validation-for="TelefonoSoporte" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="DireccionFisica" class="form-label">Dirección Física</label>
+                            <textarea asp-for="DireccionFisica" class="form-control" rows="2" 
+                                placeholder="Av. 1, Calle 9, Heredia, Costa Rica"></textarea>
+                            <span asp-validation-for="DireccionFisica" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="HorarioAtencion" class="form-label">Horario de Atención</label>
+                            <input asp-for="HorarioAtencion" class="form-control" 
+                                placeholder="Lunes a Viernes: 8:00 AM - 5:00 PM" />
+                            <span asp-validation-for="HorarioAtencion" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuración de Sesiones y Archivos -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-clock"></i>
+                            Configuración de Sesiones
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group mb-3">
+                            <label asp-for="TiempoExpiracionSesion" class="form-label required">
+                                Tiempo de Expiración de Sesión (minutos)
+                            </label>
+                            <input asp-for="TiempoExpiracionSesion" type="number" class="form-control" 
+                                min="5" max="480" placeholder="30" />
+                            <span asp-validation-for="TiempoExpiracionSesion" class="text-danger"></span>
+                            <small class="form-text text-muted">Entre 5 y 480 minutos (8 horas)</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="RecordarSesion" class="form-label">Recordar Sesión por Defecto</label>
+                            <div class="form-check">
+                                <input asp-for="RecordarSesion" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label" asp-for="RecordarSesion">
+                                    Permitir que los usuarios mantengan su sesión activa
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">Si está habilitado, se mostrará la opción "Recordarme" en el login</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="MaximoIntentosFallidos" class="form-label required">
+                                Máximo Intentos Fallidos de Login
+                            </label>
+                            <input asp-for="MaximoIntentosFallidos" type="number" class="form-control" 
+                                min="3" max="10" placeholder="5" />
+                            <span asp-validation-for="MaximoIntentosFallidos" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-file"></i>
+                            Configuración de Archivos
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group mb-3">
+                            <label asp-for="TamanoMaximoArchivo" class="form-label required">
+                                Tamaño Máximo de Archivo (MB)
+                            </label>
+                            <input asp-for="TamanoMaximoArchivo" type="number" class="form-control" 
+                                min="1" max="100" placeholder="10" />
+                            <span asp-validation-for="TamanoMaximoArchivo" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="TiposArchivosPermitidos" class="form-label required">
+                                Tipos de Archivos Permitidos
+                            </label>
+                            <input asp-for="TiposArchivosPermitidos" class="form-control" 
+                                placeholder=".jpg,.png,.pdf,.docx,.xlsx" />
+                            <span asp-validation-for="TiposArchivosPermitidos" class="text-danger"></span>
+                            <small class="form-text text-muted">Separar con comas, incluir el punto antes de la extensión</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="RutaAlmacenamiento" class="form-label required">Ruta de Almacenamiento</label>
+                            <input asp-for="RutaAlmacenamiento" class="form-control" 
+                                placeholder="~/uploads/" readonly />
+                            <span asp-validation-for="RutaAlmacenamiento" class="text-danger"></span>
+                            <small class="form-text text-muted">Ruta relativa donde se almacenarán los archivos subidos</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configuración de Notificaciones -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-bell"></i>
+                            Configuración de Notificaciones
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Notificaciones por Email</label>
+                            <div class="form-check">
+                                <input asp-for="NotificacionesEmail" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label" asp-for="NotificacionesEmail">
+                                    Enviar notificaciones por correo electrónico
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Notificaciones del Sistema</label>
+                            <div class="form-check">
+                                <input asp-for="NotificacionesSistema" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label" asp-for="NotificacionesSistema">
+                                    Mostrar notificaciones en el sistema
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="FrecuenciaNotificaciones" class="form-label">Frecuencia de Notificaciones</label>
+                            <select asp-for="FrecuenciaNotificaciones" class="form-select">
+                                <option value="Inmediata">Inmediata</option>
+                                <option value="Diaria">Diaria</option>
+                                <option value="Semanal">Semanal</option>
+                                <option value="Deshabilitada">Deshabilitada</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuración de Idioma y Formato -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-globe"></i>
+                            Configuración de Idioma y Formato
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group mb-3">
+                                    <label asp-for="IdiomaDefecto" class="form-label required">Idioma por Defecto</label>
+                                    <select asp-for="IdiomaDefecto" class="form-select">
+                                        <option value="es-CR">Español (Costa Rica)</option>
+                                        <option value="es-ES">Español (España)</option>
+                                        <option value="en-US">English (US)</option>
+                                        <option value="pt-BR">Português (Brasil)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group mb-3">
+                                    <label asp-for="ZonaHoraria" class="form-label required">Zona Horaria</label>
+                                    <select asp-for="ZonaHoraria" class="form-select">
+                                        <option value="America/Costa_Rica">América/Costa Rica (UTC-6)</option>
+                                        <option value="America/Mexico_City">América/Ciudad de México (UTC-6)</option>
+                                        <option value="America/New_York">América/Nueva York (UTC-5)</option>
+                                        <option value="Europe/Madrid">Europa/Madrid (UTC+1)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group mb-3">
+                                    <label asp-for="FormatoFecha" class="form-label required">Formato de Fecha</label>
+                                    <select asp-for="FormatoFecha" class="form-select">
+                                        <option value="dd/MM/yyyy">dd/MM/yyyy (31/12/2024)</option>
+                                        <option value="MM/dd/yyyy">MM/dd/yyyy (12/31/2024)</option>
+                                        <option value="yyyy-MM-dd">yyyy-MM-dd (2024-12-31)</option>
+                                        <option value="dd-MM-yyyy">dd-MM-yyyy (31-12-2024)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group mb-3">
+                                    <label asp-for="FormatoHora" class="form-label required">Formato de Hora</label>
+                                    <select asp-for="FormatoHora" class="form-select">
+                                        <option value="HH:mm">24 horas (14:30)</option>
+                                        <option value="hh:mm tt">12 horas (2:30 PM)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-footer bg-light">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <button type="button" class="btn btn-outline-warning" onclick="resetToDefaults()">
+                                    <i class="fas fa-undo"></i> Restaurar Valores por Defecto
+                                </button>
+                            </div>
+                            <div>
+                                <a href="@Url.Action("Index")" class="btn btn-secondary me-2">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Guardar Configuración
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function resetToDefaults() {
+            Swal.fire({
+                title: '¿Restaurar valores por defecto?',
+                text: 'Esta acción sobrescribirá la configuración actual con los valores predeterminados.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Restaurar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Restaurar valores por defecto
+                    $('#NombreInstitucion').val('Sistema de Rúbricas Académicas');
+                    $('#SitioWeb').val('');
+                    $('#LogoInstitucion').val('');
+                    $('#Descripcion').val('Sistema de gestión de rúbricas para evaluación académica');
+                    $('#EmailSoporte').val('soporte@rubricas.edu');
+                    $('#TelefonoSoporte').val('');
+                    $('#DireccionFisica').val('');
+                    $('#HorarioAtencion').val('Lunes a Viernes: 8:00 AM - 5:00 PM');
+                    $('#TiempoExpiracionSesion').val(30);
+                    $('#RecordarSesion').prop('checked', true);
+                    $('#MaximoIntentosFallidos').val(5);
+                    $('#TamanoMaximoArchivo').val(10);
+                    $('#TiposArchivosPermitidos').val('.jpg,.png,.pdf,.docx,.xlsx');
+                    $('#RutaAlmacenamiento').val('~/uploads/');
+                    $('#NotificacionesEmail').prop('checked', true);
+                    $('#NotificacionesSistema').prop('checked', true);
+                    $('#FrecuenciaNotificaciones').val('Diaria');
+                    $('#IdiomaDefecto').val('es-CR');
+                    $('#ZonaHoraria').val('America/Costa_Rica');
+                    $('#FormatoFecha').val('dd/MM/yyyy');
+                    $('#FormatoHora').val('HH:mm');
+                    
+                    toastr.success('Valores restaurados a los predeterminados');
+                }
+            });
+        }
+
+        // Validación de formulario en tiempo real
+        $(document).ready(function() {
+            // Validar URL del sitio web
+            $('#SitioWeb').on('blur', function() {
+                const value = $(this).val();
+                if (value && !isValidUrl(value)) {
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            // Validar email de soporte
+            $('#EmailSoporte').on('blur', function() {
+                const value = $(this).val();
+                if (value && !isValidEmail(value)) {
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+        });
+
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        function isValidEmail(email) {
+            const re = /^[^\s]+[^\s]+\.[^\s]+$/;
+            return re.test(email);
+        }
+    </script>
+}
+
+@section Styles {
+    <style>
+        .required::after {
+            content: ' *';
+            color: red;
+        }
+        
+        .form-control:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        .card {
+            border: none;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom: none;
+        }
+    </style>
+}

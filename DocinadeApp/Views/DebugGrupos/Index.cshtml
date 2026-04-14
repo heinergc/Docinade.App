@@ -1,0 +1,99 @@
+@{
+    ViewData["Title"] = "Debug - Sistema de Grupos";
+}
+<meta charset="utf-8" />
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-warning">
+            <h4 class="mb-0">?? Debug del Sistema de Grupos</h4>
+        </div>
+        <div class="card-body">
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">
+                    <h5>? Error</h5>
+                    <p>@ViewBag.Error</p>
+                </div>
+            }
+            else if (ViewBag.Debug != null)
+            {
+                <div class="alert alert-info">
+                    <h5>?? Estado del Sistema</h5>
+                    <ul>
+                        <li><strong>Total Grupos:</strong> @ViewBag.Debug.TotalGrupos</li>
+                        <li><strong>Total Estudiantes:</strong> @ViewBag.Debug.TotalEstudiantes</li>
+                        <li><strong>Total Períodos:</strong> @ViewBag.Debug.TotalPeriodos</li>
+                    </ul>
+                </div>
+
+                <h5>?? Pruebas de URL</h5>
+                <div class="row">
+                    @foreach (var grupo in ViewBag.Debug.Grupos)
+                    {
+                        <div class="col-md-6 mb-3">
+                            <div class="card border-primary">
+                                <div class="card-body">
+                                    <h6 class="card-title">@grupo.Codigo - @grupo.Nombre</h6>
+                                    <p class="card-text">Estado: @grupo.Estado</p>
+                                    <div class="btn-group-vertical d-grid gap-1">
+                                        <a href="/GruposEstudiantes/AsignarEstudiantes/@grupo.GrupoId" 
+                                           class="btn btn-primary btn-sm" target="_blank">
+                                            ?? AsignarEstudiantes (Original)
+                                        </a>
+                                        <a href="/TestGrupos/AsignarEstudiantes/@grupo.GrupoId" 
+                                           class="btn btn-secondary btn-sm" target="_blank">
+                                            ?? Test AsignarEstudiantes
+                                        </a>
+                                        <a href="/GruposEstudiantes/Details/@grupo.GrupoId" 
+                                           class="btn btn-info btn-sm" target="_blank">
+                                            ??? Details
+                                        </a>
+                                        <button class="btn btn-outline-warning btn-sm" 
+                                                onclick="testUrl(@grupo.GrupoId)">
+                                            ?? Test URL
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <h5 class="mt-4">?? URLs de Prueba Rápida</h5>
+                <div class="list-group">
+                    <a href="/DiagnosticoGrupos" class="list-group-item list-group-item-action">
+                        ?? Diagnóstico General del Sistema
+                    </a>
+                    <a href="/GruposEstudiantes" class="list-group-item list-group-item-action">
+                        ?? Lista de Grupos
+                    </a>
+                    <a href="/TestGrupos/AsignarEstudiantes/1" class="list-group-item list-group-item-action">
+                        ?? Test AsignarEstudiantes (ID=1)
+                    </a>
+                </div>
+            }
+
+            <div id="resultados" class="mt-4" style="display: none;">
+                <h6>?? Resultados del Test:</h6>
+                <pre id="resultadosContent" class="bg-light p-3 rounded"></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function testUrl(id) {
+        try {
+            const response = await fetch(`/DebugGrupos/TestUrl/${id}`);
+            const data = await response.json();
+            mostrarResultados(data);
+        } catch (error) {
+            mostrarResultados({ success: false, message: `Error: ${error.message}` });
+        }
+    }
+
+    function mostrarResultados(data) {
+        document.getElementById('resultados').style.display = 'block';
+        document.getElementById('resultadosContent').textContent = JSON.stringify(data, null, 2);
+    }
+</script>

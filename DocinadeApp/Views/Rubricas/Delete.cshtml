@@ -1,0 +1,56 @@
+﻿@model RubricasApp.Web.Models.Rubrica
+
+@{
+    ViewData["Title"] = "Eliminar Rúbrica";
+}
+
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-trash"></i> Eliminar Rúbrica
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    ¿Está seguro que desea eliminar esta rúbrica?
+                </div>
+
+                <dl class="row">
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.NombreRubrica)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.NombreRubrica)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Descripcion)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Descripcion)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.FechaCreacion)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.FechaCreacion)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Estado)</dt>
+                    <dd class="col-sm-9">
+                        @if (Model.Estado == "ACTIVO")
+                        {
+                            <span class="badge bg-success">@Model.Estado</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">@Model.Estado</span>
+                        }
+                    </dd>
+                </dl>
+
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="IdRubrica" />
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Cancelar
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

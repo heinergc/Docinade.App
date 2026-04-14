@@ -1,0 +1,126 @@
+﻿@model RubricasApp.Web.Models.InstrumentoEvaluacion
+
+@{
+    ViewData["Title"] = "Eliminar Instrumento";
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmar Eliminación
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-warning me-2"></i>
+                        <strong>¿Está seguro que desea eliminar este instrumento de evaluación?</strong>
+                        <br>
+                        Esta acción no se puede deshacer.
+                    </div>
+
+                    <table class="table table-borderless">
+                        <tr>
+                            <td class="fw-bold text-muted" style="width: 200px;">
+                                <i class="fas fa-hashtag me-2"></i>
+                                ID:
+                            </td>
+                            <td>@Html.DisplayFor(model => model.InstrumentoId)</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold text-muted">
+                                <i class="fas fa-tag me-2"></i>
+                                @Html.DisplayNameFor(model => model.Nombre):
+                            </td>
+                            <td>
+                                <strong class="fs-5">@Html.DisplayFor(model => model.Nombre)</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold text-muted">
+                                <i class="fas fa-align-left me-2"></i>
+                                @Html.DisplayNameFor(model => model.Descripcion):
+                            </td>
+                            <td>
+                                @if (string.IsNullOrEmpty(Model.Descripcion))
+                                {
+                                    <em class="text-muted">Sin descripción</em>
+                                }
+                                else
+                                {
+                                    @Html.DisplayFor(model => model.Descripcion)
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold text-muted">
+                                <i class="fas fa-toggle-on me-2"></i>
+                                @Html.DisplayNameFor(model => model.Activo):
+                            </td>
+                            <td>
+                                @if (Model.Activo)
+                                {
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check me-1"></i>Activo
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-times me-1"></i>Inactivo
+                                    </span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold text-muted">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                @Html.DisplayNameFor(model => model.FechaCreacion):
+                            </td>
+                            <td>
+                                @Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")
+                            </td>
+                        </tr>
+                    </table>
+
+                    <form asp-action="Delete" class="mt-4">
+                        <input type="hidden" asp-for="InstrumentoId" />
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>
+                                Cancelar
+                            </a>
+                            <div>
+                                <a asp-action="Details" asp-route-id="@Model?.InstrumentoId" class="btn btn-info me-2">
+                                    <i class="fas fa-eye me-1"></i>
+                                    Ver Detalles
+                                </a>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash me-1"></i>
+                                    Confirmar Eliminación
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Add confirmation dialog
+            $('form').on('submit', function(e) {
+                if (!confirm('¿Está absolutamente seguro que desea eliminar este instrumento de evaluación? Esta acción es permanente.')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        });
+    </script>
+}

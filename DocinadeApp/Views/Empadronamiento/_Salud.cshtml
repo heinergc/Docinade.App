@@ -1,0 +1,119 @@
+@model RubricasApp.Web.ViewModels.EstudianteEmpadronamientoViewModel
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.Alergias" class="form-label">
+                <i class="mdi mdi-alert-circle me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.Alergias)
+            </label>
+            <textarea asp-for="DatosEmpadronamiento.Alergias" class="form-control" rows="3" 
+                      placeholder="Describa cualquier alergia conocida..."></textarea>
+            <div class="form-text">
+                <i class="mdi mdi-information-outline me-1"></i>
+                Incluya alergias a medicamentos, alimentos, polen, animales, etc.
+            </div>
+            <span asp-validation-for="DatosEmpadronamiento.Alergias" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.CondicionesMedicas" class="form-label">
+                <i class="mdi mdi-medical-bag me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.CondicionesMedicas)
+            </label>
+            <textarea asp-for="DatosEmpadronamiento.CondicionesMedicas" class="form-control" rows="3" 
+                      placeholder="Describa condiciones médicas relevantes..."></textarea>
+            <div class="form-text">
+                <i class="mdi mdi-information-outline me-1"></i>
+                Diabetes, asma, epilepsia, discapacidades, etc.
+            </div>
+            <span asp-validation-for="DatosEmpadronamiento.CondicionesMedicas" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.Medicamentos" class="form-label">
+                <i class="mdi mdi-pill me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.Medicamentos)
+            </label>
+            <textarea asp-for="DatosEmpadronamiento.Medicamentos" class="form-control" rows="2" 
+                      placeholder="Liste los medicamentos que toma regularmente..."></textarea>
+            <div class="form-text">
+                <i class="mdi mdi-information-outline me-1"></i>
+                Incluya nombre del medicamento, dosis y frecuencia si es relevante
+            </div>
+            <span asp-validation-for="DatosEmpadronamiento.Medicamentos" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.SeguroMedico" class="form-label">
+                <i class="mdi mdi-shield-account me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.SeguroMedico)
+            </label>
+            <select asp-for="DatosEmpadronamiento.SeguroMedico" class="form-select">
+                <option value="">Seleccione...</option>
+                <option value="CCSS - Caja Costarricense de Seguro Social">CCSS - Caja Costarricense de Seguro Social</option>
+                <option value="INS - Instituto Nacional de Seguros">INS - Instituto Nacional de Seguros</option>
+                <option value="Seguros del Magisterio">Seguros del Magisterio</option>
+                <option value="Blue Cross Blue Shield">Blue Cross Blue Shield</option>
+                <option value="Seguros Lafise">Seguros Lafise</option>
+                <option value="Mapfre Seguros">Mapfre Seguros</option>
+                <option value="Seguros Assa">Seguros Assa</option>
+                <option value="Sin seguro">Sin seguro</option>
+                <option value="Otro">Otro</option>
+            </select>
+            <span asp-validation-for="DatosEmpadronamiento.SeguroMedico" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.CentroMedicoHabitual" class="form-label">
+                <i class="mdi mdi-hospital-building me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.CentroMedicoHabitual)
+            </label>
+            <input asp-for="DatosEmpadronamiento.CentroMedicoHabitual" class="form-control" 
+                   placeholder="Nombre del hospital, clínica o EBAIS" />
+            <div class="form-text">
+                <i class="mdi mdi-information-outline me-1"></i>
+                Centro médico donde habitualmente recibe atención
+            </div>
+            <span asp-validation-for="DatosEmpadronamiento.CentroMedicoHabitual" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-success mt-3">
+    <h6><i class="mdi mdi-shield-check-outline me-2"></i>Confidencialidad Médica</h6>
+    <p class="mb-0">
+        Toda la información médica proporcionada será tratada con estricta confidencialidad y solo será utilizada
+        para brindar la mejor atención en caso de emergencias durante actividades académicas. 
+        El acceso a esta información está limitado al personal autorizado.
+    </p>
+</div>
+
+<div class="alert alert-info mt-3">
+    <h6><i class="mdi mdi-information-outline me-2"></i>¿Por qué solicitamos esta información?</h6>
+    <ul class="mb-0">
+        <li><strong>Alergias:</strong> Para evitar exposición a alérgenos durante actividades académicas</li>
+        <li><strong>Condiciones médicas:</strong> Para brindar atención apropiada en emergencias</li>
+        <li><strong>Medicamentos:</strong> Para informar a personal médico en caso de emergencia</li>
+        <li><strong>Seguro médico:</strong> Para agilizar atención médica si es necesaria</li>
+        <li><strong>Centro médico:</strong> Para contacto directo con sus médicos de confianza</li>
+    </ul>
+</div>
+
+<div class="form-check mt-3">
+    <input class="form-check-input" type="checkbox" id="autorizacionMedica" required>
+    <label class="form-check-label" for="autorizacionMedica">
+        <strong>Autorización:</strong> Autorizo al personal de la institución a tomar las medidas médicas necesarias
+        en caso de emergencia, y a contactar a mi seguro médico y centro de atención habitual si es requerido.
+    </label>
+</div>

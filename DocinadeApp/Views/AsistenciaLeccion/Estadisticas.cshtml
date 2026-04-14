@@ -1,0 +1,336 @@
+@model RubricasApp.Web.ViewModels.EstadisticasAsistenciaViewModel
+
+@{
+    ViewData["Title"] = "Estadísticas de Asistencia";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>@ViewData["Title"]
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Filtros -->
+                    <form asp-action="Estadisticas" method="get" class="mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Estudiante (opcional)</label>
+                                <select name="estudianteId" class="form-select">
+                                    <option value="">Todos los estudiantes</option>
+                                    @foreach (var item in ViewBag.Estudiantes as IEnumerable<SelectListItem>)
+                                    {
+                                        <option value="@item.Value" selected="@item.Selected">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Grupo (opcional)</label>
+                                <select name="grupoId" class="form-select">
+                                    <option value="">Todos los grupos</option>
+                                    @foreach (var item in ViewBag.Grupos as IEnumerable<SelectListItem>)
+                                    {
+                                        <option value="@item.Value" selected="@item.Selected">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Fecha Inicio *</label>
+                                <input type="date" name="fechaInicio" class="form-control" 
+                                       value="@ViewBag.FechaInicio?.ToString("yyyy-MM-dd")" required />
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Fecha Fin *</label>
+                                <input type="date" name="fechaFin" class="form-control" 
+                                       value="@ViewBag.FechaFin?.ToString("yyyy-MM-dd")" required />
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="fas fa-chart-bar me-1"></i>Generar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    @if (Model.Estadisticas.Any())
+                    {
+                        <!-- Información del período -->
+                        <div class="alert alert-info mb-4">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <strong>Período:</strong> @Model.FechaInicio.ToString("dd/MM/yyyy") - @Model.FechaFin.ToString("dd/MM/yyyy")
+                                </div>
+                                @if (Model.EstudianteId.HasValue)
+                                {
+                                    <div class="col-md-4">
+                                        <strong>Estudiante:</strong> @ViewBag.Estudiante
+                                    </div>
+                                }
+                                @if (Model.GrupoId.HasValue)
+                                {
+                                    <div class="col-md-4">
+                                        <strong>Grupo:</strong> @ViewBag.Grupo
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Tarjetas de estadísticas principales -->
+                        <div class="row mb-4">
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-primary text-white">
+                                    <div class="card-body text-center">
+                                        <h2 class="mb-0">@Model.Estadisticas.Values.Sum()</h2>
+                                        <p class="mb-0">Total Registros</p>
+                                    </div>
+                                </div>
+                            </div>
+                            @foreach (var stat in Model.Estadisticas)
+                            {
+                                var badgeClass = stat.Key switch
+                                {
+                                    "Presente" => "bg-success",
+                                    "Ausente" => "bg-danger",
+                                    "Tardanza" => "bg-warning text-dark",
+                                    "Ausencia Justificada" => "bg-info",
+                                    _ => "bg-secondary"
+                                };
+
+                                <div class="col-md-2 mb-3">
+                                    <div class="card @badgeClass text-white">
+                                        <div class="card-body text-center">
+                                            <h3 class="mb-0">@stat.Value</h3>
+                                            <p class="mb-0">@stat.Key</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-dark text-white">
+                                    <div class="card-body text-center">
+                                        <h2 class="mb-0">@Model.PorcentajeAsistencia.ToString("F1")%</h2>
+                                        <p class="mb-0">% Asistencia</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Gráfico de barras -->
+                        <div class="row mb-4">
+                            <div class="col-md-8 offset-md-2">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Distribución de Estados</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="chartEstadisticas"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Resumen por grupo (si no se filtró por grupo específico) -->
+                        @if (!Model.GrupoId.HasValue && Model.ResumenGrupo != null && Model.ResumenGrupo.Any())
+                        {
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Resumen por Grupo</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th>Grupo</th>
+                                                    <th class="text-center">Presentes</th>
+                                                    <th class="text-center">Ausentes</th>
+                                                    <th class="text-center">Tardanzas</th>
+                                                    <th class="text-center">Justificadas</th>
+                                                    <th class="text-center">Total</th>
+                                                    <th class="text-center">% Asistencia</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var grupoStat in Model.ResumenGrupo)
+                                                {
+                                                    var total = grupoStat.Value.Values.Sum();
+                                                    var presentes = grupoStat.Value.GetValueOrDefault("Presente", 0);
+                                                    var tardanzas = grupoStat.Value.GetValueOrDefault("Tardanza", 0);
+                                                    var porcentaje = total > 0 ? ((presentes + tardanzas) * 100.0 / total) : 0;
+
+                                                    <tr>
+                                                        <td>
+                                                            <strong>
+                                                                @{
+                                                                    var grupo = ViewBag.Grupos as IEnumerable<SelectListItem>;
+                                                                    var grupoNombre = grupo?.FirstOrDefault(g => g.Value == grupoStat.Key.ToString())?.Text ?? $"Grupo {grupoStat.Key}";
+                                                                }
+                                                                @grupoNombre
+                                                            </strong>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span class="badge bg-success">@grupoStat.Value.GetValueOrDefault("Presente", 0)</span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span class="badge bg-danger">@grupoStat.Value.GetValueOrDefault("Ausente", 0)</span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span class="badge bg-warning text-dark">@grupoStat.Value.GetValueOrDefault("Tardanza", 0)</span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span class="badge bg-info">@grupoStat.Value.GetValueOrDefault("Ausencia Justificada", 0)</span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <strong>@total</strong>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span class="badge @(porcentaje >= 80 ? "bg-success" : porcentaje >= 60 ? "bg-warning text-dark" : "bg-danger") fs-6">
+                                                                @porcentaje.ToString("F1")%
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Lista de ausencias recientes -->
+                        @if (Model.Ausencias.Any())
+                        {
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Últimas Ausencias</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Fecha</th>
+                                                    <th>Estudiante</th>
+                                                    <th>Grupo</th>
+                                                    <th>Materia</th>
+                                                    <th>Estado</th>
+                                                    <th>Justificación</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var ausencia in Model.Ausencias.Take(10))
+                                                {
+                                                    <tr>
+                                                        <td>@ausencia.Fecha.ToString("dd/MM/yyyy")</td>
+                                                        <td>@ausencia.Estudiante?.NombreCompleto</td>
+                                                        <td>@ausencia.Grupo?.Nombre</td>
+                                                        <td>@ausencia.Materia?.Nombre</td>
+                                                        <td>
+                                                            <span class="badge @(ausencia.Estado == "A" ? "bg-danger" : "bg-info")">
+                                                                @(ausencia.Estado == "A" ? "Ausente" : "Justificada")
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <small class="text-muted">@ausencia.Justificacion</small>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning text-center">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Seleccione los filtros y haga clic en "Generar" para ver las estadísticas.
+                        </div>
+                    }
+
+                    <div class="mt-4">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Volver
+                        </a>
+                        @if (Model.Estadisticas.Any())
+                        {
+                            <button onclick="window.print()" class="btn btn-success">
+                                <i class="fas fa-print me-1"></i>Imprimir
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        @if (Model.Estadisticas.Any())
+        {
+            <text>
+            const ctx = document.getElementById('chartEstadisticas');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [@Html.Raw(string.Join(",", Model.Estadisticas.Keys.Select(k => $"'{k}'")))],
+                    datasets: [{
+                        label: 'Cantidad',
+                        data: [@string.Join(",", Model.Estadisticas.Values)],
+                        backgroundColor: [
+                            'rgba(40, 167, 69, 0.8)',   // Verde - Presente
+                            'rgba(220, 53, 69, 0.8)',   // Rojo - Ausente
+                            'rgba(255, 193, 7, 0.8)',   // Amarillo - Tardanza
+                            'rgba(23, 162, 184, 0.8)'   // Azul - Justificada
+                        ],
+                        borderColor: [
+                            'rgba(40, 167, 69, 1)',
+                            'rgba(220, 53, 69, 1)',
+                            'rgba(255, 193, 7, 1)',
+                            'rgba(23, 162, 184, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Distribución de Estados de Asistencia'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+            </text>
+        }
+    </script>
+}
+
+@section Styles {
+    <style>
+        @@media print {
+            .btn, form, .card-header {
+                display: none !important;
+            }
+        }
+    </style>
+}

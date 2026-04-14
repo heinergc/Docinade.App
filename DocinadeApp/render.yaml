@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: rubricasapp
+    env: dotnet
+    buildCommand: dotnet publish RubricasApp.Web.csproj -c Release -o out
+    startCommand: cd out && dotnet RubricasApp.Web.dll
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://0.0.0.0:$PORT
+      - key: DefaultConnection
+        sync: false
+    autoDeploy: true

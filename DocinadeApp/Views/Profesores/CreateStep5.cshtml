@@ -1,0 +1,784 @@
+@model RubricasApp.Web.ViewModels.ProfesorViewModel
+@{
+    ViewData["Title"] = "Nuevo Profesor - Información Laboral";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Header con progreso -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h1 class="h4 mb-0 text-gray-800">
+                                <i class="fas fa-user-plus"></i> Nuevo Profesor: @Model.NombreCompleto
+                            </h1>
+                            <p class="mb-0 text-muted">Paso 5 de 6: Información Laboral</p>
+                        </div>
+                        <div>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver a Lista
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Barra de progreso -->
+                    <div class="progress mb-3" style="height: 8px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 83.33%" aria-valuenow="83.33" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    
+                    <!-- Indicadores de pasos -->
+                    <div class="row text-center small">
+                        <div class="col-2">
+                            <a href="@Url.Action("CreateStep1", "Profesores")" class="text-decoration-none text-success step-link" title="Ver información personal">
+                                <i class="fas fa-check-circle"></i><br>Personal
+                            </a>
+                        </div>
+                        <div class="col-2">
+                            <a href="@Url.Action("CreateStep2", "Profesores")" class="text-decoration-none text-success step-link" title="Ver información de contacto">
+                                <i class="fas fa-check-circle"></i><br>Contacto
+                            </a>
+                        </div>
+                        <div class="col-2">
+                            <a href="@Url.Action("CreateStep3", "Profesores")" class="text-decoration-none text-success step-link" title="Ver información de dirección">
+                                <i class="fas fa-check-circle"></i><br>Dirección
+                            </a>
+                        </div>
+                        <div class="col-2">
+                            <a href="@Url.Action("CreateStep4", "Profesores")" class="text-decoration-none text-success step-link" title="Ver información académica">
+                                <i class="fas fa-check-circle"></i><br>Académica
+                            </a>
+                        </div>
+                        <div class="col-2">
+                            <div class="text-primary font-weight-bold">
+                                <i class="fas fa-briefcase"></i><br>Laboral
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <a href="@Url.Action("CreateStep6", "Profesores")" class="text-decoration-none text-muted step-link" title="Ver resumen y confirmación">
+                                <i class="fas fa-check-circle"></i><br>Final
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-briefcase"></i> Información Laboral
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateStep5" method="post" novalidate>
+                        @if (ViewBag.FromEdit != null && ViewBag.FromEdit)
+                        {
+                            <input type="hidden" name="FromEdit" value="true" />
+                            <input type="hidden" name="ProfesorId" value="@ViewBag.ProfesorId" />
+                        }
+                        
+                        <!-- Asignación Institucional -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label asp-for="EscuelaId" class="form-label">Escuela/Departamento de Adscripción</label>
+                                    <select asp-for="EscuelaId" class="form-control" asp-items="@Model.Escuelas">
+                                        <option value="">-- Seleccione la escuela o departamento --</option>
+                                    </select>
+                                    <span asp-validation-for="EscuelaId" class="text-danger"></span>
+                                    <small class="form-text text-muted">Seleccione la escuela donde estará adscrito el profesor</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Código y Fechas -->
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="CodigoEmpleado" class="form-label">Código de Empleado</label>
+                                    <input asp-for="CodigoEmpleado" class="form-control" 
+                                           placeholder="Ej: EMP-2025-001" />
+                                    <span asp-validation-for="CodigoEmpleado" class="text-danger"></span>
+                                    <small class="form-text text-muted">Código asignado por recursos humanos</small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="FechaIngreso" class="form-label required">Fecha de Ingreso</label>
+                                    <input asp-for="FechaIngreso" type="date" class="form-control" />
+                                    <span asp-validation-for="FechaIngreso" class="text-danger"></span>
+                                    <small class="form-text text-muted">Fecha de inicio de labores</small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="FechaRetiro" class="form-label">Fecha de Retiro</label>
+                                    <input asp-for="FechaRetiro" type="date" class="form-control" />
+                                    <span asp-validation-for="FechaRetiro" class="text-danger"></span>
+                                    <small class="form-text text-muted">Solo si ya se retiró (opcional)</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tipo de Contratación -->
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="TipoContrato" class="form-label required">Tipo de Contrato</label>
+                                    <select asp-for="TipoContrato" class="form-control">
+                                        <option value="">-- Seleccione tipo de contrato --</option>
+                                        <option value="Propiedad">Propiedad</option>
+                                        <option value="Interino">Interino</option>
+                                        <option value="Sustituto">Sustituto</option>
+                                        <option value="Honorarios">Honorarios</option>
+                                        <option value="Adhonorem">Ad honorem</option>
+                                        <option value="Tiempo Definido">Tiempo Definido</option>
+                                        <option value="Proyecto Específico">Proyecto Específico</option>
+                                    </select>
+                                    <span asp-validation-for="TipoContrato" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="RegimenLaboral" class="form-label">Régimen Laboral</label>
+                                    <select asp-for="RegimenLaboral" class="form-control">
+                                        <option value="">-- Seleccione régimen --</option>
+                                        <option value="Régimen Público">Régimen Público</option>
+                                        <option value="Régimen Privado">Régimen Privado</option>
+                                        <option value="Régimen Mixto">Régimen Mixto</option>
+                                        <option value="Consultor Externo">Consultor Externo</option>
+                                    </select>
+                                    <span asp-validation-for="RegimenLaboral" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="CategoriaLaboral" class="form-label">Categoría Laboral</label>
+                                    <select asp-for="CategoriaLaboral" class="form-control">
+                                        <option value="">-- Seleccione categoría --</option>
+                                        <option value="Profesor 1">Profesor 1</option>
+                                        <option value="Profesor 2">Profesor 2</option>
+                                        <option value="Profesor 3">Profesor 3</option>
+                                        <option value="Profesor 4">Profesor 4</option>
+                                        <option value="Profesor 5">Profesor 5</option>
+                                        <option value="Catedrático 1">Catedrático 1</option>
+                                        <option value="Catedrático 2">Catedrático 2</option>
+                                        <option value="Catedrático 3">Catedrático 3</option>
+                                        <option value="Instructor">Instructor</option>
+                                        <option value="Asistente">Asistente</option>
+                                    </select>
+                                    <span asp-validation-for="CategoriaLaboral" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Jornada Laboral -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="TipoJornada" class="form-label required">Tipo de Jornada</label>
+                                    <select asp-for="TipoJornada" class="form-control" id="tipoJornada">
+                                        <option value="">-- Seleccione tipo de jornada --</option>
+                                        <option value="Tiempo Completo">Tiempo Completo (40 horas)</option>
+                                        <option value="Tres Cuartos Tiempo">Tres Cuartos de Tiempo (30 horas)</option>
+                                        <option value="Medio Tiempo">Medio Tiempo (20 horas)</option>
+                                        <option value="Un Cuarto Tiempo">Un Cuarto de Tiempo (10 horas)</option>
+                                        <option value="Por Horas">Por Horas</option>
+                                        <option value="Personalizado">Personalizado</option>
+                                    </select>
+                                    <span asp-validation-for="TipoJornada" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="HorasLaborales" class="form-label">Horas Semanales</label>
+                                    <div class="input-group">
+                                        <input asp-for="HorasLaborales" type="number" class="form-control" 
+                                               min="1" max="48" step="0.5" placeholder="40" id="horasLaborales" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">horas/semana</span>
+                                        </div>
+                                    </div>
+                                    <span asp-validation-for="HorasLaborales" class="text-danger"></span>
+                                    <small class="form-text text-muted">Número de horas laborales por semana</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Experiencia Laboral Previa -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <hr>
+                                <h5 class="mb-3">
+                                    <i class="fas fa-history"></i> Experiencia Laboral Previa
+                                </h5>
+                                
+                                <!-- Mensaje cuando no hay experiencias -->
+                                <div class="alert alert-info @(Model.ExperienciaLaboral != null && Model.ExperienciaLaboral.Any() ? "d-none" : "")" id="alertSinExperiencias">
+                                    <i class="fas fa-info-circle"></i> No se ha agregado experiencia laboral previa. Haga clic en el botón "Agregar Experiencia Laboral" para comenzar.
+                                </div>
+                                
+                                <!-- Tabla de experiencias (siempre visible) -->
+                                <div class="table-responsive @(Model.ExperienciaLaboral == null || !Model.ExperienciaLaboral.Any() ? "d-none" : "")" id="contenedorTablaExperiencias">
+                                    <table class="table table-hover table-bordered" id="tablaExperiencias">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th style="width: 25%;">Institución</th>
+                                                <th style="width: 20%;">Cargo</th>
+                                                <th style="width: 12%;">Tipo</th>
+                                                <th style="width: 18%;">Período</th>
+                                                <th style="width: 15%;">Experiencia</th>
+                                                <th style="width: 10%;" class="text-center">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (Model.ExperienciaLaboral != null && Model.ExperienciaLaboral.Any())
+                                            {
+                                                @for (int i = 0; i < Model.ExperienciaLaboral.Count; i++)
+                                                {
+                                                    var exp = Model.ExperienciaLaboral[i];
+                                                    <tr>
+                                                        <td>@exp.NombreInstitucion</td>
+                                                        <td>@exp.CargoDesempenado</td>
+                                                        <td>
+                                                            <span class="badge badge-info">@(exp.TipoInstitucion ?? "N/A")</span>
+                                                        </td>
+                                                        <td>
+                                                            @exp.FechaInicio.ToString("MM/yyyy") - 
+                                                            @(exp.TrabajandoActualmente ? "Actual" : exp.FechaFin?.ToString("MM/yyyy") ?? "")
+                                                        </td>
+                                                        <td>
+                                                            @{
+                                                                var meses = exp.MesesExperiencia;
+                                                                var anios = meses / 12;
+                                                                var mesesRestantes = meses % 12;
+                                                            }
+                                                            @if (anios > 0)
+                                                            {
+                                                                <span>@anios año@(anios > 1 ? "s" : "")</span>
+                                                            }
+                                                            @if (mesesRestantes > 0)
+                                                            {
+                                                                <span> @mesesRestantes mes@(mesesRestantes > 1 ? "es" : "")</span>
+                                                            }
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button type="button" class="btn btn-sm btn-danger" onclick="eliminarExperiencia(@i)" title="Eliminar experiencia">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <!-- Contenedor para hidden inputs de experiencias laborales -->
+                                <div id="experienciasHiddenInputs">
+                                    @if (Model.ExperienciaLaboral != null && Model.ExperienciaLaboral.Any())
+                                    {
+                                        @for (int i = 0; i < Model.ExperienciaLaboral.Count; i++)
+                                        {
+                                            var exp = Model.ExperienciaLaboral[i];
+                                            <input type="hidden" name="ExperienciaLaboral[@i].NombreInstitucion" value="@exp.NombreInstitucion" />
+                                            <input type="hidden" name="ExperienciaLaboral[@i].CargoDesempenado" value="@exp.CargoDesempenado" />
+                                            <input type="hidden" name="ExperienciaLaboral[@i].TipoInstitucion" value="@exp.TipoInstitucion" />
+                                            <input type="hidden" name="ExperienciaLaboral[@i].FechaInicio" value="@exp.FechaInicio.ToString("yyyy-MM-dd")" />
+                                            <input type="hidden" name="ExperienciaLaboral[@i].FechaFin" value="@(exp.FechaFin?.ToString("yyyy-MM-dd"))" />
+                                            <input type="hidden" name="ExperienciaLaboral[@i].TrabajandoActualmente" value="@exp.TrabajandoActualmente" />
+                                            <input type="hidden" name="ExperienciaLaboral[@i].DescripcionFunciones" value="@exp.DescripcionFunciones" />
+                                            <input type="hidden" name="ExperienciaLaboral[@i].TipoContrato" value="@exp.TipoContrato" />
+                                            <input type="hidden" name="ExperienciaLaboral[@i].JornadaLaboral" value="@exp.JornadaLaboral" />
+                                        }
+                                    }
+                                </div>
+                                
+                                <button type="button" class="btn btn-success" onclick="mostrarModalExperiencia()">
+                                    <i class="fas fa-plus"></i> Agregar Experiencia Laboral
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Guía de jornadas -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i class="fas fa-clock text-info"></i> Jornadas Laborales Estándar:
+                                        </h6>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <small>
+                                                    <strong>Tiempo Completo:</strong><br>
+                                                    40 horas semanales<br>
+                                                    <em>Lunes a viernes</em>
+                                                </small>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <small>
+                                                    <strong>3/4 de Tiempo:</strong><br>
+                                                    30 horas semanales<br>
+                                                    <em>Carga reducida</em>
+                                                </small>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <small>
+                                                    <strong>Medio Tiempo:</strong><br>
+                                                    20 horas semanales<br>
+                                                    <em>Medio día o días alternos</em>
+                                                </small>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <small>
+                                                    <strong>Por Horas:</strong><br>
+                                                    Variable según necesidad<br>
+                                                    <em>Materias específicas</em>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de navegación -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a asp-action="CreateStep4" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left"></i> Anterior
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        Continuar <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Agregar Experiencia Laboral -->
+<div class="modal fade" id="modalExperiencia" tabindex="-1" role="dialog" aria-labelledby="modalExperienciaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalExperienciaLabel">
+                    <i class="fas fa-briefcase"></i> Agregar Experiencia Laboral
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formExperiencia">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label for="nombreInstitucion" class="font-weight-bold">Nombre de la Institución <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nombreInstitucion" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="tipoInstitucion" class="font-weight-bold">Tipo de Institución</label>
+                                <select class="form-control" id="tipoInstitucion">
+                                    <option value="">-- Seleccione --</option>
+                                    <option value="Institución Educativa">Institución Educativa</option>
+                                    <option value="Empresa Privada">Empresa Privada</option>
+                                    <option value="Institución Pública">Institución Pública</option>
+                                    <option value="ONG">ONG</option>
+                                    <option value="Consultoría">Consultoría</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="cargoDesempenado" class="font-weight-bold">Cargo Desempeñado <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="cargoDesempenado" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="tipoContratoExp" class="font-weight-bold">Tipo de Contrato</label>
+                                <select class="form-control" id="tipoContratoExp">
+                                    <option value="">-- Seleccione --</option>
+                                    <option value="Tiempo Indefinido">Tiempo Indefinido</option>
+                                    <option value="Tiempo Definido">Tiempo Definido</option>
+                                    <option value="Por Servicios">Por Servicios</option>
+                                    <option value="Honorarios">Honorarios</option>
+                                    <option value="Interinazgo">Interinazgo</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="jornadaLaboral" class="font-weight-bold">Jornada Laboral</label>
+                                <select class="form-control" id="jornadaLaboral">
+                                    <option value="">-- Seleccione --</option>
+                                    <option value="Tiempo Completo">Tiempo Completo</option>
+                                    <option value="Medio Tiempo">Medio Tiempo</option>
+                                    <option value="Por Horas">Por Horas</option>
+                                    <option value="Variable">Variable</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="fechaInicio" class="font-weight-bold">Fecha de Inicio <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="fechaInicio" required>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="fechaFin" class="font-weight-bold">Fecha de Finalización</label>
+                                <input type="date" class="form-control" id="fechaFin">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="font-weight-bold d-block">&nbsp;</label>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="trabajandoActualmente">
+                                    <label class="custom-control-label" for="trabajandoActualmente">
+                                        Actual
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="descripcionFunciones" class="font-weight-bold">Descripción de Funciones</label>
+                                <textarea class="form-control" id="descripcionFunciones" rows="3" maxlength="1000" 
+                                          placeholder="Describa las principales funciones y responsabilidades del cargo..."></textarea>
+                                <small class="form-text text-muted">Máximo 1000 caracteres</small>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" onclick="agregarExperiencia()">
+                    <i class="fas fa-plus"></i> Agregar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.required::after {
+    content: " *";
+    color: red;
+}
+
+.form-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.progress {
+    border-radius: 10px;
+}
+
+.progress-bar {
+    border-radius: 10px;
+}
+
+.card.bg-light {
+    border: 1px solid #e3e6f0;
+}
+
+.input-group-text {
+    background-color: #f8f9fc;
+    border-color: #d1d3e2;
+}
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Inicializar array de experiencias desde el modelo
+        let experiencias = @Html.Raw(Json.Serialize(Model.ExperienciaLaboral ?? new List<RubricasApp.Web.ViewModels.ProfesorExperienciaLaboralDto>()));
+        
+        $(document).ready(function() {
+            // Auto-completar horas según tipo de jornada
+            $('#tipoJornada').change(function() {
+                var tipoJornada = $(this).val();
+                var horasInput = $('#horasLaborales');
+                
+                switch(tipoJornada) {
+                    case 'Tiempo Completo':
+                        horasInput.val(40);
+                        break;
+                    case 'Tres Cuartos Tiempo':
+                        horasInput.val(30);
+                        break;
+                    case 'Medio Tiempo':
+                        horasInput.val(20);
+                        break;
+                    case 'Un Cuarto Tiempo':
+                        horasInput.val(10);
+                        break;
+                    case 'Por Horas':
+                    case 'Personalizado':
+                        horasInput.val('');
+                        horasInput.focus();
+                        break;
+                }
+            });
+            
+            // Checkbox de "Trabajando actualmente"
+            $('#trabajandoActualmente').change(function() {
+                if ($(this).is(':checked')) {
+                    $('#fechaFin').val('').prop('disabled', true);
+                } else {
+                    $('#fechaFin').prop('disabled', false);
+                }
+            });
+        });
+        
+        function mostrarModalExperiencia() {
+            // Limpiar formulario
+            $('#formExperiencia')[0].reset();
+            $('#fechaFin').prop('disabled', false);
+            $('#modalExperiencia').modal('show');
+        }
+        
+        function agregarExperiencia() {
+            try {
+                console.log('Iniciando agregarExperiencia()');
+                
+                // Validar campos requeridos
+                var nombreInstitucion = $('#nombreInstitucion').val();
+                var cargoDesempenado = $('#cargoDesempenado').val();
+                var fechaInicio = $('#fechaInicio').val();
+                
+                console.log('Valores:', { nombreInstitucion, cargoDesempenado, fechaInicio });
+                
+                if (!nombreInstitucion || nombreInstitucion.trim() === '') {
+                    alert('Por favor, ingrese el nombre de la institución');
+                    $('#nombreInstitucion').focus();
+                    return;
+                }
+                
+                if (!cargoDesempenado || cargoDesempenado.trim() === '') {
+                    alert('Por favor, ingrese el cargo desempeñado');
+                    $('#cargoDesempenado').focus();
+                    return;
+                }
+                
+                if (!fechaInicio || fechaInicio === '') {
+                    alert('Por favor, seleccione la fecha de inicio');
+                    $('#fechaInicio').focus();
+                    return;
+                }
+                
+                var trabajandoActualmente = $('#trabajandoActualmente').is(':checked');
+                var fechaFin = $('#fechaFin').val();
+                
+                console.log('Trabajando actualmente:', trabajandoActualmente);
+                console.log('Fecha fin:', fechaFin);
+                
+                // Validar que si no está trabajando actualmente, debe tener fecha fin
+                if (!trabajandoActualmente && (!fechaFin || fechaFin === '')) {
+                    alert('Por favor, ingrese la fecha de finalización o marque "Actual"');
+                    $('#fechaFin').focus();
+                    return;
+                }
+                
+                // Calcular meses de experiencia
+                var inicio = new Date(fechaInicio);
+                var fin = trabajandoActualmente ? new Date() : new Date(fechaFin);
+                var meses = Math.floor((fin - inicio) / (1000 * 60 * 60 * 24 * 30));
+                
+                if (meses < 0) meses = 0; // Evitar valores negativos
+                
+                console.log('Meses calculados:', meses);
+                
+                // Crear objeto de experiencia
+                var experiencia = {
+                    NombreInstitucion: nombreInstitucion.trim(),
+                    CargoDesempenado: cargoDesempenado.trim(),
+                    TipoInstitucion: $('#tipoInstitucion').val() || '',
+                    FechaInicio: fechaInicio,
+                    FechaFin: fechaFin || null,
+                    TrabajandoActualmente: trabajandoActualmente,
+                    DescripcionFunciones: $('#descripcionFunciones').val() ? $('#descripcionFunciones').val().trim() : '',
+                    TipoContrato: $('#tipoContratoExp').val() || '',
+                    JornadaLaboral: $('#jornadaLaboral').val() || '',
+                    MesesExperiencia: meses
+                };
+                
+                console.log('Experiencia creada:', experiencia);
+                
+                // Agregar al array
+                experiencias.push(experiencia);
+                console.log('Total experiencias:', experiencias.length);
+                
+                // Actualizar la tabla
+                actualizarListaExperiencias();
+                
+                // Cerrar modal
+                $('#modalExperiencia').modal('hide');
+                
+                // Limpiar formulario
+                $('#formExperiencia')[0].reset();
+                $('#fechaFin').prop('disabled', false);
+                
+                console.log('Experiencia agregada exitosamente');
+            } catch (error) {
+                console.error('Error en agregarExperiencia:', error);
+                alert('Ocurrió un error al agregar la experiencia. Por favor, intente nuevamente.');
+            }
+        }
+        
+        function eliminarExperiencia(index) {
+            if (confirm('¿Está seguro de eliminar esta experiencia laboral?')) {
+                experiencias.splice(index, 1);
+                actualizarListaExperiencias();
+            }
+        }
+        
+        function actualizarListaExperiencias() {
+            try {
+                console.log('Actualizando lista de experiencias. Total:', experiencias.length);
+                
+                var tabla = $('#tablaExperiencias tbody');
+                var contenedorTabla = $('#contenedorTablaExperiencias');
+                var alertaSinExperiencias = $('#alertSinExperiencias');
+                var hiddenContainer = $('#experienciasHiddenInputs');
+                
+                // Limpiar contenido
+                tabla.empty();
+                hiddenContainer.empty();
+                
+                if (experiencias.length === 0) {
+                    console.log('No hay experiencias, mostrando mensaje de alerta');
+                    // Ocultar tabla y mostrar mensaje
+                    contenedorTabla.addClass('d-none');
+                    alertaSinExperiencias.removeClass('d-none');
+                    return;
+                }
+                
+                // Mostrar tabla y ocultar mensaje
+                contenedorTabla.removeClass('d-none');
+                alertaSinExperiencias.addClass('d-none');
+                
+                // Generar filas
+                experiencias.forEach(function(exp, index) {
+                    console.log('Procesando experiencia', index, exp);
+                    
+                    var inicioFormatted = new Date(exp.FechaInicio).toLocaleDateString('es-CR', { month: '2-digit', year: 'numeric' });
+                    var finFormatted = exp.TrabajandoActualmente ? 'Actual' : 
+                        (exp.FechaFin ? new Date(exp.FechaFin).toLocaleDateString('es-CR', { month: '2-digit', year: 'numeric' }) : '');
+                    
+                    var anios = Math.floor(exp.MesesExperiencia / 12);
+                    var meses = exp.MesesExperiencia % 12;
+                    var experienciaText = '';
+                    if (anios > 0) {
+                        experienciaText += anios + ' año' + (anios > 1 ? 's' : '');
+                    }
+                    if (meses > 0) {
+                        if (experienciaText) experienciaText += ' ';
+                        experienciaText += meses + ' mes' + (meses > 1 ? 'es' : '');
+                    }
+                    if (!experienciaText) experienciaText = '0 meses';
+                    
+                    var fila = `
+                        <tr>
+                            <td>${exp.NombreInstitucion}</td>
+                            <td>${exp.CargoDesempenado}</td>
+                            <td><span class="badge badge-info">${exp.TipoInstitucion || 'N/A'}</span></td>
+                            <td>${inicioFormatted} - ${finFormatted}</td>
+                            <td>${experienciaText}</td>
+                            <td class="text-center">
+                                <button type="button" class="btn btn-sm btn-danger" onclick="eliminarExperiencia(${index})" title="Eliminar experiencia">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    
+                    tabla.append(fila);
+                    
+                    // Agregar hidden inputs al contenedor específico (fuera de la tabla)
+                    var hiddenInputs = `
+                        <input type="hidden" name="ExperienciaLaboral[${index}].NombreInstitucion" value="${exp.NombreInstitucion}" />
+                        <input type="hidden" name="ExperienciaLaboral[${index}].CargoDesempenado" value="${exp.CargoDesempenado}" />
+                        <input type="hidden" name="ExperienciaLaboral[${index}].TipoInstitucion" value="${exp.TipoInstitucion || ''}" />
+                        <input type="hidden" name="ExperienciaLaboral[${index}].FechaInicio" value="${exp.FechaInicio}" />
+                        <input type="hidden" name="ExperienciaLaboral[${index}].FechaFin" value="${exp.FechaFin || ''}" />
+                        <input type="hidden" name="ExperienciaLaboral[${index}].TrabajandoActualmente" value="${exp.TrabajandoActualmente}" />
+                        <input type="hidden" name="ExperienciaLaboral[${index}].DescripcionFunciones" value="${exp.DescripcionFunciones || ''}" />
+                        <input type="hidden" name="ExperienciaLaboral[${index}].TipoContrato" value="${exp.TipoContrato || ''}" />
+                        <input type="hidden" name="ExperienciaLaboral[${index}].JornadaLaboral" value="${exp.JornadaLaboral || ''}" />
+                    `;
+                    
+                    hiddenContainer.append(hiddenInputs);
+                });
+                
+                console.log('Lista de experiencias actualizada exitosamente');
+            } catch (error) {
+                console.error('Error en actualizarListaExperiencias:', error);
+            }
+        }
+    </script>
+    
+    <style>
+        .step-link {
+            display: block;
+            padding: 5px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .step-link:hover {
+            background-color: #f8f9fc;
+            color: #4e73df !important;
+            transform: translateY(-2px);
+        }
+        
+        .step-link i {
+            transition: transform 0.3s ease;
+        }
+        
+        .step-link:hover i {
+            transform: scale(1.1);
+        }
+    </style>
+}

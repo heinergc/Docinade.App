@@ -1,0 +1,440 @@
+@model RubricasApp.Web.ViewModels.SEA.SEAReporteViewModel
+@using RubricasApp.Web.Models.SEA
+
+@{
+    ViewData["Title"] = "Reporte SEA - Sistema de Evaluación MEP";
+}
+
+<div class="container-fluid">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1">
+                                <i class="fas fa-file-csv me-2"></i>
+                                Reporte SEA - Sistema de Evaluación MEP
+                            </h4>
+                            <small>Compatible con el sistema SEA del Ministerio de Educación Pública</small>
+                        </div>
+                        <div>
+                            @if (Model.MateriaId.HasValue)
+                            {
+                                <a asp-action="Configurar" asp-route-materiaId="@Model.MateriaId" class="btn btn-light btn-sm">
+                                    <i class="fas fa-cog"></i> Configurar Componentes
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Index" method="get" id="filtrosForm">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label for="materiaId" class="form-label">
+                                    <i class="fas fa-book me-1"></i> Materia
+                                </label>
+                                <select name="materiaId" id="materiaId" class="form-select" asp-items="ViewBag.Materias">
+                                    <option value="">-- Todas las materias --</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="periodoAcademicoId" class="form-label">
+                                    <i class="fas fa-calendar me-1"></i> Periodo Académico
+                                </label>
+                                <select name="periodoAcademicoId" id="periodoAcademicoId" class="form-select" asp-items="ViewBag.Periodos">
+                                    <option value="">-- Periodo activo --</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <label for="redondeo" class="form-label">
+                                    <i class="fas fa-calculator me-1"></i> Redondeo
+                                </label>
+                                <select name="redondeo" id="redondeo" class="form-select">
+                                    <option value="0" selected>Sin decimales</option>
+                                    <option value="1">1 decimal</option>
+                                    <option value="2">2 decimales</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="busqueda" class="form-label">
+                                    <i class="fas fa-search me-1"></i> Buscar estudiante
+                                </label>
+                                <input type="text" name="busqueda" id="busqueda" class="form-control" 
+                                       placeholder="Nombre o ID..." value="@ViewBag.Busqueda">
+                            </div>
+                            
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-filter"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.PonderacionesValidas && Model.MateriaId.HasValue)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Advertencia:</strong> Las ponderaciones de componentes SEA no suman 100% (Total: @Model.PonderacionTotal%).
+            <a asp-action="Configurar" asp-route-materiaId="@Model.MateriaId" class="alert-link">Configurar ahora</a>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Estadísticas -->
+    @if (Model.Estudiantes.Any())
+    {
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title mb-0">Total Estudiantes</h6>
+                                <h3 class="mb-0">@Model.Estadisticas.TotalEstudiantes</h3>
+                            </div>
+                            <i class="fas fa-users fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title mb-0">Promedio General</h6>
+                                <h3 class="mb-0">@Model.Estadisticas.PromedioGeneral.ToString("F1")</h3>
+                            </div>
+                            <i class="fas fa-chart-line fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title mb-0">Aprobación</h6>
+                                <h3 class="mb-0">@Model.Estadisticas.PorcentajeAprobacion.ToString("F1")%</h3>
+                                <small>@Model.Estadisticas.EstudiantesAprobados de @Model.Estadisticas.EstudiantesConDatos</small>
+                            </div>
+                            <i class="fas fa-check-circle fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card bg-warning text-dark">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title mb-0">Asistencia Promedio</h6>
+                                <h3 class="mb-0">@Model.Estadisticas.AsistenciaPromedio.ToString("F1")%</h3>
+                            </div>
+                            <i class="fas fa-calendar-check fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Botones de exportación -->
+    @if (Model.Estudiantes.Any())
+    {
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex gap-2">
+                            <a asp-action="ExportarCSV" 
+                               asp-route-materiaId="@Model.MateriaId" 
+                               asp-route-periodoAcademicoId="@Model.PeriodoAcademicoId" 
+                               asp-route-redondeo="@((int)Model.OpcionRedondeo)"
+                               class="btn btn-success">
+                                <i class="fas fa-file-csv me-2"></i>
+                                Exportar CSV para SEA
+                            </a>
+                            
+                            <a asp-action="ExportarExcel" 
+                               asp-route-materiaId="@Model.MateriaId" 
+                               asp-route-periodoAcademicoId="@Model.PeriodoAcademicoId" 
+                               asp-route-redondeo="@((int)Model.OpcionRedondeo)"
+                               class="btn btn-primary">
+                                <i class="fas fa-file-excel me-2"></i>
+                                Exportar Excel
+                            </a>
+                            
+                            <a asp-action="ExportarPDF" 
+                               asp-route-materiaId="@Model.MateriaId" 
+                               asp-route-periodoAcademicoId="@Model.PeriodoAcademicoId" 
+                               asp-route-redondeo="@((int)Model.OpcionRedondeo)"
+                               class="btn btn-danger">
+                                <i class="fas fa-file-pdf me-2"></i>
+                                Exportar PDF
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de estudiantes regulares -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-table me-2"></i>
+                    Estudiantes Regulares (@Model.EstudiantesRegulares.Count)
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                @foreach (var componente in Model.ComponentesActivos)
+                                {
+                                    <th class="text-center">@ComponentesSEA.ObtenerNombreAmigable(componente)</th>
+                                }
+                                <th class="text-center">Asistencia</th>
+                                <th class="text-center">Nota Final</th>
+                                <th class="text-center">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var estudiante in Model.EstudiantesRegulares.OrderBy(e => e.Apellidos).ThenBy(e => e.Nombre))
+                            {
+                                <tr class="@(estudiante.Aprobado ? "table-success" : estudiante.NotaFinal.HasValue ? "table-danger" : "")">
+                                    <td>
+                                        @estudiante.NumeroIdentificacion
+                                        @if (estudiante.TieneAdvertencias)
+                                        {
+                                            <i class="fas fa-exclamation-triangle text-warning ms-1"
+                                               data-bs-toggle="tooltip"
+                                               title="@string.Join("; ", estudiante.AdvertenciasValidacion)"></i>
+                                        }
+                                    </td>
+                                    <td>@estudiante.NombreCompleto</td>
+                                    
+                                    @foreach (var componente in Model.ComponentesActivos)
+                                    {
+                                        <td class="text-center">
+                                            @if (estudiante.NotasPorComponente.TryGetValue(componente, out var nota) && nota.HasValue)
+                                            {
+                                                @Math.Round(nota.Value, (int)Model.OpcionRedondeo).ToString($"F{(int)Model.OpcionRedondeo}")
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                    }
+                                    
+                                    <td class="text-center">
+                                        @if (estudiante.Asistencia.HasValue)
+                                        {
+                                            @Math.Round(estudiante.Asistencia.Value, (int)Model.OpcionRedondeo).ToString($"F{(int)Model.OpcionRedondeo}")
+                                            <text>%</text>
+                                            <small class="text-muted d-block">
+                                                (@estudiante.LeccionesPresente/@estudiante.TotalLecciones)
+                                            </small>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        @if (estudiante.NotaFinal.HasValue)
+                                        {
+                                            <strong>@Math.Round(estudiante.NotaFinal.Value, (int)Model.OpcionRedondeo).ToString($"F{(int)Model.OpcionRedondeo}")</strong>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Sin datos</span>
+                                        }
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        @switch (estudiante.EstadoGeneral)
+                                        {
+                                            case "EXCELENTE":
+                                                <span class="badge bg-success">Excelente</span>
+                                                break;
+                                            case "SATISFACTORIO":
+                                                <span class="badge bg-primary">Satisfactorio</span>
+                                                break;
+                                            case "EN_RIESGO":
+                                                <span class="badge bg-warning">En Riesgo</span>
+                                                break;
+                                            case "CRITICO":
+                                                <span class="badge bg-danger">Crítico</span>
+                                                break;
+                                            default:
+                                                <span class="badge bg-secondary">Sin Datos</span>
+                                                break;
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de estudiantes ACS -->
+        @if (Model.TieneEstudiantesACS)
+        {
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-graduate me-2"></i>
+                        Estudiantes con Adecuación Curricular Significativa (@Model.EstudiantesACS.Count)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Estos estudiantes requieren Adecuación Curricular Significativa y pueden tener criterios de evaluación adaptados.
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Tipo Adecuación</th>
+                                    @foreach (var componente in Model.ComponentesActivos)
+                                    {
+                                        <th class="text-center">@ComponentesSEA.ObtenerNombreAmigable(componente)</th>
+                                    }
+                                    <th class="text-center">Asistencia</th>
+                                    <th class="text-center">Nota Final</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var estudiante in Model.EstudiantesACS.OrderBy(e => e.Apellidos).ThenBy(e => e.Nombre))
+                                {
+                                    <tr class="@(estudiante.Aprobado ? "table-success" : estudiante.NotaFinal.HasValue ? "table-danger" : "")">
+                                        <td>@estudiante.NumeroIdentificacion</td>
+                                        <td>@estudiante.NombreCompleto</td>
+                                        <td>
+                                            <span class="badge bg-info">@estudiante.TipoAdecuacion</span>
+                                        </td>
+                                        
+                                        @foreach (var componente in Model.ComponentesActivos)
+                                        {
+                                            <td class="text-center">
+                                                @if (estudiante.NotasPorComponente.TryGetValue(componente, out var nota) && nota.HasValue)
+                                                {
+                                                    @Math.Round(nota.Value, (int)Model.OpcionRedondeo).ToString($"F{(int)Model.OpcionRedondeo}")
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                        }
+                                        
+                                        <td class="text-center">
+                                            @if (estudiante.Asistencia.HasValue)
+                                            {
+                                                @Math.Round(estudiante.Asistencia.Value, (int)Model.OpcionRedondeo).ToString($"F{(int)Model.OpcionRedondeo}")
+                                                <text>%</text>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        
+                                        <td class="text-center">
+                                            @if (estudiante.NotaFinal.HasValue)
+                                            {
+                                                <strong>@Math.Round(estudiante.NotaFinal.Value, (int)Model.OpcionRedondeo).ToString($"F{(int)Model.OpcionRedondeo}")</strong>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Sin datos</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No hay datos disponibles</h5>
+                <p class="text-muted">
+                    No se encontraron registros de evaluaciones o asistencia para los filtros aplicados.
+                </p>
+                @if (Model.MateriaId.HasValue)
+                {
+                    <a asp-action="Configurar" asp-route-materiaId="@Model.MateriaId" class="btn btn-primary">
+                        <i class="fas fa-cog me-2"></i>
+                        Configurar Componentes SEA
+                    </a>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Inicializar tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Auto-submit al cambiar filtros
+            $('#materiaId, #periodoAcademicoId, #redondeo').change(function() {
+                $('#filtrosForm').submit();
+            });
+
+            // Búsqueda con Enter
+            $('#busqueda').keypress(function(e) {
+                if (e.which === 13) {
+                    $('#filtrosForm').submit();
+                }
+            });
+        });
+    </script>
+}

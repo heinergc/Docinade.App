@@ -1,0 +1,110 @@
+@model RubricasApp.Web.ViewModels.ProfesorGuiaEditViewModel
+
+@{
+    ViewData["Title"] = "Editar Profesor Guía";
+}
+
+<div class="container">
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2><i class="fas fa-edit"></i> Editar Asignación de Profesor Guía</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index">Profesores Guía</a></li>
+                    <li class="breadcrumb-item active">Editar</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0"><i class="fas fa-user-edit"></i> Modificar Información</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="ProfesorId" />
+                        <input type="hidden" asp-for="GrupoId" />
+                        <input type="hidden" asp-for="FechaAsignacion" />
+                        
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <!-- Información de solo lectura -->
+                        <div class="mb-3">
+                            <label class="form-label">Profesor</label>
+                            <input type="text" class="form-control" value="@Model.NombreProfesor" readonly />
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle"></i> No se puede cambiar el profesor asignado
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Grupo</label>
+                            <input type="text" class="form-control" value="@Model.NombreGrupo" readonly />
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle"></i> No se puede cambiar el grupo asignado
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Fecha de Asignación</label>
+                            <input type="text" class="form-control" value="@Model.FechaAsignacion.ToString("dd/MM/yyyy")" readonly />
+                        </div>
+
+                        <hr />
+
+                        <!-- Campos editables -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="FechaInicio" class="form-label"></label>
+                                    <input asp-for="FechaInicio" class="form-control" type="date" />
+                                    <span asp-validation-for="FechaInicio" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="FechaFin" class="form-label"></label>
+                                    <input asp-for="FechaFin" class="form-control" type="date" />
+                                    <span asp-validation-for="FechaFin" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input asp-for="Estado" class="form-check-input" type="checkbox" id="estadoSwitch" />
+                                <label asp-for="Estado" class="form-check-label" for="estadoSwitch"></label>
+                            </div>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle"></i> Desactive si el profesor ya no es guía de este grupo
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Observaciones" class="form-label"></label>
+                            <textarea asp-for="Observaciones" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Observaciones" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

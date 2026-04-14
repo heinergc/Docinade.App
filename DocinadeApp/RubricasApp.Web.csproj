@@ -1,0 +1,94 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="16.1.1" />
+    <PackageReference Include="Azure.Identity" Version="1.14.1" />
+    <PackageReference Include="ClosedXML" Version="0.105.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.22" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.22">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.22" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.22" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.22">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.22" />
+    
+    <!-- ASP.NET Core Identity packages -->
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.22" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.22" />
+    
+    <!-- UI and frontend packages -->
+    <PackageReference Include="Bootstrap" Version="5.3.0" />
+    <PackageReference Include="jQuery" Version="3.7.0" />
+    <PackageReference Include="EPPlus" Version="8.5.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.10" />
+    <PackageReference Include="NuGet.Common" Version="7.3.0" />
+    <PackageReference Include="PdfSharp" Version="6.2.2" />
+    <PackageReference Include="QuestPDF" Version="2025.7.4" />
+    <PackageReference Include="Rotativa.AspNetCore" Version="1.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Excluir archivos de Scripts de la compilación -->
+    <Compile Remove="Scripts\**" />
+    <Content Remove="Scripts\**" />
+    <EmbeddedResource Remove="Scripts\**" />
+    <None Remove="Scripts\**" />
+    
+    <!-- Incluir específicamente el archivo de auditoría -->
+    <Compile Include="Scripts\CrearTablaAuditoria.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Services\Academic\Repositories.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Views\Evaluaciones\Reportes23-07-2025.cshtml" />
+    <Content Remove="Views\GruposEstudiantes\AsignarEstudiantes-bk.cshtml" />
+    <Content Remove="Views\GruposEstudiantes\Create-bk.cshtml" />
+    <Content Remove="Views\GruposEstudiantes\Details-bk.cshtml" />
+    <Content Remove="Views\GruposEstudiantes\Edit-bk.cshtml" />
+    <Content Remove="Views\GruposEstudiantes\Estadisticas-bk.cshtml" />
+    <Content Remove="Views\GruposEstudiantes\Index-bk.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Areas\Admin\Views\Users\Details.bk" />
+  </ItemGroup>
+
+  <!-- Asegurar que wwwroot/uploads se copie al publicar -->
+  <ItemGroup>
+    <Content Update="wwwroot\uploads\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Scripts\ConfigurarDatos.ps1" />
+    <None Include="Scripts\CuadernoCalificador_Consultas.sql" />
+    <None Include="Scripts\DatosPrueba_CuadernoCalificador.sql" />
+    <None Include="Scripts\DatosPrueba_Simplificado.sql" />
+    <None Include="Scripts\DatosPrueba_SqlServer.sql" />
+    <None Include="Scripts\FixMigrationsAndCreateTables.sql" />
+    <None Include="Scripts\MarcarMigracionGrupos.sql" />
+    <None Include="Scripts\MigrarSqlServer.ps1" />
+    <None Include="Scripts\SistemaGrupos_CrearTablas.sql" />
+    <None Include="Scripts\VerificarSistemaGrupos.sql" />
+    <None Include="Views\Evaluaciones\Reportes23-07-2025.cshtml" />
+  </ItemGroup>
+
+</Project>

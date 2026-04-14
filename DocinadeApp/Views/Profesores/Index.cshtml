@@ -1,0 +1,363 @@
+@model List<RubricasApp.Web.Models.Profesor>
+@{
+    ViewData["Title"] = "Gestión de Profesores";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="fas fa-users-cog"></i> Gestión de Profesores
+                    </h1>
+                    <p class="mb-0 text-muted">Administración completa del personal docente</p>
+                </div>
+                <div>
+                    <a asp-action="CreateStep1" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nuevo Profesor
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros de búsqueda -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form method="get" asp-action="Index">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="buscar">Buscar</label>
+                            <input type="text" 
+                                   id="buscar" 
+                                   name="buscar" 
+                                   class="form-control" 
+                                   value="@ViewBag.Buscar"
+                                   placeholder="Nombre, apellidos, cédula o email...">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="provinciaId">Provincia</label>
+                            <select id="provinciaId" 
+                                    name="provinciaId" 
+                                    class="form-control">
+                                <option value="">-- Todas las provincias --</option>
+                                @foreach (var provincia in ViewBag.Provincias as List<SelectListItem> ?? new List<SelectListItem>())
+                                {
+                                    <option value="@provincia.Value" selected="@provincia.Selected">@provincia.Text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="activo">Estado</label>
+                            <select id="activo" 
+                                    name="activo" 
+                                    class="form-control">
+                                <option value="">-- Todos los estados --</option>
+                                <option value="true" selected="@(ViewBag.Activo?.ToString() == "True")">Activos</option>
+                                <option value="false" selected="@(ViewBag.Activo?.ToString() == "False")">Inactivos</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <div>
+                                <button type="submit" class="btn btn-outline-primary">
+                                    <i class="fas fa-search"></i> Buscar
+                                </button>
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Resultados -->
+    <div class="card shadow">
+        <div class="card-header py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    Lista de Profesores (@ViewBag.TotalRegistros registros)
+                </h6>
+                <div>
+                    <button type="button" class="btn btn-info" id="btnGenerarCVMasivo">
+                        <i class="fas fa-file-pdf"></i> Generar CVs Seleccionados
+                    </button>
+                    <span class="text-muted-while small ml-2">
+                        Página @ViewBag.PaginaActual de @ViewBag.TotalPaginas
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="thead-light">
+                            <tr>
+                                <th width="50">
+                                    <input type="checkbox" id="selectAll" title="Seleccionar todos">
+                                </th>
+                                <th>Foto</th>
+                                <th>Información Personal</th>
+                                <th>Contacto</th>
+                                <th>Ubicación</th>
+                                <th>Institución</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var profesor in Model)
+                            {
+                                <tr>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="profesor-checkbox" value="@profesor.Id">
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="avatar-circle">
+                                            @{
+                                                var iniciales = $"{profesor.Nombres.FirstOrDefault()}{profesor.PrimerApellido.FirstOrDefault()}";
+                                            }
+                                            <span class="initials">@iniciales</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>@profesor.NombreCompleto</strong>
+                                            <br>
+                                            <small class="text-muted">
+                                                <i class="fas fa-id-card"></i> @profesor.Cedula
+                                            </small>
+                                            @if (!string.IsNullOrEmpty(profesor.GradoAcademico))
+                                            {
+                                                <br>
+                                                <small class="text-info">
+                                                    <i class="fas fa-graduation-cap"></i> @profesor.GradoAcademico
+                                                </small>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            @if (!string.IsNullOrEmpty(profesor.EmailInstitucional))
+                                            {
+                                                <small>
+                                                    <i class="fas fa-envelope"></i> <strong>@profesor.EmailInstitucional</strong>
+                                                </small>
+                                                <br>
+                                            }
+                                            @if (!string.IsNullOrEmpty(profesor.EmailPersonal))
+                                            {
+                                                <small class="text-muted">
+                                                    <i class="fas fa-envelope-open"></i> @profesor.EmailPersonal
+                                                </small>
+                                                <br>
+                                            }
+                                            <small>
+                                                <i class="fas fa-phone"></i> @profesor.TelefonoCelular
+                                            </small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">
+                                            @if (profesor.Provincia != null)
+                                            {
+                                                <div><i class="fas fa-map-marker-alt"></i> @profesor.Provincia.Nombre</div>
+                                            }
+                                            @if (profesor.Canton != null)
+                                            {
+                                                <div>@profesor.Canton.Nombre</div>
+                                            }
+                                            @if (profesor.Distrito != null)
+                                            {
+                                                <div>@profesor.Distrito.Nombre</div>
+                                            }
+                                        </small>
+                                    </td>
+                                    <td>
+                                        @if (profesor.Escuela?.Facultad?.Institucion != null)
+                                        {
+                                            <div>
+                                                <strong>@profesor.Escuela.Facultad.Institucion.Nombre</strong>
+                                                <br>
+                                                <small class="text-muted">@profesor.Escuela.Facultad.Nombre</small>
+                                                <br>
+                                                <small class="text-muted">@profesor.Escuela.Nombre</small>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Sin asignar</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        @if (profesor.Estado)
+                                        {
+                                            <span class="badge badge-success">Activo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-danger">Inactivo</span>
+                                        }
+                                        <br>
+                                        <small class="text-muted">
+                                            @profesor.AniosServicio año(s) de servicio
+                                        </small>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="Details" 
+                                               asp-route-id="@profesor.Id" 
+                                               class="btn btn-sm btn-info" 
+                                               title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a asp-action="Edit" 
+                                               asp-route-id="@profesor.Id" 
+                                               class="btn btn-sm btn-warning" 
+                                               title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a asp-action="Delete" 
+                                               asp-route-id="@profesor.Id" 
+                                               class="btn btn-sm btn-danger" 
+                                               title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginación -->
+                @if (ViewBag.TotalPaginas > 1)
+                {
+                    <nav aria-label="Navegación de páginas">
+                        <ul class="pagination justify-content-center">
+                            @if (ViewBag.PaginaActual > 1)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" 
+                                       asp-action="Index" 
+                                       asp-route-pagina="@(ViewBag.PaginaActual - 1)"
+                                       asp-route-buscar="@ViewBag.Buscar"
+                                       asp-route-provinciaId="@ViewBag.ProvinciaId"
+                                       asp-route-activo="@ViewBag.Activo">
+                                        Anterior
+                                    </a>
+                                </li>
+                            }
+
+                            @for (int i = Math.Max(1, (int)ViewBag.PaginaActual - 2); i <= Math.Min((int)ViewBag.TotalPaginas, (int)ViewBag.PaginaActual + 2); i++)
+                            {
+                                <li class="page-item @(i == ViewBag.PaginaActual ? "active" : "")">
+                                    <a class="page-link" 
+                                       asp-action="Index" 
+                                       asp-route-pagina="@i"
+                                       asp-route-buscar="@ViewBag.Buscar"
+                                       asp-route-provinciaId="@ViewBag.ProvinciaId"
+                                       asp-route-activo="@ViewBag.Activo">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+
+                            @if (ViewBag.PaginaActual < ViewBag.TotalPaginas)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" 
+                                       asp-action="Index" 
+                                       asp-route-pagina="@(ViewBag.PaginaActual + 1)"
+                                       asp-route-buscar="@ViewBag.Buscar"
+                                       asp-route-provinciaId="@ViewBag.ProvinciaId"
+                                       asp-route-activo="@ViewBag.Activo">
+                                        Siguiente
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                }
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No hay profesores registrados</h5>
+                    <p class="text-muted">Comience agregando el primer profesor al sistema.</p>
+                    <a asp-action="Create" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Agregar Profesor
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #007bff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.avatar-circle .initials {
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.table td {
+    vertical-align: middle;
+}
+</style>
+
+@section Scripts {
+<script>
+    // Seleccionar/deseleccionar todos los checkboxes
+    document.getElementById('selectAll')?.addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.profesor-checkbox');
+        checkboxes.forEach(cb => cb.checked = this.checked);
+    });
+
+    // Generar CVs masivos
+    document.getElementById('btnGenerarCVMasivo')?.addEventListener('click', function() {
+        const selectedIds = Array.from(document.querySelectorAll('.profesor-checkbox:checked'))
+            .map(cb => parseInt(cb.value));
+        
+        if (selectedIds.length === 0) {
+            alert('Debe seleccionar al menos un profesor');
+            return;
+        }
+
+        // Crear URL con los IDs como query string
+        const idsParam = selectedIds.join(',');
+        const url = '@Url.Action("GenerarCurriculumsMasivoPdf", "Profesores")' + '?ids=' + encodeURIComponent(idsParam);
+        
+        // Abrir en nueva ventana para descargar el PDF
+        window.open(url, '_blank');
+    });
+</script>
+}

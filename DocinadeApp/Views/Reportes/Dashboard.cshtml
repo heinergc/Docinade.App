@@ -1,0 +1,235 @@
+@model Dictionary<string, object>
+
+@{
+    ViewData["Title"] = "Dashboard de Reportes";
+}
+
+<div class="container-fluid">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Dashboard de Reportes - Sistema de Evaluaciones
+                    </h4>
+                    <small>Panel de control con métricas clave del sistema</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tarjetas de Estadísticas Principales -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-primary h-100">
+                <div class="card-body text-center">
+                    <div class="text-primary">
+                        <i class="fas fa-book fa-2x mb-3"></i>
+                    </div>
+                    <h2 class="text-primary mb-1">@(Model.ContainsKey("totalMaterias") ? Model["totalMaterias"] : 0)</h2>
+                    <p class="text-muted mb-0">Materias Activas</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-info h-100">
+                <div class="card-body text-center">
+                    <div class="text-info">
+                        <i class="fas fa-calendar-alt fa-2x mb-3"></i>
+                    </div>
+                    <h2 class="text-info mb-1">@(Model.ContainsKey("totalPeriodos") ? Model["totalPeriodos"] : 0)</h2>
+                    <p class="text-muted mb-0">Periodos Academicos</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-warning h-100">
+                <div class="card-body text-center">
+                    <div class="text-warning">
+                        <i class="fas fa-tools fa-2x mb-3"></i>
+                    </div>
+                    <h2 class="text-warning mb-1">@(Model.ContainsKey("totalInstrumentos") ? Model["totalInstrumentos"] : 0)</h2>
+                    <p class="text-muted mb-0">Instrumentos de Evaluacion</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-success h-100">
+                <div class="card-body text-center">
+                    <div class="text-success">
+                        <i class="fas fa-clipboard-list fa-2x mb-3"></i>
+                    </div>
+                    <h2 class="text-success mb-1">@(Model.ContainsKey("totalRubricas") ? Model["totalRubricas"] : 0)</h2>
+                    <p class="text-muted mb-0">Rubricas Configuradas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas de Actividad -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-4 col-md-6">
+            <div class="card border-danger h-100">
+                <div class="card-body text-center">
+                    <div class="text-danger">
+                        <i class="fas fa-clipboard-check fa-2x mb-3"></i>
+                    </div>
+                    <h2 class="text-danger mb-1">@(Model.ContainsKey("totalEvaluaciones") ? Model["totalEvaluaciones"] : 0)</h2>
+                    <p class="text-muted mb-0">Total de Evaluaciones</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-4 col-md-6">
+            <div class="card border-dark h-100">
+                <div class="card-body text-center">
+                    <div class="text-dark">
+                        <i class="fas fa-users fa-2x mb-3"></i>
+                    </div>
+                    <h2 class="text-dark mb-1">@(Model.ContainsKey("totalEstudiantes") ? Model["totalEstudiantes"] : 0)</h2>
+                    <p class="text-muted mb-0">Estudiantes Activos</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-4 col-md-12">
+            <div class="card border-secondary h-100">
+                <div class="card-body text-center">
+                    <div class="text-secondary">
+                        <i class="fas fa-percentage fa-2x mb-3"></i>
+                    </div>
+                    <h2 class="text-secondary mb-1">
+                        @{
+                            var completitud = Model.ContainsKey("porcentajeCompletitud") ? 
+                                Convert.ToDecimal(Model["porcentajeCompletitud"]).ToString("F1") : "0.0";
+                        }
+                        @completitud%
+                    </h2>
+                    <p class="text-muted mb-0">Completitud General</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enlaces Rápidos -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-external-link-alt me-2"></i>
+                        Acceso Rapido a Reportes
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a asp-action="ArbolEvaluaciones" class="btn btn-primary">
+                            <i class="fas fa-sitemap me-2"></i>
+                            Ver Reporte en Arbol
+                        </a>
+                        <a asp-controller="CuadernoCalificador" asp-action="Index" class="btn btn-success">
+                            <i class="fas fa-table me-2"></i>
+                            Cuaderno Calificador Dinamico
+                        </a>
+                        <a asp-action="ExportarArbolExcel" class="btn btn-outline-success">
+                            <i class="fas fa-file-excel me-2"></i>
+                            Exportar Datos a Excel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Informacion del Sistema
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="text-center">
+                                <div class="h6 mb-1">@(Model.ContainsKey("totalNodos") ? Model["totalNodos"] : 0)</div>
+                                <small class="text-muted">Nodos en Arbol</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center">
+                                <div class="h6 mb-1">
+                                    @{
+                                        var promedio = Model.ContainsKey("promedioGeneral") ? 
+                                            Convert.ToDecimal(Model["promedioGeneral"]).ToString("F1") : "0.0";
+                                    }
+                                    @promedio
+                                </div>
+                                <small class="text-muted">Promedio General</small>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <hr class="my-2">
+                            <p class="text-muted text-center mb-0">
+                                <small>
+                                    <i class="fas fa-clock me-1"></i>
+                                    Actualizado: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+                                </small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button onclick="location.reload()" class="btn btn-outline-primary btn-sm w-100">
+                        <i class="fas fa-sync-alt me-1"></i>
+                        Actualizar Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-refresh cada 5 minutos
+        setTimeout(function() {
+            location.reload();
+        }, 300000); // 5 minutos
+        
+        // Mensaje de bienvenida
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Dashboard de Reportes cargado correctamente');
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .fa-2x {
+            font-size: 2rem;
+        }
+        
+        .border-primary { border-color: #007bff !important; }
+        .border-info { border-color: #17a2b8 !important; }
+        .border-warning { border-color: #ffc107 !important; }
+        .border-success { border-color: #28a745 !important; }
+        .border-danger { border-color: #dc3545 !important; }
+        .border-dark { border-color: #343a40 !important; }
+        .border-secondary { border-color: #6c757d !important; }
+    </style>
+}

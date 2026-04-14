@@ -1,0 +1,191 @@
+@{
+    ViewData["Title"] = "Diagnóstico de Base de Datos";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-tools"></i> Herramientas de Diagnóstico de Base de Datos
+                    </h3>
+                </div>
+                <div class="card-body">
+                    
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <div class="row">
+                        <!-- Diagnóstico del Esquema -->
+                        <div class="col-md-6">
+                            <div class="card border-info">
+                                <div class="card-header bg-info text-white">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-search"></i> Diagnóstico
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        Verificar el esquema actual de la tabla <code>ValoresRubrica</code> 
+                                        para identificar problemas con la columna <code>ValorPuntos</code>.
+                                    </p>
+                                    <button type="button" class="btn btn-info" onclick="diagnosticarEsquema()">
+                                        <i class="fas fa-search"></i> Diagnosticar Esquema
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Corrección del Esquema -->
+                        <div class="col-md-6">
+                            <div class="card border-success">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-wrench"></i> Corrección
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        <strong>?? CUIDADO:</strong> Esto modificará el esquema de la base de datos.
+                                        Corrige el problema de <code>NOT NULL constraint failed: ValoresRubrica.ValorPuntos</code>.
+                                    </p>
+                                    
+                                    <!-- Botón con formulario tradicional -->
+                                    <form asp-action="CorregirEsquemaValorPuntos" method="post" style="display: inline;">
+                                        <button type="submit" class="btn btn-success me-2" 
+                                                onclick="return confirm('¿Estás seguro de que quieres corregir el esquema? Esto modificará la base de datos.')">
+                                            <i class="fas fa-wrench"></i> Corregir Esquema
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Test de Creación de Rúbrica -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card border-primary">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-vial"></i> Test de Creación de Rúbrica
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">
+                                        Probar la creación de una rúbrica completa (Rubrica ? Nivel ? Item ? ValorRubrica) 
+                                        para verificar si el problema persiste.
+                                    </p>
+                                    <button type="button" class="btn btn-primary" onclick="testCrearRubrica()">
+                                        <i class="fas fa-play"></i> Ejecutar Test
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resultados -->
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div id="resultados" style="display: none;">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-list-alt"></i> Resultados
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <pre id="resultadosTexto" class="bg-light p-3" style="max-height: 400px; overflow-y: auto;"></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function mostrarResultados(data) {
+        const resultadosDiv = document.getElementById('resultados');
+        const resultadosTexto = document.getElementById('resultadosTexto');
+        
+        resultadosTexto.textContent = JSON.stringify(data, null, 2);
+        resultadosTexto.className = 'bg-light p-3';
+        resultadosDiv.style.display = 'block';
+        
+        // Scroll to results
+        resultadosDiv.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function mostrarError(error) {
+        const resultadosDiv = document.getElementById('resultados');
+        const resultadosTexto = document.getElementById('resultadosTexto');
+        
+        resultadosTexto.textContent = '? ERROR: ' + error;
+        resultadosTexto.className = 'bg-danger text-white p-3';
+        resultadosDiv.style.display = 'block';
+    }
+
+    async function diagnosticarEsquema() {
+        try {
+            const response = await fetch('/TestImport/DiagnosticarEsquema');
+            const data = await response.json();
+            mostrarResultados(data);
+        } catch (error) {
+            mostrarError('Error al diagnosticar esquema: ' + error.message);
+        }
+    }
+
+    async function testCrearRubrica() {
+        try {
+            const response = await fetch('/TestImport/TestCrearRubricaSimple');
+            const data = await response.json();
+            mostrarResultados(data);
+        } catch (error) {
+            mostrarError('Error en test de creación: ' + error.message);
+        }
+    }
+</script>
+}
+
+<style>
+    .card {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+    }
+    
+    .card-header {
+        font-weight: 600;
+    }
+    
+    pre {
+        border-radius: 4px;
+        font-size: 0.9em;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+    
+    .btn {
+        min-width: 150px;
+    }
+</style>

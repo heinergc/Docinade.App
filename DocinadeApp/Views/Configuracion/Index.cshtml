@@ -1,0 +1,236 @@
+﻿@model RubricasApp.Web.ViewModels.Configuracion.ConfiguracionIndexViewModel
+@{
+    ViewData["Title"] = "Configuración del Sistema";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-cogs me-2"></i>
+                Configuración del Sistema
+            </h2>
+        </div>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Configuración de Modo de Registro -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-user-plus me-2"></i>
+                    Modo de Registro de Usuarios
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="alert @(Model.ModoRegistroActual == ModoRegistroUsuarios.Abierto ? "alert-success" : "alert-warning")" role="alert">
+                            <i class="fas @(Model.ModoRegistroActual == ModoRegistroUsuarios.Abierto ? "fa-unlock" : "fa-lock") me-2"></i>
+                            <strong>Estado Actual:</strong> 
+                            @(Model.ModoRegistroActual == ModoRegistroUsuarios.Abierto ? "ABIERTO" : "CERRADO")
+                        </div>
+                        
+                        <form asp-action="ActualizarModoRegistro" method="post">
+                            <div class="mb-3">
+                                <label class="form-label">Nuevo Modo de Registro</label>
+                                <select name="ModoRegistro" class="form-select" required>
+                                    <option value="">Seleccionar...</option>
+                                    <option value="@ModoRegistroUsuarios.Abierto" selected="@(Model.ModoRegistroActual == ModoRegistroUsuarios.Abierto)">
+                                        🔓 Abierto - Permite registro público
+                                    </option>
+                                    <option value="@ModoRegistroUsuarios.Cerrado" selected="@(Model.ModoRegistroActual == ModoRegistroUsuarios.Cerrado)">
+                                        🔒 Cerrado - Solo administradores pueden crear usuarios
+                                    </option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Mensaje Personalizado (opcional)</label>
+                                <textarea name="MensajePersonalizado" class="form-control" rows="3" 
+                                          placeholder="Mensaje que se mostrará cuando el registro esté cerrado...">@Model.MensajeRegistroCerrado</textarea>
+                                <div class="form-text">
+                                    Si no especifica un mensaje, se usará el mensaje por defecto.
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>
+                                Actualizar Configuración
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h6>Descripción de Modos:</h6>
+                        <div class="border rounded p-3">
+                            <h6 class="text-success">
+                                <i class="fas fa-unlock me-1"></i>
+                                Modo Abierto
+                            </h6>
+                            <ul class="small">
+                                <li>Los usuarios pueden registrarse públicamente</li>
+                                <li>Formulario de registro accesible en /Account/Register</li>
+                                <li>Los usuarios pueden elegir entre roles básicos</li>
+                                <li>Recomendado para sistemas de acceso general</li>
+                            </ul>
+                            
+                            <h6 class="text-warning mt-3">
+                                <i class="fas fa-lock me-1"></i>
+                                Modo Cerrado
+                            </h6>
+                            <ul class="small">
+                                <li>Solo administradores pueden crear usuarios</li>
+                                <li>El formulario público muestra mensaje de bloqueo</li>
+                                <li>Control total sobre quién accede al sistema</li>
+                                <li>Recomendado para sistemas institucionales</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Todas las Configuraciones del Sistema -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    Todas las Configuraciones
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (Model.Configuraciones.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Clave</th>
+                                    <th>Valor</th>
+                                    <th>Descripción</th>
+                                    <th>Última Modificación</th>
+                                    <th>Usuario</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var config in Model.Configuraciones)
+                                {
+                                    <tr>
+                                        <td>
+                                            <code>@config.Clave</code>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">@config.Valor</span>
+                                        </td>
+                                        <td class="small">
+                                            @(config.Descripcion ?? "Sin descripción")
+                                        </td>
+                                        <td class="small">
+                                            @config.FechaModificacion.ToString("dd/MM/yyyy HH:mm")
+                                        </td>
+                                        <td class="small">
+                                            @(config.UsuarioModificacion ?? "Sistema")
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#editModal"
+                                                    data-clave="@config.Clave"
+                                                    data-valor="@config.Valor"
+                                                    data-descripcion="@(config.Descripcion ?? "")">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4">
+                        <i class="fas fa-database text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-2">No hay configuraciones registradas en el sistema.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Editar Configuración -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="ActualizarConfiguracion" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Configuración</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Clave</label>
+                        <input type="text" name="clave" class="form-control" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Valor</label>
+                        <input type="text" name="valor" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <textarea name="descripcion" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Manejar modal de edición
+        var editModal = document.getElementById('editModal');
+        editModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var clave = button.getAttribute('data-clave');
+            var valor = button.getAttribute('data-valor');
+            var descripcion = button.getAttribute('data-descripcion');
+            
+            var modal = this;
+            modal.querySelector('input[name="clave"]').value = clave;
+            modal.querySelector('input[name="valor"]').value = valor;
+            modal.querySelector('textarea[name="descripcion"]').value = descripcion;
+        });
+    </script>
+}

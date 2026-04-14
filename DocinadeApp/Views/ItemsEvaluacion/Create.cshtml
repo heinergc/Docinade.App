@@ -1,0 +1,166 @@
+﻿@model RubricasApp.Web.Models.ItemEvaluacion
+
+@{
+    ViewData["Title"] = "Crear Item de Evaluación";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h1 class="mb-4">Crear Item de Evaluación</h1>
+            
+            <div class="card">
+                <div class="card-body">
+                    <form action="/ItemsEvaluacion/Create" method="post" id="itemForm">
+                        @Html.AntiForgeryToken()
+                        
+                        <div asp-validation-summary="All" class="alert alert-danger" role="alert" style="display: none;"></div>
+                        
+                        <div class="mb-3">
+                            <label for="IdRubrica" class="form-label">Rúbrica *</label>
+                            <select name="IdRubrica" id="IdRubrica" class="form-select" required>
+                                <option value="">-- Seleccione una rúbrica --</option>
+                                @if (ViewBag.IdRubrica != null)
+                                {
+                                    @foreach (var rubrica in ViewBag.IdRubrica as SelectList ?? new SelectList(new List<object>()))
+                                    {
+                                        <option value="@rubrica.Value">@rubrica.Text</option>
+                                    }
+                                }
+                            </select>
+                            <span id="IdRubrica-error" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="NombreItem" class="form-label">Nombre del Item *</label>
+                            <input name="NombreItem" id="NombreItem" type="text" class="form-control" placeholder="Ingrese el nombre del item" required />
+                            <span id="NombreItem-error" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="Descripcion" class="form-label">Descripción</label>
+                            <textarea name="Descripcion" id="Descripcion" class="form-control" rows="3" placeholder="Ingrese una descripción (opcional)"></textarea>
+                            <span id="Descripcion-error" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="OrdenItem" class="form-label">Orden</label>
+                            <input name="OrdenItem" id="OrdenItem" type="number" class="form-control" min="1" placeholder="Ingrese el orden (opcional)" />
+                            <span id="OrdenItem-error" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <input type="submit" value="Crear Item" class="btn btn-primary" />
+                            <a href="/ItemsEvaluacion" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        console.log('ItemEvaluacion Create form loaded');
+        
+        $(document).ready(function() {
+            console.log('Document ready');
+            
+            // Verificar elementos del formulario con diferentes selectores
+            const form = $('#itemForm');
+            const rubricaSelect = $('#IdRubrica');
+            const nombreInput = $('#NombreItem');
+            
+            console.log('Form found:', form.length);
+            console.log('Rubrica select found:', rubricaSelect.length);
+            console.log('Nombre input found:', nombreInput.length);
+            
+            // Verificar opciones en el select
+            if (rubricaSelect.length > 0) {
+                console.log('Rubrica options:');
+                rubricaSelect.find('option').each(function(index, option) {
+                    console.log(`  ${index}: value="${option.value}", text="${option.text}"`);
+                });
+            }
+            
+            // Evento para monitorear cambios en el select
+            rubricaSelect.on('change', function() {
+                const selectedValue = $(this).val();
+                const selectedText = $(this).find('option:selected').text();
+                console.log(`Rubrica changed: value="${selectedValue}", text="${selectedText}"`);
+            });
+            
+            // Evento para monitorear el click del botón
+            form.find('input[type="submit"]').on('click', function(e) {
+                console.log('=== SUBMIT INPUT CLICKED ===');
+                console.log('Input element:', this);
+                console.log('Event:', e);
+                
+                // Verificar validez del formulario antes del envío
+                const formElement = document.getElementById('itemForm');
+                const isValid = formElement.checkValidity();
+                console.log('Form validity before submit:', isValid);
+                
+                if (!isValid) {
+                    console.log('Form is invalid, HTML5 validation will prevent submission');
+                    formElement.reportValidity();
+                }
+            });
+            
+            // Eventos de validación HTML5
+            form[0].addEventListener('invalid', function(e) {
+                console.log('=== FORM INVALID EVENT ===');
+                console.log('Invalid element:', e.target);
+                console.log('Validation message:', e.target.validationMessage);
+            }, true);
+            
+            form[0].addEventListener('submit', function(e) {
+                console.log('=== NATIVE FORM SUBMIT EVENT ===');
+                console.log('Form element:', this);
+                console.log('Event:', e);
+            }, true);
+            
+            // Evento para monitorear el envío del formulario
+            form.on('submit', function(e) {
+                console.log('=== FORM SUBMIT EVENT ===');
+                
+                // Obtener datos del formulario
+                const formData = new FormData(this);
+                const formObject = {};
+                
+                for (let [key, value] of formData.entries()) {
+                    formObject[key] = value;
+                }
+                
+                console.log('Form data object:', formObject);
+                console.log('Form serialized:', $(this).serialize());
+                
+                // Validar campos requeridos
+                const idRubrica = rubricaSelect.val();
+                const nombreItem = nombreInput.val();
+                
+                console.log('Validation check:');
+                console.log(`  IdRubrica: "${idRubrica}" (valid: ${idRubrica && idRubrica !== ''})`);
+                console.log(`  NombreItem: "${nombreItem}" (valid: ${nombreItem && nombreItem.trim() !== ''})`);
+                
+                // Verificar validez del formulario
+                const isValid = this.checkValidity();
+                console.log('Form validity (HTML5):', isValid);
+                
+                if (!isValid) {
+                    console.log('Form is invalid, submission will be prevented');
+                    e.preventDefault();
+                    return false;
+                }
+                
+                console.log('Form is valid, allowing submission');
+                return true;
+            });
+        });
+    </script>
+}

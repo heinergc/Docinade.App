@@ -1,0 +1,182 @@
+@model Dictionary<DayOfWeek, List<RubricasApp.Web.Models.Leccion>>
+
+@{
+    ViewData["Title"] = "Horario Semanal";
+    var leccionesPorDia = Model.ToDictionary(kvp => (int)kvp.Key, kvp => kvp.Value);
+    var todasLasHoras = Model.Values.SelectMany(l => l).Select(l => l.HoraInicio).Distinct().OrderBy(h => h).ToList();
+    
+    // Colores para cada materia
+    var materias = Model.Values.SelectMany(l => l).Select(l => l.MateriaId).Distinct().ToList();
+    var colores = new Dictionary<int, string>();
+    var paletaColores = new[] { "primary", "success", "danger", "warning", "info", "dark", "secondary", "purple", "teal", "orange" };
+    
+    for (int i = 0; i < materias.Count; i++)
+    {
+        colores[materias[i]] = paletaColores[i % paletaColores.Length];
+    }
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-calendar-week me-2"></i>@ViewData["Title"]
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Selector de grupo -->
+                    <form method="get" class="mb-4">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="form-label">Seleccione Grupo</label>
+                                <select name="grupoId" class="form-select" onchange="this.form.submit()">
+                                    <option value="">-- Seleccione un grupo --</option>
+                                    @foreach (var item in ViewBag.Grupos as IEnumerable<SelectListItem>)
+                                    {
+                                        <option value="@item.Value" selected="@item.Selected">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width: 100px;">Hora</th>
+                                        <th>Lunes</th>
+                                        <th>Martes</th>
+                                        <th>Miércoles</th>
+                                        <th>Jueves</th>
+                                        <th>Viernes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var hora in todasLasHoras)
+                                    {
+                                        <tr>
+                                            <td class="text-center align-middle">
+                                                <strong>@hora.ToString(@"hh\:mm")</strong>
+                                            </td>
+                                            @for (int dia = 1; dia <= 5; dia++)
+                                            {
+                                                <td>
+                                                    @if (leccionesPorDia.ContainsKey(dia))
+                                                    {
+                                                        var leccionesEnHora = leccionesPorDia[dia].Where(l => l.HoraInicio == hora);
+                                                        @foreach (var leccion in leccionesEnHora)
+                                                        {
+                                                            var color = colores[leccion.MateriaId];
+                                                            var opacidad = leccion.Activa ? "" : "opacity-50";
+                                                            
+                                                            <div class="leccion-card bg-@color @opacidad mb-2 p-2 rounded">
+                                                                <div class="d-flex justify-content-between align-items-start">
+                                                                    <div>
+                                                                        <strong>@leccion.Materia?.Nombre</strong>
+                                                                        <br />
+                                                                        <small>@leccion.HorarioFormateado</small>
+                                                                        <br />
+                                                                        <small>
+                                                                            @if (!string.IsNullOrEmpty(leccion.Observaciones))
+                                                                            {
+                                                                                <span>@leccion.Observaciones</span>
+                                                                            }
+                                                                        </small>
+                                                                    </div>
+                                                                    <div>
+                                                                        <span class="badge bg-light text-dark">Bloque @leccion.NumeroBloque</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="mt-2">
+                                                                    <a asp-action="Details" asp-route-id="@leccion.IdLeccion" 
+                                                                       class="btn btn-sm btn-light">
+                                                                        <i class="fas fa-eye"></i>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    }
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Leyenda de materias -->
+                        <div class="mt-4">
+                            <h5>Leyenda de Materias</h5>
+                            <div class="row">
+                                @foreach (var materia in Model.Values.SelectMany(l => l).Where(l => l.Materia != null).Select(l => l.Materia).GroupBy(m => m.MateriaId).Select(g => g.First()).OrderBy(m => m.Nombre))
+                                {
+                                    var color = colores[materia.MateriaId];
+                                    <div class="col-md-3 mb-2">
+                                        <span class="badge bg-@color me-2">&nbsp;&nbsp;&nbsp;</span>
+                                        <span>@materia.Nombre</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No hay lecciones programadas para este grupo. Seleccione otro grupo o agregue lecciones.
+                        </div>
+                    }
+
+                    <div class="mt-4">
+                        <a asp-action="Index" class="btn btn-secondary print-hide">
+                            <i class="fas fa-arrow-left me-1"></i>Volver
+                        </a>
+                        <button onclick="window.print()" class="btn btn-primary print-hide">
+                            <i class="fas fa-print me-1"></i>Imprimir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .leccion-card {
+            transition: transform 0.2s;
+            color: white;
+        }
+        
+        .leccion-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .bg-purple {
+            background-color: #6f42c1 !important;
+        }
+
+        .bg-teal {
+            background-color: #20c997 !important;
+        }
+
+        .bg-orange {
+            background-color: #fd7e14 !important;
+        }
+
+        @@media print {
+            .print-hide {
+                display: none !important;
+            }
+            .leccion-card {
+                break-inside: avoid;
+            }
+        }
+    </style>
+}

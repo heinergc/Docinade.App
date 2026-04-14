@@ -1,0 +1,457 @@
+@model RubricasApp.Web.Models.Profesor
+@{
+    ViewData["Title"] = "Detalles del Profesor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="h4 mb-0 text-gray-800">
+                                <i class="fas fa-user"></i> @Model.NombreCompleto
+                            </h1>
+                            <p class="mb-0 text-muted">Detalles del Profesor</p>
+                        </div>
+                        <div>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver a Lista
+                            </a>
+                            <a asp-action="GenerarCurriculumPdf" asp-route-id="@Model.Id" class="btn btn-info" target="_blank">
+                                <i class="fas fa-file-pdf"></i> Generar CV en PDF
+                            </a>
+                            <a asp-action="VincularUsuario" asp-route-id="@Model.Id" class="btn btn-success">
+                                <i class="fas fa-user-check"></i> Vincular Usuario
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <a href="#" onclick="confirmarEliminacion(@Model.Id)" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Información Personal -->
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user text-primary"></i> Información Personal
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Nombre Completo:</strong></div>
+                        <div class="col-sm-8">@Model.NombreCompleto</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Cédula:</strong></div>
+                        <div class="col-sm-8">@Model.Cedula</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Fecha de Nacimiento:</strong></div>
+                        <div class="col-sm-8">@Model.FechaNacimiento?.ToString("dd/MM/yyyy")</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Género:</strong></div>
+                        <div class="col-sm-8">@Model.Sexo</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Estado Civil:</strong></div>
+                        <div class="col-sm-8">@Model.EstadoCivil</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Nacionalidad:</strong></div>
+                        <div class="col-sm-8">@Model.Nacionalidad</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Estado:</strong></div>
+                        <div class="col-sm-8">
+                            @if (Model.Estado)
+                            {
+                                <span class="badge badge-success">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-danger">Inactivo</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información de Contacto -->
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-phone text-info"></i> Información de Contacto
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Email Personal:</strong></div>
+                        <div class="col-sm-8">
+                            <a href="mailto:@Model.EmailPersonal">@Model.EmailPersonal</a>
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.EmailInstitucional))
+                    {
+                        <div class="row mb-3">
+                            <div class="col-sm-4"><strong>Email Institucional:</strong></div>
+                            <div class="col-sm-8">
+                                <a href="mailto:@Model.EmailInstitucional">@Model.EmailInstitucional</a>
+                            </div>
+                        </div>
+                    }
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Teléfono Celular:</strong></div>
+                        <div class="col-sm-8">@Model.TelefonoCelular</div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.TelefonoFijo))
+                    {
+                        <div class="row mb-3">
+                            <div class="col-sm-4"><strong>Teléfono Fijo:</strong></div>
+                            <div class="col-sm-8">@Model.TelefonoFijo</div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.TelefonoOficina))
+                    {
+                        <div class="row mb-3">
+                            <div class="col-sm-4"><strong>Teléfono Oficina:</strong></div>
+                            <div class="col-sm-8">@Model.TelefonoOficina @(!string.IsNullOrEmpty(Model.Extension) ? " Ext. " + Model.Extension : "")</div>
+                        </div>
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(Model.ContactoEmergenciaNombre))
+                    {
+                        <hr>
+                        <h6 class="text-danger">Contacto de Emergencia</h6>
+                        <div class="row mb-2">
+                            <div class="col-sm-4"><strong>Nombre:</strong></div>
+                            <div class="col-sm-8">@Model.ContactoEmergenciaNombre</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-4"><strong>Teléfono:</strong></div>
+                            <div class="col-sm-8">@Model.ContactoEmergenciaTelefono</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-4"><strong>Parentesco:</strong></div>
+                            <div class="col-sm-8">@Model.ContactoEmergenciaParentesco</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Dirección -->
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-map-marker-alt text-success"></i> Dirección
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Provincia != null)
+                    {
+                        <div class="row mb-3">
+                            <div class="col-sm-4"><strong>Provincia:</strong></div>
+                            <div class="col-sm-8">@Model.Provincia.Nombre</div>
+                        </div>
+                    }
+                    @if (Model.Canton != null)
+                    {
+                        <div class="row mb-3">
+                            <div class="col-sm-4"><strong>Cantón:</strong></div>
+                            <div class="col-sm-8">@Model.Canton.Nombre</div>
+                        </div>
+                    }
+                    @if (Model.Distrito != null)
+                    {
+                        <div class="row mb-3">
+                            <div class="col-sm-4"><strong>Distrito:</strong></div>
+                            <div class="col-sm-8">@Model.Distrito.Nombre</div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.DireccionExacta))
+                    {
+                        <div class="row mb-3">
+                            <div class="col-sm-4"><strong>Dirección Exacta:</strong></div>
+                            <div class="col-sm-8">@Model.DireccionExacta</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Información Adicional -->
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clipboard-list text-warning"></i> Información Adicional
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.AreasEspecializacion))
+                    {
+                        <div class="mb-3">
+                            <strong>Áreas de Especialización:</strong>
+                            <p class="mt-2">@Model.AreasEspecializacion</p>
+                        </div>
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(Model.IdiomasHabla))
+                    {
+                        <div class="mb-3">
+                            <strong>Idiomas:</strong>
+                            <p class="mt-2">@Model.IdiomasHabla</p>
+                        </div>
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(Model.NivelIngles))
+                    {
+                        <div class="mb-3">
+                            <strong>Nivel de Inglés:</strong>
+                            <p class="mt-2">@Model.NivelIngles</p>
+                        </div>
+                    }
+                    
+                    <div class="mb-2">
+                        <strong>Preferencias de Notificación:</strong>
+                    </div>
+                    <ul class="list-unstyled">
+                        <li>
+                            <i class="fas @(Model.NotificacionesEmail ? "fa-check-circle text-success" : "fa-times-circle text-danger")"></i>
+                            Notificaciones por Email
+                        </li>
+                        <li>
+                            <i class="fas @(Model.NotificacionesSMS ? "fa-check-circle text-success" : "fa-times-circle text-danger")"></i>
+                            Notificaciones por SMS
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formación Académica -->
+    @if (Model.FormacionAcademica != null && Model.FormacionAcademica.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-graduation-cap text-primary"></i> Formación Académica
+                        </h5>
+                        <span class="badge badge-primary">@Model.FormacionAcademica.Count formación(es)</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            @foreach (var formacion in Model.FormacionAcademica)
+                            {
+                                <div class="col-lg-6 mb-4">
+                                    <div class="card border-left-primary h-100">
+                                        <div class="card-body">
+                                            <h6 class="text-primary">@formacion.TituloObtenido</h6>
+                                            <p class="mb-1"><strong>Tipo:</strong> @formacion.TipoFormacion</p>
+                                            <p class="mb-1"><strong>Institución:</strong> @formacion.InstitucionEducativa</p>
+                                            @if (formacion.AnioFinalizacion.HasValue)
+                                            {
+                                                <p class="mb-1"><strong>Año:</strong> @formacion.AnioFinalizacion</p>
+                                            }
+                                            else if (formacion.EnCurso)
+                                            {
+                                                <p class="mb-1"><strong>Estado:</strong> <span class="badge badge-info">En Curso</span></p>
+                                            }
+                                            @if (formacion.EsTituloReconocidoCONARE)
+                                            {
+                                                <p class="mb-1">
+                                                    <span class="badge badge-success">
+                                                        <i class="fas fa-check"></i> Título Reconocido CONARE
+                                                    </span>
+                                                </p>
+                                            }
+                                            @if (formacion.PromedioGeneral.HasValue)
+                                            {
+                                                <p class="mb-0 text-muted small">Promedio: @formacion.PromedioGeneral.Value.ToString("F2")</p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Experiencia Laboral -->
+    @if (Model.ExperienciaLaboral != null && Model.ExperienciaLaboral.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-briefcase text-info"></i> Experiencia Laboral
+                        </h5>
+                        <span class="badge badge-info">@Model.ExperienciaLaboral.Count experiencia(s)</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            @foreach (var experiencia in Model.ExperienciaLaboral)
+                            {
+                                <div class="col-lg-6 mb-4">
+                                    <div class="card border-left-info h-100">
+                                        <div class="card-body">
+                                            <h6 class="text-info">@experiencia.CargoDesempenado</h6>
+                                            <p class="mb-1"><strong>Institución:</strong> @experiencia.NombreInstitucion</p>
+                                            <p class="mb-1"><strong>Tipo:</strong> @experiencia.TipoInstitucion</p>
+                                            <p class="mb-1">
+                                                <strong>Período:</strong> 
+                                                @experiencia.FechaInicio.ToString("MM/yyyy") - 
+                                                @(experiencia.TrabajandoActualmente ? "Actual" : experiencia.FechaFin?.ToString("MM/yyyy"))
+                                            </p>
+                                            @if (experiencia.TrabajandoActualmente)
+                                            {
+                                                <p class="mb-1">
+                                                    <span class="badge badge-success">
+                                                        <i class="fas fa-briefcase"></i> Trabajo Actual
+                                                    </span>
+                                                </p>
+                                            }
+                                            @if (!string.IsNullOrEmpty(experiencia.DescripcionFunciones))
+                                            {
+                                                <p class="mb-0 text-muted small">@experiencia.DescripcionFunciones</p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Grupos Asignados -->
+    @if (Model.ProfesorGrupos != null && Model.ProfesorGrupos.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chalkboard-teacher text-success"></i> Grupos Asignados
+                        </h5>
+                        <span class="badge badge-success">@Model.ProfesorGrupos.Count asignación(es)</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Grupo</th>
+                                        <th>Materia</th>
+                                        <th>Período</th>
+                                        <th>Profesor Guía</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var grupo in Model.ProfesorGrupos)
+                                    {
+                                        <tr>
+                                            <td>@grupo.Grupo?.Nombre</td>
+                                            <td>@grupo.Materia?.Nombre</td>
+                                            <td>@grupo.PeriodoAcademico?.Nombre</td>
+                                            <td>
+                                                @if (grupo.EsProfesorPrincipal)
+                                                {
+                                                    <span class="badge badge-primary">
+                                                        <i class="fas fa-star"></i> Profesor Guía
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">No</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (grupo.Estado)
+                                                {
+                                                    <span class="badge badge-success">Activo</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-danger">Inactivo</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Modal de confirmación para eliminar -->
+<div class="modal fade" id="modalEliminar" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-trash"></i> Confirmar Eliminación
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro de que desea eliminar al profesor <strong>@Model.NombreCompleto</strong>?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Esta acción no se puede deshacer. Toda la información relacionada será eliminada permanentemente.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <form asp-action="Delete" asp-route-id="@Model.Id" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Eliminar Definitivamente
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmarEliminacion(profesorId) {
+            $('#modalEliminar').modal('show');
+        }
+    </script>
+}

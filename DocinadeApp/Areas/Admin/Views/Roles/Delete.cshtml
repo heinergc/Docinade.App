@@ -1,0 +1,164 @@
+@model RubricasApp.Web.ViewModels.Admin.RoleViewModel
+@{
+    ViewData["Title"] = "Confirmar Eliminación";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2><i class="fas fa-exclamation-triangle text-danger"></i> Confirmar Eliminación</h2>
+                <p class="text-muted">¿Está seguro que desea eliminar este rol?</p>
+            </div>
+            <div>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver a Roles
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card shadow border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-trash"></i> Eliminar Rol
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (Model.IsSystemRole)
+                {
+                    <div class="alert alert-danger">
+                        <i class="fas fa-shield-alt"></i>
+                        <strong>Error:</strong> No se puede eliminar un rol del sistema.
+                    </div>
+                    
+                    <div class="text-center">
+                        <i class="fas fa-lock fa-3x text-danger mb-3"></i>
+                        <h5>Rol Protegido</h5>
+                        <p class="text-muted">Los roles del sistema están protegidos y no se pueden eliminar.</p>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver a Roles
+                        </a>
+                    </div>
+                }
+                else if (Model.UserCount > 0)
+                {
+                    <div class="alert alert-warning">
+                        <i class="fas fa-users"></i>
+                        <strong>Advertencia:</strong> Este rol está asignado a usuarios activos.
+                    </div>
+                    
+                    <div class="text-center">
+                        <i class="fas fa-users fa-3x text-warning mb-3"></i>
+                        <h5>Rol en Uso</h5>
+                        <p class="text-muted">
+                            No se puede eliminar el rol "<strong>@Model.Name</strong>" porque está asignado a 
+                            <strong>@Model.UserCount usuario@(Model.UserCount > 1 ? "s" : "")</strong>.
+                        </p>
+                        <p class="text-muted">
+                            Primero debe reasignar o eliminar estos usuarios antes de eliminar el rol.
+                        </p>
+                        
+                        <div class="d-flex gap-2 justify-content-center">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver a Roles
+                            </a>
+                            <a asp-area="Admin" asp-controller="Users" asp-action="Index" asp-route-roleFilter="@Model.Id" 
+                               class="btn btn-primary">
+                                <i class="fas fa-users"></i> Ver Usuarios
+                            </a>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>¡Atención!</strong> Esta acción no se puede deshacer.
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6><i class="fas fa-user-tag text-primary"></i> Información del Rol</h6>
+                        <div class="table-responsive">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Nombre:</strong></td>
+                                    <td>@Model.Name</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Permisos:</strong></td>
+                                    <td>
+                                        <span class="badge bg-info">@Model.PermissionCount</span>
+                                        @if (Model.PermissionCount > 0)
+                                        {
+                                            <small class="text-muted">permisos asignados</small>
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Usuarios:</strong></td>
+                                    <td>
+                                        <span class="badge bg-success">@Model.UserCount</span>
+                                        <small class="text-muted">usuarios asignados</small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Tipo:</strong></td>
+                                    <td>
+                                        @if (Model.IsSystemRole)
+                                        {
+                                            <span class="badge bg-warning text-dark">Sistema</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Personalizado</span>
+                                        }
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="bg-light p-3 rounded mb-4">
+                        <h6><i class="fas fa-info-circle text-info"></i> Consecuencias de la eliminación:</h6>
+                        <ul class="mb-0">
+                            <li>El rol "<strong>@Model.Name</strong>" será eliminado permanentemente</li>
+                            <li>Se perderán todos los permisos asociados a este rol</li>
+                            <li>No se podrá recuperar esta configuración</li>
+                        </ul>
+                    </div>
+
+                    <form asp-action="Delete" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <div class="d-flex justify-content-end gap-2">
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger" onclick="return confirmDelete()">
+                                <i class="fas fa-trash"></i> Eliminar Rol
+                            </button>
+                        </div>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDelete() {
+            return confirm('¿Está completamente seguro que desea eliminar el rol "@Model.Name"?\n\nEsta acción no se puede deshacer.');
+        }
+
+        $(document).ready(function() {
+            // Auto-focus en el botón cancelar por seguridad
+            $('a[asp-action="Index"]').first().focus();
+        });
+    </script>
+}

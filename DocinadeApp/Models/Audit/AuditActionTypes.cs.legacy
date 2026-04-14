@@ -1,0 +1,182 @@
+namespace RubricasApp.Web.Models.Audit
+{
+    /// <summary>
+    /// Tipos de acciones de auditoría
+    /// </summary>
+    public static class AuditActionTypes
+    {
+        /// <summary>
+        /// Acciones de autenticación
+        /// </summary>
+        public static class Auth
+        {
+            public const string LOGIN = "Auth.Login";
+            public const string LOGOUT = "Auth.Logout";
+            public const string FAILED_LOGIN = "Auth.FailedLogin";
+            public const string PASSWORD_CHANGE = "Auth.PasswordChange";
+            public const string PASSWORD_RESET = "Auth.PasswordReset";
+            public const string ACCOUNT_LOCKOUT = "Auth.AccountLockout";
+            public const string ACCOUNT_UNLOCK = "Auth.AccountUnlock";
+        }
+
+        /// <summary>
+        /// Acciones de rúbricas
+        /// </summary>
+        public static class Rubricas
+        {
+            public const string CREAR = "Rubricas.Crear";
+            public const string VER = "Rubricas.Ver";
+            public const string EDITAR = "Rubricas.Editar";
+            public const string ELIMINAR = "Rubricas.Eliminar";
+            public const string DUPLICAR = "Rubricas.Duplicar";
+            public const string IMPORTAR = "Rubricas.Importar";
+            public const string EXPORTAR = "Rubricas.Exportar";
+            public const string APROBAR = "Rubricas.Aprobar";
+            public const string PUBLICAR = "Rubricas.Publicar";
+        }
+
+        /// <summary>
+        /// Acciones de evaluaciones
+        /// </summary>
+        public static class Evaluaciones
+        {
+            public const string CREAR = "Evaluaciones.Crear";
+            public const string VER = "Evaluaciones.Ver";
+            public const string EDITAR = "Evaluaciones.Editar";
+            public const string ELIMINAR = "Evaluaciones.Eliminar";
+            public const string EVALUAR = "Evaluaciones.Evaluar";
+            public const string APROBAR = "Evaluaciones.Aprobar";
+            public const string FINALIZAR = "Evaluaciones.Finalizar";
+            public const string REABRIR = "Evaluaciones.Reabrir";
+            public const string EXPORTAR = "Evaluaciones.Exportar";
+            public const string VER_RESULTADOS = "Evaluaciones.VerResultados";
+        }
+
+        /// <summary>
+        /// Acciones de estudiantes
+        /// </summary>
+        public static class Estudiantes
+        {
+            public const string CREAR = "Estudiantes.Crear";
+            public const string VER = "Estudiantes.Ver";
+            public const string EDITAR = "Estudiantes.Editar";
+            public const string ELIMINAR = "Estudiantes.Eliminar";
+            public const string IMPORTAR = "Estudiantes.Importar";
+            public const string EXPORTAR = "Estudiantes.Exportar";
+            public const string VER_HISTORIAL = "Estudiantes.VerHistorial";
+            public const string VER_NOTAS = "Estudiantes.VerNotas";
+            public const string EDITAR_NOTAS = "Estudiantes.EditarNotas";
+        }
+
+        /// <summary>
+        /// Acciones de períodos académicos
+        /// </summary>
+        public static class Periodos
+        {
+            public const string CREAR = "Periodos.Crear";
+            public const string VER = "Periodos.Ver";
+            public const string EDITAR = "Periodos.Editar";
+            public const string ELIMINAR = "Periodos.Eliminar";
+            public const string ACTIVAR = "Periodos.Activar";
+            public const string CERRAR = "Periodos.Cerrar";
+        }
+
+        /// <summary>
+        /// Acciones de niveles de calificación
+        /// </summary>
+        public static class Niveles
+        {
+            public const string CREAR = "Niveles.Crear";
+            public const string VER = "Niveles.Ver";
+            public const string EDITAR = "Niveles.Editar";
+            public const string ELIMINAR = "Niveles.Eliminar";
+            public const string REORDENAR = "Niveles.Reordenar";
+        }
+
+        /// <summary>
+        /// Acciones de ítems de evaluación
+        /// </summary>
+        public static class Items
+        {
+            public const string CREAR = "Items.Crear";
+            public const string VER = "Items.Ver";
+            public const string EDITAR = "Items.Editar";
+            public const string ELIMINAR = "Items.Eliminar";
+            public const string REORDENAR = "Items.Reordenar";
+        }
+
+        /// <summary>
+        /// Acciones de configuración
+        /// </summary>
+        public static class Configuracion
+        {
+            public const string VER = "Configuracion.Ver";
+            public const string EDITAR_SISTEMA = "Configuracion.EditarSistema";
+            public const string EDITAR_SEGURIDAD = "Configuracion.EditarSeguridad";
+            public const string GESTIONAR_ROLES = "Configuracion.GestionarRoles";
+            public const string GESTIONAR_PERMISOS = "Configuracion.GestionarPermisos";
+            public const string BACKUP = "Configuracion.Backup";
+            public const string RESTAURAR = "Configuracion.Restaurar";
+            public const string MODO_MANTENIMIENTO = "Configuracion.ModoMantenimiento";
+            public const string INICIALIZAR = "Configuracion.Inicializar";
+            public const string SINCRONIZAR_PERMISOS = "Configuracion.SincronizarPermisos";
+            public const string VERIFICAR_ESTADO = "Configuracion.VerificarEstado";
+        }
+
+        /// <summary>
+        /// Acciones de auditoría
+        /// </summary>
+        public static class Auditoria
+        {
+            public const string VER = "Auditoria.Ver";
+            public const string VER_ACCESOS = "Auditoria.VerAccesos";
+            public const string VER_CAMBIOS = "Auditoria.VerCambios";
+            public const string VER_ERRORES = "Auditoria.VerErrores";
+            public const string VER_METRICAS = "Auditoria.VerMetricas";
+            public const string EXPORTAR = "Auditoria.Exportar";
+            public const string LIMPIAR = "Auditoria.Limpiar";
+        }
+
+        /// <summary>
+        /// Acciones de usuarios
+        /// </summary>
+        public static class Usuarios
+        {
+            public const string CREAR = "Usuarios.Crear";
+            public const string VER = "Usuarios.Ver";
+            public const string EDITAR = "Usuarios.Editar";
+            public const string ELIMINAR = "Usuarios.Eliminar";
+            public const string ACTIVAR = "Usuarios.Activar";
+            public const string DESACTIVAR = "Usuarios.Desactivar";
+            public const string CAMBIAR_PASSWORD = "Usuarios.CambiarPassword";
+            public const string RESETEAR_PASSWORD = "Usuarios.ResetearPassword";
+            public const string GESTIONAR_ROLES = "Usuarios.GestionarRoles";
+            public const string VER_ACTIVIDAD = "Usuarios.VerActividad";
+        }
+
+        /// <summary>
+        /// Acciones de roles
+        /// </summary>
+        public static class Roles
+        {
+            public const string CREAR = "Roles.Crear";
+            public const string VER = "Roles.Ver";
+            public const string EDITAR = "Roles.Editar";
+            public const string ELIMINAR = "Roles.Eliminar";
+            public const string GESTIONAR_PERMISOS = "Roles.GestionarPermisos";
+            public const string SINCRONIZAR_PERMISOS = "Roles.SincronizarPermisos";
+        }
+
+        /// <summary>
+        /// Acciones de reportes
+        /// </summary>
+        public static class Reportes
+        {
+            public const string VER_BASICOS = "Reportes.VerBasicos";
+            public const string VER_AVANZADOS = "Reportes.VerAvanzados";
+            public const string CREAR_PERSONALIZADOS = "Reportes.CrearPersonalizados";
+            public const string EXPORTAR = "Reportes.Exportar";
+            public const string PROGRAMAR = "Reportes.Programar";
+        }
+    }
+}

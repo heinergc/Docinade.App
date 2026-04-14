@@ -1,0 +1,688 @@
+﻿@model RubricasApp.Web.ViewModels.Grupos.CrearGrupoViewModel
+
+@{
+    ViewData["Title"] = "Crear Grupo";
+}
+
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="page-title">
+                <i class="fas fa-plus-circle text-primary me-2"></i>
+                Crear Nuevo Grupo
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index")">
+                            <i class="fas fa-users-cog"></i> Grupos
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">Crear Grupo</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="modern-card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Información del Grupo
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post" id="createGroupForm">
+                    @* Mostrar errores de validación de una manera más clara *@
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Por favor corrija los siguientes errores:
+                            </h6>
+                            <ul class="mb-0">
+                                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                {
+                                    <li>@error.ErrorMessage</li>
+                                }
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="display: none;"></div>
+
+                    <!-- Información básica -->
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label asp-for="Codigo" class="form-label required">Código del Grupo</label>
+                                <input asp-for="Codigo" class="form-control" placeholder="Ej: 7-1, G1, VIRT-A" maxlength="20" />
+                                <span asp-validation-for="Codigo" class="text-danger"></span>
+                                <div class="form-text">Código único identificador del grupo</div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="form-group mb-3">
+                                <label asp-for="Nombre" class="form-label required">Nombre del Grupo</label>
+                                <input asp-for="Nombre" class="form-control" placeholder="Ej: Séptimo Sección 1" maxlength="100" />
+                                <span asp-validation-for="Nombre" class="text-danger"></span>
+                                <div class="form-text">Nombre descriptivo del grupo</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="IdTipoGrupo" class="form-label required">Tipo de Grupo</label>
+                                <select asp-for="IdTipoGrupo" class="form-select" id="IdTipoGrupo" name="IdTipoGrupo">
+                                    <option value="">Seleccione un tipo</option>
+                                    @if (Model.TiposGrupo != null)
+                                    {
+                                        @foreach (var tipo in Model.TiposGrupo)
+                                        {
+                                            <option value="@tipo.Value">@tipo.Text</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="IdTipoGrupo" class="text-danger"></span>
+                                <div class="form-text">Seleccione el tipo de grupo</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Nivel" class="form-label">Nivel Académico</label>
+                                <input asp-for="Nivel" class="form-control" placeholder="Ej: SEPTIMO, OCTAVO, VIRTUAL" maxlength="50" />
+                                <span asp-validation-for="Nivel" class="text-danger"></span>
+                                <div class="form-text">Opcional: Especifica el nivel académico</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="PeriodoAcademicoId" class="form-label required">Período Académico</label>
+                                <select asp-for="PeriodoAcademicoId" class="form-select" id="PeriodoAcademicoId" name="PeriodoAcademicoId">
+                                    <option value="">Seleccione un período</option>
+                                    @if (ViewBag.PeriodosAcademicos != null)
+                                    {
+                                        @foreach (var periodo in ViewBag.PeriodosAcademicos)
+                                        {
+                                            <option value="@periodo.Value" selected="@(periodo.Value == Model.PeriodoAcademicoId.ToString())">
+                                                @periodo.Text
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="PeriodoAcademicoId" class="text-danger"></span>
+                                <div class="form-text">Seleccione el período académico</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="CapacidadMaxima" class="form-label">Capacidad Máxima</label>
+                                <input asp-for="CapacidadMaxima" type="number" class="form-control"
+                                       placeholder="Opcional: Límite de estudiantes" min="1" max="200" />
+                                <span asp-validation-for="CapacidadMaxima" class="text-danger"></span>
+                                <div class="form-text">Dejar vacío para capacidad ilimitada</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group mb-3">
+                                <label asp-for="InstitucionId" class="form-label">
+                                    <i class="fas fa-school me-1"></i>Institución
+                                </label>
+                                <select asp-for="InstitucionId" class="form-select" id="InstitucionId" name="InstitucionId">
+                                    <option value="">-- Seleccione una institución (opcional) --</option>
+                                    @if (Model.InstitucionesDisponibles != null)
+                                    {
+                                        @foreach (var institucion in Model.InstitucionesDisponibles)
+                                        {
+                                            <option value="@institucion.Value">@institucion.Text</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="InstitucionId" class="text-danger"></span>
+                                <div class="form-text">Opcional: Asigne el grupo a una institución educativa</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Descripcion" class="form-label">Descripción</label>
+                        <textarea asp-for="Descripcion" class="form-control" rows="3"
+                                  placeholder="Descripción opcional del grupo..." maxlength="500"></textarea>
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                        <div class="form-text">
+                            <span id="descripcionCounter">0</span>/500 caracteres
+                        </div>
+                    </div>
+
+                    <!-- Materias asociadas -->
+                    <div class="form-group mb-4">
+                        <label class="form-label">Materias Asociadas (Opcional)</label>
+                        <div class="card border-light bg-light">
+                            <div class="card-body">
+                                <div class="row">
+                                    @if (ViewBag.MateriasDisponibles != null)
+                                    {
+                                        @foreach (var materia in ViewBag.MateriasDisponibles)
+                                        {
+                                            <div class="col-md-6 mb-2">
+                                                <div class="form-check">
+                                                    <input type="checkbox" name="MateriasSeleccionadas" 
+                                                           value="@materia.Value" class="form-check-input" 
+                                                           id="materia_@materia.Value" />
+                                                    <label class="form-check-label" for="materia_@materia.Value">
+                                                        @materia.Text
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="col-12">
+                                            <p class="text-muted mb-0">No hay materias disponibles</p>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="form-text mt-2">
+                                    Seleccione las materias que estarán asociadas a este grupo
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Observaciones" class="form-label">Observaciones</label>
+                        <textarea asp-for="Observaciones" class="form-control" rows="2"
+                                  placeholder="Observaciones adicionales..." maxlength="1000"></textarea>
+                        <span asp-validation-for="Observaciones" class="text-danger"></span>
+                        <div class="form-text">
+                            <span id="observacionesCounter">0</span>/1000 caracteres
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="row">
+                        <div class="col-12">
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <a href="@Url.Action("Index")" class="btn btn-modern secondary">
+                                    <i class="fas fa-arrow-left"></i> Cancelar
+                                </a>
+                                <div>
+                                    <button type="button" class="btn btn-modern info me-2" id="generateNameBtn">
+                                        <i class="fas fa-magic"></i> Auto-generar Nombre
+                                    </button>
+                                    <button type="button" class="btn btn-modern warning me-2" id="debugBtn">
+                                        <i class="fas fa-bug"></i> Debug
+                                    </button>
+                                    <button type="submit" class="btn btn-modern primary" id="submitBtn">
+                                        <i class="fas fa-save"></i> Crear Grupo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            console.log('🚀 Formulario Create GrupoEstudiantes cargado');
+            
+            // 🔧 NUEVO ENFOQUE: Habilitar botón por defecto y validar en tiempo real
+            const submitBtn = $('#submitBtn');
+            submitBtn.prop('disabled', false).removeClass('btn-disabled');
+            console.log('✅ Botón habilitado por defecto');
+            
+            // 🔧 VALIDACIÓN MEJORADA en tiempo real
+            function validarYActualizarBoton() {
+                const codigo = $('#Codigo').val()?.trim() || '';
+                const nombre = $('#Nombre').val()?.trim() || '';
+                const tipoGrupo = $('#IdTipoGrupo').val() || '';
+                const periodoAcademico = $('#PeriodoAcademicoId').val() || '';
+                
+                console.log('🔍 Validación:', {
+                    codigo: codigo,
+                    nombre: nombre,
+                    tipoGrupo: tipoGrupo,
+                    periodoAcademico: periodoAcademico
+                });
+                
+                // Solo deshabilitar si faltan campos críticos
+                const todosCamposLlenos = codigo && nombre && tipoGrupo && periodoAcademico;
+                
+                if (todosCamposLlenos) {
+                    submitBtn.prop('disabled', false).removeClass('btn-disabled');
+                    console.log('✅ Todos los campos completos - Botón habilitado');
+                } else {
+                    // Por ahora mantener habilitado para permitir validación del servidor
+                    submitBtn.prop('disabled', false).removeClass('btn-disabled');
+                    console.log('⚠️ Campos faltantes pero botón sigue habilitado');
+                }
+            }
+            
+            // Aplicar validación en cambios de campos críticos
+            $('#Codigo, #Nombre, #IdTipoGrupo, #PeriodoAcademicoId').on('input change blur', validarYActualizarBoton);
+            
+            // Validación inicial
+            setTimeout(validarYActualizarBoton, 200);
+
+            // Contador de caracteres para descripción
+            $('#Descripcion').on('input', function() {
+                const length = $(this).val().length;
+                $('#descripcionCounter').text(length);
+
+                if (length > 450) {
+                    $('#descripcionCounter').addClass('text-warning');
+                } else {
+                    $('#descripcionCounter').removeClass('text-warning');
+                }
+            });
+
+            // Contador de caracteres para observaciones
+            $('#Observaciones').on('input', function() {
+                const length = $(this).val().length;
+                $('#observacionesCounter').text(length);
+
+                if (length > 900) {
+                    $('#observacionesCounter').addClass('text-warning');
+                } else {
+                    $('#observacionesCounter').removeClass('text-warning');
+                }
+            });
+
+            // 🔧 MANTENER: Funciones útiles pero simplificadas
+            // Auto-generar nombre basado en tipo y código
+            $('#generateNameBtn').click(function() {
+                const codigo = $('#Codigo').val();
+                const tipoTexto = $('#IdTipoGrupo option:selected').text();
+                const nivel = $('#Nivel').val();
+                
+                if (!codigo || !tipoTexto || tipoTexto === 'Seleccione un tipo') {
+                    Swal.fire({
+                        title: 'Información faltante',
+                        text: 'Por favor, complete el código y tipo de grupo antes de auto-generar el nombre.',
+                        icon: 'warning'
+                    });
+                    return;
+                }
+                
+                let nombreGenerado = '';
+                
+                switch(tipoTexto) {
+                    case 'Sección':
+                        if (nivel) {
+                            nombreGenerado = `${nivel} Sección ${codigo}`;
+                        } else {
+                            nombreGenerado = `Sección ${codigo}`;
+                        }
+                        break;
+                    case 'Nivel':
+                        nombreGenerado = `Grupo Nivel ${codigo}`;
+                        if (nivel) {
+                            nombreGenerado = `${nivel} - Grupo ${codigo}`;
+                        }
+                        break;
+                    case 'Modalidad':
+                        nombreGenerado = `Modalidad ${codigo}`;
+                        if (nivel) {
+                            nombreGenerado = `${nivel} ${codigo}`;
+                        }
+                        break;
+                    case 'Personalizado':
+                        nombreGenerado = `Grupo ${codigo}`;
+                        if (nivel) {
+                            nombreGenerado = `${nivel} - Grupo ${codigo}`;
+                        }
+                        break;
+                    default:
+                        nombreGenerado = `Grupo ${codigo}`;
+                }
+                
+                $('#Nombre').val(nombreGenerado);
+                
+                Swal.fire({
+                    title: 'Nombre generado',
+                    text: `Se ha generado el nombre: "${nombreGenerado}"`,
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            });
+
+
+            // Sugerencias de nivel basadas en tipo
+            $('#IdTipoGrupo').change(function() {
+                const tipo = $(this).val();
+                const nivelInput = $('#Nivel');
+
+                // Limpiar valor actual
+                nivelInput.val('');
+
+                // Sugerir placeholder basado en tipo (usando valores del catálogo)
+                // Para mayor compatibilidad, usamos los nombres de las opciones
+                const tipoTexto = $(this).find('option:selected').text();
+                
+                switch(tipoTexto) {
+                    case 'Sección':
+                        nivelInput.attr('placeholder', 'Ej: SEPTIMO, OCTAVO, NOVENO');
+                        break;
+                    case 'Nivel':
+                        nivelInput.attr('placeholder', 'Ej: BASICO, MEDIO, AVANZADO');
+                        break;
+                    case 'Modalidad':
+                        nivelInput.attr('placeholder', 'Ej: PRESENCIAL, VIRTUAL, HIBRIDA');
+                        break;
+                    case 'Personalizado':
+                        nivelInput.attr('placeholder', 'Ej: ESPECIAL, REFUERZO, HONOR');
+                        break;
+                    default:
+                        nivelInput.attr('placeholder', 'Opcional: Especifica el nivel');
+                }
+            });
+
+            // Validación en tiempo real
+            function validarCamposRequeridos() {
+                const codigo = $('#Codigo').val().trim();
+                const nombre = $('#Nombre').val().trim();
+                const tipo = $('#IdTipoGrupo').val(); // 🔧 USAR: IdTipoGrupo
+                const periodo = $('#PeriodoAcademicoId').val();
+                
+                let errores = [];
+                
+                if (!codigo) errores.push('Código del Grupo');
+                if (!nombre) errores.push('Nombre del Grupo');
+                if (!tipo || tipo === '') errores.push('Tipo de Grupo'); // 🔧 MEJORAR: Validación más específica
+                if (!periodo || periodo === '') errores.push('Período Académico'); // 🔧 MEJORAR: Validación más específica
+                
+                console.log('🔍 DEBUG Validación:', {
+                    codigo: codigo,
+                    nombre: nombre,
+                    tipo: tipo,
+                    periodo: periodo,
+                    errores: errores
+                });
+                
+                return errores;
+            }
+            
+            // Validar campos al perder el foco
+            $('#Codigo, #Nombre, #IdTipoGrupo, #PeriodoAcademicoId').on('blur change input keyup', function() {
+                console.log('🔧 Campo cambiado:', this.id, '=', $(this).val());
+                
+                const errores = validarCamposRequeridos();
+                const submitBtn = $('#submitBtn'); // 🔧 USAR: ID específico
+                
+                if (errores.length > 0) {
+                    submitBtn.prop('disabled', true).addClass('btn-disabled');
+                    console.log('❌ Botón deshabilitado. Errores:', errores);
+                } else {
+                    submitBtn.prop('disabled', false).removeClass('btn-disabled');
+                    console.log('✅ Botón habilitado');
+                }
+            });
+
+            // 🔧 NUEVA: Validación inicial al cargar la página
+            console.log('🚀 Inicializando validación...');
+            setTimeout(function() {
+                const errores = validarCamposRequeridos();
+                const submitBtn = $('#submitBtn'); // 🔧 USAR: ID específico
+                
+                // 🔧 CAMBIO: Iniciar siempre habilitado, solo deshabilitar si hay errores críticos
+                submitBtn.prop('disabled', false).removeClass('btn-disabled');
+                console.log('📋 Estado inicial: Botón habilitado por defecto');
+                
+                if (errores.length > 0) {
+                    console.log('📋 Errores encontrados pero botón sigue habilitado:', errores);
+                }
+            }, 100);
+            
+            // 🔧 NUEVA: Debug de tipos de grupo disponibles
+            console.log('📊 Tipos de grupo disponibles:');
+            $('#IdTipoGrupo option').each(function() {
+                console.log('  -', $(this).val(), '=', $(this).text());
+            });
+
+            // Validación del formulario antes de envío (solo campos críticos)
+            $('#createGroupForm').on('submit', function(e) {
+                console.log('📝 Enviando formulario...');
+                
+                const codigo = $('#Codigo').val().trim();
+                const nombre = $('#Nombre').val().trim();
+                
+                // Solo validar campos absolutamente críticos
+                let erroresCriticos = [];
+                if (!codigo) erroresCriticos.push('Código del Grupo');
+                if (!nombre) erroresCriticos.push('Nombre del Grupo');
+
+                if (erroresCriticos.length > 0) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Campos requeridos',
+                        html: `Los siguientes campos son obligatorios:<br><br><ul style="text-align: left;"><li>${erroresCriticos.join('</li><li>')}</li></ul>`,
+                        icon: 'error',
+                        confirmButtonText: 'Entendido'
+                    });
+                    return false;
+                }
+
+                // Mostrar loading si todo está bien
+                Swal.fire({
+                    title: 'Creando grupo...',
+                    text: 'Por favor espere',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                return true;
+            });
+
+            // Inicializar contadores y validación inicial
+            $('#Descripcion').trigger('input');
+            $('#Observaciones').trigger('input');
+            
+            // 🔧 NUEVA: Validación inicial al cargar la página
+            console.log('🚀 Inicializando validación...');
+            setTimeout(function() {
+                const errores = validarCamposRequeridos();
+                const submitBtn = $('#submitBtn'); // 🔧 USAR: ID específico
+                
+                // 🔧 CAMBIO: Iniciar siempre habilitado, solo deshabilitar si hay errores críticos
+                submitBtn.prop('disabled', false).removeClass('btn-disabled');
+                console.log('📋 Estado inicial: Botón habilitado por defecto');
+                
+                if (errores.length > 0) {
+                    console.log('📋 Errores encontrados pero botón sigue habilitado:', errores);
+                }
+            }, 100);
+            
+            // 🔧 NUEVA: Debug de tipos de grupo disponibles
+            console.log('📊 Tipos de grupo disponibles:');
+            $('#IdTipoGrupo option').each(function() {
+                console.log('  -', $(this).val(), '=', $(this).text());
+            });
+
+            // Debug automático cuando cambian los campos
+            $('#Codigo, #Nombre, #IdTipoGrupo, #PeriodoAcademicoId').on('change input', function() {
+                debugFormulario();
+                
+                // 🔧 NUEVA: Mostrar estado de validación en tiempo real
+                const errores = validarCamposRequeridos();
+                console.log('🔍 Errores encontrados:', errores);
+                console.log('🔍 Botón habilitado:', errores.length === 0);
+            });
+
+            // 🔧 NUEVA: Debug adicional para verificar que los campos se cargan correctamente
+            $(document).ready(function() {
+                console.log('🚀 Vista Create cargada');
+                console.log('🔍 Campo IdTipoGrupo encontrado:', $('#IdTipoGrupo').length > 0);
+                console.log('🔍 Opciones de tipo disponibles:', $('#IdTipoGrupo option').length);
+                console.log('🔍 Campo PeriodoAcademicoId encontrado:', $('#PeriodoAcademicoId').length > 0);
+                console.log('🔍 Opciones de período disponibles:', $('#PeriodoAcademicoId option').length);
+                
+                // Listar todas las opciones de tipo de grupo
+                $('#IdTipoGrupo option').each(function(index, element) {
+                    console.log(`🏷️ Tipo ${index}: Valor="${$(element).val()}" Texto="${$(element).text()}"`);
+                });
+            });
+            
+            // Evento para el botón de debug
+            $('#debugBtn').click(function() {
+                console.log('🐛 DEBUG ACTIVADO');
+                const estado = {
+                    codigo: $('#Codigo').val() || '',
+                    nombre: $('#Nombre').val() || '',
+                    idTipoGrupo: $('#IdTipoGrupo').val() || '',
+                    tipoTexto: $('#IdTipoGrupo option:selected').text() || '',
+                    periodoAcademico: $('#PeriodoAcademicoId').val() || '',
+                    periodoTexto: $('#PeriodoAcademicoId option:selected').text() || '',
+                    submitBtnDisabled: $('#submitBtn').prop('disabled'),
+                    elementosEncontrados: {
+                        codigoInput: $('#Codigo').length,
+                        nombreInput: $('#Nombre').length,
+                        tipoSelect: $('#IdTipoGrupo').length,
+                        periodoSelect: $('#PeriodoAcademicoId').length,
+                        submitButton: $('#submitBtn').length
+                    }
+                };
+                
+                console.table(estado);
+                $('#submitBtn').prop('disabled', false).removeClass('btn-disabled');
+                
+                // Mostrar opciones disponibles
+                console.log('📋 Tipos de grupo disponibles:');
+                $('#IdTipoGrupo option').each(function(i, el) {
+                    console.log(`  ${i}: value="${$(el).val()}" text="${$(el).text()}"`);
+                });
+                
+                console.log('📋 Períodos disponibles:');
+                $('#PeriodoAcademicoId option').each(function(i, el) {
+                    console.log(`  ${i}: value="${$(el).val()}" text="${$(el).text()}"`);
+                });
+                
+                Swal.fire({
+                    title: 'Debug - Estado del Formulario',
+                    html: `<div style="text-align: left; font-family: monospace;">
+                        <strong>Elementos encontrados:</strong><br>
+                        - Código input: ${estado.elementosEncontrados.codigoInput ? '✅' : '❌'}<br>
+                        - Nombre input: ${estado.elementosEncontrados.nombreInput ? '✅' : '❌'}<br>
+                        - Tipo select: ${estado.elementosEncontrados.tipoSelect ? '✅' : '❌'}<br>
+                        - Período select: ${estado.elementosEncontrados.periodoSelect ? '✅' : '❌'}<br>
+                        - Submit button: ${estado.elementosEncontrados.submitButton ? '✅' : '❌'}<br><br>
+                        <strong>Valores:</strong><br>
+                        - Código: "${estado.codigo}" ${estado.codigo ? '✅' : '❌'}<br>
+                        - Nombre: "${estado.nombre}" ${estado.nombre ? '✅' : '❌'}<br>
+                        - Tipo ID: "${estado.idTipoGrupo}" ${estado.idTipoGrupo ? '✅' : '❌'}<br>
+                        - Tipo Texto: "${estado.tipoTexto}"<br>
+                        - Período ID: "${estado.periodoAcademico}" ${estado.periodoAcademico ? '✅' : '❌'}<br>
+                        - Período Texto: "${estado.periodoTexto}"<br>
+                        - Botón Deshabilitado: ${estado.submitBtnDisabled ? 'Sí ❌' : 'No ✅'}
+                    </div>`,
+                    icon: 'info',
+                    width: '600px'
+                });
+            });
+            
+            $('#Descripcion, #Observaciones').trigger('input');
+            console.log('✅ Formulario inicializado');
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .required::after {
+            content: ' *';
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .form-check {
+            padding: 0.25rem 0;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .card-body {
+            background-color: #f8f9fa;
+        }
+
+        .text-warning {
+            font-weight: bold;
+        }
+
+        .modern-card {
+            border: none;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+
+            .modern-card .card-header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border-radius: 10px 10px 0 0;
+            }
+
+        .btn-modern.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+        }
+
+        .btn-modern.secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            color: white;
+        }
+
+        .btn-modern.info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border: none;
+            color: white;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .alert ul {
+            padding-left: 1.5rem;
+        }
+        
+        .alert ul li {
+            margin-bottom: 0.25rem;
+        }
+    </style>
+}

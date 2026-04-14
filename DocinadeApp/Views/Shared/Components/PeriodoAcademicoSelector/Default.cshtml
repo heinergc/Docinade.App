@@ -1,0 +1,176 @@
+﻿@model RubricasApp.Web.ViewModels.PeriodoAcademicoSelectorViewModel
+
+@if (User.Identity?.IsAuthenticated == true && Model.PeriodoActivo != null)
+{
+    <div class="periodo-academico-selector @Model.CssClass">
+        <div class="dropdown">
+            <button class="btn btn-outline-primary dropdown-toggle d-flex align-items-center" 
+                    type="button" 
+                    id="periodoSelector" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false"
+                    title="Período Académico Activo: @Model.PeriodoActivo.NombreCompleto">
+                <i class="fas fa-calendar-alt me-2"></i>
+                @if (Model.MostrarTexto)
+                {
+                    <span class="d-none d-lg-inline">Período: </span>
+                }
+                <span class="fw-bold">@Model.PeriodoActivo.NombreCompleto</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="periodoSelector">
+                <li>
+                    <h6 class="dropdown-header">
+                        <i class="fas fa-calendar-check"></i> Períodos Disponibles
+                    </h6>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                
+                @foreach(var periodo in Model.PeriodosDisponibles)
+                {
+                    <li>
+                        <a class="dropdown-item d-flex justify-content-between align-items-center @(periodo.Id == Model.PeriodoActivo.Id ? "active" : "")" 
+                           href="#" 
+                           onclick="cambiarPeriodo(@periodo.Id)"
+                           title="@periodo.NombreCompleto">
+                            <div>
+                                <div class="fw-bold">@periodo.NombreCompleto</div>
+                                <small class="text-muted-while">
+                                    @periodo.FechaInicio.ToString("dd/MM") - @periodo.FechaFin.ToString("dd/MM/yyyy")
+                                </small>
+                            </div>
+                            @if(periodo.Id == Model.PeriodoActivo.Id)
+                            {
+                                <i class="fas fa-check text-success"></i>
+                            }
+                        </a>
+                    </li>
+                }
+                
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item" href="@Url.Action("Seleccionar", "PeriodoAcademico")">
+                        <i class="fas fa-cog me-2"></i>
+                        Administrar Períodos
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        @if (Model.MostrarIndicador)
+        {
+            <div class="periodo-indicator mt-1">
+                <small class="text-muted">
+                    <i class="fas fa-clock me-1"></i>
+                    @Model.PeriodoActivo.FechaInicio.ToString("dd/MM") - @Model.PeriodoActivo.FechaFin.ToString("dd/MM/yyyy")
+                </small>
+            </div>
+        }
+    </div>
+}
+else if (User.Identity?.IsAuthenticated == true)
+{
+    <div class="periodo-academico-selector @Model.CssClass">
+        <a href="@Url.Action("Seleccionar", "PeriodoAcademico")" class="btn btn-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span class="d-none d-lg-inline">Seleccionar Período</span>
+            <span class="d-lg-none">Período</span>
+        </a>
+    </div>
+}
+
+<script>
+    function cambiarPeriodo(periodoId) {
+        // Mostrar indicador de carga
+        const button = document.getElementById('periodoSelector');
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Cambiando...';
+        button.disabled = true;
+
+        fetch('@Url.Action("CambiarPeriodo", "PeriodoAcademico")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: JSON.stringify({ periodoId: periodoId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                // Mostrar mensaje de éxito brevemente
+                button.innerHTML = '<i class="fas fa-check me-2"></i>¡Cambiado!';
+                
+                // Recargar página después de un breve delay
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
+            } else {
+                // Mostrar error
+                console.error('Error al cambiar período:', data.message);
+                button.innerHTML = originalText;
+                button.disabled = false;
+                
+                // Mostrar notificación de error (si tienes un sistema de notificaciones)
+                if (typeof showNotification === 'function') {
+                    showNotification('Error al cambiar período: ' + data.message, 'error');
+                } else {
+                    alert('Error al cambiar período: ' + data.message);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            button.innerHTML = originalText;
+            button.disabled = false;
+            
+            if (typeof showNotification === 'function') {
+                showNotification('Error de conexión', 'error');
+            } else {
+                alert('Error de conexión');
+            }
+        });
+    }
+</script>
+
+<style>
+    .periodo-academico-selector .dropdown-toggle {
+        max-width: 250px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .periodo-academico-selector .dropdown-menu {
+        min-width: 300px;
+        max-width: 400px;
+    }
+    
+    .periodo-academico-selector .dropdown-item {
+        white-space: normal;
+        padding: 0.75rem 1rem;
+    }
+    
+    .periodo-academico-selector .dropdown-item:hover {
+        background-color: var(--bs-light);
+    }
+    
+    .periodo-academico-selector .dropdown-item.active {
+        background-color: var(--bs-primary);
+        color: white;
+    }
+    
+    .periodo-indicator {
+        font-size: 0.75rem;
+        text-align: center;
+    }
+    
+    @@media (max-width: 768px) {
+        .periodo-academico-selector .dropdown-toggle {
+            max-width: 150px;
+        }
+        
+        .periodo-academico-selector .dropdown-menu {
+            min-width: 280px;
+        }
+    }
+</style>

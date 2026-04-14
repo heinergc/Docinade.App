@@ -1,0 +1,87 @@
+@{
+    ViewData["Title"] = "Test de Datos - Sistema de Grupos";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-database me-2"></i>
+                        Test de Datos del Sistema de Grupos
+                    </h4>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">
+                            <h5><i class="fas fa-exclamation-triangle me-2"></i>Error en Test</h5>
+                            <p><strong>Mensaje:</strong> @ViewBag.Error</p>
+                            @if (ViewBag.StackTrace != null)
+                            {
+                                <details>
+                                    <summary>Ver stack trace completo</summary>
+                                    <pre class="mt-2" style="font-size: 0.8rem; background: #f8f9fa; padding: 1rem; border-radius: 4px;">@ViewBag.StackTrace</pre>
+                                </details>
+                            }
+                        </div>
+                    }
+                    else if (ViewBag.Resultados != null)
+                    {
+                        <div class="alert alert-success">
+                            <h5><i class="fas fa-check-circle me-2"></i>Test Completado</h5>
+                            <p>Todos los tests se ejecutaron correctamente.</p>
+                        </div>
+
+                        <h5>?? Resultados del Test</h5>
+                        <ul class="list-group">
+                            @foreach (string resultado in ViewBag.Resultados)
+                            {
+                                <li class="list-group-item">
+                                    <code>@resultado</code>
+                                </li>
+                            }
+                        </ul>
+                    }
+
+                    <hr>
+                    <div class="d-flex gap-2">
+                        <a href="@Url.Action("Index")" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver a Pruebas
+                        </a>
+                        <a href="@Url.Action("Index", "GruposEstudiantes")" class="btn btn-primary">
+                            <i class="fas fa-users-cog me-2"></i>Ir al Sistema Real
+                        </a>
+                        <button onclick="location.reload()" class="btn btn-outline-secondary">
+                            <i class="fas fa-redo me-2"></i>Ejecutar Test Nuevamente
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            console.log('?? Test de datos cargado');
+            
+            @if (ViewBag.Resultados != null)
+            {
+                <text>
+                console.log('? Test completado exitosamente');
+                console.log('?? Resultados:', @Html.Raw(Json.Serialize(ViewBag.Resultados)));
+                </text>
+            }
+            
+            @if (ViewBag.Error != null)
+            {
+                <text>
+                console.error('? Error en test:', '@ViewBag.Error');
+                </text>
+            }
+        });
+    </script>
+}

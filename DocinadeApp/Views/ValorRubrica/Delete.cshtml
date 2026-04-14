@@ -1,0 +1,172 @@
+﻿@model RubricasApp.Web.Models.ValorRubrica
+
+@{
+    ViewData["Title"] = "Eliminar Valor de Rúbrica";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> @ViewData["Title"]
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <h5><i class="fas fa-exclamation-triangle"></i> ¡Atención!</h5>
+                        <p class="mb-0">
+                            ¿Está seguro de que desea eliminar este valor de rúbrica? 
+                            Esta acción <strong>no se puede deshacer</strong> y puede afectar evaluaciones existentes.
+                        </p>
+                    </div>
+
+                    <!-- Información del valor a eliminar -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-clipboard-list"></i> Información de la Configuración
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <dl class="row">
+                                        <dt class="col-sm-4">Rúbrica:</dt>
+                                        <dd class="col-sm-8">@Model.Rubrica.NombreRubrica</dd>
+                                        
+                                        <dt class="col-sm-4">Item:</dt>
+                                        <dd class="col-sm-8">@Model.ItemEvaluacion.NombreItem</dd>
+                                        
+                                        <dt class="col-sm-4">Nivel:</dt>
+                                        <dd class="col-sm-8">
+                                            <span class="badge bg-secondary">@Model.NivelCalificacion.NombreNivel</span>
+                                        </dd>
+                                        
+                                        <dt class="col-sm-4">Valor:</dt>
+                                        <dd class="col-sm-8">
+                                            <span class="badge bg-success fs-6">@Model.ValorPuntos pts</span>
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-warning">
+                                <div class="card-header bg-warning text-dark">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-exclamation-circle"></i> Impacto de la Eliminación
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="mb-0">
+                                        <li>Se elimina la configuración de puntos para esta combinación</li>
+                                        <li>Las evaluaciones futuras no podrán usar esta configuración</li>
+                                        <li>Las evaluaciones existentes pueden verse afectadas</li>
+                                        <li>Será necesario reconfigurar si se desea usar nuevamente</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información adicional si hay descripciones -->
+                    @if (!string.IsNullOrEmpty(Model.Rubrica.Descripcion) || 
+                         !string.IsNullOrEmpty(Model.ItemEvaluacion.Descripcion) || 
+                         !string.IsNullOrEmpty(Model.NivelCalificacion.Descripcion))
+                    {
+                        <div class="card bg-light mb-4">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-info-circle"></i> Detalles Adicionales
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                @if (!string.IsNullOrEmpty(Model.Rubrica.Descripcion))
+                                {
+                                    <p><strong>Descripción de la Rúbrica:</strong> @Model.Rubrica.Descripcion</p>
+                                }
+                                @if (!string.IsNullOrEmpty(Model.ItemEvaluacion.Descripcion))
+                                {
+                                    <p><strong>Descripción del Item:</strong> @Model.ItemEvaluacion.Descripcion</p>
+                                }
+                                @if (!string.IsNullOrEmpty(Model.NivelCalificacion.Descripcion))
+                                {
+                                    <p class="mb-0"><strong>Descripción del Nivel:</strong> @Model.NivelCalificacion.Descripcion</p>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Verificación de uso -->
+                    @if (ViewBag.TieneEvaluacionesAsociadas != null && (bool)ViewBag.TieneEvaluacionesAsociadas)
+                    {
+                        <div class="alert alert-warning">
+                            <h6><i class="fas fa-exclamation-triangle"></i> ¡Advertencia Importante!</h6>
+                            <p class="mb-0">
+                                Este valor está siendo utilizado en evaluaciones existentes. 
+                                Al eliminarlo, esas evaluaciones podrían verse afectadas.
+                            </p>
+                        </div>
+                    }
+
+                    <hr>
+
+                    <!-- Acciones -->
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" asp-for="IdValor" />
+                        
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Cancelar
+                                </a>
+                                <a asp-action="Details" asp-route-id="@Model.IdValor" class="btn btn-outline-info">
+                                    <i class="fas fa-eye"></i> Ver Detalles
+                                </a>
+                            </div>
+                            <div>
+                                <a asp-action="Edit" asp-route-id="@Model.IdValor" class="btn btn-warning">
+                                    <i class="fas fa-edit"></i> Editar en su lugar
+                                </a>
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('¿Está completamente seguro de eliminar este valor? Esta acción no se puede deshacer.')">
+                                    <i class="fas fa-trash"></i> Confirmar Eliminación
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Card de ayuda -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-lightbulb"></i> Alternativas a la Eliminación
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>En lugar de eliminar:</h6>
+                            <ul class="small">
+                                <li><strong>Editar:</strong> Modificar el valor de puntos</li>
+                                <li><strong>Cambiar:</strong> Asignar a otro nivel o item</li>
+                                <li><strong>Reconfigurar:</strong> Usar la función de configuración masiva</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Consideraciones:</h6>
+                            <ul class="small">
+                                <li>La eliminación es permanente</li>
+                                <li>Puede afectar el cálculo de notas</li>
+                                <li>Se recomienda respaldar antes de eliminar</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

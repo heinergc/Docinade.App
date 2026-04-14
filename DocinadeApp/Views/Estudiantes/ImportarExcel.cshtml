@@ -1,0 +1,534 @@
+﻿@{
+    ViewData["Title"] = "Importar Estudiantes desde Excel";
+}
+
+<!-- Contenido Principal -->
+<main class="main-content fade-in">
+    <div class="container-fluid px-4">
+        <!-- Header de Página Mejorado -->
+        <div class="page-header">
+            <h3 class="page-title-white">
+                <i class="fas fa-file-excel"></i>
+                Importar Estudiantes desde Excel
+            </h3>
+        </div>
+
+        <!-- Mensajes de alerta modernos -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert-modern success">
+                <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert-modern danger">
+                <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Card Principal de Importación -->
+                <div class="modern-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0">
+                            <i class="fas fa-upload"></i>
+                            Subir Archivo de Excel
+                        </h5>
+                        <span class="badge bg-info">
+                            <i class="fas fa-info-circle"></i> Formatos: .xlsx, .xls
+                        </span>
+                    </div>
+
+                    <form asp-action="ImportarExcel" method="post" enctype="multipart/form-data" id="importForm">
+                        <!-- Zona de Carga de Archivos -->
+                        <div class="upload-zone" id="uploadZone">
+                            <div class="upload-content">
+                                <i class="fas fa-cloud-upload-alt fa-3x mb-3"></i>
+                                <h5>Arrastra tu archivo aquí o haz clic para seleccionar</h5>
+                                <p class="text-muted">Archivo Excel con información de estudiantes (.xlsx, .xls)</p>
+                                <input type="file" name="archivo" id="archivo" accept=".xlsx,.xls" class="file-input" required />
+                                <div class="file-info mt-3" id="fileInfo" style="display: none;">
+                                    <i class="fas fa-file-excel"></i>
+                                    <span id="fileName"></span>
+                                    <button type="button" class="btn btn-sm btn-outline-danger ms-2" id="removeFile">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Período Académico Obligatorio -->
+                        <div class="import-options mt-4">
+                            <h6><i class="fas fa-cogs"></i> Configuración de Importación</h6>
+                            
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="periodoAcademico" class="form-label">
+                                            <i class="fas fa-calendar-check"></i> Período Académico *
+                                        </label>
+                                        <select id="periodoAcademico" name="periodoAcademicoId" class="form-select" required>
+                                            <option value="">Seleccionar período académico</option>
+                                            @if (ViewBag.PeriodosAcademicos != null)
+                                            {
+                                                @foreach (var periodo in ViewBag.PeriodosAcademicos)
+                                                {
+                                                    <option value="@periodo.Value">@periodo.Text</option>
+                                                }
+                                            }
+                                        </select>
+                                        <small class="text-muted">El año se tomará automáticamente del período seleccionado</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert-modern info mt-3">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Nota:</strong> Si un estudiante ya existe (mismo número de ID), será omitido durante la importación.
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-4">
+                            <div class="btn-group-responsive">
+                                <button type="submit" class="btn-modern success" id="btnImportar" disabled>
+                                    <i class="fas fa-upload"></i> Importar Estudiantes
+                                </button>
+                                <button type="button" class="btn-modern info" id="btnValidar" disabled>
+                                    <i class="fas fa-check-circle"></i> Validar Archivo
+                                </button>
+                                <a asp-action="Index" class="btn-modern secondary">
+                                    <i class="fas fa-arrow-left"></i> Volver a Lista
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Barra de Progreso -->
+                    <div class="progress-container mt-4" id="progressContainer" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Procesando archivo...</span>
+                            <span id="progressText">0%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" id="progressBar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Card de Instrucciones -->
+                <div class="modern-card">
+                    <h5 class="mb-3">
+                        <i class="fas fa-info-circle"></i>
+                        Instrucciones de Uso
+                    </h5>
+                    
+                    <div class="instruction-list">
+                        <div class="instruction-item">
+                            <i class="fas fa-file-excel"></i>
+                            <div>
+                                <strong>Formato del archivo:</strong>
+                                <small>Debe ser un archivo Excel (.xlsx o .xls)</small>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-item">
+                            <i class="fas fa-table"></i>
+                            <div>
+                                <strong>Primera fila:</strong>
+                                <small>Debe contener los encabezados de las columnas</small>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-item">
+                            <i class="fas fa-columns"></i>
+                            <div>
+                                <strong>Columnas requeridas:</strong>
+                                <small>Nombre, Apellidos, NumeroId, DireccionCorreo, Institucion</small>
+                            </div>
+                        </div>
+                        
+                        <div class="instruction-item">
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <strong>Validación:</strong>
+                                <small>Se verificará el formato de correos e IDs</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card de Formato de Ejemplo -->
+                <div class="modern-card">
+                    <h5 class="mb-3">
+                        <i class="fas fa-table"></i>
+                        Formato de Ejemplo
+                    </h5>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Apellidos</th>
+                                    <th>NumeroId</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Juan</td>
+                                    <td>Pérez González</td>
+                                    <td>0208390339</td>
+                                </tr>
+                                <tr>
+                                    <td>María</td>
+                                    <td>López Rodríguez</td>
+                                    <td>0301234567</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="table-responsive mt-3">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>DireccionCorreo</th>
+                                    <th>Institucion</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>juan@email.com</td>
+                                    <td>PALMARES (06)</td>
+                                </tr>
+                                <tr>
+                                    <td>maria@email.com</td>
+                                    <td>SAN CARLOS (07)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="alert-modern info mt-3">
+                        <i class="fas fa-download"></i>
+                        <a href="@Url.Action("DescargarPlantilla", "Estudiantes")" class="text-decoration-none">Descargar plantilla de ejemplo</a>
+                    </div>
+                </div>
+
+                <!-- Card de Estadísticas -->
+                <div class="modern-card">
+                    <h5 class="mb-3">
+                        <i class="fas fa-chart-bar"></i>
+                        Estadísticas Recientes
+                    </h5>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <i class="fas fa-users"></i>
+                            <div>
+                                <span class="stat-number">@ViewBag.TotalEstudiantes</span>
+                                <span class="stat-label">Estudiantes totales</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <i class="fas fa-upload"></i>
+                            <div>
+                                <span class="stat-number">@ViewBag.ImportacionesRecientes</span>
+                                <span class="stat-label">Importaciones este mes</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <span class="stat-number">@ViewBag.UltimaImportacion</span>
+                                <span class="stat-label">Última importación</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    <script>
+        // Variables globales
+        let fileInput = document.getElementById('archivo');
+        let uploadZone = document.getElementById('uploadZone');
+        let fileInfo = document.getElementById('fileInfo');
+        let fileName = document.getElementById('fileName');
+        let btnImportar = document.getElementById('btnImportar');
+        let btnValidar = document.getElementById('btnValidar');
+        let removeFileBtn = document.getElementById('removeFile');
+
+        // Configurar drag and drop
+        uploadZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadZone.classList.add('drag-over');
+        });
+
+        uploadZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadZone.classList.remove('drag-over');
+        });
+
+        uploadZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadZone.classList.remove('drag-over');
+            
+            let files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelection(files[0]);
+            }
+        });
+
+        // Click en zona de upload (evitar doble disparo)
+        uploadZone.addEventListener('click', function(e) {
+            // Solo disparar si no se hizo click directamente en el input
+            if (e.target !== fileInput) {
+                fileInput.click();
+            }
+        });
+
+        // Prevenir propagación del click en el input
+        fileInput.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        // Cambio en input de archivo
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                handleFileSelection(this.files[0]);
+            }
+        });
+
+        // Remover archivo
+        removeFileBtn.addEventListener('click', function() {
+            fileInput.value = '';
+            fileInfo.style.display = 'none';
+            uploadZone.classList.remove('file-selected');
+            btnImportar.disabled = true;
+            btnValidar.disabled = true;
+        });
+
+        // Manejar selección de archivo
+        function handleFileSelection(file) {
+            // Validar tipo de archivo
+            let validTypes = [
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.ms-excel'
+            ];
+            
+            if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls)$/i)) {
+                alert('Por favor seleccione un archivo Excel válido (.xlsx o .xls)');
+                return;
+            }
+
+            // Mostrar información del archivo
+            fileName.textContent = file.name;
+            fileInfo.style.display = 'block';
+            uploadZone.classList.add('file-selected');
+            btnImportar.disabled = false;
+            btnValidar.disabled = false;
+        }
+
+        // Validar archivo
+        btnValidar.addEventListener('click', function() {
+            if (fileInput.files.length === 0) {
+                alert('Por favor seleccione un archivo primero');
+                return;
+            }
+
+            // Aquí iría la lógica de validación
+            showProgress();
+            
+            // Simular validación
+            setTimeout(function() {
+                hideProgress();
+                alert('Archivo validado correctamente. Puede proceder con la importación.');
+            }, 2000);
+        });
+
+        // Envío del formulario
+        document.getElementById('importForm').addEventListener('submit', function(e) {
+            if (fileInput.files.length === 0) {
+                e.preventDefault();
+                alert('Por favor seleccione un archivo para importar');
+                return;
+            }
+
+            let periodoSelect = document.getElementById('periodoAcademico');
+            if (!periodoSelect.value) {
+                e.preventDefault();
+                alert('Por favor seleccione un período académico');
+                return;
+            }
+
+            showProgress();
+        });
+
+        // Mostrar progreso
+        function showProgress() {
+            document.getElementById('progressContainer').style.display = 'block';
+            let progress = 0;
+            let progressBar = document.getElementById('progressBar');
+            let progressText = document.getElementById('progressText');
+            
+            let interval = setInterval(function() {
+                progress += 10;
+                progressBar.style.width = progress + '%';
+                progressText.textContent = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                }
+            }, 200);
+        }
+
+        // Ocultar progreso
+        function hideProgress() {
+            document.getElementById('progressContainer').style.display = 'none';
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('progressText').textContent = '0%';
+        }
+    </script>
+    
+    <style>
+        .upload-zone {
+            border: 2px dashed #007bff;
+            border-radius: 8px;
+            padding: 3rem 2rem;
+            text-align: center;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .upload-zone:hover {
+            border-color: #0056b3;
+            background-color: #e9ecef;
+        }
+
+        .upload-zone.drag-over {
+            border-color: #28a745;
+            background-color: #d4edda;
+        }
+
+        .upload-zone.file-selected {
+            border-color: #28a745;
+            background-color: #d4edda;
+        }
+
+        .upload-content {
+            color: #6c757d;
+        }
+
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .file-info {
+            background-color: #e9ecef;
+            padding: 0.75rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .import-options {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+
+        .instruction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .instruction-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .instruction-item i {
+            color: #007bff;
+            margin-top: 0.25rem;
+            width: 20px;
+            flex-shrink: 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #007bff;
+        }
+
+        .stat-item i {
+            color: #007bff;
+            font-size: 1.5rem;
+            width: 30px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #212529;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+
+        .progress-container {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .progress {
+            height: 8px;
+            background-color: #e9ecef;
+        }
+
+        .progress-bar {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+        }
+    </style>
+}

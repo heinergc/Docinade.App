@@ -1,0 +1,294 @@
+@model IEnumerable<RubricasApp.Web.ViewModels.Conducta.BoletaConductaListViewModel>
+
+@{
+    ViewData["Title"] = "Boletas de Conducta";
+}
+
+@section Styles {
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="text-dark"><i class="fas fa-clipboard-list me-2"></i> Boletas de Conducta</h2>
+                    <p class="text-muted mb-0">Registro de incidentes de conducta estudiantil - REA 40862-V21</p>
+                </div>
+                <div>
+                    <a asp-action="Create" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nueva Boleta
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-filter"></i> Filtros de Búsqueda</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" asp-action="Index" id="formFiltros">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="idPeriodo" class="form-label">Período Académico</label>
+                        <select class="form-select" id="idPeriodo" name="idPeriodo">
+                            <option value="">Todos los períodos</option>
+                            @if (ViewBag.Periodos != null)
+                            {
+                                foreach (var periodo in ViewBag.Periodos)
+                                {
+                                    <option value="@periodo.Value" selected="@(periodo.Value == ViewBag.PeriodoSeleccionado?.ToString())">
+                                        @periodo.Text
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="idTipoFalta" class="form-label">Tipo de Falta</label>
+                        <select class="form-select" id="idTipoFalta" name="idTipoFalta">
+                            <option value="">Todos los tipos</option>
+                            @if (ViewBag.TiposFalta != null)
+                            {
+                                foreach (var tipo in ViewBag.TiposFalta)
+                                {
+                                    <option value="@tipo.Value" selected="@(tipo.Value == ViewBag.IdTipoFalta?.ToString())">
+                                        @tipo.Text
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-redo"></i> Limpiar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50">Total Boletas</h6>
+                            <h3 class="mb-0">@Model.Count()</h3>
+                        </div>
+                        <i class="fas fa-clipboard-list fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50">Estudiantes Afectados</h6>
+                            <h3 class="mb-0">@Model.Select(b => b.IdEstudiante).Distinct().Count()</h3>
+                        </div>
+                        <i class="fas fa-users fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50">Total Rebajos</h6>
+                            <h3 class="mb-0">@Model.Sum(b => b.RebajoAplicado)</h3>
+                        </div>
+                        <i class="fas fa-minus-circle fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50">Notificaciones Enviadas</h6>
+                            <h3 class="mb-0">@Model.Count(b => b.NotificacionEnviada)</h3>
+                        </div>
+                        <i class="fas fa-bell fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de boletas -->
+    <div class="card">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">
+                <i class="fas fa-list"></i> Listado de Boletas
+                <span class="badge bg-primary">@Model.Count() registros</span>
+            </h5>
+        </div>
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped" id="tablaBoletas">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Estudiante</th>
+                                <th>Cédula</th>
+                                <th>Tipo de Falta</th>
+                                <th>Rebajo</th>
+                                <th>Docente Emisor</th>
+                                <th>Estado</th>
+                                <th class="text-center">Notificación</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var boleta in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <small>@boleta.FechaEmision.ToString("dd/MM/yyyy HH:mm")</small>
+                                    </td>
+                                    <td>
+                                        <strong>@boleta.NombreEstudiante</strong>
+                                    </td>
+                                    <td>@boleta.NumeroId</td>
+                                    <td>
+                                        <span class="badge 
+                                            @(boleta.TipoFalta == "Muy leve" ? "bg-info" : 
+                                              boleta.TipoFalta == "Leve" ? "bg-primary" :
+                                              boleta.TipoFalta == "Grave" ? "bg-warning" :
+                                              boleta.TipoFalta == "Muy grave" ? "bg-danger" :
+                                              "bg-dark")">
+                                            @boleta.TipoFalta
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <strong class="text-danger">-@boleta.RebajoAplicado pts</strong>
+                                    </td>
+                                    <td>
+                                        <small>@boleta.DocenteEmisor</small>
+                                    </td>
+                                    <td>
+                                        @if (boleta.Estado == "Activa")
+                                        {
+                                            <span class="badge bg-success">Activa</span>
+                                        }
+                                        else if (boleta.Estado == "Anulada")
+                                        {
+                                            <span class="badge bg-secondary">Anulada</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning">@boleta.Estado</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        @if (boleta.NotificacionEnviada)
+                                        {
+                                            <i class="fas fa-check-circle text-success" title="Notificación enviada"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-clock text-warning" title="Pendiente"></i>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a asp-action="Details" asp-route-id="@boleta.IdBoleta" 
+                                               class="btn btn-info" title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-success" 
+                                                    title="Reenviar notificación al profesor guía"
+                                                    onclick="reenviarNotificacion(@boleta.IdBoleta, '@boleta.NombreEstudiante')">
+                                                <i class="fas fa-envelope"></i>
+                                            </button>
+                                            @if (boleta.Estado == "Activa")
+                                            {
+                                                <a asp-action="Anular" asp-route-id="@boleta.IdBoleta" 
+                                                   class="btn btn-danger" title="Anular boleta">
+                                                    <i class="fas fa-ban"></i>
+                                                </a>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle fa-2x mb-2"></i>
+                    <p class="mb-0">No se encontraron boletas de conducta con los filtros seleccionados.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Formulario oculto para reenvío de notificaciones -->
+<form id="formReenviarNotificacion" method="post" asp-action="ReenviarNotificacion" style="display: none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" id="idBoletaReenviar" name="id" />
+</form>
+
+@section Scripts {
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // DataTables para ordenar y buscar
+            if ($('#tablaBoletas').length) {
+                $('#tablaBoletas').DataTable({
+                    "language": {
+                        "url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json"
+                    },
+                    "order": [[0, "desc"]],
+                    "pageLength": 25
+                });
+            }
+
+            // Auto-submit al cambiar filtros
+            $('#idPeriodo, #idTipoFalta').on('change', function() {
+                $('#formFiltros').submit();
+            });
+        });
+
+        // Función para reenviar notificación
+        function reenviarNotificacion(idBoleta, nombreEstudiante) {
+            if (confirm('¿Está seguro de reenviar la notificación al profesor guía del estudiante ' + nombreEstudiante + '?')) {
+                $('#idBoletaReenviar').val(idBoleta);
+                $('#formReenviarNotificacion').submit();
+            }
+        }
+    </script>
+}

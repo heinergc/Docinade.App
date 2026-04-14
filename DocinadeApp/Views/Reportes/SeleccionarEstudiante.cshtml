@@ -1,0 +1,121 @@
+@{
+    ViewData["Title"] = "Seleccionar Estudiante - Historial de Conducta";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller="NotaConducta" asp-action="Dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Seleccionar Estudiante</li>
+                </ol>
+            </nav>
+            <h2><i class="fas fa-user-graduate text-primary"></i> Seleccionar Estudiante</h2>
+            <p class="text-muted">Seleccione un estudiante para ver su historial de conducta completo</p>
+        </div>
+    </div>
+
+    <!-- Formulario de selección -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-search"></i> Buscar Estudiante</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-controller="Reportes" asp-action="HistorialConductaEstudiante" method="get">
+                        <div class="mb-3">
+                            <label for="idEstudiante" class="form-label">
+                                <i class="fas fa-user"></i> Estudiante
+                            </label>
+                            <select id="idEstudiante" 
+                                    name="idEstudiante" 
+                                    class="form-select form-select-lg" 
+                                    required
+                                    data-live-search="true">
+                                <option value="">-- Seleccione un estudiante --</option>
+                                @foreach (var estudiante in ViewBag.Estudiantes)
+                                {
+                                    <option value="@estudiante.Value">@estudiante.Text</option>
+                                }
+                            </select>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle"></i> Seleccione el estudiante del cual desea consultar su historial de conducta
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-between mt-4">
+                            <a asp-controller="NotaConducta" asp-action="Dashboard" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-chart-line"></i> Ver Historial
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Información adicional -->
+            <div class="alert alert-info mt-4">
+                <h6 class="alert-heading"><i class="fas fa-info-circle"></i> ¿Qué verás en el historial?</h6>
+                <ul class="mb-0">
+                    <li>Historial completo de boletas de conducta por período académico</li>
+                    <li>Evolución de la nota de conducta a través del tiempo</li>
+                    <li>Estadísticas y promedios históricos</li>
+                    <li>Programas de acciones y decisiones profesionales aplicadas</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Inicializar Select2 para búsqueda mejorada
+            if ($.fn.select2) {
+                $('#idEstudiante').select2({
+                    placeholder: '-- Seleccione un estudiante --',
+                    allowClear: true,
+                    width: '100%',
+                    language: {
+                        noResults: function() {
+                            return "No se encontraron estudiantes";
+                        },
+                        searching: function() {
+                            return "Buscando...";
+                        }
+                    }
+                });
+            }
+
+            // Validación del formulario
+            $('form').on('submit', function(e) {
+                const estudianteId = $('#idEstudiante').val();
+                if (!estudianteId) {
+                    e.preventDefault();
+                    toastr.error('Por favor seleccione un estudiante');
+                    return false;
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .select2-container .select2-selection--single {
+        height: 48px !important;
+        padding: 8px 12px;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 32px !important;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 46px !important;
+    }
+</style>

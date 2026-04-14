@@ -1,0 +1,416 @@
+﻿@model RubricasApp.Web.Models.GrupoCalificacion
+
+@{
+    ViewData["Title"] = "Asignar Niveles al Grupo";
+}
+
+@* Token CSRF para peticiones AJAX *@
+@Html.AntiForgeryToken()
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-users-cog me-2"></i>
+                            Asignar Niveles: @Model.NombreGrupo
+                        </h3>
+                        <a asp-action="Details" asp-route-id="@Model.IdGrupo" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Volver
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Instrucción:</strong> Arrastra los niveles entre las dos columnas o usa los botones para asignar/desasignar múltiples niveles al grupo.
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5><i class="fas fa-list me-2"></i>Niveles Disponibles</h5>
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="asignarTodosDisponibles()">
+                                    <i class="fas fa-angle-double-right"></i> Asignar Todos
+                                </button>
+                            </div>
+                            <div id="availableLevels" class="border rounded p-3 mb-3 drop-zone" style="min-height: 300px; background-color: #f8f9fa;">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    Cargando niveles disponibles...
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5><i class="fas fa-check-square me-2"></i>Niveles Asignados</h5>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="desasignarTodosAsignados()">
+                                    <i class="fas fa-angle-double-left"></i> Desasignar Todos
+                                </button>
+                            </div>
+                            <div id="assignedLevels" class="border rounded p-3 mb-3 drop-zone" style="min-height: 300px; background-color: #f0f8ff;">
+                                @if (Model.NivelesCalificacion.Any())
+                                {
+                                    @foreach (var nivel in Model.NivelesCalificacion.OrderBy(n => n.OrdenNivel ?? int.MaxValue))
+                                    {
+                                        <div class="level-item assigned mb-2 p-3 bg-white rounded shadow-sm border-left-primary" data-level-id="@nivel.IdNivel" draggable="true">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="flex-grow-1">
+                                                    <strong class="text-primary">@nivel.NombreNivel</strong>
+                                                    @if (!string.IsNullOrEmpty(nivel.Descripcion))
+                                                    {
+                                                        <br><small class="text-muted">@nivel.Descripcion</small>
+                                                    }
+                                                    @if (nivel.OrdenNivel.HasValue)
+                                                    {
+                                                        <br><span class="badge badge-secondary">Orden: @nivel.OrdenNivel</span>
+                                                    }
+                                                </div>
+                                                <div class="btn-group-vertical">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger remove-level" title="Desasignar">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary drag-handle" title="Arrastrar">
+                                                        <i class="fas fa-grip-vertical"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="text-center text-muted empty-message">
+                                        <i class="fas fa-inbox mb-2" style="font-size: 2rem;"></i><br>
+                                        <strong>No hay niveles asignados</strong><br>
+                                        <small>Arrastra niveles aquí o usa el botón "Asignar Todos"</small>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <div class="btn-group" role="group">
+                                <button id="saveChanges" class="btn btn-success btn-lg">
+                                    <i class="fas fa-save me-1"></i>
+                                    Guardar Cambios
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-lg" onclick="resetChanges()">
+                                    <i class="fas fa-undo me-1"></i>
+                                    Restablecer
+                                </button>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted" id="changesIndicator"></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let groupId = @Model.IdGrupo;
+        let hasChanges = false;
+        let originalState = [];
+        let draggedElement = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAvailableLevels();
+            setupEventListeners();
+            setupDragAndDrop();
+            saveOriginalState();
+            updateChangesIndicator();
+        });
+
+        function loadAvailableLevels() {
+            fetch('/GruposCalificacion/GetAvailableLevels')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('availableLevels');
+                    container.innerHTML = '';
+                    
+                    if (data.length === 0) {
+                        container.innerHTML = `
+                            <div class="text-center text-muted empty-message">
+                                <i class="fas fa-inbox mb-2" style="font-size: 2rem;"></i><br>
+                                <strong>No hay niveles disponibles</strong><br>
+                                <small>Todos los niveles están asignados a grupos</small>
+                            </div>`;
+                        return;
+                    }
+                    
+                    data.forEach(level => {
+                        const levelDiv = createLevelElement(level, false);
+                        container.appendChild(levelDiv);
+                    });
+                });
+        }
+
+        function createLevelElement(level, isAssigned) {
+            const div = document.createElement('div');
+            div.className = `level-item ${isAssigned ? 'assigned' : 'available'} mb-2 p-3 bg-white rounded shadow-sm ${isAssigned ? 'border-left-primary' : 'border-left-info'}`;
+            div.setAttribute('data-level-id', level.value || level.id);
+            div.setAttribute('draggable', 'true');
+            
+            const badgeClass = isAssigned ? 'badge-secondary' : 'badge-info';
+            const orderBadge = (level.order || level.ordenNivel) ? 
+                `<br><span class="badge ${badgeClass}">Orden: ${level.order || level.ordenNivel}</span>` : '';
+            
+            div.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="flex-grow-1">
+                        <strong class="${isAssigned ? 'text-primary' : 'text-info'}">${level.text || level.name}</strong>
+                        ${level.description ? `<br><small class="text-muted">${level.description}</small>` : ''}
+                        ${orderBadge}
+                    </div>
+                    <div class="btn-group-vertical">
+                        <button type="button" class="btn btn-sm ${isAssigned ? 'btn-outline-danger remove-level' : 'btn-outline-success add-level'}" title="${isAssigned ? 'Desasignar' : 'Asignar'}">
+                            <i class="fas ${isAssigned ? 'fa-times' : 'fa-plus'}"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary drag-handle" title="Arrastrar">
+                            <i class="fas fa-grip-vertical"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return div;
+        }
+
+        function setupEventListeners() {
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.add-level')) {
+                    const levelItem = e.target.closest('.level-item');
+                    moveLevel(levelItem, 'assignedLevels', true);
+                    hasChanges = true;
+                    updateChangesIndicator();
+                }
+                
+                if (e.target.closest('.remove-level')) {
+                    const levelItem = e.target.closest('.level-item');
+                    moveLevel(levelItem, 'availableLevels', false);
+                    hasChanges = true;
+                    updateChangesIndicator();
+                }
+            });
+            
+            document.getElementById('saveChanges').addEventListener('click', saveChanges);
+        }
+
+        function setupDragAndDrop() {
+            // Configurar drag and drop
+            document.addEventListener('dragstart', function(e) {
+                if (e.target.classList.contains('level-item')) {
+                    draggedElement = e.target;
+                    e.target.style.opacity = '0.5';
+                }
+            });
+
+            document.addEventListener('dragend', function(e) {
+                if (e.target.classList.contains('level-item')) {
+                    e.target.style.opacity = '1';
+                    draggedElement = null;
+                }
+            });
+
+            // Configurar drop zones
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.style.backgroundColor = this.id === 'assignedLevels' ? '#e6f3ff' : '#f0f0f0';
+                });
+
+                zone.addEventListener('dragleave', function(e) {
+                    this.style.backgroundColor = this.id === 'assignedLevels' ? '#f0f8ff' : '#f8f9fa';
+                });
+
+                zone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.style.backgroundColor = this.id === 'assignedLevels' ? '#f0f8ff' : '#f8f9fa';
+                    
+                    if (draggedElement) {
+                        const isMovingToAssigned = this.id === 'assignedLevels';
+                        const isCurrentlyAssigned = draggedElement.classList.contains('assigned');
+                        
+                        if (isMovingToAssigned !== isCurrentlyAssigned) {
+                            moveLevel(draggedElement, this.id, isMovingToAssigned);
+                            hasChanges = true;
+                            updateChangesIndicator();
+                        }
+                    }
+                });
+            });
+        }
+
+        function moveLevel(levelItem, targetContainerId, isAssigning) {
+            const levelId = levelItem.getAttribute('data-level-id');
+            const levelData = {
+                value: levelId,
+                text: levelItem.querySelector('strong').textContent,
+                description: levelItem.querySelector('small')?.textContent || '',
+                order: levelItem.querySelector('.badge')?.textContent.replace('Orden: ', '') || null
+            };
+            
+            levelItem.remove();
+            
+            const targetContainer = document.getElementById(targetContainerId);
+            const newElement = createLevelElement(levelData, isAssigning);
+            
+            // Remover mensaje vacío si existe
+            const emptyMessage = targetContainer.querySelector('.empty-message');
+            if (emptyMessage) {
+                emptyMessage.remove();
+            }
+            
+            targetContainer.appendChild(newElement);
+            
+            // Agregar mensaje vacío si el contenedor origen queda vacío
+            const sourceContainer = targetContainerId === 'assignedLevels' ? 
+                document.getElementById('availableLevels') : document.getElementById('assignedLevels');
+            
+            if (sourceContainer.children.length === 0) {
+                const emptyMessage = targetContainerId === 'assignedLevels' ?
+                    `<div class="text-center text-muted empty-message">
+                        <i class="fas fa-inbox mb-2" style="font-size: 2rem;"></i><br>
+                        <strong>No hay niveles disponibles</strong><br>
+                        <small>Todos los niveles están asignados a grupos</small>
+                    </div>` :
+                    `<div class="text-center text-muted empty-message">
+                        <i class="fas fa-inbox mb-2" style="font-size: 2rem;"></i><br>
+                        <strong>No hay niveles asignados</strong><br>
+                        <small>Arrastra niveles aquí o usa el botón "Asignar Todos"</small>
+                    </div>`;
+                sourceContainer.innerHTML = emptyMessage;
+            }
+        }
+
+        function asignarTodosDisponibles() {
+            const availableLevels = document.querySelectorAll('#availableLevels .level-item');
+            if (availableLevels.length === 0) {
+                alert('No hay niveles disponibles para asignar.');
+                return;
+            }
+            
+            if (confirm(`¿Está seguro de que desea asignar todos los ${availableLevels.length} niveles disponibles al grupo?`)) {
+                availableLevels.forEach(levelItem => {
+                    moveLevel(levelItem, 'assignedLevels', true);
+                });
+                hasChanges = true;
+                updateChangesIndicator();
+            }
+        }
+
+        function desasignarTodosAsignados() {
+            const assignedLevels = document.querySelectorAll('#assignedLevels .level-item');
+            if (assignedLevels.length === 0) {
+                alert('No hay niveles asignados para desasignar.');
+                return;
+            }
+            
+            if (confirm(`¿Está seguro de que desea desasignar todos los ${assignedLevels.length} niveles del grupo?`)) {
+                assignedLevels.forEach(levelItem => {
+                    moveLevel(levelItem, 'availableLevels', false);
+                });
+                hasChanges = true;
+                updateChangesIndicator();
+            }
+        }
+
+        function resetChanges() {
+            if (!hasChanges) {
+                alert('No hay cambios para restablecer.');
+                return;
+            }
+            
+            if (confirm('¿Está seguro de que desea restablecer todos los cambios?')) {
+                location.reload();
+            }
+        }
+
+        function saveOriginalState() {
+            originalState = Array.from(document.querySelectorAll('#assignedLevels .level-item'))
+                .map(item => parseInt(item.getAttribute('data-level-id')));
+        }
+
+        function updateChangesIndicator() {
+            const indicator = document.getElementById('changesIndicator');
+            const saveButton = document.getElementById('saveChanges');
+            
+            if (hasChanges) {
+                const currentAssigned = Array.from(document.querySelectorAll('#assignedLevels .level-item'))
+                    .map(item => parseInt(item.getAttribute('data-level-id')));
+                
+                const added = currentAssigned.filter(id => !originalState.includes(id));
+                const removed = originalState.filter(id => !currentAssigned.includes(id));
+                
+                let message = '';
+                if (added.length > 0) message += `+${added.length} asignados `;
+                if (removed.length > 0) message += `-${removed.length} desasignados`;
+                
+                indicator.innerHTML = `<i class="fas fa-exclamation-circle text-warning"></i> ${message.trim()}`;
+                saveButton.classList.remove('btn-success');
+                saveButton.classList.add('btn-warning');
+            } else {
+                indicator.innerHTML = '<i class="fas fa-check-circle text-success"></i> Sin cambios pendientes';
+                saveButton.classList.remove('btn-warning');
+                saveButton.classList.add('btn-success');
+            }
+        }
+
+        function saveChanges() {
+            if (!hasChanges) {
+                alert('No hay cambios para guardar.');
+                return;
+            }
+            
+            const assignedLevels = Array.from(document.querySelectorAll('#assignedLevels .level-item'))
+                .map(item => parseInt(item.getAttribute('data-level-id')));
+            
+            const saveButton = document.getElementById('saveChanges');
+            const originalText = saveButton.innerHTML;
+            saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+            saveButton.disabled = true;
+            
+            fetch('/GruposCalificacion/AssignLevels', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                },
+                body: JSON.stringify({
+                    groupId: groupId,
+                    levelIds: assignedLevels
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('¡Cambios guardados exitosamente!');
+                    hasChanges = false;
+                    saveOriginalState();
+                    updateChangesIndicator();
+                } else {
+                    alert('Error al guardar: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al guardar los cambios.');
+            })
+            .finally(() => {
+                saveButton.innerHTML = originalText;
+                saveButton.disabled = false;
+            });
+        }
+    </script>
+}

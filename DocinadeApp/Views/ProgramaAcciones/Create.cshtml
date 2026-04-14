@@ -1,0 +1,136 @@
+@model RubricasApp.Web.ViewModels.Conducta.CrearProgramaViewModel
+
+@{
+    ViewData["Title"] = "Crear Programa de Acciones";
+}
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col">
+            <h2><i class="fas fa-clipboard-list me-2"></i>@ViewData["Title"]</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index">Programas de Acciones</a></li>
+                    <li class="breadcrumb-item active">Crear</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-10">
+            <div class="card shadow">
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="IdEstudiante" class="form-label">Estudiante</label>
+                                <select asp-for="IdEstudiante" class="form-select" asp-items="ViewBag.Estudiantes">
+                                    <option value="">-- Seleccione un estudiante --</option>
+                                </select>
+                                <span asp-validation-for="IdEstudiante" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="IdPeriodo" class="form-label">Período Académico</label>
+                                <select asp-for="IdPeriodo" class="form-select" asp-items="ViewBag.Periodos">
+                                    <option value="">-- Seleccione un período --</option>
+                                </select>
+                                <span asp-validation-for="IdPeriodo" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="TituloPrograma" class="form-label">Título del Programa</label>
+                            <input asp-for="TituloPrograma" class="form-control" placeholder="Ej: Programa de Servicio Comunal 2024" />
+                            <span asp-validation-for="TituloPrograma" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Descripcion" class="form-label">Descripción General</label>
+                            <textarea asp-for="Descripcion" class="form-control" rows="4" 
+                                      placeholder="Descripción detallada del programa de acciones..."></textarea>
+                            <span asp-validation-for="Descripcion" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ObjetivosEspecificos" class="form-label">Objetivos Específicos</label>
+                            <textarea asp-for="ObjetivosEspecificos" class="form-control" rows="3" 
+                                      placeholder="Objetivos que se desean alcanzar con este programa..."></textarea>
+                            <span asp-validation-for="ObjetivosEspecificos" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ActividadesARealizar" class="form-label">Actividades a Realizar</label>
+                            <textarea asp-for="ActividadesARealizar" class="form-control" rows="4" 
+                                      placeholder="Detalle de las actividades que realizará el estudiante..."></textarea>
+                            <span asp-validation-for="ActividadesARealizar" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CompromisosEstudiante" class="form-label">Compromisos del Estudiante</label>
+                            <textarea asp-for="CompromisosEstudiante" class="form-control" rows="3" 
+                                      placeholder="Compromisos que asume el estudiante..."></textarea>
+                            <span asp-validation-for="CompromisosEstudiante" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CompromisosFamilia" class="form-label">Compromisos de la Familia</label>
+                            <textarea asp-for="CompromisosFamilia" class="form-control" rows="3" 
+                                      placeholder="Compromisos que asume la familia..."></textarea>
+                            <span asp-validation-for="CompromisosFamilia" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CriteriosEvaluacion" class="form-label">Criterios de Evaluación</label>
+                            <textarea asp-for="CriteriosEvaluacion" class="form-control" rows="3" 
+                                      placeholder="Criterios que se utilizarán para evaluar el cumplimiento del programa..."></textarea>
+                            <span asp-validation-for="CriteriosEvaluacion" class="text-danger"></span>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label asp-for="FechaInicio" class="form-label">Fecha de Inicio</label>
+                                <input asp-for="FechaInicio" type="date" class="form-control" />
+                                <span asp-validation-for="FechaInicio" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="FechaFinPrevista" class="form-label">Fecha de Fin Prevista</label>
+                                <input asp-for="FechaFinPrevista" type="date" class="form-control" />
+                                <span asp-validation-for="FechaFinPrevista" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="Estado" class="form-label">Estado</label>
+                                <select asp-for="Estado" class="form-select" asp-items="ViewBag.Estados">
+                                    <option value="">-- Seleccione --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ResponsableSupervisionId" class="form-label">Responsable de Supervisión</label>
+                            <select asp-for="ResponsableSupervisionId" class="form-select" asp-items="ViewBag.Supervisores">
+                                <option value="">-- Seleccione un supervisor --</option>
+                            </select>
+                            <span asp-validation-for="ResponsableSupervisionId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Crear Programa
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,27 @@
+{
+  "name": "rubricas-app-playwright-tests",
+  "version": "1.0.0",
+  "description": "Pruebas E2E para RubricasApp con Playwright",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    "test:asignacion": "playwright test asignacion-estudiantes.spec.js",
+    "test:asignacion:headed": "playwright test asignacion-estudiantes.spec.js --headed",
+    "report": "playwright show-report"
+  },
+  "keywords": [
+    "playwright",
+    "testing",
+    "e2e",
+    "asp.net",
+    "rubricas"
+  ],
+  "author": "RubricasApp Team",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  }
+}

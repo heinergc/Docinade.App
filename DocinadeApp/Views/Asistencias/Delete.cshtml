@@ -1,0 +1,388 @@
+@model RubricasApp.Web.Models.Asistencia
+
+@{
+    ViewData["Title"] = "Eliminar Registro de Asistencia";
+    Layout = "_Layout";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">@ViewData["Title"]</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Inicio</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index")">Asistencias</a></li>
+                        <li class="breadcrumb-item active">Eliminar</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <div class="card card-danger">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-trash mr-2"></i>Confirmar Eliminación del Registro de Asistencia
+                            </h3>
+                        </div>
+
+                        <div class="card-body">
+                            <!-- Advertencia -->
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                <strong>¡Atención!</strong> Esta acción no se puede deshacer. 
+                                Una vez eliminado, el registro no se podrá recuperar.
+                            </div>
+
+                            <!-- Información del registro a eliminar -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h5 class="text-danger border-bottom pb-2 mb-4">
+                                        <i class="fas fa-info-circle mr-2"></i>Información del Registro a Eliminar
+                                    </h5>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>ID del Registro:</strong></td>
+                                            <td>#@Html.DisplayFor(model => model.AsistenciaId)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Estudiante:</strong></td>
+                                            <td>
+                                                <strong>@Html.DisplayFor(model => model.Estudiante.NombreCompleto)</strong><br />
+                                                <small class="text-muted">@Html.DisplayFor(model => model.Estudiante.NumeroId)</small>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Grupo:</strong></td>
+                                            <td>
+                                                @Html.DisplayFor(model => model.Grupo.Nombre)<br />
+                                                <small class="text-muted">@Html.DisplayFor(model => model.Grupo.PeriodoAcademico.Nombre)</small>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Fecha:</strong></td>
+                                            <td>
+                                                <i class="fas fa-calendar mr-1"></i>
+                                                @Model.Fecha.ToString("dddd, dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-ES"))
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Estado:</strong></td>
+                                            <td>
+                                                @switch (Model.Estado)
+                                                {
+                                                    case "P":
+                                                        <span class="badge badge-success"><i class="fas fa-check mr-1"></i>Presente</span>
+                                                        break;
+                                                    case "A":
+                                                        <span class="badge badge-danger"><i class="fas fa-times mr-1"></i>Ausente</span>
+                                                        break;
+                                                    case "T":
+                                                        <span class="badge badge-warning"><i class="fas fa-clock mr-1"></i>Tardanza</span>
+                                                        break;
+                                                    case "AJ":
+                                                        <span class="badge badge-info"><i class="fas fa-file-medical mr-1"></i>Ausencia Justificada</span>
+                                                        break;
+                                                }
+                                            </td>
+                                        </tr>
+                                        @if (Model.HoraLlegada.HasValue)
+                                        {
+                                            <tr>
+                                                <td><strong>Hora de Llegada:</strong></td>
+                                                <td>
+                                                    <i class="fas fa-clock mr-1"></i>
+                                                    @Model.HoraLlegada.Value.ToString("HH:mm")
+                                                </td>
+                                            </tr>
+                                        }
+                                        <tr>
+                                            <td><strong>Registrado Por:</strong></td>
+                                            <td>
+                                                @Html.DisplayFor(model => model.RegistradoPor.UserName)<br />
+                                                <small class="text-muted">@Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</small>
+                                            </td>
+                                        </tr>
+                                        @if (Model.EsModificacion)
+                                        {
+                                            <tr>
+                                                <td><strong>Modificado Por:</strong></td>
+                                                <td>
+                                                    @Html.DisplayFor(model => model.ModificadoPor.UserName)<br />
+                                                    <small class="text-muted">@Model.FechaModificacion?.ToString("dd/MM/yyyy HH:mm")</small>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Justificación y Observaciones si existen -->
+                            @if (!string.IsNullOrEmpty(Model.Justificacion) || !string.IsNullOrEmpty(Model.Observaciones))
+                            {
+                                <div class="row mt-3">
+                                    <div class="col-md-12">
+                                        <h6 class="text-muted border-bottom pb-2">
+                                            <i class="fas fa-comment mr-2"></i>Información Adicional
+                                        </h6>
+                                    </div>
+                                    
+                                    @if (!string.IsNullOrEmpty(Model.Justificacion))
+                                    {
+                                        <div class="col-md-12 mb-2">
+                                            <div class="alert alert-info">
+                                                <strong><i class="fas fa-file-medical mr-1"></i>Justificación:</strong><br />
+                                                @Model.Justificacion
+                                            </div>
+                                        </div>
+                                    }
+                                    
+                                    @if (!string.IsNullOrEmpty(Model.Observaciones))
+                                    {
+                                        <div class="col-md-12">
+                                            <div class="alert alert-secondary">
+                                                <strong><i class="fas fa-sticky-note mr-1"></i>Observaciones:</strong><br />
+                                                @Model.Observaciones
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+
+                            <!-- Consecuencias de la eliminación -->
+                            <div class="alert alert-danger mt-4">
+                                <h6><i class="fas fa-exclamation-circle mr-2"></i>Consecuencias de esta acción:</h6>
+                                <ul class="mb-0">
+                                    <li>El registro de asistencia será eliminado permanentemente</li>
+                                    <li>Esta información no aparecerá en futuros reportes de asistencia</li>
+                                    <li>Los datos no podrán ser recuperados una vez confirmada la eliminación</li>
+                                    <li>Se afectarán las estadísticas de asistencia del estudiante y del grupo</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <form asp-action="Delete" method="post">
+                                <input type="hidden" asp-for="AsistenciaId" />
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <button type="submit" class="btn btn-danger" onclick="return confirmarEliminacion()">
+                                            <i class="fas fa-trash mr-1"></i>Sí, Eliminar Definitivamente
+                                        </button>
+                                        <a href="@Url.Action("Index")" class="btn btn-secondary ml-2">
+                                            <i class="fas fa-times mr-1"></i>Cancelar
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        <a href="@Url.Action("Details", new { id = Model.AsistenciaId })" class="btn btn-info">
+                                            <i class="fas fa-eye mr-1"></i>Ver Detalles Completos
+                                        </a>
+                                        <a href="@Url.Action("Edit", new { id = Model.AsistenciaId })" class="btn btn-warning ml-2">
+                                            <i class="fas fa-edit mr-1"></i>Editar en su lugar
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Alternativas -->
+                    <div class="card card-light mt-3">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-lightbulb mr-2"></i>Alternativas Recomendadas
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-3">Antes de eliminar este registro, considere estas opciones:</p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-box bg-info">
+                                        <span class="info-box-icon">
+                                            <i class="fas fa-edit"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Editar Registro</span>
+                                            <span class="info-box-number">Corregir datos incorrectos</span>
+                                            <div class="progress">
+                                                <div class="progress-bar" style="width: 100%"></div>
+                                            </div>
+                                            <span class="progress-description">
+                                                <a href="@Url.Action("Edit", new { id = Model.AsistenciaId })" class="text-white">
+                                                    Ir a Editar
+                                                </a>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-box bg-success">
+                                        <span class="info-box-icon">
+                                            <i class="fas fa-sticky-note"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Agregar Observación</span>
+                                            <span class="info-box-number">Marcar como incorrecto</span>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-success" style="width: 100%"></div>
+                                            </div>
+                                            <span class="progress-description">
+                                                <a href="@Url.Action("Edit", new { id = Model.AsistenciaId })" class="text-white">
+                                                    Añadir Nota
+                                                </a>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmarEliminacion() {
+            return confirm('¿Está COMPLETAMENTE SEGURO de que desea eliminar este registro de asistencia?\n\n' +
+                          'Esta acción NO se puede deshacer y el registro se perderá permanentemente.\n\n' +
+                          'Haga clic en "Aceptar" solo si está absolutamente seguro de proceder.');
+        }
+
+        $(document).ready(function() {
+            // Efecto visual para resaltar la advertencia
+            $('.alert-warning').hide().fadeIn(1000);
+            
+            // Deshabilitar el botón de eliminar por unos segundos para evitar clicks accidentales
+            var deleteBtn = $('button[type="submit"]');
+            deleteBtn.prop('disabled', true);
+            deleteBtn.html('<i class="fas fa-hourglass-half mr-1"></i>Espere 3 segundos...');
+            
+            setTimeout(function() {
+                deleteBtn.prop('disabled', false);
+                deleteBtn.html('<i class="fas fa-trash mr-1"></i>Sí, Eliminar Definitivamente');
+                deleteBtn.addClass('pulse');
+            }, 3000);
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .table-borderless td {
+            border: none;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .table-borderless td:first-child {
+            width: 40%;
+            font-weight: 600;
+        }
+
+        .card-danger .card-header {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+
+        .card-light .card-header {
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+            color: #495057;
+        }
+
+        .info-box {
+            box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+            border-radius: .25rem;
+            background-color: #fff;
+            display: flex;
+            margin-bottom: 1rem;
+            min-height: 80px;
+            padding: .5rem;
+            position: relative;
+            width: 100%;
+        }
+
+        .info-box .info-box-icon {
+            border-radius: .25rem;
+            align-items: center;
+            display: flex;
+            font-size: 1.875rem;
+            justify-content: center;
+            text-align: center;
+            width: 70px;
+            color: rgba(255,255,255,.8);
+        }
+
+        .info-box .info-box-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            line-height: 1.8;
+            margin-left: 10px;
+            overflow: hidden;
+            padding: 5px 10px;
+        }
+
+        .info-box .info-box-text {
+            display: block;
+            font-size: .875rem;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .info-box .info-box-number {
+            display: block;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-top: 0;
+        }
+
+        .progress {
+            height: 2px;
+            margin: 5px 0;
+        }
+
+        .progress-description {
+            font-size: 0.75rem;
+            margin: 0;
+        }
+
+        @@@@keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        .badge {
+            font-size: 0.875em;
+        }
+    </style>
+}

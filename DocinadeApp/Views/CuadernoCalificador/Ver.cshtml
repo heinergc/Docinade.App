@@ -1,0 +1,318 @@
+﻿@model RubricasApp.Web.Models.CuadernoCalificadorViewModel
+
+@{
+    ViewData["Title"] = "Ver Cuaderno Calificador";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header Section  modern-card card border-0 shadow-sm -->
+            <div class="modern-card shadow-sm mb-4">
+                <div class="card-header bg-gradient-primary text-white">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h4 class="mb-0">
+                                <i class="fas fa-table me-2"></i>
+                                @Model.Nombre
+                            </h4>
+                            <small class="opacity-75">@Model.Materia - @Model.PeriodoAcademico</small>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge @(Model.Estado == "ACTIVO" ? "bg-success" : "bg-secondary") fs-6">
+                                @Model.Estado
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-calendar-alt text-primary me-2"></i>
+                                <div>
+                                    <small class="text-muted">Fecha de Creación</small>
+                                    <div class="fw-semibold">@Model.FechaCreacion.ToString("dd/MM/yyyy")</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-lock text-warning me-2"></i>
+                                <div>
+                                    <small class="text-muted">Fecha de Cierre</small>
+                                    <div class="fw-semibold">
+                                        @(Model.FechaCierre?.ToString("dd/MM/yyyy") ?? "No cerrado")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <div class="text-primary mb-2">
+                                <i class="fas fa-list-check fa-2x"></i>
+                            </div>
+                            <h5 class="card-title text-primary">@Model.TotalInstrumentos</h5>
+                            <p class="card-text text-muted">Instrumentos</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <div class="text-success mb-2">
+                                <i class="fas fa-percentage fa-2x"></i>
+                            </div>
+                            <h5 class="card-title text-success">@Model.PonderacionTotal%</h5>
+                            <p class="card-text text-muted">Ponderación Total</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <div class="text-info mb-2">
+                                <i class="fas fa-users fa-2x"></i>
+                            </div>
+                            <h5 class="card-title text-info">@Model.EstudiantesEvaluados</h5>
+                            <p class="card-text text-muted">Estudiantes Evaluados</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <div class="text-warning mb-2">
+                                <i class="fas fa-chart-line fa-2x"></i>
+                            </div>
+                            <h5 class="card-title text-warning">@Model.PromedioGeneral.ToString("F2")</h5>
+                            <p class="card-text text-muted">Promedio General</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instruments Configuration -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h5 class="mb-0">
+                                <i class="fas fa-cogs me-2"></i>
+                                Configuración de Instrumentos
+                            </h5>
+                        </div>
+                        <div class="col-auto">
+                            @if (Model.Estado == "ACTIVO")
+                            {
+                                <a href="@Url.Action("ConfigurarInstrumentos", new { id = Model.Id })" 
+                                   class="btn btn-primary btn-sm">
+                                    <i class="fas fa-edit me-1"></i>
+                                    Configurar
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model.Instrumentos?.Any() == true)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Orden</th>
+                                        <th>Instrumento (Rúbrica)</th>
+                                        <th>Ponderación</th>
+                                        <th>Obligatorio</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var instrumento in Model.Instrumentos.OrderBy(i => i.Orden))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <span class="badge bg-secondary">@instrumento.Orden</span>
+                                            </td>
+                                            <td>
+                                                <div class="fw-semibold">@instrumento.NombreRubrica</div>
+                                                <small class="text-muted">@instrumento.DescripcionRubrica</small>
+                                            </td>
+                                            <td>
+                                                <div class="progress" style="width: 100px;">
+                                                    <div class="progress-bar" 
+                                                         role="progressbar" 
+                                                         style="width: @instrumento.PonderacionPorcentaje%"
+                                                         aria-valuenow="@instrumento.PonderacionPorcentaje" 
+                                                         aria-valuemin="0" 
+                                                         aria-valuemax="100">
+                                                        @instrumento.PonderacionPorcentaje%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @if (instrumento.EsObligatorio)
+                                                {
+                                                    <span class="badge bg-warning">
+                                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                                        Obligatorio
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-info">
+                                                        <i class="fas fa-info-circle me-1"></i>
+                                                        Opcional
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check me-1"></i>
+                                                    Configurado
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No hay instrumentos configurados</h5>
+                            <p class="text-muted">Configura los instrumentos de evaluación para este cuaderno.</p>
+                            @if (Model.Estado == "ACTIVO")
+                            {
+                                <a href="@Url.Action("ConfigurarInstrumentos", new { id = Model.Id })" 
+                                   class="btn btn-primary">
+                                    <i class="fas fa-plus me-1"></i>
+                                    Configurar Instrumentos
+                                </a>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <div class="d-grid">
+                                <a href="@Url.Action("ExportarExcel", new { id = Model.Id })" 
+                                   class="btn btn-success">
+                                    <i class="fas fa-file-excel me-2"></i>
+                                    Exportar a Excel
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            @if (Model.Estado == "ACTIVO")
+                            {
+                                <div class="d-grid">
+                                    <button type="button" 
+                                            class="btn btn-warning" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#cerrarCuadernoModal">
+                                        <i class="fas fa-lock me-2"></i>
+                                        Cerrar Cuaderno
+                                    </button>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="d-grid">
+                                    <button type="button" class="btn btn-outline-secondary" disabled>
+                                        <i class="fas fa-lock me-2"></i>
+                                        Cuaderno Cerrado
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para cerrar cuaderno -->
+<div class="modal fade" id="cerrarCuadernoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-lock me-2"></i>
+                    Cerrar Cuaderno Calificador
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>¡Atención!</strong> Una vez cerrado el cuaderno, no podrás modificar la configuración de instrumentos.
+                </div>
+                <p>¿Estás seguro de que deseas cerrar este cuaderno calificador?</p>
+                <p><strong>Cuaderno:</strong> @Model.Nombre</p>
+                <p><strong>Materia:</strong> @Model.Materia</p>
+                <p><strong>Período:</strong> @Model.PeriodoAcademico</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>
+                    Cancelar
+                </button>
+                <form method="post" action="@Url.Action("CerrarCuaderno", new { id = Model.Id })" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-lock me-1"></i>
+                        Cerrar Cuaderno
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Navigation Buttons -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between">
+            <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>
+                Volver a la Lista
+            </a>
+            @if (Model.Estado == "ACTIVO")
+            {
+                <a href="@Url.Action("Edit", new { id = Model.Id })" class="btn btn-primary">
+                    <i class="fas fa-edit me-1"></i>
+                    Editar Cuaderno
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Confirmación adicional para cerrar cuaderno
+        document.querySelector('#cerrarCuadernoModal form').addEventListener('submit', function(e) {
+            if (!confirm('¿Estás completamente seguro? Esta acción no se puede deshacer.')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+}

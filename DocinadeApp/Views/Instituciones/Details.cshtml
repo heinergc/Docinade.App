@@ -1,0 +1,225 @@
+@model RubricasApp.Web.ViewModels.InstitucionDetailsViewModel
+
+@{
+    ViewData["Title"] = "Detalles de Institución";
+}
+
+<!-- Contenido Principal -->
+<main class="main-content fade-in">
+    <div class="container-fluid px-4">
+        <!-- Header de Página -->
+        <div class="page-header">
+            <h3 class="page-title-white">
+                <i class="fas fa-university"></i>
+                @Model.Nombre
+            </h3>
+        </div>
+
+        <!-- Tarjetas de información -->
+        <div class="row">
+            <!-- Información Principal -->
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle"></i> Información General
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <strong><i class="fas fa-building text-primary"></i> Nombre:</strong>
+                                <p class="mb-0">@Model.Nombre</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <strong><i class="fas fa-tag text-primary"></i> Siglas:</strong>
+                                <p class="mb-0">@(Model.Siglas ?? "No especificado")</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <strong><i class="fas fa-graduation-cap text-primary"></i> Tipo:</strong>
+                                <p class="mb-0"><span class="badge bg-info">@Model.TipoInstitucion</span></p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <strong><i class="fas fa-barcode text-primary"></i> Código MEP:</strong>
+                                <p class="mb-0">@(Model.CodigoMEP ?? "No especificado")</p>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <h6 class="text-success"><i class="fas fa-map-marker-alt"></i> Ubicación MEP</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <strong><i class="fas fa-map text-success"></i> Dirección Regional:</strong>
+                                <p class="mb-0">@(Model.DireccionRegional ?? "No especificado")</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <strong><i class="fas fa-network-wired text-success"></i> Circuito Escolar:</strong>
+                                <p class="mb-0">@(Model.CircuitoEscolar ?? "No especificado")</p>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <h6 class="text-info"><i class="fas fa-address-card"></i> Información de Contacto</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <strong><i class="fas fa-phone text-info"></i> Teléfono:</strong>
+                                <p class="mb-0">@(Model.Telefono ?? "No especificado")</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <strong><i class="fas fa-envelope text-info"></i> Email:</strong>
+                                <p class="mb-0">
+                                    @if (!string.IsNullOrEmpty(Model.Email))
+                                    {
+                                        <a href="mailto:@Model.Email">@Model.Email</a>
+                                    }
+                                    else
+                                    {
+                                        <span>No especificado</span>
+                                    }
+                                </p>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <strong><i class="fas fa-globe text-info"></i> Sitio Web:</strong>
+                                <p class="mb-0">
+                                    @if (!string.IsNullOrEmpty(Model.SitioWeb))
+                                    {
+                                        <a href="@Model.SitioWeb" target="_blank">@Model.SitioWeb</a>
+                                    }
+                                    else
+                                    {
+                                        <span>No especificado</span>
+                                    }
+                                </p>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <strong><i class="fas fa-map-marker-alt text-info"></i> Dirección Física:</strong>
+                                <p class="mb-0">@(Model.Direccion ?? "No especificado")</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Facultades Asociadas -->
+                @if (Model.Facultades.Any())
+                {
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-school"></i> 
+                                Facultades Asociadas (@Model.CantidadFacultades)
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Código</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var facultad in Model.Facultades)
+                                        {
+                                            <tr>
+                                                <td>@facultad.Nombre</td>
+                                                <td>@(facultad.Codigo ?? "-")</td>
+                                                <td>
+                                                    @if (facultad.Estado)
+                                                    {
+                                                        <span class="badge bg-success">Activa</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-secondary">Inactiva</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Panel lateral -->
+            <div class="col-lg-4">
+                <!-- Estado y Fechas -->
+                <div class="card mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info"></i> Estado
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <strong><i class="fas fa-toggle-on"></i> Estado Actual:</strong>
+                            <p class="mb-0">
+                                @if (Model.Estado)
+                                {
+                                    <span class="badge bg-success fs-6">Activa</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger fs-6">Inactiva</span>
+                                }
+                            </p>
+                        </div>
+                        <div class="mb-3">
+                            <strong><i class="fas fa-calendar-alt"></i> Fecha de Creación:</strong>
+                            <p class="mb-0">@Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acciones -->
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-tools"></i> Acciones
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            @if (User.HasClaim("permission", RubricasApp.Web.Models.Permissions.ApplicationPermissions.Instituciones.EDITAR))
+                            {
+                                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                                    <i class="fas fa-edit"></i> Editar Institución
+                                </a>
+                            }
+                            @if (User.HasClaim("permission", RubricasApp.Web.Models.Permissions.ApplicationPermissions.Instituciones.ELIMINAR) && Model.Estado)
+                            {
+                                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+                                    <i class="fas fa-trash"></i> Eliminar Institución
+                                </a>
+                            }
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver a la Lista
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estadísticas -->
+                <div class="card mt-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-bar"></i> Estadísticas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center">
+                            <h2 class="text-primary">@Model.CantidadFacultades</h2>
+                            <p class="text-muted mb-0">Facultades Asociadas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

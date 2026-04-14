@@ -1,0 +1,291 @@
+@model RubricasApp.Web.ViewModels.EstudianteEmpadronamientoViewModel
+@{
+    ViewData["Title"] = "Editar Empadronamiento";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">@ViewData["Title"]</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index")">Empadronamiento</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Details", new { id = Model.IdEstudiante })">Detalles</a></li>
+                        <li class="breadcrumb-item active">Editar</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form asp-action="Edit" method="post" id="formEmpadronamiento">
+        <input type="hidden" asp-for="IdEstudiante" />
+        <input type="hidden" asp-for="SeccionActual" id="seccionActual" />
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="row">
+            <!-- Información del Estudiante (Sidebar) -->
+            <div class="col-lg-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="mdi mdi-account-circle me-2"></i>
+                            Estudiante
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <div class="avatar-md mx-auto mb-2">
+                                <span class="avatar-title rounded-circle bg-soft-primary text-primary">
+                                    @(Model.NombreCompletoEstudiante?.Substring(0, 1).ToUpper() ?? "E")
+                                </span>
+                            </div>
+                            <h6 class="font-size-14 mb-1">@Model.NombreCompletoEstudiante</h6>
+                            <p class="text-muted font-size-12">@Model.CorreoEstudiante</p>
+                        </div>
+
+                        <div class="progress mb-3" style="height: 8px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: @(Model.PorcentajeCompletitud())%" id="progressBar"></div>
+                        </div>
+                        <p class="text-center font-size-12 text-muted">
+                            <span id="progressText">@(Model.PorcentajeCompletitud().ToString("F0"))% completado</span>
+                        </p>
+
+                        <!-- Estado actual -->
+                        <div class="alert alert-info alert-dismissible fade show" role="alert">
+                            <strong>Etapa actual:</strong> 
+                            @switch (Model.DatosEmpadronamiento?.EtapaActual)
+                            {
+                                case "PreRegistro":
+                                    <span class="badge bg-warning">Pre-registro</span>
+                                    break;
+                                case "RevisionDocumental":
+                                    <span class="badge bg-primary">Revisión Documental</span>
+                                    break;
+                                case "Aprobacion":
+                                    <span class="badge bg-info">Aprobación</span>
+                                    break;
+                                case "MatriculaFinalizada":
+                                    <span class="badge bg-success">Finalizada</span>
+                                    break;
+                                default:
+                                    <span class="badge bg-secondary">@Model.DatosEmpadronamiento?.EtapaActual</span>
+                                    break;
+                            }
+                        </div>
+
+                        <!-- Navegación por pasos -->
+                        <div class="steps-navigation">
+                            <div class="step-item @(Model.Seccion1Valida ? "step-valid" : "")" data-step="1">
+                                <div class="step-icon">
+                                    <i class="mdi mdi-account-outline"></i>
+                                </div>
+                                <div class="step-content">
+                                    <h6 class="step-title">Datos Personales</h6>
+                                    <p class="step-desc">Información básica</p>
+                                </div>
+                            </div>
+                            <div class="step-item @(Model.Seccion2Valida ? "step-valid" : "")" data-step="2">
+                                <div class="step-icon">
+                                    <i class="mdi mdi-map-marker-outline"></i>
+                                </div>
+                                <div class="step-content">
+                                    <h6 class="step-title">Contacto</h6>
+                                    <p class="step-desc">Dirección y teléfonos</p>
+                                </div>
+                            </div>
+                            <div class="step-item @(Model.Seccion3Valida ? "step-valid" : "")" data-step="3">
+                                <div class="step-icon">
+                                    <i class="mdi mdi-account-group-outline"></i>
+                                </div>
+                                <div class="step-content">
+                                    <h6 class="step-title">Responsables</h6>
+                                    <p class="step-desc">Familiares y emergencias</p>
+                                </div>
+                            </div>
+                            <div class="step-item @(Model.Seccion4Valida ? "step-valid" : "")" data-step="4">
+                                <div class="step-icon">
+                                    <i class="mdi mdi-medical-bag"></i>
+                                </div>
+                                <div class="step-content">
+                                    <h6 class="step-title">Salud</h6>
+                                    <p class="step-desc">Información médica</p>
+                                </div>
+                            </div>
+                            <div class="step-item @(Model.Seccion5Valida ? "step-valid" : "")" data-step="5">
+                                <div class="step-icon">
+                                    <i class="mdi mdi-school"></i>
+                                </div>
+                                <div class="step-content">
+                                    <h6 class="step-title">Académico</h6>
+                                    <p class="step-desc">Historial educativo</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Enlace a detalles -->
+                        <div class="mt-3">
+                            <a href="@Url.Action("Details", new { id = Model.IdEstudiante })" class="btn btn-outline-info btn-sm w-100">
+                                <i class="mdi mdi-eye-outline me-1"></i> Ver Detalles
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario Principal -->
+            <div class="col-lg-9">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0" id="sectionTitle">
+                                <i class="mdi mdi-account-outline me-2"></i>
+                                Datos Personales
+                            </h5>
+                            <div class="step-counter">
+                                <span class="badge bg-primary">Paso <span id="currentStep">1</span> de @Model.TotalSecciones</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Sección 1: Datos Personales -->
+                        <div class="form-section" id="section-1">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label asp-for="DatosEmpadronamiento.NumeroId" class="form-label">
+                                            <i class="mdi mdi-card-account-details-outline me-1"></i>
+                                            @Html.DisplayNameFor(m => m.DatosEmpadronamiento.NumeroId)
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <input asp-for="DatosEmpadronamiento.NumeroId" class="form-control" placeholder="Número de identificación" />
+                                        <span asp-validation-for="DatosEmpadronamiento.NumeroId" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label asp-for="DatosEmpadronamiento.FechaNacimiento" class="form-label">
+                                            <i class="mdi mdi-calendar me-1"></i>
+                                            @Html.DisplayNameFor(m => m.DatosEmpadronamiento.FechaNacimiento)
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <input asp-for="DatosEmpadronamiento.FechaNacimiento" class="form-control" type="date" />
+                                        <span asp-validation-for="DatosEmpadronamiento.FechaNacimiento" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label asp-for="DatosEmpadronamiento.Genero" class="form-label">
+                                            <i class="mdi mdi-human-male-female me-1"></i>
+                                            @Html.DisplayNameFor(m => m.DatosEmpadronamiento.Genero)
+                                        </label>
+                                        <select asp-for="DatosEmpadronamiento.Genero" class="form-select">
+                                            <option value="">Seleccione...</option>
+                                            <option value="Masculino">Masculino</option>
+                                            <option value="Femenino">Femenino</option>
+                                            <option value="Otro">Otro</option>
+                                            <option value="Prefiero no decir">Prefiero no decir</option>
+                                        </select>
+                                        <span asp-validation-for="DatosEmpadronamiento.Genero" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label asp-for="DatosEmpadronamiento.Nacionalidad" class="form-label">
+                                            <i class="mdi mdi-flag me-1"></i>
+                                            @Html.DisplayNameFor(m => m.DatosEmpadronamiento.Nacionalidad)
+                                        </label>
+                                        <select asp-for="DatosEmpadronamiento.Nacionalidad" class="form-select">
+                                            <option value="">Seleccione...</option>
+                                            <option value="Costarricense">Costarricense</option>
+                                            <option value="Nicaragüense">Nicaragüense</option>
+                                            <option value="Panameña">Panameña</option>
+                                            <option value="Colombiana">Colombiana</option>
+                                            <option value="Estadounidense">Estadounidense</option>
+                                            <option value="Otra">Otra</option>
+                                        </select>
+                                        <span asp-validation-for="DatosEmpadronamiento.Nacionalidad" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label asp-for="DatosEmpadronamiento.EstadoCivil" class="form-label">
+                                            <i class="mdi mdi-heart me-1"></i>
+                                            @Html.DisplayNameFor(m => m.DatosEmpadronamiento.EstadoCivil)
+                                        </label>
+                                        <select asp-for="DatosEmpadronamiento.EstadoCivil" class="form-select">
+                                            <option value="">Seleccione...</option>
+                                            <option value="Soltero/a">Soltero/a</option>
+                                            <option value="Casado/a">Casado/a</option>
+                                            <option value="Unión libre">Unión libre</option>
+                                            <option value="Divorciado/a">Divorciado/a</option>
+                                            <option value="Viudo/a">Viudo/a</option>
+                                        </select>
+                                        <span asp-validation-for="DatosEmpadronamiento.EstadoCivil" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección 2: Contacto y Residencia -->
+                        <div class="form-section d-none" id="section-2">
+                            @await Html.PartialAsync("_ContactoResidencia", Model)
+                        </div>
+
+                        <!-- Sección 3: Responsables -->
+                        <div class="form-section d-none" id="section-3">
+                            @await Html.PartialAsync("_Responsables", Model)
+                        </div>
+
+                        <!-- Sección 4: Salud -->
+                        <div class="form-section d-none" id="section-4">
+                            @await Html.PartialAsync("_Salud", Model)
+                        </div>
+
+                        <!-- Sección 5: Académico -->
+                        <div class="form-section d-none" id="section-5">
+                            @await Html.PartialAsync("_Academico", Model)
+                        </div>
+                    </div>
+
+                    <!-- Navegación del formulario -->
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary" id="btnAnterior" disabled>
+                                <i class="mdi mdi-arrow-left me-1"></i> Anterior
+                            </button>
+                            
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-outline-primary" id="btnGuardarBorrador">
+                                    <i class="mdi mdi-content-save-outline me-1"></i> Guardar Cambios
+                                </button>
+                                <button type="button" class="btn btn-primary" id="btnSiguiente">
+                                    Siguiente <i class="mdi mdi-arrow-right ms-1"></i>
+                                </button>
+                                <button type="submit" class="btn btn-success d-none" id="btnFinalizar">
+                                    <i class="mdi mdi-check-circle-outline me-1"></i> Guardar Empadronamiento
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Styles {
+    <link href="~/css/empadronamiento-multistep.css" rel="stylesheet" />
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/empadronamiento-multistep.js"></script>
+}

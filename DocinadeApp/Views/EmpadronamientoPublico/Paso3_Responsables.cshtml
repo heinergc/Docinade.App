@@ -1,0 +1,193 @@
+@model RubricasApp.Web.ViewModels.EmpadronamientoPublicoViewModel
+
+@{
+    ViewData["Title"] = "Paso 3: Responsables y Emergencia";
+}
+
+<!-- Barra de progreso -->
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="progress" style="height: 30px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" 
+                     role="progressbar" 
+                     style="width: 60%;" 
+                     aria-valuenow="60" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                    Paso @Model.PasoActual de @Model.TotalPasos (60%)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-users"></i> Paso 3: Información de Responsables y Contacto de Emergencia
+                    </h3>
+                    <small>Complete los datos de sus responsables legales y contacto de emergencia</small>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Paso3" method="post">
+                        @Html.AntiForgeryToken()
+                        
+                        <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+                        
+                        <h5 class="text-info mb-3"><i class="fas fa-user-friends"></i> Datos de los Padres/Responsables</h5>
+                        
+                        <div class="alert alert-light border">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i> Complete al menos uno de estos campos (Padre, Madre o Tutor Legal)
+                            </small>
+                        </div>
+                        
+                        <!-- Nombre del Padre -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="NombrePadre" class="form-label fw-bold">
+                                    <i class="fas fa-male"></i> Nombre Completo del Padre
+                                </label>
+                                <input asp-for="NombrePadre" class="form-control" 
+                                       placeholder="Nombre completo" />
+                                <span asp-validation-for="NombrePadre" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Nombre de la Madre -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="NombreMadre" class="form-label fw-bold">
+                                    <i class="fas fa-female"></i> Nombre Completo de la Madre
+                                </label>
+                                <input asp-for="NombreMadre" class="form-control" 
+                                       placeholder="Nombre completo" />
+                                <span asp-validation-for="NombreMadre" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Nombre del Tutor -->
+                        <div class="row">
+                            <div class="col-md-12 mb-4">
+                                <label asp-for="NombreTutor" class="form-label fw-bold">
+                                    <i class="fas fa-user-shield"></i> Nombre Completo del Tutor Legal
+                                </label>
+                                <input asp-for="NombreTutor" class="form-control" 
+                                       placeholder="Solo si aplica" />
+                                <span asp-validation-for="NombreTutor" class="text-danger"></span>
+                                <small class="form-text text-muted">
+                                    Complete este campo solo si tiene un tutor legal asignado
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <h5 class="text-danger mb-3">
+                            <i class="fas fa-ambulance"></i> Contacto de Emergencia
+                            <span class="badge bg-danger">REQUERIDO</span>
+                        </h5>
+                        
+                        <div class="alert alert-warning">
+                            <strong><i class="fas fa-exclamation-triangle"></i> Importante:</strong> 
+                            Esta información será utilizada para contactarle en caso de emergencia. 
+                            Asegúrese de proporcionar datos correctos y actualizados.
+                        </div>
+                        
+                        <!-- Contacto de Emergencia -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="ContactoEmergencia" class="form-label fw-bold">
+                                    Nombre Completo del Contacto de Emergencia <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="ContactoEmergencia" class="form-control" 
+                                       placeholder="Nombre de la persona a contactar en emergencias" required />
+                                <span asp-validation-for="ContactoEmergencia" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Teléfono y Relación -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="TelefonoEmergencia" class="form-label fw-bold">
+                                    Teléfono de Emergencia <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="TelefonoEmergencia" type="tel" class="form-control" 
+                                       placeholder="8888-8888" required />
+                                <span asp-validation-for="TelefonoEmergencia" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="RelacionEmergencia" class="form-label fw-bold">
+                                    Relación con el Contacto <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="RelacionEmergencia" class="form-select" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="Padre">Padre</option>
+                                    <option value="Madre">Madre</option>
+                                    <option value="Hermano/a">Hermano/a</option>
+                                    <option value="Abuelo/a">Abuelo/a</option>
+                                    <option value="Tío/a">Tío/a</option>
+                                    <option value="Tutor Legal">Tutor Legal</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                                <span asp-validation-for="RelacionEmergencia" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Campos ocultos -->
+                        <input type="hidden" asp-for="PasoActual" />
+                        <input type="hidden" asp-for="TotalPasos" />
+                        <input type="hidden" asp-for="SessionId" />
+                        
+                        <hr class="my-4">
+                        
+                        <!-- Botones de navegación -->
+                        <div class="row">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                                    <i class="fas fa-arrow-left"></i> Anterior
+                                </button>
+                            </div>
+                            <div class="col-6 text-end">
+                                <button type="submit" class="btn btn-info btn-lg text-white">
+                                    Siguiente <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        $(document).ready(function() {
+            // Validar que al menos uno de los responsables esté completo
+            $('form').on('submit', function(e) {
+                const padre = $('#NombrePadre').val().trim();
+                const madre = $('#NombreMadre').val().trim();
+                const tutor = $('#NombreTutor').val().trim();
+                
+                if (!padre && !madre && !tutor) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Información Incompleta',
+                        text: 'Debe completar al menos el nombre de uno de sus responsables (Padre, Madre o Tutor Legal)',
+                        confirmButtonText: 'Entendido'
+                    });
+                    return false;
+                }
+            });
+        });
+    </script>
+}

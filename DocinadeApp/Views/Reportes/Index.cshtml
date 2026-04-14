@@ -1,0 +1,333 @@
+@{
+    ViewData["Title"] = "Centro de Reportes";
+}
+
+<div class="container-fluid">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="jumbotron bg-primary text-white p-4 rounded">
+                <h1 class="display-4">
+                    <i class="fas fa-chart-bar me-3"></i>
+                    Centro de Reportes
+                </h1>
+                <p class="lead">
+                    Accede a reportes completos y analisis detallados del sistema de evaluaciones.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tarjetas de Reportes Disponibles -->
+    <div class="row g-4">
+        <!-- Reporte en Arbol -->
+        <div class="col-lg-6 col-xl-4">
+            <div class="card h-100 border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-sitemap me-2"></i>
+                        Reporte en Arbol
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        Visualiza la estructura jerarquica completa del sistema: 
+                        <strong>Materias - Periodos - Instrumentos - Rubricas</strong>
+                    </p>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Estructura organizacional</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Estadisticas por nivel</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Estado de evaluaciones</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Exportacion Excel/CSV</li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <a asp-action="ArbolEvaluaciones" class="btn btn-primary w-100">
+                        <i class="fas fa-tree me-2"></i>
+                        Ver Reporte en Arbol
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard de Estadisticas -->
+        <div class="col-lg-6 col-xl-4">
+            <div class="card h-100 border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Dashboard General
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        Panel de control con metricas clave e indicadores de rendimiento del sistema.
+                    </p>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Metricas en tiempo real</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Indicadores de rendimiento</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Resumen ejecutivo</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Graficos interactivos</li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <a asp-action="Dashboard" class="btn btn-info w-100">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Ver Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cuaderno Calificador -->
+        <div class="col-lg-6 col-xl-4">
+            <div class="card h-100 border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-table me-2"></i>
+                        Cuaderno Calificador
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        Sistema dinamico de calificaciones con calculos automaticos de ponderaciones.
+                    </p>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Generacion automatica</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Calculos ponderados</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Filtros dinamicos</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Exportacion Excel</li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <a asp-controller="CuadernoCalificador" asp-action="Index" class="btn btn-success w-100">
+                        <i class="fas fa-calculator me-2"></i>
+                        Ver Cuaderno Calificador
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Proximamente - Reportes de Evaluaciones -->
+        <div class="col-lg-6 col-xl-4">
+            <div class="card h-100 border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-file-alt me-2"></i>
+                        Reportes de Evaluaciones
+                        <span class="badge bg-secondary ms-2">Proximamente</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text text-muted">
+                        Reportes detallados sobre el rendimiento de evaluaciones y analisis de resultados.
+                    </p>
+                    <ul class="list-unstyled text-muted">
+                        <li><i class="fas fa-clock text-warning me-2"></i>Analisis de rendimiento</li>
+                        <li><i class="fas fa-clock text-warning me-2"></i>Tendencias temporales</li>
+                        <li><i class="fas fa-clock text-warning me-2"></i>Comparativas por grupo</li>
+                        <li><i class="fas fa-clock text-warning me-2"></i>Reportes personalizados</li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-outline-warning w-100" disabled>
+                        <i class="fas fa-hourglass-half me-2"></i>
+                        En Desarrollo
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Proximamente - Analytics Avanzado -->
+        <div class="col-lg-6 col-xl-4">
+            <div class="card h-100 border-secondary">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>
+                        Analytics Avanzado
+                        <span class="badge bg-light text-dark ms-2">Proximamente</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text text-muted">
+                        Analisis avanzado con inteligencia artificial y predicciones de rendimiento.
+                    </p>
+                    <ul class="list-unstyled text-muted">
+                        <li><i class="fas fa-clock text-secondary me-2"></i>Machine Learning</li>
+                        <li><i class="fas fa-clock text-secondary me-2"></i>Predicciones de rendimiento</li>
+                        <li><i class="fas fa-clock text-secondary me-2"></i>Alertas inteligentes</li>
+                        <li><i class="fas fa-clock text-secondary me-2"></i>Analisis predictivo</li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-outline-secondary w-100" disabled>
+                        <i class="fas fa-brain me-2"></i>
+                        En Planificacion
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acceso Rapido a Estadisticas -->
+        <div class="col-lg-6 col-xl-4">
+            <div class="card h-100 border-dark">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bolt me-2"></i>
+                        Estadisticas Rapidas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        Acceso instantaneo a las metricas mas importantes del sistema.
+                    </p>
+                    <div id="estadisticas-rapidas" class="mt-3">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <p class="mt-2 text-muted">Cargando estadisticas...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button onclick="cargarEstadisticasRapidas()" class="btn btn-dark w-100">
+                        <i class="fas fa-sync-alt me-2"></i>
+                        Actualizar Estadisticas
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informaci�n Adicional -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Informacion sobre los Reportes
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Que puedes hacer aqui?</h6>
+                            <ul>
+                                <li>Explorar la estructura completa del sistema de evaluaciones</li>
+                                <li>Analizar estadisticas y metricas de rendimiento</li>
+                                <li>Exportar datos para analisis externos</li>
+                                <li>Monitorear el progreso de evaluaciones en tiempo real</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-success">Consejos de Uso</h6>
+                            <ul>
+                                <li>Usa filtros para enfocarte en datos especificos</li>
+                                <li>Exporta reportes para compartir con otros equipos</li>
+                                <li>Revisa regularmente las estadisticas de completitud</li>
+                                <li>Utiliza el reporte en arbol para detectar problemas estructurales</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Cargar estad�sticas r�pidas al cargar la p�gina
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarEstadisticasRapidas();
+        });
+
+        async function cargarEstadisticasRapidas() {
+            const container = document.getElementById('estadisticas-rapidas');
+            
+            try {
+                container.innerHTML = `
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Cargando estadisticas...</p>
+                    </div>
+                `;
+
+                const response = await fetch('/Reportes/EstadisticasRapidas');
+                const result = await response.json();
+
+                if (result.success) {
+                    const stats = result.data;
+                    container.innerHTML = `
+                        <div class="row g-2 text-center">
+                            <div class="col-6">
+                                <div class="h6 text-primary mb-0">${stats.totalMaterias || 0}</div>
+                                <small class="text-muted">Materias</small>
+                            </div>
+                            <div class="col-6">
+                                <div class="h6 text-info mb-0">${stats.totalPeriodos || 0}</div>
+                                <small class="text-muted">Periodos</small>
+                            </div>
+                            <div class="col-6">
+                                <div class="h6 text-warning mb-0">${stats.totalInstrumentos || 0}</div>
+                                <small class="text-muted">Instrumentos</small>
+                            </div>
+                            <div class="col-6">
+                                <div class="h6 text-success mb-0">${stats.totalRubricas || 0}</div>
+                                <small class="text-muted">Rubricas</small>
+                            </div>
+                            <div class="col-12 mt-2">
+                                <div class="h5 text-danger mb-0">${stats.totalEvaluaciones || 0}</div>
+                                <small class="text-muted">Total Evaluaciones</small>
+                            </div>
+                            <div class="col-12">
+                                <div class="h6 text-dark mb-0">${(stats.porcentajeCompletitud || 0).toFixed(1)}%</div>
+                                <small class="text-muted">Completitud</small>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div class="alert alert-warning mb-0">
+                            <small>Error al cargar estadisticas: ${result.message}</small>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="alert alert-danger mb-0">
+                        <small>Error de conexion</small>
+                    </div>
+                `;
+            }
+        }
+    </script>
+}
+
+@section Styles {
+    <style>
+        .jumbotron {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        }
+        
+        .card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .badge {
+            font-size: 0.7em;
+        }
+        
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+    </style>
+}

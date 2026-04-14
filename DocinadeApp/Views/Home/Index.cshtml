@@ -1,0 +1,1174 @@
+﻿@model RubricasApp.Web.ViewModels.HomeIndexViewModel
+@{
+    ViewData["Title"] = "Panel de Control";
+}
+
+<!-- Slider Dinámico: Solo visible para usuarios NO autenticados (página pública) -->
+@if (!User.Identity?.IsAuthenticated ?? true)
+{
+    <!-- Slider sin contenedor para ancho completo -->
+    <div class="slider-fullwidth">
+        <vc:slider></vc:slider>
+    </div>
+}
+
+<style>
+/* Modern Dashboard Styles */
+.modern-dashboard {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.dashboard-header {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.dashboard-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-subtitle {
+    font-size: 1.1rem;
+    color: #718096;
+}
+
+.user-info-compact {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-avatar-large {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.user-roles-compact .badge {
+    margin: 0 0.2rem;
+    font-size: 0.7rem;
+}
+
+/* Section Headers */
+.section-header h3 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.section-header p {
+    font-size: 1rem;
+    margin-bottom: 0;
+}
+
+/* Modern Cards */
+.modern-card {
+    background: white;
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.modern-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #667eea, transparent);
+    transition: left 0.6s ease;
+    z-index: 10;
+}
+
+.modern-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.modern-card:hover::before {
+    left: 100%;
+}
+
+.modern-card .card-body {
+    padding: 2rem;
+}
+
+.card-icon-wrapper {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+    color: white;
+}
+
+.card-icon-wrapper i {
+    display: block !important;
+    color: white !important;
+    font-size: 1.8rem !important;
+    line-height: 1 !important;
+}
+
+.card-icon-wrapper.primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.card-icon-wrapper.success { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.card-icon-wrapper.danger { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.card-icon-wrapper.dark { background: linear-gradient(135deg, #434343 0%, #000000 100%); }
+
+.card-content h5 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.8rem;
+}
+
+.card-description {
+    color: #718096;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.card-stats {
+    margin-bottom: 1.5rem;
+}
+
+.btn-modern {
+    border-radius: 12px;
+    padding: 0.7rem 1.5rem;
+    font-weight: 500;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-modern:hover {
+    transform: translateY(-2px);
+}
+
+/* Config Cards */
+.config-card {
+    background: white;
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.config-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #28a745, transparent);
+    transition: left 0.5s ease;
+    z-index: 10;
+}
+
+.config-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.config-card:hover::before {
+    left: 100%;
+}
+
+.config-card-body {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.config-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.2rem;
+    color: white;
+}
+
+.config-icon i {
+    display: block !important;
+    color: inherit !important;
+    font-size: 1.2rem !important;
+    line-height: 1 !important;
+}
+
+.config-icon.primary { background: #007bff; }
+.config-icon.success { background: #28a745; }
+.config-icon.danger { background: #dc3545; }
+.config-icon.warning { background: #ffc107; color: #333 !important; }
+.config-icon.info { background: #17a2b8; }
+.config-icon.secondary { background: #6c757d; }
+
+.config-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.config-description {
+    font-size: 0.85rem;
+    color: #718096;
+    margin-bottom: 1rem;
+}
+
+.warning-accent { border-left-color: #ffc107 !important; }
+.info-accent { border-left-color: #17a2b8 !important; }
+.secondary-accent { border-left-color: #6c757d !important; }
+.primary-accent { border-left-color: #007bff !important; }
+.success-accent { border-left-color: #28a745 !important; }
+.danger-accent { border-left-color: #dc3545 !important; }
+
+/* Tool Cards */
+.tool-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    position: relative;
+    border-left: 3px solid transparent;
+    overflow: hidden;
+}
+
+.tool-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #17a2b8, transparent);
+    transition: left 0.4s ease;
+    z-index: 10;
+}
+
+.tool-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.tool-card:hover::before {
+    left: 100%;
+}
+
+.tool-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+}
+
+.tool-icon i {
+    display: block !important;
+    color: white !important;
+    font-size: 1rem !important;
+    line-height: 1 !important;
+}
+
+.purple-tool { border-left-color: #9f7aea; }
+.purple-tool .tool-icon { background: #9f7aea; }
+
+.teal-tool { border-left-color: #38b2ac; }
+.teal-tool .tool-icon { background: #38b2ac; }
+
+.orange-tool { border-left-color: #ed8936; }
+.orange-tool .tool-icon { background: #ed8936; }
+
+.green-tool { border-left-color: #68d391; }
+.green-tool .tool-icon { background: #68d391; }
+
+.red-tool { border-left-color: #f56565; }
+.red-tool .tool-icon { background: #f56565; }
+
+.dark-tool { border-left-color: #4a5568; }
+.dark-tool .tool-icon { background: #4a5568; }
+
+.tool-info h6 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0;
+}
+
+.tool-info small {
+    color: #718096;
+    font-size: 0.75rem;
+}
+
+.tool-link {
+    margin-left: auto;
+    color: #718096;
+    text-decoration: none;
+}
+
+.tool-link:hover {
+    color: #2d3748;
+}
+
+/* User Profile Section */
+.user-activity-card, .user-profile-card {
+    background: white;
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.card-header-modern {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border: none;
+}
+
+.card-header-modern h5 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.activity-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f7fafc;
+    border-radius: 12px;
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.1rem;
+}
+
+.stat-icon i {
+    display: block !important;
+    color: white !important;
+    font-size: 1.1rem !important;
+    line-height: 1 !important;
+}
+
+.stat-icon.primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.stat-icon.success { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.stat-icon.warning { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+.stat-icon.info { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); }
+
+.stat-info h6 {
+    font-size: 0.9rem;
+    color: #4a5568;
+    margin: 0 0 0.2rem 0;
+    font-weight: 500;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2d3748;
+}
+
+.profile-avatar-large {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin: 0 auto;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.profile-roles {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.3rem;
+}
+
+.profile-badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: white;
+}
+
+.profile-badge.danger { background: #dc3545; }
+.profile-badge.warning { background: #ffc107; color: #333; }
+.profile-badge.info { background: #17a2b8; }
+.profile-badge.success { background: #28a745; }
+.profile-badge.primary { background: #007bff; }
+
+.profile-actions .btn {
+    border-radius: 12px;
+    font-size: 0.85rem;
+}
+
+.feature-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #667eea, transparent);
+    transition: left 0.5s ease;
+    z-index: 10;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.feature-card:hover::before {
+    left: 100%;
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2rem;
+    color: white;
+}
+
+.feature-icon i {
+    display: block !important;
+    color: white !important;
+    font-size: 2rem !important;
+    line-height: 1 !important;
+}
+
+.feature-icon.primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.feature-icon.success { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.feature-icon.info { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+
+/* Media queries para responsividad */
+@@media (max-width: 768px) {
+    .dashboard-title {
+        font-size: 2rem;
+    }
+    
+    .modern-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .activity-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .user-info-compact {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+}
+
+/* Estilos adicionales para usuarios no autenticados */
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    margin: 2rem 0;
+}
+
+.hero-actions .btn {
+    border-radius: 25px;
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.hero-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+</style>
+
+<div class="modern-dashboard">
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        <!-- Header moderno -->
+        <div class="dashboard-header mb-4">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="welcome-section">
+                            <h1 class="dashboard-title">
+                                <i class="fas fa-tachometer-alt me-3" style="color: #2a599b;"></i>
+                                Panel de Control
+                            </h1>
+                            <p class="dashboard-subtitle mb-0">
+                                Bienvenido, <strong>@User.Identity.Name</strong> • 
+                                <span class="text-muted">@DateTime.Now.ToString("dddd, dd MMMM yyyy")</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="user-info-compact">
+                            @{
+                                var userName = User.Identity.Name;
+                                var userInitials = "";
+                                if (!string.IsNullOrEmpty(userName) && userName.Contains("@"))
+                                {
+                                    var name = userName.Split('@')[0];
+                                    userInitials = name.Length >= 2 ? name.Substring(0, 2).ToUpper() : name.ToUpper();
+                                }
+                                else if (!string.IsNullOrEmpty(userName))
+                                {
+                                    userInitials = userName.Length >= 2 ? userName.Substring(0, 2).ToUpper() : userName.ToUpper();
+                                }
+                            }
+                            <div class="user-avatar-large">@userInitials</div>
+                            <div class="user-roles-compact">
+                                @if (User.IsInRole("SuperAdmin"))
+                                {
+                                    <span class="badge bg-danger">Super Admin</span>
+                                }
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <span class="badge bg-warning">Admin</span>
+                                }
+                                @if (User.IsInRole("Coordinador"))
+                                {
+                                    <span class="badge bg-info">Coordinador</span>
+                                }
+                                @if (User.IsInRole("Profesor"))
+                                {
+                                    <span class="badge bg-success">Profesor</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Módulos Principales -->
+        <div class="main-modules mb-5">
+            <div class="section-header mb-4">
+                <h3 style="display: inline-block; padding: 0.5rem 1rem; border-radius: 8px;">
+                    <i class="fas fa-cube me-2" style="color: #2a599b;"></i> Módulos Principales
+                </h3>
+                <p class="text-muted">Accede a las funcionalidades principales del sistema</p>
+            </div>
+            <div class="row g-4">
+                @if (User.HasClaim("permission", "rubricas.ver"))
+                {
+                    <div class="col-xl-3 col-md-6">
+                        <div class="modern-card primary-card h-100">
+                            <div class="card-body">
+                                <div class="card-icon-wrapper primary">
+                                    <i class="fas fa-list-alt"></i>
+                                </div>
+                                <div class="card-content">
+                                    <h5 class="card-title">Rúbricas</h5>
+                                    <p class="card-description">Crea y gestiona rúbricas de evaluación</p>
+                                    <div class="card-stats">
+                                        <small class="text-muted">Sistema de evaluación</small>
+                                    </div>
+                                </div>
+                                <div class="card-action">
+                                    <a href="@Url.Action("Index", "Rubricas")" class="btn btn-primary btn-modern">
+                                        Gestionar <i class="fas fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                
+                @if (User.HasClaim("permission", "estudiantes.ver"))
+                {
+                    <div class="col-xl-3 col-md-6">
+                        <div class="modern-card success-card h-100">
+                            <div class="card-body">
+                                <div class="card-icon-wrapper success">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="card-content">
+                                    <h5 class="card-title">Estudiantes</h5>
+                                    <p class="card-description">Administra información de estudiantes</p>
+                                    <div class="card-stats">
+                                        <small class="text-muted">Gestión académica</small>
+                                    </div>
+                                </div>
+                                <div class="card-action">
+                                    <a href="@Url.Action("Index", "Estudiantes")" class="btn btn-success btn-modern">
+                                        Gestionar <i class="fas fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                
+                @if (User.HasClaim("permission", "evaluaciones.ver"))
+                {
+                    <div class="col-xl-3 col-md-6">
+                        <div class="modern-card danger-card h-100">
+                            <div class="card-body">
+                                <div class="card-icon-wrapper danger">
+                                    <i class="fas fa-clipboard-check"></i>
+                                </div>
+                                <div class="card-content">
+                                    <h5 class="card-title">Evaluaciones</h5>
+                                    <p class="card-description">Realiza evaluaciones con rúbricas</p>
+                                    <div class="card-stats">
+                                        <small class="text-muted">Proceso evaluativo</small>
+                                    </div>
+                                </div>
+                                <div class="card-action">
+                                    <a href="@Url.Action("Index", "Evaluaciones")" class="btn btn-danger btn-modern">
+                                        Evaluar <i class="fas fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                
+                @if (User.HasClaim("permission", "reportes.ver_basicos") || User.HasClaim("permission", "reportes.ver_avanzados") || User.HasClaim("permission", "reportes.ver_todos"))
+                {
+                    <div class="col-xl-3 col-md-6">
+                        <div class="modern-card dark-card h-100">
+                            <div class="card-body">
+                                <div class="card-icon-wrapper dark">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div class="card-content">
+                                    <h5 class="card-title">Reportes</h5>
+                                    <p class="card-description">Análisis y estadísticas detalladas</p>
+                                    <div class="card-stats">
+                                        <small class="text-muted">Business Intelligence</small>
+                                    </div>
+                                </div>
+                                <div class="card-action">
+                                    <a href="@Url.Action("Index", "Reportes")" class="btn btn-dark btn-modern">
+                                        Ver Reportes <i class="fas fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Gestión Académica -->
+        <div class="academic-management mb-5">
+            <div class="section-header mb-4">
+                <h3><i class="fas fa-graduation-cap text-info me-2"></i>Gestión Académica</h3>
+                <p class="text-muted">Configuración y administración del sistema académico</p>
+            </div>
+            <div class="row g-4">
+                @if (User.HasClaim("permission", "grupos_estudiantes.ver"))
+                {
+                    <div class="col-lg-4 col-md-6">
+                        <div class="config-card warning-accent h-100">
+                            <div class="config-card-body">
+                                <div class="config-icon warning">
+                                    <i class="fas fa-users-cog"></i>
+                                </div>
+                                <h6 class="config-title">Grupos de Estudiantes</h6>
+                                <p class="config-description">Organiza estudiantes en grupos</p>
+                                <a href="@Url.Action("Index", "GruposEstudiantes")" class="btn btn-outline-warning btn-sm">
+                                    <i class="fas fa-users-cog me-1"></i> Gestionar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                
+                @if (User.HasClaim("permission", "tipos_grupo.ver"))
+                {
+                    <div class="col-lg-4 col-md-6">
+                        <div class="config-card info-accent h-100">
+                            <div class="config-card-body">
+                                <div class="config-icon info">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <h6 class="config-title">Tipos de Grupo</h6>
+                                <p class="config-description">Define tipos de agrupación</p>
+                                <a href="@Url.Action("Index", "TiposGrupo")" class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-layer-group me-1"></i> Gestionar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                
+                @if (User.HasClaim("permission", "materias.ver"))
+                {
+                    <div class="col-lg-4 col-md-6">
+                        <div class="config-card secondary-accent h-100">
+                            <div class="config-card-body">
+                                <div class="config-icon secondary">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <h6 class="config-title">Materias</h6>
+                                <p class="config-description">Administra materias académicas</p>
+                                <a href="@Url.Action("Index", "Materias")" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-book me-1"></i> Gestionar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                
+                @if (User.HasClaim("permission", "periodos.ver"))
+                {
+                    <div class="col-lg-4 col-md-6">
+                        <div class="config-card primary-accent h-100">
+                            <div class="config-card-body">
+                                <div class="config-icon primary">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <h6 class="config-title">Períodos Académicos</h6>
+                                <p class="config-description">Gestiona períodos lectivos</p>
+                                <a href="@Url.Action("Index", "PeriodosAcademicos")" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-calendar-alt me-1"></i> Gestionar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                
+                @if (User.HasClaim("permission", "niveles.ver"))
+                {
+                    <div class="col-lg-4 col-md-6">
+                        <div class="config-card success-accent h-100">
+                            <div class="config-card-body">
+                                <div class="config-icon success">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <h6 class="config-title">Niveles de Calificación</h6>
+                                <p class="config-description">Define escalas de evaluación</p>
+                                <a href="@Url.Action("Index", "NivelesCalificacion")" class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-star me-1"></i> Gestionar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                
+                @if (User.HasClaim("permission", "items_evaluacion.ver"))
+                {
+                    <div class="col-lg-4 col-md-6">
+                        <div class="config-card danger-accent h-100">
+                            <div class="config-card-body">
+                                <div class="config-icon danger">
+                                    <i class="fas fa-tasks"></i>
+                                </div>
+                                <h6 class="config-title">Items de Evaluación</h6>
+                                <p class="config-description">Configura elementos evaluativos</p>
+                                <a href="@Url.Action("Index", "ItemsEvaluacion")" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-tasks me-1"></i> Gestionar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Herramientas Avanzadas -->
+        @if (User.HasClaim("permission", "instrumentos_evaluacion.ver") || User.HasClaim("permission", "instrumento_materias.ver") || User.HasClaim("permission", "instrumento_rubrica.ver") || User.HasClaim("permission", "cuaderno_calificador.ver") || User.HasClaim("permission", "auditoria.ver"))
+        {
+            <div class="advanced-tools mb-5">
+                <div class="section-header mb-4">
+                    <h3><i class="fas fa-tools text-purple me-2"></i>Herramientas Avanzadas</h3>
+                    <p class="text-muted">Funcionalidades especializadas y de administración</p>
+                </div>
+                <div class="row g-3">
+                    @if (User.HasClaim("permission", "instrumentos_evaluacion.ver"))
+                    {
+                        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                            <div class="tool-card purple-tool">
+                                <div class="tool-icon">
+                                    <i class="fas fa-tools"></i>
+                                </div>
+                                <div class="tool-info">
+                                    <h6>Instrumentos</h6>
+                                    <small>Herramientas evaluativas</small>
+                                </div>
+                                <a href="@Url.Action("Index", "InstrumentosEvaluacion")" class="tool-link">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    
+                    @if (User.HasClaim("permission", "instrumento_materias.ver"))
+                    {
+                        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                            <div class="tool-card teal-tool">
+                                <div class="tool-icon">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                                <div class="tool-info">
+                                    <h6>Inst-Materias</h6>
+                                    <small>Asociaciones</small>
+                                </div>
+                                <a href="@Url.Action("Index", "InstrumentoMaterias")" class="tool-link">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    
+                    @if (User.HasClaim("permission", "instrumento_rubrica.ver"))
+                    {
+                        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                            <div class="tool-card orange-tool">
+                                <div class="tool-icon">
+                                    <i class="fas fa-project-diagram"></i>
+                                </div>
+                                <div class="tool-info">
+                                    <h6>Inst-Rúbricas</h6>
+                                    <small>Vinculaciones</small>
+                                </div>
+                                <a href="@Url.Action("Index", "InstrumentoRubrica")" class="tool-link">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    
+                    @if (User.HasClaim("permission", "cuaderno_calificador.ver"))
+                    {
+                        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                            <div class="tool-card green-tool">
+                                <div class="tool-icon">
+                                    <i class="fas fa-clipboard-list"></i>
+                                </div>
+                                <div class="tool-info">
+                                    <h6>Cuaderno</h6>
+                                    <small>Calificaciones</small>
+                                </div>
+                                <a href="@Url.Action("Index", "CuadernoCalificador")" class="tool-link">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    
+                    @if (User.HasClaim("permission", "auditoria.ver"))
+                    {
+                        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                            <div class="tool-card red-tool">
+                                <div class="tool-icon">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <div class="tool-info">
+                                    <h6>Auditoría</h6>
+                                    <small>Logs del sistema</small>
+                                </div>
+                                <a href="@Url.Action("Index", "Auditoria")" class="tool-link">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    
+                    @if (User.HasClaim("permission", "admin.ver_dashboard"))
+                    {
+                        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                            <div class="tool-card dark-tool">
+                                <div class="tool-icon">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                                <div class="tool-info">
+                                    <h6>Admin</h6>
+                                    <small>Panel control</small>
+                                </div>
+                                <a href="@Url.Action("Index", "Admin", new { area = "Admin" })" class="tool-link">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- Información del Usuario Reestructurada -->
+        <div class="user-profile-section">
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="user-activity-card">
+                        <div class="card-header-modern">
+                            <h5><i class="fas fa-chart-line me-2"></i>Actividad Reciente</h5>
+                            <small class="text-muted-while">Resumen de tu actividad en el sistema</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="activity-stats">
+                                <div class="stat-item">
+                                    <div class="stat-icon primary">
+                                        <i class="fas fa-list-alt"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h6>Rúbricas Creadas</h6>
+                                        <span class="stat-number">@Model.RubricasCreadas</span>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-icon success">
+                                        <i class="fas fa-clipboard-check"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h6>Evaluaciones Completadas</h6>
+                                        <span class="stat-number">@Model.EvaluacionesCompletadas</span>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-icon warning">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h6>Estudiantes Evaluados</h6>
+                                        <span class="stat-number">@Model.EstudiantesEvaluados</span>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-icon info">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h6>Reportes Generados</h6>
+                                        <span class="stat-number">@Model.ReportesGenerados</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="user-profile-card">
+                        <div class="card-header-modern">
+                            <h5><i class="fas fa-user-circle me-2"></i>Mi Perfil</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="profile-avatar-large">@userInitials</div>
+                            <h6 class="mt-3 mb-2">@User.Identity.Name</h6>
+                            
+                            <div class="profile-roles mb-3">
+                                @if (User.IsInRole("SuperAdmin"))
+                                {
+                                    <span class="profile-badge danger">Super Administrador</span>
+                                }
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <span class="profile-badge warning">Administrador</span>
+                                }
+                                @if (User.IsInRole("Coordinador"))
+                                {
+                                    <span class="profile-badge info">Coordinador</span>
+                                }
+                                @if (User.IsInRole("Profesor"))
+                                {
+                                    <span class="profile-badge success">Profesor</span>
+                                }
+                                @if (User.IsInRole("Evaluador"))
+                                {
+                                    <span class="profile-badge primary">Evaluador</span>
+                                }
+                            </div>
+                            
+                            <div class="profile-actions">
+                                <a href="@Url.Action("Profile", "Account")" class="btn btn-outline-primary btn-sm mb-2">
+                                    <i class="fas fa-user me-1"></i> Mi Perfil
+                                </a>
+                                <br>
+                                <a href="@Url.Action("ChangePassword", "Account")" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-key me-1"></i> Cambiar Contraseña
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Vista para usuarios no autenticados -->
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="hero-section text-center text-white p-5 rounded">
+                        <h1 class="display-4 mb-4">
+                            <i class="fas fa-clipboard-check me-3"></i> 
+                            Sistema de Evaluaciones
+                        </h1>
+                        <p class="lead fs-3 mb-4">Gestiona y evalúa el desempeño académico de manera eficiente</p>
+                        <p class="fs-5 mb-5">Sistema completo para la creación, configuración y aplicación de rúbricas de evaluación</p>
+                        <div class="hero-actions">
+                            <a class="btn btn-success btn-lg me-3" href="@Url.Action("Register", "Account")" role="button">
+                                <i class="fas fa-user-plus me-2"></i> Registrarse
+                            </a>
+                            <a class="btn btn-outline-light btn-lg" href="@Url.Action("Login", "Account")" role="button">
+                                <i class="fas fa-sign-in-alt me-2"></i> Iniciar Sesión
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Empadronamiento Público (solo visible si está habilitado) -->
+        @if (Model.EmpadronamientoPublicoHabilitado)
+        {
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="card border-warning shadow-lg">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h4 class="text-warning mb-3">
+                                        <i class="fas fa-user-graduate fa-2x me-2"></i>
+                                        <strong>¿Eres Estudiante? ¡Empadrónate Aquí!</strong>
+                                    </h4>
+                                    <p class="fs-5 mb-2">
+                                        Completa tu proceso de empadronamiento en línea de manera rápida y sencilla.
+                                    </p>
+                                    <ul class="list-unstyled mb-0">
+                                        <li><i class="fas fa-check-circle text-success me-2"></i> Sin necesidad de crear cuenta</li>
+                                        <li><i class="fas fa-check-circle text-success me-2"></i> Proceso guiado paso a paso</li>
+                                        <li><i class="fas fa-check-circle text-success me-2"></i> Confirmación inmediata por correo</li>
+                                        <li><i class="fas fa-check-circle text-success me-2"></i> Solo toma 10 minutos</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <a class="btn btn-warning btn-lg px-5 py-3 shadow" 
+                                       href="@Url.Action("Index", "EmpadronamientoPublico")" 
+                                       role="button"
+                                       style="font-size: 1.2rem;">
+                                        <i class="fas fa-clipboard-list me-2"></i>
+                                        <strong>Empadronarme Ahora</strong>
+                                    </a>
+                                    <p class="text-muted mt-2 small">
+                                        <i class="fas fa-clock me-1"></i> Disponible 24/7
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Características del Sistema -->
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col-md-12 text-center mb-5">
+                    <h3 class="text-dark display-6 fw-bold">Características Principales</h3>
+                    <p class="text-muted fs-5">Descubre las funcionalidades de nuestro sistema</p>
+                </div>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card text-center">
+                        <div class="feature-icon primary">
+                            <i class="fas fa-list-alt"></i>
+                        </div>
+                        <h5 class="fw-bold">Rúbricas Personalizadas</h5>
+                        <p class="text-muted">Crea rúbricas adaptadas a tus necesidades con múltiples criterios y niveles.</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="feature-card text-center">
+                        <div class="feature-icon success">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h5 class="fw-bold">Gestión de Estudiantes</h5>
+                        <p class="text-muted">Administra la información de estudiantes con importación desde Excel.</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="feature-card text-center">
+                        <div class="feature-icon info">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h5 class="fw-bold">Reportes Detallados</h5>
+                        <p class="text-muted">Genera reportes completos con estadísticas y análisis de rendimiento.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div> <!-- Fin dashboard-container -->

@@ -1,0 +1,107 @@
+namespace RubricasApp.Web.Models.Audit
+{
+    /// <summary>
+    /// Niveles de log para auditoría
+    /// </summary>
+    public static class AuditLogLevels
+    {
+        public const string TRACE = "Trace";
+        public const string DEBUG = "Debug";
+        public const string INFORMATION = "Information";
+        public const string WARNING = "Warning";
+        public const string ERROR = "Error";
+        public const string CRITICAL = "Critical";
+
+        /// <summary>
+        /// Obtiene todos los niveles de log como lista
+        /// </summary>
+        public static List<string> GetAllLogLevels()
+        {
+            return new List<string>
+            {
+                TRACE,
+                DEBUG,
+                INFORMATION,
+                WARNING,
+                ERROR,
+                CRITICAL
+            };
+        }
+
+        /// <summary>
+        /// Verifica si un nivel de log es válido
+        /// </summary>
+        public static bool IsValidLogLevel(string logLevel)
+        {
+            return GetAllLogLevels().Contains(logLevel);
+        }
+
+        /// <summary>
+        /// Obtiene el nombre amigable de un nivel de log
+        /// </summary>
+        public static string GetDisplayName(string logLevel)
+        {
+            return logLevel switch
+            {
+                TRACE => "Rastreo",
+                DEBUG => "Depuración",
+                INFORMATION => "Información",
+                WARNING => "Advertencia",
+                ERROR => "Error",
+                CRITICAL => "Crítico",
+                _ => logLevel
+            };
+        }
+
+        /// <summary>
+        /// Obtiene el color CSS asociado a un nivel de log
+        /// </summary>
+        public static string GetCssClass(string logLevel)
+        {
+            return logLevel switch
+            {
+                TRACE => "text-muted",
+                DEBUG => "text-secondary",
+                INFORMATION => "text-info",
+                WARNING => "text-warning",
+                ERROR => "text-danger",
+                CRITICAL => "text-danger fw-bold",
+                _ => "text-dark"
+            };
+        }
+
+        /// <summary>
+        /// Obtiene el nivel de severidad numérico
+        /// </summary>
+        public static int GetSeverityLevel(string logLevel)
+        {
+            return logLevel switch
+            {
+                TRACE => 0,
+                DEBUG => 1,
+                INFORMATION => 2,
+                WARNING => 3,
+                ERROR => 4,
+                CRITICAL => 5,
+                _ => 2
+            };
+        }
+
+        /// <summary>
+        /// Obtiene el icono asociado a un nivel de log
+        /// </summary>
+        public static string GetIcon(string logLevel)
+        {
+            return logLevel switch
+            {
+                TRACE => "fas fa-search",
+                DEBUG => "fas fa-bug",
+                INFORMATION => "fas fa-info-circle",
+                WARNING => "fas fa-exclamation-triangle",
+                ERROR => "fas fa-times-circle",
+                CRITICAL => "fas fa-exclamation-circle",
+                _ => "fas fa-circle"
+            };
+        }
+    }
+}

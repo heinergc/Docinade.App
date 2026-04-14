@@ -1,0 +1,128 @@
+﻿@model RubricasApp.Web.ViewModels.Academic.PeriodoVm
+
+@{
+    ViewData["Title"] = "Detalles del Período Académico";
+}
+<meta charset="utf-8" />
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-info-circle"></i> Detalles del Período Académico
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>Código:</strong>
+                            <span class="badge bg-primary fs-6">@Model.Codigo</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Nombre:</strong>
+                            <p class="mb-0">@Model.Nombre</p>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Tipo:</strong>
+                            <span class="badge @(Model.Tipo == "Cuatrimestre" ? "bg-info" : "bg-warning")">
+                                @Model.Tipo
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>Año:</strong>
+                            <p class="mb-0">@Model.Anio</p>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Ciclo:</strong>
+                            <p class="mb-0">@Model.Ciclo</p>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Número de Período:</strong>
+                            <p class="mb-0">@Model.NumeroPeriodo</p>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Estado:</strong>
+                            @if (Model.Activo)
+                            {
+                                <span class="badge bg-success">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactivo</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+                
+                <hr />
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>Fecha de Inicio:</strong>
+                            <p class="mb-0">@Model.FechaInicio.ToString("dddd, dd 'de' MMMM 'de' yyyy")</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>Fecha de Fin:</strong>
+                            <p class="mb-0">@Model.FechaFin.ToString("dddd, dd 'de' MMMM 'de' yyyy")</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <strong>Duración:</strong>
+                            @{
+                                var duracion = Model.FechaFin - Model.FechaInicio;
+                                var meses = (Model.FechaFin.Year - Model.FechaInicio.Year) * 12 + Model.FechaFin.Month - Model.FechaInicio.Month;
+                            }
+                            <p class="mb-0">@duracion.Days días (aproximadamente @meses meses)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr />
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <strong>Información Adicional:</strong>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <strong>Fecha de Creación:</strong>
+                                    <p class="mb-0">@Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                @if (Model.FechaModificacion.HasValue)
+                                {
+                                    <div class="mb-3">
+                                        <strong>Última Modificación:</strong>
+                                        <p class="mb-0">@Model.FechaModificacion.Value.ToString("dd/MM/yyyy HH:mm")</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group mt-4">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning me-2">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver a la lista
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

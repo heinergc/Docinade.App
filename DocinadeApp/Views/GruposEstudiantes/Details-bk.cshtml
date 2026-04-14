@@ -1,0 +1,642 @@
+@model RubricasApp.Web.ViewModels.Grupos.DetalleGrupoViewModel
+
+@{
+    ViewData["Title"] = $"Grupo: {Model.Codigo}";
+}
+
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="page-title">
+                <span class="badge bg-primary me-2">@Model.Codigo</span>
+                @Model.Nombre
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index")">
+                            <i class="fas fa-users-cog"></i> Grupos
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">@Model.Codigo</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="btn-group">
+                <a href="@Url.Action("AsignarEstudiantes", new { id = Model.GrupoId })" 
+                   class="btn btn-modern success">
+                    <i class="fas fa-user-plus"></i> Asignar Estudiantes
+                </a>
+                <a href="@Url.Action("Edit", new { id = Model.GrupoId })" 
+                   class="btn btn-modern warning">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+                <div class="dropdown">
+                    <button class="btn btn-modern secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="@Url.Action("ExportarEstudiantesExcel", new { id = Model.GrupoId })">
+                                <i class="fas fa-download me-2"></i>Exportar Estudiantes
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger" 
+                               href="@Url.Action("Delete", new { id = Model.GrupoId })"
+                               onclick="return confirm('¿Está seguro de eliminar este grupo?')">
+                                <i class="fas fa-trash me-2"></i>Eliminar Grupo
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tarjetas de estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="modern-card stat-card">
+            <div class="card-body text-center">
+                <div class="stat-icon mb-2">
+                    <i class="fas fa-users fa-2x text-primary"></i>
+                </div>
+                <h3 class="stat-number">@Model.CantidadEstudiantes</h3>
+                <p class="stat-label">Estudiantes</p>
+                @if (Model.CapacidadMaxima.HasValue)
+                {
+                    <small class="text-muted">de @Model.CapacidadMaxima máximo</small>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="modern-card stat-card">
+            <div class="card-body text-center">
+                <div class="stat-icon mb-2">
+                    <i class="fas fa-chart-pie fa-2x text-success"></i>
+                </div>
+                <h3 class="stat-number @(Model.EstaCompleto ? "text-warning" : "text-success")">
+                    @Model.EstadoCapacidad
+                </h3>
+                <p class="stat-label">Capacidad</p>
+                @if (Model.CapacidadMaxima.HasValue)
+                {
+                    <small class="text-muted">
+                        @(((double)Model.CantidadEstudiantes / Model.CapacidadMaxima.Value * 100).ToString("F1"))% ocupado
+                    </small>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="modern-card stat-card">
+            <div class="card-body text-center">
+                <div class="stat-icon mb-2">
+                    <i class="fas fa-book fa-2x text-info"></i>
+                </div>
+                <h3 class="stat-number">@Model.Materias.Count</h3>
+                <p class="stat-label">Materias</p>
+                <small class="text-muted">asociadas</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="modern-card stat-card">
+            <div class="card-body text-center">
+                <div class="stat-icon mb-2">
+                    <i class="fas fa-info-circle fa-2x text-secondary"></i>
+                </div>
+                <h3 class="stat-number">
+                    <span class="badge bg-@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Activo ? "success" : Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Inactivo ? "secondary" : "danger")">
+                        @Model.EstadoDisplay
+                    </span>
+                </h3>
+                <p class="stat-label">Estado</p>
+                <small class="text-muted">del grupo</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Información del grupo -->
+<div class="row">
+    <div class="col-md-4">
+        <div class="modern-card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Información del Grupo
+                </h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <td><strong>Código:</strong></td>
+                        <td><span class="badge bg-primary">@Model.Codigo</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tipo:</strong></td>
+                        <td>
+                            <span class="badge badge-tipo-@(Model.TipoGrupo.ToString().ToLower())">
+                                @Model.TipoGrupoDisplay
+                            </span>
+                        </td>
+                    </tr>
+                    @if (!string.IsNullOrEmpty(Model.Nivel))
+                    {
+                        <tr>
+                            <td><strong>Nivel:</strong></td>
+                            <td>@Model.Nivel</td>
+                        </tr>
+                    }
+                    <tr>
+                        <td><strong>Período:</strong></td>
+                        <td>@Model.PeriodoAcademico</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Creado:</strong></td>
+                        <td>
+                            @Model.FechaCreacion.ToString("dd/MM/yyyy")
+                            @if (!string.IsNullOrEmpty(Model.CreadoPor))
+                            {
+                                <br><small class="text-muted">por @Model.CreadoPor</small>
+                            }
+                        </td>
+                    </tr>
+                    @if (Model.FechaModificacion.HasValue)
+                    {
+                        <tr>
+                            <td><strong>Modificado:</strong></td>
+                            <td>@Model.FechaModificacion.Value.ToString("dd/MM/yyyy HH:mm")</td>
+                        </tr>
+                    }
+                </table>
+                
+                @if (!string.IsNullOrEmpty(Model.Descripcion))
+                {
+                    <hr>
+                    <h6><strong>Descripción:</strong></h6>
+                    <p class="text-muted">@Model.Descripcion</p>
+                }
+                
+                @if (!string.IsNullOrEmpty(Model.Observaciones))
+                {
+                    <hr>
+                    <h6><strong>Observaciones:</strong></h6>
+                    <p class="text-muted">@Model.Observaciones</p>
+                }
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <!-- Pestañas para estudiantes y materias -->
+        <div class="modern-card">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs" id="groupTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="students-tab" data-bs-toggle="tab" 
+                                data-bs-target="#students" type="button" role="tab">
+                            <i class="fas fa-users me-2"></i>
+                            Estudiantes (@Model.Estudiantes.Count)
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="subjects-tab" data-bs-toggle="tab" 
+                                data-bs-target="#subjects" type="button" role="tab">
+                            <i class="fas fa-book me-2"></i>
+                            Materias (@Model.Materias.Count)
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content" id="groupTabsContent">
+                    <!-- Pestaña de Estudiantes -->
+                    <div class="tab-pane fade show active" id="students" role="tabpanel">
+                        @if (Model.Estudiantes.Any())
+                        {
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="mb-0">Lista de Estudiantes</h6>
+                                <a href="@Url.Action("AsignarEstudiantes", new { id = Model.GrupoId })" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-plus"></i> Agregar más
+                                </a>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Estudiante</th>
+                                            <th>Email</th>
+                                            <th>Asignado</th>
+                                            <th>Principal</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var estudiante in Model.Estudiantes.OrderBy(e => e.NombreCompleto))
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <code>@estudiante.NumeroId</code>
+                                                </td>
+                                                <td>
+                                                    <strong>@estudiante.NombreCompleto</strong>
+                                                </td>
+                                                <td>
+                                                    <a href="mailto:@estudiante.Email">@estudiante.Email</a>
+                                                </td>
+                                                <td>
+                                                    <small class="text-muted">
+                                                        @estudiante.FechaAsignacion.ToString("dd/MM/yyyy")
+                                                        @if (!string.IsNullOrEmpty(estudiante.AsignadoPor))
+                                                        {
+                                                            <br>
+                                                            <span>por @estudiante.AsignadoPor</span>
+                                                        }
+                                                    </small>
+                                                </td>
+                                                <td>
+                                                    @if (estudiante.EsGrupoPrincipal)
+                                                    {
+                                                        <span class="badge bg-success">Principal</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-secondary">Secundario</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <form asp-action="DesasignarEstudiante" method="post" class="d-inline">
+                                                        <input type="hidden" name="grupoId" value="@Model.GrupoId" />
+                                                        <input type="hidden" name="estudianteId" value="@estudiante.EstudianteId" />
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                                onclick="return confirm('¿Desasignar a @estudiante.NombreCompleto del grupo?')"
+                                                                title="Desasignar estudiante">
+                                                            <i class="fas fa-user-minus"></i>
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="fas fa-user-plus fa-3x text-muted mb-3"></i>
+                                <h6 class="text-muted">No hay estudiantes asignados</h6>
+                                <p class="text-muted">Comience agregando estudiantes a este grupo.</p>
+                                <a href="@Url.Action("AsignarEstudiantes", new { id = Model.GrupoId })" 
+                                   class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Asignar Estudiantes
+                                </a>
+                            </div>
+                        }
+                    </div>
+                    
+                    <!-- Pestaña de Materias -->
+                    <div class="tab-pane fade" id="subjects" role="tabpanel">
+                        @if (Model.Materias.Any())
+                        {
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="mb-0">Materias Asociadas</h6>
+                                <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#materiasModal">
+                                    <i class="fas fa-cog"></i> Gestionar
+                                </button>
+                            </div>
+                            
+                            <div class="row">
+                                @foreach (var materia in Model.Materias.OrderBy(m => m.Nombre))
+                                {
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card border-left-info">
+                                            <div class="card-body py-2">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <h6 class="mb-0">@materia.Nombre</h6>
+                                                        <small class="text-muted">
+                                                            Código: @materia.Codigo
+                                                        </small>
+                                                        <br>
+                                                        <small class="text-muted">
+                                                            Asociada: @materia.FechaAsignacion.ToString("dd/MM/yyyy")
+                                                        </small>
+                                                    </div>
+                                                    <div>
+                                                        <span class="badge bg-@(materia.Estado == RubricasApp.Web.Models.EstadoAsignacion.Activo ? "success" : "secondary")">
+                                                            @materia.EstadoDisplay
+                                                        </span>
+                                                        <div class="mt-1">
+                                                            <form asp-action="DesasignarMateria" method="post" class="d-inline" 
+                                                                  onsubmit="return confirm('¿Desasociar la materia @materia.Nombre?')">
+                                                                <input type="hidden" name="grupoId" value="@Model.GrupoId" />
+                                                                <input type="hidden" name="materiaId" value="@materia.MateriaId" />
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Desasociar materia">
+                                                                    <i class="fas fa-unlink"></i>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @if (!string.IsNullOrEmpty(materia.Observaciones))
+                                                {
+                                                    <small class="text-muted d-block mt-1">
+                                                        <em>@materia.Observaciones</em>
+                                                    </small>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                                <h6 class="text-muted">No hay materias asociadas</h6>
+                                <p class="text-muted">Este grupo no tiene materias específicas asociadas.</p>
+                                <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#materiasModal">
+                                    <i class="fas fa-plus"></i> Asociar Materias
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para gestionar materias -->
+<div class="modal fade" id="materiasModal" tabindex="-1" aria-labelledby="materiasModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="materiasModalLabel">
+                    <i class="fas fa-book me-2"></i>
+                    Gestionar Materias del Grupo
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="materiasForm" asp-action="AsignarMaterias" method="post">
+                    <input type="hidden" name="grupoId" value="@Model.GrupoId" />
+                    
+                    <div class="mb-3">
+                        <h6>Materias Disponibles</h6>
+                        <p class="text-muted">Seleccione las materias que desea asociar al grupo <strong>@Model.Codigo</strong></p>
+                        
+                        <div id="materiasContainer" class="row">
+                            <!-- Las materias se cargarán aquí via AJAX -->
+                            <div class="col-12 text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Cargando materias...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="observacionesMaterias" class="form-label">Observaciones (Opcional)</label>
+                        <textarea name="observaciones" id="observacionesMaterias" class="form-control" rows="2" 
+                                  placeholder="Observaciones sobre la asociación de materias..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-info" onclick="guardarMaterias()">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let materiasDisponibles = [];
+        
+        $(document).ready(function() {
+            // Configurar el modal de materias
+            $('#materiasModal').on('show.bs.modal', function() {
+                cargarMateriasDisponibles();
+            });
+            
+            // Confirmar desasignación con SweetAlert
+            $('form[action*="DesasignarEstudiante"]').on('submit', function(e) {
+                e.preventDefault();
+                const form = this;
+                const estudianteNombre = $(this).find('button').attr('onclick').match(/'([^']+)'/)[1].split(' del grupo')[0].replace('¿Desasignar a ', '');
+                
+                Swal.fire({
+                    title: '¿Desasignar estudiante?',
+                    text: `Se desasignará a ${estudianteNombre} de este grupo.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, desasignar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+        
+        async function cargarMateriasDisponibles() {
+            try {
+                const response = await fetch(`/GruposEstudiantes/ObtenerMateriasDisponibles/@Model.GrupoId`);
+                if (!response.ok) {
+                    throw new Error('Error al cargar materias');
+                }
+                
+                const data = await response.json();
+                mostrarMaterias(data.materias, data.materiasAsociadas);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('materiasContainer').innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Error al cargar las materias. Intente nuevamente.
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        function mostrarMaterias(materias, materiasAsociadas) {
+            const container = document.getElementById('materiasContainer');
+            
+            if (!materias || materias.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No hay materias disponibles para asociar.
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            materias.forEach(materia => {
+                const isChecked = materiasAsociadas.includes(materia.materiaId);
+                html += `
+                    <div class="col-md-6 mb-2">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="materiasSeleccionadas" 
+                                   value="${materia.materiaId}" id="materia_${materia.materiaId}" 
+                                   ${isChecked ? 'checked' : ''}>
+                            <label class="form-check-label" for="materia_${materia.materiaId}">
+                                <strong>${materia.codigo}</strong> - ${materia.nombre}
+                            </label>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        async function guardarMaterias() {
+            try {
+                const form = document.getElementById('materiasForm');
+                const formData = new FormData(form);
+                
+                // Mostrar loading
+                Swal.fire({
+                    title: 'Guardando cambios...',
+                    text: 'Por favor espere',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    }
+                });
+                
+                if (response.ok) {
+                    Swal.fire({
+                        title: '¡Éxito!',
+                        text: 'Las materias se han actualizado correctamente.',
+                        icon: 'success'
+                    }).then(() => {
+                        location.reload(); // Recargar la página para mostrar los cambios
+                    });
+                } else {
+                    throw new Error('Error en el servidor');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'No se pudieron guardar los cambios. Intente nuevamente.',
+                    icon: 'error'
+                });
+            }
+        }
+    </script>
+}
+
+@section Styles {
+    <style>
+        .stat-card {
+            transition: transform 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .stat-icon {
+            opacity: 0.8;
+        }
+        
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .stat-label {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .badge-tipo-seccion { background-color: #0d6efd; }
+        .badge-tipo-nivel { background-color: #198754; }
+        .badge-tipo-modalidad { background-color: #fd7e14; }
+        .badge-tipo-custom { background-color: #6f42c1; }
+        
+        .card-header-tabs .nav-link {
+            color: #6c757d;
+            border: none;
+            background: none;
+        }
+        
+        .card-header-tabs .nav-link.active {
+            color: #495057;
+            background-color: rgba(255,255,255,0.1);
+            border-bottom: 2px solid #007bff;
+        }
+        
+        .border-left-info {
+            border-left: 4px solid #17a2b8;
+        }
+        
+        .table-borderless td {
+            border: none;
+            padding: 0.5rem 0;
+        }
+        
+        .modern-card {
+            border: none;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        
+        .btn-modern.success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            border: none;
+            color: white;
+        }
+        
+        .btn-modern.warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            color: white;
+        }
+        
+        .btn-modern.secondary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+        }
+    </style>
+}

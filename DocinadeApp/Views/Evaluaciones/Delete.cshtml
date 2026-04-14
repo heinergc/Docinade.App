@@ -1,0 +1,184 @@
+﻿@model RubricasApp.Web.Models.Evaluacion
+
+@{
+    ViewData["Title"] = "Eliminar Evaluación";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-trash"></i> Eliminar Evaluación
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>¿Está seguro que desea eliminar esta evaluación?</strong>
+                    <br>
+                    Esta acción no se puede deshacer. Se eliminarán todos los detalles de evaluación asociados.
+                </div>
+
+                <!-- Información de la evaluación a eliminar -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-user"></i> Estudiante</h6>
+                            </div>
+                            <div class="card-body">
+                                <dl class="row mb-0">
+                                    <dt class="col-sm-4">Nombre:</dt>
+                                    <dd class="col-sm-8">@Model.Estudiante.Apellidos, @Model.Estudiante.Nombre</dd>
+                                    
+                                    <dt class="col-sm-4">ID:</dt>
+                                    <dd class="col-sm-8">@Model.Estudiante.NumeroId</dd>
+                                    
+                                    <dt class="col-sm-4">Correo:</dt>
+                                    <dd class="col-sm-8">@Model.Estudiante.DireccionCorreo</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-clipboard-list"></i> Evaluación</h6>
+                            </div>
+                            <div class="card-body">
+                                <dl class="row mb-0">
+                                    <dt class="col-sm-4">Rúbrica:</dt>
+                                    <dd class="col-sm-8">
+                                        <span class="badge bg-primary">@Model.Rubrica.Titulo</span>
+                                    </dd>
+                                    
+                                    <dt class="col-sm-4">Fecha:</dt>
+                                    <dd class="col-sm-8">@Model.FechaEvaluacion.ToString("dd/MM/yyyy HH:mm")</dd>
+                                    
+                                    <dt class="col-sm-4">Total:</dt>
+                                    <dd class="col-sm-8">
+                                        @if (Model.TotalPuntos.HasValue)
+                                        {
+                                            <span class="badge bg-success">@Model.TotalPuntos.Value.ToString("F2") puntos</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning">Sin calcular</span>
+                                        }
+                                    </dd>
+                                    
+                                    <dt class="col-sm-4">Items:</dt>
+                                    <dd class="col-sm-8">@Model.DetallesEvaluacion.Count items evaluados</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Observaciones -->
+                @if (!string.IsNullOrEmpty(Model.Observaciones))
+                {
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-list-alt"></i> Observaciones</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-0">Retroalimentación: @Html.Raw(Model.Observaciones)</p>
+                        </div>
+                    </div>
+                }
+                <br />
+                <!-- Resumen de items evaluados -->
+                @if (Model.DetallesEvaluacion.Any())
+                {
+                    <div class="card mb-4">
+                        <div class="card-header bg-dark text-white">
+                            <h6 class="mb-0"><i class="fas fa-list"></i> Items que se eliminarán</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>Nivel</th>
+                                            <th>Puntos</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @* @foreach (var detalle in Model.DetallesEvaluacion)
+                                        {
+                                            <tr>
+                                                <td>@detalle.ItemEvaluacion.Descripcion</td>
+                                                <td>
+                                                    <span class="badge bg-info">@detalle.NivelCalificacion.NombreNivel</span>
+                                                </td>
+                                                <td>@detalle.PuntosObtenidos.ToString("F2")</td>
+                                            </tr>
+                                        } *@
+
+                                        @foreach (var detalle in Model.DetallesEvaluacion)
+                                        {
+                                            <tr>
+                                                <td>@detalle.ItemEvaluacion?.NombreItem</td>
+                                                <td>
+                                                    @if (detalle.NivelCalificacion != null)
+                                                    {
+                                                        <span class="badge bg-info">@detalle.NivelCalificacion.NombreNivel</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-warning">Sin nivel</span>
+                                                    }
+                                                </td>
+                                                <td>@detalle.PuntosObtenidos.ToString("F2")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Formulario de confirmación -->
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="IdEvaluacion" />
+                    
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Sí, Eliminar Evaluación
+                            </button>
+                        </div>
+                        <div>
+                            <a asp-action="Details" asp-route-id="@Model.IdEvaluacion" class="btn btn-info">
+                                <i class="fas fa-eye"></i> Ver Detalles
+                            </a>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Confirmación adicional antes de eliminar
+            $('form').submit(function(e) {
+                var confirmacion = confirm('¿Está absolutamente seguro que desea eliminar esta evaluación?\n\nEsta acción NO se puede deshacer.');
+                if (!confirmacion) {
+                    e.preventDefault();
+                    return false;
+                }
+                return true;
+            });
+        });
+    </script>
+}

@@ -1,0 +1,35 @@
+{
+  "name": "rubricasapp.web",
+  "version": "1.0.0",
+  "description": "Pruebas E2E con Playwright para RubricasApp",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:experiencia": "playwright test tests/experiencia-laboral.spec.ts",
+    "test:debug": "playwright test --debug",
+    "test:report": "playwright show-report",
+    "test:codegen": "playwright codegen https://localhost:18163"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/heinergc/RubricasApp.Web.git"
+  },
+  "keywords": ["playwright", "e2e", "testing"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/heinergc/RubricasApp.Web/issues"
+  },
+  "homepage": "https://github.com/heinergc/RubricasApp.Web#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "playwright": "^1.55.0"
+  }
+}

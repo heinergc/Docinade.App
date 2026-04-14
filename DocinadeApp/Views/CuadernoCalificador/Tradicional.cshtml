@@ -1,0 +1,126 @@
+@model List<RubricasApp.Web.Models.CuadernoCalificador>
+
+@{
+    ViewData["Title"] = "Cuadernos Calificadores Tradicionales";
+}
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col">
+            <h2>
+                <i class="fas fa-book"></i> Cuadernos Calificadores Tradicionales
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a asp-action="Index">Cuaderno Calificador</a>
+                    </li>
+                    <li class="breadcrumb-item active">Cuadernos Tradicionales</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-auto">
+            <a href="@Url.Action("Index")" class="btn btn-primary">
+                <i class="fas fa-table me-1"></i> Cuaderno Dinámico
+            </a>
+            <a href="@Url.Action("Crear")" class="btn btn-success">
+                <i class="fas fa-plus"></i> Nuevo Cuaderno
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Materia</label>
+                    <select name="materiaId" class="form-select" asp-items="ViewBag.Materias">
+                        <option value="">-- Todas las materias --</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Período Académico</label>
+                    <select name="periodoAcademicoId" class="form-select" asp-items="ViewBag.Periodos">
+                        <option value="">-- Todos los períodos --</option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de cuadernos -->
+    @if (Model.Any())
+    {
+        <div class="row">
+            @foreach(var cuaderno in Model)
+            {
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                            <h6 class="mb-0">@cuaderno.Nombre</h6>
+                            <span class="badge bg-@(cuaderno.Estado == "ACTIVO" ? "success" : "secondary")">
+                                @cuaderno.Estado
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted mb-1">
+                                <i class="fas fa-book-open"></i> @(cuaderno.Materia?.Nombre ?? "Materia no asignada")
+                            </p>
+                            <p class="text-muted mb-1">
+                                <i class="fas fa-calendar"></i> @(cuaderno.PeriodoAcademico?.Nombre ?? "Período no asignado")
+                            </p>
+                            <p class="text-muted">
+                                <i class="fas fa-clock"></i> @cuaderno.FechaCreacion.ToString("dd/MM/yyyy")
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="@Url.Action("Ver", new { id = cuaderno.Id })" 
+                               class="btn btn-sm btn-primary">
+                                <i class="fas fa-eye"></i> Ver Calificaciones
+                            </a>
+                            <a href="@Url.Action("ConfigurarInstrumentos", new { id = cuaderno.Id })" 
+                               class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-cog"></i> Configurar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle fa-2x mb-3"></i>
+            <h5>No hay cuadernos calificadores</h5>
+            <p>No se encontraron cuadernos calificadores con los filtros aplicados.</p>
+            <a href="@Url.Action("Crear")" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Crear el primer cuaderno
+            </a>
+        </div>
+    }
+</div>
+
+<script>
+    // Mantener valores seleccionados en los filtros
+    document.addEventListener('DOMContentLoaded', function() {
+        const materiaSelect = document.querySelector('select[name="materiaId"]');
+        const periodoSelect = document.querySelector('select[name="periodoAcademicoId"]');
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        if (urlParams.get('materiaId')) {
+            materiaSelect.value = urlParams.get('materiaId');
+        }
+        
+        if (urlParams.get('periodoAcademicoId')) {
+            periodoSelect.value = urlParams.get('periodoAcademicoId');
+        }
+    });
+</script>

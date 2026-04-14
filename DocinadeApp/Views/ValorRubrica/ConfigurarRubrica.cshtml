@@ -1,0 +1,1375 @@
+﻿@model RubricasApp.Web.Models.ConfigurarRubricaViewModel
+
+@{
+    ViewData["Title"] = "Configurar Rúbrica Masivamente";
+    var rubrica = Model.Rubrica;
+    var items = Model.Rubrica.ItemsEvaluacion;
+    var niveles = Model.Niveles;
+}
+
+@* Token CSRF para peticiones AJAX *@
+@Html.AntiForgeryToken()
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-cog"></i> @ViewData["Title"]
+                        </h4>
+                        <div>
+                            <a asp-action="Index" asp-route-idRubrica="@rubrica!.IdRubrica" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Información de la rúbrica -->
+                        <div class="alert alert-info mb-4">
+                            <h5><i class="fas fa-clipboard-list"></i> @rubrica!.NombreRubrica</h5>
+                            @if (!string.IsNullOrEmpty(rubrica!.Descripcion))
+                            {
+                                <p class="mb-0">@rubrica.Descripcion</p>
+                            }
+                        </div>                    <!-- Herramientas de configuración rápida -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-magic"></i> Herramientas de Configuración Rápida
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-outline-primary w-100" onclick="aplicarValoresLineales()">
+                                        <i class="fas fa-chart-line"></i> Aplicar Valores Lineales
+                                    </button>
+                                    <small class="text-muted">Distribuye valores uniformemente</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-outline-info w-100" onclick="copiarFilaCompleta()">
+                                        <i class="fas fa-copy"></i> Copiar Fila Completa
+                                    </button>
+                                    <small class="text-muted">Copia valores de un item a otros</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-outline-warning w-100" onclick="limpiarTodo()">
+                                        <i class="fas fa-eraser"></i> Limpiar Todo
+                                    </button>
+                                    <small class="text-muted">Elimina todos los valores</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formulario de configuración masiva -->
+                    <form asp-action="ConfigurarRubrica" method="post" id="formConfiguracion">
+                        <input type="hidden" name="id" value="@rubrica!.IdRubrica" />
+                        
+                        <!-- Tabla de configuración -->
+                        <div class="table-scroll-container">
+                            <!-- Header fijo con scroll horizontal -->
+                            <div class="table-header-fixed">
+                                <table class="table table-bordered" id="tablaHeader">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th width="25%">Item de Evaluación</th>
+                                            @foreach (var nivel in niveles!.OrderBy(n => n.OrdenNivel))
+                                            {
+                                                <th class="text-center">
+                                                    @if (!string.IsNullOrEmpty(nivel.Descripcion))
+                                                    {
+                                                        <span data-bs-toggle="tooltip"
+                                                              data-bs-placement="top"
+                                                              title="@nivel.Descripcion"
+                                                              class="nivel-tooltip">
+                                                            @nivel.NombreNivel
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        @nivel.NombreNivel
+                                                    }
+                                                </th>
+                                            }
+                                            <th width="10%">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            
+                            <!-- Cuerpo de la tabla con scroll -->
+                            <div class="table-body-scroll">
+                                <table class="table table-bordered table-hover" id="tablaConfiguracion">
+                                <tbody>
+                                    @foreach (var item in items!)
+                                    {
+                                        <tr data-item-id="@item.IdItem">
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(item.Descripcion))
+                                                {
+                                                    <strong class="item-tooltip" title="@item.Descripcion">@item.NombreItem</strong>
+                                                }
+                                                else
+                                                {
+                                                    <strong>@item.NombreItem</strong>
+                                                }
+                                                @if (!string.IsNullOrEmpty(item.Descripcion) && !string.Equals(item.Descripcion.Trim(), item.NombreItem.Trim(), StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    <br><small class="text-muted">@item.Descripcion</small>
+                                                }
+                                            </td>
+                                            @foreach (var nivel in niveles!.OrderBy(n => n.OrdenNivel))
+                                            {
+                                                var valorExistente = Model.ValoresExistentes.FirstOrDefault(v => v.IdItem == item.IdItem && v.IdNivel == nivel.IdNivel);
+                                                <td class="text-center">
+                                                    <div class="input-group">
+                                                        <input type="number" 
+                                                               name="valores[@item.IdItem][@nivel.IdNivel]" 
+                                                               value="@(valorExistente?.ValorPuntos.ToString("F1", System.Globalization.CultureInfo.InvariantCulture) ?? "")"
+                                                               class="form-control text-center valor-input" 
+                                                               step="0.1" 
+                                                               min="0" 
+                                                               max="100"
+                                                               data-item="@item.IdItem"
+                                                               data-nivel="@nivel.IdNivel"
+                                                               placeholder="0.0" />
+                                                        <span class="input-group-text">pts</span>
+                                                    </div>
+                                                    @if (valorExistente != null)
+                                                    {
+                                                        <input type="hidden" name="idsExistentes[@item.IdItem][@nivel.IdNivel]" value="@valorExistente.IdValor" />
+                                                    }
+                                                </td>
+                                            }
+                                            <td class="text-center">
+                                                <div class="btn-group-vertical">
+                                                    <button type="button" class="btn btn-sm btn-outline-info" onclick="copiarFila(@item.IdItem)" title="Copiar esta fila">
+                                                        <i class="fas fa-copy"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="aplicarProgresion(@item.IdItem)" title="Aplicar progresión lineal">
+                                                        <i class="fas fa-chart-line"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="limpiarFila(@item.IdItem)" title="Limpiar fila">
+                                                        <i class="fas fa-eraser"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-primary">
+                                        <th class="text-end" style="font-weight:bold; font-size:1.1em;">
+                                            <i class="fas fa-sigma"></i> Total
+                                        </th>
+                                        @foreach (var nivel in niveles!.OrderBy(n => n.OrdenNivel))
+                                        {
+                                            <th class="text-center" id="total-nivel-@nivel.IdNivel" style="font-weight:bold; font-size:1.1em;">
+                                                0.0
+                                            </th>
+                                        }
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
+@*                                 <tfoot>
+                                    <tr>
+                                        <th class="text-end">Total</th>
+                                        @foreach (var nivel in niveles!.OrderBy(n => n.OrdenNivel))
+                                        {
+                                            <th class="text-center" id="total-nivel-@nivel.IdNivel">0.0</th>
+                                        }
+                                        <th></th>
+                                    </tr>
+                                </tfoot> *@
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Estadísticas en tiempo real -->
+                        <div class="row mt-4">
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-primary" id="totalConfiguraciones">0</h5>
+                                        <p class="card-text small">Configuraciones</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-success" id="promedioGeneral">0.0</h5>
+                                        <p class="card-text small">Promedio General</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-warning" id="valorMinimo">0.0</h5>
+                                        <p class="card-text small">Valor Mínimo</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-danger" id="valorMaximo">0.0</h5>
+                                        <p class="card-text small">Valor Máximo</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Botones de acción -->
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a asp-action="Index" asp-route-idRubrica="@rubrica!.IdRubrica" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                                <button type="button" class="btn btn-outline-info" onclick="previsualizarCambios()">
+                                    <i class="fas fa-eye"></i> Previsualizar
+                                </button>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> Guardar Configuración
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para herramientas -->
+<div class="modal fade" id="modalHerramientas" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Herramienta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Contenido dinámico -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="modalConfirmar">Aplicar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Función debounce para optimizar eventos de input
+        function debounce(func, wait) {
+            var timeout;
+            return function executedFunction() {
+                var context = this;
+                var args = arguments;
+                var later = function() {
+                    clearTimeout(timeout);
+                    func.apply(context, args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        $(document).ready(function() {
+            console.log('=== INICIALIZANDO TOOLTIPS ===');
+            
+            // Verificar que jQuery esté disponible
+            console.log('jQuery disponible:', typeof $ !== 'undefined');
+            
+            // Inicializar scroll sincronizado
+            inicializarScrollSincronizado();
+            
+            // IMPLEMENTACIÓN LIMPIA: Tooltips con CSS puro
+            $('.nivel-tooltip, .item-tooltip').each(function() {
+                var $element = $(this);
+                var title = $element.attr('title') || $element.attr('data-bs-original-title');
+                
+                if (title && title.trim() !== '') {
+                    // Crear tooltip con CSS puro
+                    var $tooltip = $('<div class="simple-tooltip"></div>');
+                    $tooltip.text(title);
+                    $('body').append($tooltip);
+                    $tooltip.hide();
+                    
+                    $element.hover(
+                        function(e) {
+                            var offset = $element.offset();
+                            var tooltipWidth = $tooltip.outerWidth();
+                            var tooltipHeight = $tooltip.outerHeight();
+                            var elementWidth = $element.outerWidth();
+                            var elementHeight = $element.outerHeight();
+                            
+                            // Posicionar arriba del elemento, centrado
+                            var left = offset.left + (elementWidth / 2) - (tooltipWidth / 2);
+                            var top = offset.top - tooltipHeight - 8;
+                            
+                            // Asegurar que no se salga de la pantalla
+                            if (left < 10) left = 10;
+                            if (left + tooltipWidth > $(window).width() - 10) {
+                                left = $(window).width() - tooltipWidth - 10;
+                            }
+                            
+                            $tooltip.css({
+                                top: top,
+                                left: left,
+                                display: 'block'
+                            }).addClass('show');
+                        },
+                        function() {
+                            $tooltip.removeClass('show').hide();
+                        }
+                    );
+                }
+            });
+            
+            // Calcular estadísticas al cargar y cuando cambien los valores (con debounce)
+            $('.valor-input').on('input', debounce(function() {
+                calcularEstadisticas();
+                validarRango(this);
+            }, 150));
+            
+            calcularEstadisticas();
+        });
+
+        function inicializarScrollSincronizado() {
+            var $headerFixed = $('.table-header-fixed');
+            var $bodyScroll = $('.table-body-scroll');
+            var isScrolling = false;
+            
+            // Sincronizar scroll horizontal con debounce para evitar bucles
+            $bodyScroll.on('scroll', function() {
+                if (!isScrolling) {
+                    isScrolling = true;
+                    $headerFixed.scrollLeft($(this).scrollLeft());
+                    setTimeout(function() { isScrolling = false; }, 10);
+                }
+            });
+            
+            $headerFixed.on('scroll', function() {
+                if (!isScrolling) {
+                    isScrolling = true;
+                    $bodyScroll.scrollLeft($(this).scrollLeft());
+                    setTimeout(function() { isScrolling = false; }, 10);
+                }
+            });
+        }
+
+        function calcularEstadisticas() {
+            var valores = [];
+            $('.valor-input').each(function() {
+                var valor = parseFloat($(this).val());
+                if (!isNaN(valor)) {
+                    valores.push(valor);
+                }
+            });
+
+            var total = valores.length;
+            var suma = valores.reduce((a, b) => a + b, 0);
+            var promedio = total > 0 ? suma / total : 0;
+            var minimo = total > 0 ? Math.min(...valores) : 0;
+            var maximo = total > 0 ? Math.max(...valores) : 0;
+
+                    // Calcular totales por nivel (columna)
+            var nivelesIds = @Html.Raw(Json.Serialize(niveles.OrderBy(n => n.OrdenNivel).Select(n => n.IdNivel)));
+            nivelesIds.forEach(function(nivelId) {
+                var totalNivel = 0;
+                $('.valor-input[data-nivel="' + nivelId + '"]').each(function() {
+                    var valor = parseFloat($(this).val());
+                    if (!isNaN(valor)) {
+                        totalNivel += valor;
+                    }
+                });
+                $('#total-nivel-' + nivelId).text(totalNivel.toFixed(1));
+            });
+
+            // REMOVIDO: Cálculo de pesos porcentuales que causaba parpadeo del scrollbar
+            // La funcionalidad de mostrar porcentajes se eliminó para evitar cambios dinámicos en el layout
+     
+
+            $('#totalConfiguraciones').text(total);
+            $('#promedioGeneral').text(promedio.toFixed(1));
+            $('#valorMinimo').text(minimo.toFixed(1));
+            $('#valorMaximo').text(maximo.toFixed(1));
+        }
+
+        function validarRango(input) {
+            var valor = parseFloat($(input).val());
+            if (valor < 0 || valor > 100) {
+                $(input).addClass('is-invalid');
+            } else {
+                $(input).removeClass('is-invalid');
+            }
+        }
+
+        function aplicarValoresLineales() {
+            var niveles = @Html.Raw(Json.Serialize(niveles!.OrderBy(n => n.OrdenNivel).Select(n => n.IdNivel)));
+            var nivelesCount = niveles.length;
+            
+            $('.valor-input').each(function() {
+                var nivelIndex = niveles.indexOf(parseInt($(this).data('nivel')));
+                // Invertir la lógica: el primer nivel (index 0) debe tener el valor más bajo
+                // y el último nivel debe tener el valor más alto
+                var valor = ((nivelesCount - 1 - nivelIndex) / (nivelesCount - 1)) * 100;
+                $(this).val(valor.toFixed(1));
+            });
+            
+            calcularEstadisticas();
+        }
+
+        function copiarFilaCompleta() {
+            // Mostrar modal para seleccionar fila origen
+            var html = '<div class="mb-3">';
+            html += '<label class="form-label"><strong>Selecciona la fila origen (de donde copiar):</strong></label>';
+            html += '<select class="form-select" id="filaOrigen">';
+            html += '<option value="">-- Selecciona un ítem --</option>';
+            
+            $('tr[data-item-id]').each(function() {
+                var id = $(this).data('item-id');
+                var nombre = $(this).find('td:first strong').text();
+                html += '<option value="' + id + '">' + nombre + '</option>';
+            });
+            
+            html += '</select></div>';
+            html += '<div class="mb-3">';
+            html += '<label class="form-label"><strong>Selecciona las filas destino (donde copiar):</strong></label>';
+            html += '<div id="filasDestino">';
+            
+            $('tr[data-item-id]').each(function() {
+                var id = $(this).data('item-id');
+                var nombre = $(this).find('td:first strong').text();
+                html += '<div class="form-check">';
+                html += '<input class="form-check-input fila-destino" type="checkbox" value="' + id + '" id="dest_' + id + '">';
+                html += '<label class="form-check-label" for="dest_' + id + '">' + nombre + '</label>';
+                html += '</div>';
+            });
+            
+            html += '</div></div>';
+            
+            $('#modalTitle').text('Copiar Fila Completa');
+            $('#modalBody').html(html);
+            
+            // Actualizar filas destino cuando cambie la selección origen
+            $('#filaOrigen').on('change', function() {
+                var origenId = $(this).val();
+                $('.fila-destino').each(function() {
+                    if ($(this).val() == origenId) {
+                        $(this).prop('disabled', true).prop('checked', false);
+                        $(this).next('label').addClass('text-muted');
+                    } else {
+                        $(this).prop('disabled', false);
+                        $(this).next('label').removeClass('text-muted');
+                    }
+                });
+            });
+            
+            $('#modalConfirmar').off('click').on('click', function() {
+                var origenId = $('#filaOrigen').val();
+                if (!origenId) {
+                    alert('Por favor selecciona una fila origen.');
+                    return;
+                }
+                
+                var destinosSeleccionados = $('.fila-destino:checked');
+                if (destinosSeleccionados.length === 0) {
+                    alert('Por favor selecciona al menos una fila destino.');
+                    return;
+                }
+                
+                // Obtener valores de la fila origen
+                var filaOrigen = $('tr[data-item-id="' + origenId + '"]');
+                var valores = [];
+                filaOrigen.find('.valor-input').each(function() {
+                    valores.push($(this).val());
+                });
+                
+                // Copiar a filas destino
+                destinosSeleccionados.each(function() {
+                    var targetItemId = $(this).val();
+                    var filaDestino = $('tr[data-item-id="' + targetItemId + '"]');
+                    
+                    filaDestino.find('.valor-input').each(function(index) {
+                        $(this).val(valores[index]);
+                    });
+                });
+                
+                calcularEstadisticas();
+                $('#modalHerramientas').modal('hide');
+                
+                var mensaje = 'Se copiaron los valores de "' + $('#filaOrigen option:selected').text() + 
+                            '" a ' + destinosSeleccionados.length + ' fila(s) destino.';
+                
+                // Mostrar mensaje de confirmación
+                setTimeout(function() {
+                    alert(mensaje);
+                }, 300);
+            });
+            
+            $('#modalHerramientas').modal('show');
+        }
+
+        function copiarFila(itemId) {
+            var filaOrigen = $('tr[data-item-id="' + itemId + '"]');
+            var valores = [];
+            
+            filaOrigen.find('.valor-input').each(function() {
+                valores.push($(this).val());
+            });
+            
+            // Mostrar modal para seleccionar filas destino
+            var html = '<p>Selecciona las filas donde copiar los valores:</p>';
+            $('tr[data-item-id]').each(function() {
+                var id = $(this).data('item-id');
+                if (id != itemId) {
+                    var nombre = $(this).find('td:first strong').text();
+                    html += '<div class="form-check">';
+                    html += '<input class="form-check-input" type="checkbox" value="' + id + '" id="item_' + id + '">';
+                    html += '<label class="form-check-label" for="item_' + id + '">' + nombre + '</label>';
+                    html += '</div>';
+                }
+            });
+            
+            $('#modalTitle').text('Copiar Fila');
+            $('#modalBody').html(html);
+            $('#modalConfirmar').off('click').on('click', function() {
+                $('.form-check-input:checked').each(function() {
+                    var targetItemId = $(this).val();
+                    var filaDestino = $('tr[data-item-id="' + targetItemId + '"]');
+                    
+                    filaDestino.find('.valor-input').each(function(index) {
+                        $(this).val(valores[index]);
+                    });
+                });
+                
+                calcularEstadisticas();
+                $('#modalHerramientas').modal('hide');
+            });
+            
+            $('#modalHerramientas').modal('show');
+        }
+
+        function aplicarProgresion(itemId) {
+            var fila = $('tr[data-item-id="' + itemId + '"]');
+            var inputs = fila.find('.valor-input');
+            var count = inputs.length;
+            
+            inputs.each(function(index) {
+                // Invertir la lógica: el primer input (index 0) debe tener el valor más bajo
+                // y el último input debe tener el valor más alto
+                var valor = ((count - 1 - index) / (count - 1)) * 100;
+                $(this).val(valor.toFixed(1));
+            });
+            
+            calcularEstadisticas();
+        }
+
+        function limpiarFila(itemId) {
+            if (confirm('¿Limpiar todos los valores de esta fila?')) {
+                $('tr[data-item-id="' + itemId + '"] .valor-input').val('');
+                calcularEstadisticas();
+            }
+        }
+
+        function limpiarTodo() {
+            if (confirm('¿Está seguro de limpiar TODOS los valores?')) {
+                $('.valor-input').val('');
+                calcularEstadisticas();
+            }
+        }
+
+        function previsualizarCambios() {
+            var cambios = [];
+            var itemsAfectados = {};
+            
+            $('.valor-input').each(function() {
+                if ($(this).val()) {
+                    var itemId = $(this).data('item');
+                    var nivelId = $(this).data('nivel');
+                    var valor = parseFloat($(this).val());
+                    
+                    // Obtener nombres para mostrar
+                    var itemNombre = $('tr[data-item-id="' + itemId + '"] td:first strong').text();
+                    var nivelNombre = $('th').filter(function() {
+                        return $(this).text().includes($('input[data-nivel="' + nivelId + '"]').closest('td').index());
+                    }).first().text().split('\n')[0];
+                    
+                    // Buscar el nombre del nivel de forma más confiable
+                    var nivelIndex = $('input[data-nivel="' + nivelId + '"]').closest('td').index() - 1;
+                    var nivelHeader = $('thead th').eq(nivelIndex + 1);
+                    nivelNombre = nivelHeader.contents().filter(function() {
+                        return this.nodeType === 3; // Text node
+                    }).first().text().trim();
+                    
+                    if (!itemsAfectados[itemId]) {
+                        itemsAfectados[itemId] = {
+                            nombre: itemNombre,
+                            niveles: []
+                        };
+                    }
+                    
+                    itemsAfectados[itemId].niveles.push({
+                        nivel: nivelNombre,
+                        valor: valor
+                    });
+                    
+                    cambios.push({ item: itemId, nivel: nivelId, valor: valor });
+                }
+            });
+            
+            // Crear HTML para el modal
+            var html = '<div class="preview-container">';
+            
+            if (cambios.length === 0) {
+                html += '<div class="alert alert-warning">';
+                html += '<i class="fas fa-exclamation-triangle"></i> ';
+                html += 'No hay configuraciones para guardar. Todos los campos están vacíos.';
+                html += '</div>';
+            } else {
+                // Resumen general
+                html += '<div class="alert alert-info mb-3">';
+                html += '<h6><i class="fas fa-info-circle"></i> Resumen de Cambios</h6>';
+                html += '<ul class="mb-0">';
+                html += '<li><strong>' + cambios.length + '</strong> configuraciones de valores</li>';
+                html += '<li><strong>' + Object.keys(itemsAfectados).length + '</strong> ítems de evaluación afectados</li>';
+                html += '</ul>';
+                html += '</div>';
+                
+                // Detalles por ítem
+                html += '<div class="row">';
+                
+                Object.keys(itemsAfectados).forEach(function(itemId) {
+                    var item = itemsAfectados[itemId];
+                    
+                    html += '<div class="col-md-6 mb-3">';
+                    html += '<div class="card border-primary">';
+                    html += '<div class="card-header bg-primary text-white py-2">';
+                    html += '<small><i class="fas fa-clipboard-check"></i> ' + item.nombre + '</small>';
+                    html += '</div>';
+                    html += '<div class="card-body p-2">';
+                    html += '<div class="table-responsive">';
+                    html += '<table class="table table-sm table-borderless mb-0">';
+                    
+                    // Ordenar niveles por valor (descendente)
+                    item.niveles.sort(function(a, b) { return b.valor - a.valor; });
+                    
+                    item.niveles.forEach(function(config) {
+                        var badgeClass = '';
+                        if (config.valor >= 80) badgeClass = 'bg-success';
+                        else if (config.valor >= 60) badgeClass = 'bg-info';
+                        else if (config.valor >= 40) badgeClass = 'bg-warning text-dark';
+                        else badgeClass = 'bg-danger';
+                        
+                        html += '<tr>';
+                        html += '<td class="text-start">' + config.nivel + '</td>';
+                        html += '<td class="text-end">';
+                        html += '<span class="badge ' + badgeClass + '">' + config.valor.toFixed(1) + ' pts</span>';
+                        html += '</td>';
+                        html += '</tr>';
+                    });
+                    
+                    html += '</table>';
+                    html += '</div>';
+                    html += '</div>';
+                    html += '</div>';
+                    html += '</div>';
+                });
+                
+                html += '</div>';
+                
+                // Estadísticas adicionales
+                var valores = cambios.map(c => c.valor);
+                var promedio = valores.reduce((a, b) => a + b, 0) / valores.length;
+                var minimo = Math.min(...valores);
+                var maximo = Math.max(...valores);
+                
+                html += '<div class="mt-3">';
+                html += '<h6><i class="fas fa-chart-bar"></i> Estadísticas</h6>';
+                html += '<div class="row text-center">';
+                html += '<div class="col-3">';
+                html += '<div class="bg-light p-2 rounded">';
+                html += '<strong class="text-success">' + promedio.toFixed(1) + '</strong><br>';
+                html += '<small>Promedio</small>';
+                html += '</div>';
+                html += '</div>';
+                html += '<div class="col-3">';
+                html += '<div class="bg-light p-2 rounded">';
+                html += '<strong class="text-warning">' + minimo.toFixed(1) + '</strong><br>';
+                html += '<small>Mínimo</small>';
+                html += '</div>';
+                html += '</div>';
+                html += '<div class="col-3">';
+                html += '<div class="bg-light p-2 rounded">';
+                html += '<strong class="text-danger">' + maximo.toFixed(1) + '</strong><br>';
+                html += '<small>Máximo</small>';
+                html += '</div>';
+                html += '</div>';
+                html += '<div class="col-3">';
+                html += '<div class="bg-light p-2 rounded">';
+                html += '<strong class="text-info">' + (maximo - minimo).toFixed(1) + '</strong><br>';
+                html += '<small>Rango</small>';
+                html += '</div>';
+                html += '</div>';
+                html += '</div>';
+                html += '</div>';
+            }
+            
+            html += '</div>';
+            
+            $('#modalTitle').text('Vista Previa de Configuración');
+            $('#modalBody').html(html);
+            
+            // Cambiar el botón "Aplicar" por "Cerrar" ya que es solo vista previa
+            $('#modalConfirmar').text('Cerrar').off('click').on('click', function() {
+                $('#modalHerramientas').modal('hide');
+            });
+            
+            $('#modalHerramientas').modal('show');
+            
+            // También mantener el log en consola para desarrolladores
+            console.log('Cambios a aplicar:', cambios);
+        }
+    </script>
+}
+
+<style>
+    /* Variables de colores para consistencia */
+    :root {
+        --primary-color: #0d6efd;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --danger-color: #dc3545;
+        --info-color: #0dcaf0;
+        --border-radius: 0.375rem;
+    }
+
+    /* Contenedor principal */
+    .container-fluid {
+        max-width: 1600px;
+        padding: 0 15px;
+    }
+
+    /* Tabla principal */
+    #tablaConfiguracion {
+        font-size: 0.9rem;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    #tablaConfiguracion tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+    #tablaConfiguracion tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    #tablaConfiguracion tbody td {
+        padding: 1rem 0.5rem;
+        vertical-align: middle;
+        border-color: #dee2e6;
+    }
+
+    #tablaConfiguracion tbody td:first-child {
+        padding-left: 1rem;
+        font-weight: 500;
+        color: #2c3e50;
+    }
+
+    #tablaConfiguracion tbody td:first-child small {
+        color: #6c757d;
+        display: block;
+        margin-top: 0.25rem;
+        font-weight: 400;
+    }
+
+    /* Footer de totales */
+    #tablaConfiguracion tfoot tr {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border-top: 3px solid var(--primary-color);
+    }
+
+    #tablaConfiguracion tfoot th {
+        padding: 1rem 0.5rem;
+        font-weight: 700;
+        font-size: 1rem;
+        color: #1565c0;
+    }
+
+    /* Inputs de valores */
+    .valor-input {
+        width: 85px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        padding: 0.5rem 0.3rem;
+        height: 40px;
+        text-align: center;
+        border: 2px solid #ced4da;
+        border-radius: var(--border-radius);
+        transition: all 0.2s ease;
+        background-color: #fff;
+        color: #2c3e50;
+    }
+
+    .valor-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+        outline: none;
+        background-color: #f8f9ff;
+    }
+
+    .valor-input:hover {
+        border-color: #adb5bd;
+    }
+
+    .valor-input.is-invalid {
+        border-color: var(--danger-color);
+        background-color: #fff5f5;
+    }
+
+    /* Grupo de input */
+    .input-group {
+        justify-content: center;
+        max-width: 200px;
+        margin: 0 auto;
+        gap: 0;
+    }
+
+    .input-group-text {
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 0.5rem 0.6rem;
+        background-color: #e9ecef;
+        border: 2px solid #ced4da;
+        border-left: none;
+        color: #495057;
+        height: 40px;
+        display: flex;
+        align-items: center;
+    }
+
+    .peso-span {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.5rem 0.5rem;
+        background-color: #d1ecf1;
+        border: 2px solid #bee5eb;
+        border-left: none;
+        color: #0c5460;
+        min-width: 55px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Spinners de número */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        opacity: 1;
+        height: 36px;
+        cursor: pointer;
+    }
+
+    /* Botones de acciones */
+    .btn-group-vertical {
+        gap: 2px;
+    }
+
+    .btn-group-vertical .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        border-radius: var(--border-radius);
+    }
+
+    .btn-group-vertical .btn:hover {
+        transform: scale(1.05);
+        z-index: 1;
+    }
+
+    /* Cards de estadísticas */
+    .card {
+        border-radius: var(--border-radius);
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .card-text.small {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin: 0;
+        font-weight: 500;
+    }
+
+    /* Herramientas de configuración rápida */
+    .card-header h6 {
+        margin: 0;
+        font-weight: 600;
+    }
+
+    /* Botones principales */
+    .btn {
+        border-radius: var(--border-radius);
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .btn-outline-info:hover {
+        background-color: var(--info-color);
+        color: white;
+    }
+
+    .btn-outline-warning:hover {
+        background-color: var(--warning-color);
+        color: #212529;
+    }
+
+    /* Alertas */
+    .alert {
+        border-radius: var(--border-radius);
+        border-left: 4px solid;
+    }
+
+    .alert-info {
+        border-left-color: var(--info-color);
+        background-color: #e7f5ff;
+    }
+
+    /* Tabla responsive mejorada */
+    .table-responsive {
+        border-radius: var(--border-radius);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 1.5rem;
+    }
+
+    /* Estilos para la vista previa */
+    .preview-container {
+        max-height: 70vh;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+
+    .preview-container::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .preview-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .preview-container::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+    }
+
+    .preview-container::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    .preview-container .card {
+        transition: transform 0.2s;
+        border-radius: var(--border-radius);
+    }
+
+    .preview-container .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .preview-container .badge {
+        font-size: 0.75em;
+        padding: 0.5em 0.75em;
+        border-radius: 0.25rem;
+    }
+
+    .preview-container .bg-light {
+        border: 1px solid #dee2e6;
+        transition: background-color 0.2s;
+        border-radius: var(--border-radius);
+    }
+
+    .preview-container .bg-light:hover {
+        background-color: #e9ecef !important;
+    }
+
+    /* Modal mejorado */
+    .modal-dialog {
+        max-width: 900px;
+    }
+
+    .modal-content {
+        border-radius: var(--border-radius);
+        border: none;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #0a58ca 100%);
+        color: white;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        padding: 1rem 1.5rem;
+    }
+
+    .modal-title {
+        font-weight: 600;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem;
+        background-color: #f8f9fa;
+        border-radius: 0 0 var(--border-radius) var(--border-radius);
+    }
+
+    /* Animaciones sutiles */
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .card, .table-responsive {
+        animation: fadeIn 0.3s ease;
+    }
+
+    /* Responsive ajustes */
+    @@media (max-width: 768px) {
+        .container-fluid {
+            padding: 0 10px;
+        }
+        
+        .valor-input {
+            width: 70px;
+            font-size: 0.85rem;
+            padding: 0.4rem 0.2rem;
+            height: 36px;
+        }
+
+        .input-group {
+            max-width: 160px;
+        }
+
+        .input-group-text, .peso-span {
+            font-size: 0.7rem;
+            padding: 0.4rem 0.4rem;
+            height: 36px;
+        }
+
+        #tablaConfiguracion {
+            font-size: 0.8rem;
+        }
+
+        #tablaConfiguracion thead th {
+            font-size: 0.75rem;
+            padding: 0.75rem 0.25rem;
+        }
+
+        .btn-group-vertical .btn {
+            padding: 0.2rem 0.4rem;
+            font-size: 0.7rem;
+        }
+    }
+
+    /* Mejoras de accesibilidad */
+    .valor-input:focus-visible {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+    }
+
+    /* Estilo para totales destacados */
+    #tablaConfiguracion tfoot th[id^="total-nivel-"] {
+        background-color: rgba(13, 110, 253, 0.1);
+        border-radius: 0.25rem;
+        padding: 0.5rem;
+    }
+
+    /* Scroll horizontal sincronizado */
+    .table-scroll-container {
+        position: relative;
+        border-radius: var(--border-radius);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 1.5rem;
+        background-color: white;
+        /* Evitar cambios de layout que causen parpadeo del scrollbar */
+        contain: layout style paint;
+    }
+
+    .table-header-fixed {
+        overflow-x: auto;
+        overflow-y: hidden;
+        border-bottom: 2px solid #dee2e6;
+        background-color: white;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        /* Estabilidad del scrollbar */
+        scrollbar-gutter: stable;
+    }
+
+    .table-header-fixed::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .table-header-fixed::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 0 0 var(--border-radius) var(--border-radius);
+    }
+
+    .table-header-fixed::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    .table-header-fixed::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    .table-body-scroll {
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: 70vh;
+        border-radius: 0 0 var(--border-radius) var(--border-radius);
+        /* Estabilidad del scrollbar */
+        scrollbar-gutter: stable;
+        /* Evitar cambios de layout */
+        contain: layout style;
+    }
+
+    .table-body-scroll::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .table-body-scroll::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 0 0 var(--border-radius) var(--border-radius);
+    }
+
+    .table-body-scroll::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    .table-body-scroll::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    #tablaHeader {
+        margin-bottom: 0;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        box-shadow: none;
+    }
+
+    #tablaHeader thead th {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        color: white;
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 1rem 0.5rem;
+        text-align: center;
+        vertical-align: middle;
+        border: none;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        white-space: nowrap;
+    }
+
+    #tablaHeader thead th:first-child {
+        text-align: left;
+        padding-left: 1rem;
+        position: sticky;
+        left: 0;
+        z-index: 11;
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    }
+
+    #tablaConfiguracion {
+        margin-bottom: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    #tablaConfiguracion tbody td:first-child {
+        position: sticky;
+        left: 0;
+        background-color: white;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        z-index: 5;
+    }
+
+    #tablaConfiguracion tbody tr:hover td:first-child {
+        background-color: #f8f9fa;
+    }
+
+    /* Ajustes para mantener consistencia visual */
+    .table-scroll-container .table {
+        border-collapse: separate;
+        border-spacing: 0;
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    .table-scroll-container .table td,
+    .table-scroll-container .table th {
+        border-left: 1px solid #dee2e6;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .table-scroll-container .table th:first-child,
+    .table-scroll-container .table td:first-child {
+        border-left: none;
+        width: 25%;
+        min-width: 200px;
+    }
+
+    .table-scroll-container .table th:last-child,
+    .table-scroll-container .table td:last-child {
+        width: 10%;
+        min-width: 80px;
+    }
+
+    /* Las columnas de niveles deben tener ancho automático pero consistente */
+    #tablaHeader th:not(:first-child):not(:last-child),
+    #tablaConfiguracion td:not(:first-child):not(:last-child) {
+        width: auto;
+        min-width: 120px;
+    }
+
+    /* Estilo para tooltips de niveles */
+    .nivel-tooltip {
+        cursor: help;
+        border-bottom: 1px dotted #6c757d;
+        transition: color 0.2s ease;
+    }
+
+    .nivel-tooltip:hover {
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+
+    /* Estilo para tooltips de items de evaluación */
+    .item-tooltip {
+        cursor: help;
+        transition: color 0.2s ease;
+    }
+
+    .item-tooltip:hover {
+        color: var(--primary-color);
+        text-decoration: underline;
+    }
+
+    /* Personalización de tooltips de Bootstrap */
+    .tooltip {
+        --bs-tooltip-bg: rgba(44, 62, 80, 0.95) !important;
+        --bs-tooltip-color: white !important;
+        --bs-tooltip-border-radius: var(--border-radius) !important;
+        --bs-tooltip-font-size: 0.75rem !important;
+        --bs-tooltip-padding-x: 0.75rem !important;
+        --bs-tooltip-padding-y: 0.5rem !important;
+        z-index: 99999 !important;
+        pointer-events: none !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    .tooltip.show {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    .tooltip-inner {
+        max-width: 300px !important;
+        text-align: center !important;
+        background-color: rgba(44, 62, 80, 0.95) !important;
+        color: white !important;
+        border-radius: var(--border-radius) !important;
+        padding: 0.5rem 0.75rem !important;
+        font-size: 0.75rem !important;
+        white-space: normal !important;
+        word-wrap: break-word !important;
+    }
+
+    /* Asegurar que los tooltips sean visibles sobre la tabla */
+    .table-scroll-container .tooltip {
+        z-index: 99999 !important;
+    }
+
+    /* Tooltips personalizados (fallback) */
+    .custom-tooltip {
+        background: rgba(44, 62, 80, 0.9);
+        color: white;
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--border-radius);
+        font-size: 0.75rem;
+        text-align: center;
+        max-width: 300px;
+        word-wrap: break-word;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        pointer-events: none;
+    }
+
+    /* Tooltips simples con CSS puro */
+    .simple-tooltip {
+        position: absolute;
+        background: rgba(44, 62, 80, 0.95);
+        color: white;
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--border-radius);
+        font-size: 0.75rem;
+        text-align: center;
+        max-width: 300px;
+        word-wrap: break-word;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 100000;
+        pointer-events: none;
+        border: 1px solid rgba(255,255,255,0.1);
+        white-space: normal;
+        line-height: 1.4;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .simple-tooltip.show {
+        opacity: 1;
+    }
+</style>

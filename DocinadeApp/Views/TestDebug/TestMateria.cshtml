@@ -1,0 +1,58 @@
+@{
+    ViewData["Title"] = "Test Debug";
+}
+
+<div class="container mt-5">
+    <h2>Debug Test - Materia ID: @ViewBag.Id</h2>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Test 1: Búsqueda directa en la base de datos</h4>
+            <p><strong>Existe:</strong> @ViewBag.MateriaDirectaExists</p>
+            @if (ViewBag.MateriaDirectaExists)
+            {
+                <pre>@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.MateriaDirecta, Newtonsoft.Json.Formatting.Indented))</pre>
+            }
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h4>Test 2: Via Servicio</h4>
+            <p><strong>Existe:</strong> @ViewBag.MateriaViaServicioExists</p>
+            @if (ViewBag.MateriaViaServicioError != null)
+            {
+                <div class="alert alert-danger">Error: @ViewBag.MateriaViaServicioError</div>
+            }
+            @if (ViewBag.MateriaViaServicioExists)
+            {
+                <pre>@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.MateriaViaServicio, Newtonsoft.Json.Formatting.Indented))</pre>
+            }
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h4>Test 3: Todas las materias</h4>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var materia in ViewBag.TodasMaterias)
+                    {
+                        <tr>
+                            <td>@materia.MateriaId</td>
+                            <td>@materia.Codigo</td>
+                            <td>@materia.Nombre</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,75 @@
+﻿@{
+    ViewData["Title"] = "Registro Cerrado";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0">
+                    <i class="fas fa-lock me-2"></i>
+                    Registro No Disponible
+                </h4>
+            </div>
+            <div class="card-body text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-user-lock text-warning" style="font-size: 4rem;"></i>
+                </div>
+                
+                <h5 class="text-muted mb-3">Acceso Restringido</h5>
+                
+                <div class="alert alert-warning" role="alert">
+                    @ViewBag.MensajeBloqueo
+                </div>
+                
+                <div class="mt-4">
+                    <p class="text-muted">
+                        Si necesita acceso al sistema, por favor contacte al administrador con los siguientes datos:
+                    </p>
+                    
+                    <ul class="list-unstyled text-start">
+                        <li><strong>Email:</strong> Proporcione su dirección de correo electrónico</li>
+                        <li><strong>Institución:</strong> Indique su institución educativa</li>
+                        <li><strong>Rol solicitado:</strong> Especifique el rol que necesita (Docente, Evaluador, etc.)</li>
+                        <li><strong>Justificación:</strong> Explique brevemente el motivo de su solicitud</li>
+                    </ul>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+                    <a href="@Url.Action("Login", "Account")" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt me-1"></i>
+                        Iniciar Sesión
+                    </a>
+                    <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">
+                        <i class="fas fa-home me-1"></i>
+                        Página Principal
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Información del Sistema
+                </h6>
+                <p class="card-text small text-muted">
+                    El administrador del sistema ha configurado el registro en modo cerrado para mantener 
+                    la seguridad y controlar el acceso. Los usuarios autorizados pueden ser creados únicamente 
+                    por administradores desde el panel de gestión interno.
+                </p>
+                <p class="card-text small text-muted mb-0">
+                    <strong>Fecha y hora:</strong> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Log del intento de acceso para estadísticas del lado cliente
+        console.log('Acceso denegado al registro público:', new Date().toISOString());
+    </script>
+}

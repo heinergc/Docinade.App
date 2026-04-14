@@ -1,0 +1,240 @@
+@model RubricasApp.Web.ViewModels.Academic.PagedResult<RubricasApp.Web.ViewModels.Academic.MateriaListVm>
+
+@{
+    ViewData["Title"] = "Gestión de Materias";
+    Layout = "_Layout";
+}
+
+<div class="main-container">
+    <!-- Sección de Encabezado -->
+    <div class="header-section">
+        <div>
+            <h2><i class="fas fa-book"></i> Gestión de Materias</h2>
+            <p class="text-muted mb-0">Administra las materias del sistema académico</p>
+        </div>
+        <div class="header-actions">
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nueva Materia
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtros y búsqueda -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title">
+                <i class="fas fa-filter"></i> Filtros de Búsqueda
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="searchTerm" class="form-label">
+                            <i class="fas fa-search"></i> Buscar Materia
+                        </label>
+                        <input type="text" class="form-control" id="searchTerm" name="searchTerm" 
+                               value="@ViewBag.SearchTerm" placeholder="Código, nombre o descripción...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="pageSize" class="form-label">
+                            <i class="fas fa-list"></i> Registros por página
+                        </label>
+                        <select class="form-control form-select" id="pageSize" name="pageSize">
+                            <option value="10" selected="@(ViewBag.PageSize == 10)">10</option>
+                            <option value="25" selected="@(ViewBag.PageSize == 25)">25</option>
+                            <option value="50" selected="@(ViewBag.PageSize == 50)">50</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <div class="btn-group w-100">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                        <a href="@Url.Action("Index")" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Limpiar
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de resultados -->
+    <div class="table-container">
+        @if (Model.Items.Any())
+        {
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-code"></i> Código</th>
+                            <th><i class="fas fa-book-open"></i> Nombre</th>
+                            <th><i class="fas fa-tag"></i> Tipo</th>
+                            <th><i class="fas fa-graduation-cap"></i> Créditos</th>
+                            <th><i class="fas fa-toggle-on"></i> Estado</th>
+                            <th><i class="fas fa-tools"></i> Instrumentos</th>
+                            <th class="table-actions"><i class="fas fa-cogs"></i> Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var materia in Model.Items)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="badge badge-primary fw-bold">@materia.Codigo</span>
+                                </td>
+                                <td>
+                                    <strong>@materia.Nombre</strong>
+                                </td>
+                                <td>
+                                    <span class="badge @(materia.Tipo == "Teórica" ? "badge-secondary" : 
+                                                         materia.Tipo == "Práctica" ? "badge-success" : 
+                                                         materia.Tipo == "Virtual" ? "badge-info" : "badge-warning")">
+                                        @materia.Tipo
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-info">@materia.Creditos</span>
+                                </td>
+                                <td>
+                                    <span class="status-badge @(materia.Activa ? "" : "inactive")">
+                                        @(materia.Activa ? "Activa" : "Inactiva")
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-primary">@materia.NumeroInstrumentos</span>
+                                </td>
+                                <td class="table-actions">
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Details" asp-route-id="@materia.MateriaId" 
+                                           class="btn btn-small btn-outline-info" title="Ver detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@materia.MateriaId" 
+                                           class="btn btn-small btn-outline-warning" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a asp-action="AsignarInstrumentos" asp-route-id="@materia.MateriaId" 
+                                           class="btn btn-small btn-outline-success" title="Gestionar instrumentos">
+                                            <i class="fas fa-tools"></i>
+                                        </a>
+                                        <a asp-action="Instrumentos" asp-route-id="@materia.MateriaId" 
+                                           class="btn btn-small btn-outline-primary" title="Ver instrumentos">
+                                            <i class="fas fa-list"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Información de paginación y navegación -->
+            <div class="card-footer">
+                <div class="d-flex justify-content-between align-items-center">
+                    <!-- Información de registros -->
+                    <div class="text-muted">
+                        <i class="fas fa-info-circle"></i>
+                        Mostrando @((Model.Page - 1) * Model.PageSize + 1) - @Math.Min(Model.Page * Model.PageSize, Model.TotalCount) 
+                        de @Model.TotalCount registros
+                    </div>
+
+                    <!-- Paginación -->
+                    @if (Model.TotalPages > 1)
+                    {
+                        <nav aria-label="Paginación">
+                            <ul class="pagination">
+                                @if (Model.Page > 1)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" href="@Url.Action("Index", new { page = Model.Page - 1, pageSize = ViewBag.PageSize, searchTerm = ViewBag.SearchTerm })">
+                                            <i class="fas fa-chevron-left"></i> Anterior
+                                        </a>
+                                    </li>
+                                }
+
+                                @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
+                                {
+                                    <li class="page-item @(i == Model.Page ? "active" : "")">
+                                        <a class="page-link" href="@Url.Action("Index", new { page = i, pageSize = ViewBag.PageSize, searchTerm = ViewBag.SearchTerm })">
+                                            @i
+                                        </a>
+                                    </li>
+                                }
+
+                                @if (Model.Page < Model.TotalPages)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" href="@Url.Action("Index", new { page = Model.Page + 1, pageSize = ViewBag.PageSize, searchTerm = ViewBag.SearchTerm })">
+                                            Siguiente <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <!-- Estado vacío con estilos genéricos -->
+            <div class="card-body text-center p-5">
+                <div class="mb-4">
+                    <i class="fas fa-search fa-3x text-muted"></i>
+                </div>
+                <h5 class="text-muted">No se encontraron materias</h5>
+                <p class="text-muted mb-4">
+                    @if (!string.IsNullOrEmpty(ViewBag.SearchTerm))
+                    {
+                        <span>No hay resultados para "<strong>@ViewBag.SearchTerm</strong>".</span>
+                        <br />
+                        <span>Intenta con otros criterios de búsqueda o crea una nueva materia.</span>
+                    }
+                    else
+                    {
+                        <span>Aún no hay materias registradas en el sistema.</span>
+                        <br />
+                        <span>Comienza creando tu primera materia.</span>
+                    }
+                </p>
+                <div class="header-actions">
+                    @if (!string.IsNullOrEmpty(ViewBag.SearchTerm))
+                    {
+                        <a href="@Url.Action("Index")" class="btn btn-secondary me-2">
+                            <i class="fas fa-times"></i> Limpiar Búsqueda
+                        </a>
+                    }
+                    <a asp-action="Create" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Crear Nueva Materia
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto submit form on page size change
+        document.getElementById('pageSize').addEventListener('change', function() {
+            this.form.submit();
+        });
+
+        // Mejorar la experiencia del usuario con tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar tooltips si está disponible Bootstrap
+            if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            }
+        });
+    </script>
+}

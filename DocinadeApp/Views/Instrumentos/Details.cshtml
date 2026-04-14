@@ -1,0 +1,19 @@
+﻿@model RubricasApp.Web.Models.InstrumentoEvaluacion
+@{ViewData["Title"] = "Detalles";}
+<div class="container mt-4">
+<div class="card">
+<div class="card-header">
+<h5>@Model.Nombre</h5>
+<a asp-action="Edit" asp-route-id="@Model.InstrumentoId" class="btn btn-sm btn-warning">Editar</a>
+<a asp-action="Index" class="btn btn-sm btn-secondary">Volver</a>
+</div>
+<div class="card-body">
+<table class="table">
+<tr><td><strong>Estado:</strong></td><td>@(Model.Activo ? "Activo" : "Inactivo")</td></tr>
+<tr><td><strong>Descripción:</strong></td><td>@(Model.Descripcion ?? "Sin descripción")</td></tr>
+<tr><td><strong>Rúbricas:</strong></td><td>@Model.InstrumentoRubricas.Count</td></tr>
+<tr><td><strong>Materias:</strong></td><td>@Model.InstrumentoMaterias.Count</td></tr>
+</table>
+</div>
+</div>
+</div>

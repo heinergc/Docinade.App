@@ -1,0 +1,519 @@
+@model RubricasApp.Web.ViewModels.Conducta.ReporteGeneralConductaViewModel
+
+@{
+    ViewData["Title"] = "Reporte General de Conducta";
+}
+
+@section Styles {
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2><i class="fas fa-chart-bar text-success"></i> Reporte General de Conducta</h2>
+                    <p class="text-muted mb-0">Análisis institucional del comportamiento estudiantil</p>
+                </div>
+                <div>
+                    <button onclick="window.print()" class="btn btn-info">
+                        <i class="fas fa-print"></i> Imprimir
+                    </button>
+                    <button onclick="exportarExcel()" class="btn btn-success">
+                        <i class="fas fa-file-excel"></i> Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" id="formFiltros">
+                <div class="row align-items-end">
+                    <div class="col-md-4">
+                        <label for="idPeriodo" class="form-label">Período Académico</label>
+                        <select id="idPeriodo" name="idPeriodo" class="form-select" onchange="$('#formFiltros').submit()">
+                            @foreach (var periodo in ViewBag.Periodos)
+                            {
+                                <option value="@periodo.Value" selected="@(periodo.Value == Model.IdPeriodo.ToString())">
+                                    @periodo.Text
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="idNivel" class="form-label">Nivel (Opcional)</label>
+                        <select id="idNivel" name="idNivel" class="form-select" onchange="$('#formFiltros').submit()">
+                            <option value="">Todos los niveles</option>
+                            @foreach (var nivel in ViewBag.Niveles)
+                            {
+                                <option value="@nivel.Value" selected="@(nivel.Value == Model.IdNivel?.ToString())">
+                                    @nivel.Text
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-secondary" onclick="location.href='@Url.Action("ReporteGeneral")'">
+                            <i class="fas fa-redo"></i> Limpiar Filtros
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Encabezado del reporte -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información del Reporte</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <p><strong>Institución:</strong> @ViewBag.NombreInstitucion</p>
+                    <p><strong>Período:</strong> @Model.NombrePeriodo</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>Nivel:</strong> @(Model.NombreNivel ?? "Todos los niveles")</p>
+                    <p><strong>Fecha de Generación:</strong> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>Total de Estudiantes:</strong> @Model.TotalEstudiantes</p>
+                    <p><strong>Total de Boletas:</strong> @Model.TotalBoletas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas globales -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-success shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle fa-3x text-success mb-2"></i>
+                    <h6 class="text-muted">Estudiantes Aprobados</h6>
+                    <h2 class="text-success mb-1">@Model.EstudiantesAprobados</h2>
+                    <p class="text-muted mb-0">@Model.PorcentajeAprobados.ToString("F1")%</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-warning shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-2"></i>
+                    <h6 class="text-muted">Estudiantes en Riesgo</h6>
+                    <h2 class="text-warning mb-1">@Model.EstudiantesEnRiesgo</h2>
+                    <p class="text-muted mb-0">@Model.PorcentajeEnRiesgo.ToString("F1")%</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-danger shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-times-circle fa-3x text-danger mb-2"></i>
+                    <h6 class="text-muted">Estudiantes Aplazados</h6>
+                    <h2 class="text-danger mb-1">@Model.EstudiantesAplazados</h2>
+                    <p class="text-muted mb-0">@Model.PorcentajeAplazados.ToString("F1")%</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-primary shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-star fa-3x text-primary mb-2"></i>
+                    <h6 class="text-muted">Promedio General</h6>
+                    <h2 class="text-primary mb-1">@Model.PromedioGeneral.ToString("F2")</h2>
+                    <p class="text-muted mb-0">de 100 puntos</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row mb-4">
+        <!-- Distribución por estado -->
+        <div class="col-lg-6 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0 text-dark">
+                        <span class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle me-2" style="width:36px;height:36px;">
+                            <i class="fas fa-chart-pie"></i>
+                        </span>
+                        Distribución por Estado
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px; max-height: 300px; position: relative;">
+                        <canvas id="chartEstados"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Boletas por tipo -->
+        <div class="col-lg-6 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0 text-dark">
+                        <span class="d-inline-flex align-items-center justify-content-center bg-info text-white rounded-circle me-2" style="width:36px;height:36px;">
+                            <i class="fas fa-clipboard-list"></i>
+                        </span>
+                        Boletas por Tipo de Falta
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px; max-height: 300px; position: relative;">
+                        <canvas id="chartTiposFalta"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas por grupo -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0"><i class="fas fa-users"></i> Estadísticas por Grupo</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.EstadisticasPorGrupo != null && Model.EstadisticasPorGrupo.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tablaGrupos">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Grupo</th>
+                                <th>Profesor Guía</th>
+                                <th class="text-center">Total Est.</th>
+                                <th class="text-center">Aprobados</th>
+                                <th class="text-center">En Riesgo</th>
+                                <th class="text-center">Aplazados</th>
+                                <th class="text-center">Promedio</th>
+                                <th class="text-center">Boletas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var grupo in Model.EstadisticasPorGrupo.OrderBy(g => g.NombreGrupo))
+                            {
+                                <tr>
+                                    <td><strong>@grupo.NombreGrupo</strong></td>
+                                    <td>@grupo.ProfesorGuia</td>
+                                    <td class="text-center">@grupo.TotalEstudiantes</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success">@grupo.Aprobados</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-warning">@grupo.EnRiesgo</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-danger">@grupo.Aplazados</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <strong class="@(grupo.PromedioGrupo >= 65 ? "text-success" : grupo.PromedioGrupo >= 60 ? "text-warning" : "text-danger")">
+                                            @grupo.PromedioGrupo.ToString("F2")
+                                        </strong>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-info">@grupo.TotalBoletas</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <th colspan="2">TOTALES</th>
+                                <th class="text-center">@Model.TotalEstudiantes</th>
+                                <th class="text-center">
+                                    <span class="badge bg-success">@Model.EstudiantesAprobados</span>
+                                </th>
+                                <th class="text-center">
+                                    <span class="badge bg-warning">@Model.EstudiantesEnRiesgo</span>
+                                </th>
+                                <th class="text-center">
+                                    <span class="badge bg-danger">@Model.EstudiantesAplazados</span>
+                                </th>
+                                <th class="text-center">
+                                    <strong>@Model.PromedioGeneral.ToString("F2")</strong>
+                                </th>
+                                <th class="text-center">
+                                    <span class="badge bg-info">@Model.TotalBoletas</span>
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle fa-3x mb-3"></i>
+                    <p class="mb-0">No hay datos disponibles para el período seleccionado.</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Top 10 estudiantes con mejor conducta -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-3">
+            <div class="card shadow-sm border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-trophy"></i> Top 10 - Mejor Conducta</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Top10MejorConducta != null && Model.Top10MejorConducta.Any())
+                    {
+                        <div class="list-group list-group-flush">
+                            @for (int i = 0; i < Model.Top10MejorConducta.Count; i++)
+                            {
+                                var estudiante = Model.Top10MejorConducta[i];
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="badge @(i < 3 ? "bg-warning" : "bg-secondary") me-2">#@(i + 1)</span>
+                                        <strong>@estudiante.NombreEstudiante</strong>
+                                        <small class="text-muted d-block">@estudiante.Grupo</small>
+                                    </div>
+                                    <span class="badge bg-success fs-6">@estudiante.Nota.ToString("F2")</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center mb-0">No hay datos disponibles</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Estudiantes requieren atención -->
+        <div class="col-lg-6 mb-3">
+            <div class="card shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-circle"></i> Requieren Atención Urgente</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.EstudiantesAtencionUrgente != null && Model.EstudiantesAtencionUrgente.Any())
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var estudiante in Model.EstudiantesAtencionUrgente)
+                            {
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>@estudiante.NombreEstudiante</strong>
+                                        <small class="text-muted d-block">@estudiante.Grupo</small>
+                                        <small class="text-danger">@estudiante.CantidadBoletas boletas</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-danger fs-6">@estudiante.Nota.ToString("F2")</span>
+                                        @if (!estudiante.TienePrograma && !estudiante.TieneDecision)
+                                        {
+                                            <span class="badge bg-warning d-block mt-1">Sin atención</span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="text-center mt-3">
+                            <a asp-controller="NotaConducta" asp-action="EstudiantesAplazados" class="btn btn-danger">
+                                <i class="fas fa-clipboard-list"></i> Ver Todos los Aplazados
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success text-center mb-0">
+                            <i class="fas fa-check-circle fa-2x mb-2"></i>
+                            <p class="mb-0">¡Excelente! No hay estudiantes que requieran atención urgente.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="card">
+        <div class="card-body">
+            <a asp-controller="NotaConducta" asp-action="Dashboard" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver al Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // DataTable
+            $('#tablaGrupos').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
+                },
+                order: [[6, 'desc']], // Ordenar por promedio descendente
+                pageLength: 25,
+                paging: false
+            });
+
+            // Gráfico de estados
+            const ctxEstados = document.getElementById('chartEstados').getContext('2d');
+            new Chart(ctxEstados, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Aprobados', 'En Riesgo', 'Aplazados'],
+                    datasets: [{
+                        data: [@Model.EstudiantesAprobados, @Model.EstudiantesEnRiesgo, @Model.EstudiantesAplazados],
+                        backgroundColor: [
+                            'rgba(40, 167, 69, 0.8)',
+                            'rgba(255, 193, 7, 0.8)',
+                            'rgba(220, 53, 69, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(40, 167, 69, 1)',
+                            'rgba(255, 193, 7, 1)',
+                            'rgba(220, 53, 69, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 1.5,
+                    plugins: {
+                        legend: { 
+                            position: 'bottom',
+                            labels: {
+                                padding: 10,
+                                font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const total = @Model.TotalEstudiantes;
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return label + ': ' + value + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de tipos de falta
+            const ctxTipos = document.getElementById('chartTiposFalta').getContext('2d');
+            new Chart(ctxTipos, {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.BoletasPorTipo.Select(b => b.TipoFalta))),
+                    datasets: [{
+                        label: 'Cantidad de Boletas',
+                        data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.BoletasPorTipo.Select(b => b.Cantidad))),
+                        backgroundColor: [
+                            'rgba(23, 162, 184, 0.8)',
+                            'rgba(13, 110, 253, 0.8)',
+                            'rgba(255, 193, 7, 0.8)',
+                            'rgba(253, 126, 20, 0.8)',
+                            'rgba(220, 53, 69, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(23, 162, 184)',
+                            'rgb(13, 110, 253)',
+                            'rgb(255, 193, 7)',
+                            'rgb(253, 126, 20)',
+                            'rgb(220, 53, 69)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 1.5,
+                    plugins: { 
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { 
+                                stepSize: 1,
+                                font: { size: 11 }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: { size: 10 },
+                                autoSkip: false,
+                                maxRotation: 45,
+                                minRotation: 0
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        function exportarExcel() {
+            toastr.info('Exportando reporte a Excel...');
+            const params = new URLSearchParams();
+            params.append('idPeriodo', $('#idPeriodo').val());
+            const idNivel = $('#idNivel').val();
+            if (idNivel) params.append('idNivel', idNivel);
+            
+            window.location.href = '@Url.Action("ExportarReporteGeneral")?' + params.toString();
+        }
+    </script>
+}
+
+<style>
+    /* Estilos para los gráficos */
+    .card-body canvas {
+        max-width: 100%;
+        max-height: 300px;
+    }
+
+    .chart-container {
+        height: 300px;
+        max-height: 300px;
+        position: relative;
+    }
+
+    /* Estilos de impresión */
+    @@media print {
+        .btn, nav, .breadcrumb, form {
+            display: none !important;
+        }
+        .card {
+            page-break-inside: avoid;
+        }
+        .chart-container {
+            height: 250px !important;
+            max-height: 250px !important;
+        }
+    }
+
+    /* Responsive para pantallas pequeñas */
+    @@media (max-width: 768px) {
+        .chart-container {
+            height: 250px;
+            max-height: 250px;
+        }
+    }
+</style>

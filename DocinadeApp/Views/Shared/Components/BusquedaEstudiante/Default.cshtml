@@ -1,0 +1,135 @@
+@model RubricasApp.Web.ViewComponents.BusquedaEstudianteViewModel
+
+<div class="mb-3">
+    <label for="@Model.SelectId" class="form-label">@Model.Label</label>
+    <div class="input-group">
+        <button class="btn btn-outline-secondary" type="button" 
+                data-bs-toggle="modal" 
+                data-bs-target="#@Model.ModalId" 
+                title="Buscar Estudiante"
+                @(Model.Disabled ? "disabled" : "")>
+            <i class="fas fa-magnifying-glass"></i>
+        </button>
+        <select name="@Model.SelectName" 
+                id="@Model.SelectId" 
+                class="@Model.CssClass"
+                @(Model.Disabled ? "disabled" : "")
+                @(Model.Required ? "required" : "")>
+            <option value="">@Model.Placeholder</option>
+            @foreach (var estudiante in Model.Estudiantes)
+            {
+                <option value="@estudiante.Value" selected="@estudiante.Selected">
+                    @estudiante.Text
+                </option>
+            }
+        </select>
+    </div>
+</div>
+
+<!-- Modal de Búsqueda -->
+<div class="modal fade" id="@Model.ModalId" tabindex="-1" aria-labelledby="@(Model.ModalId)Label" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="@(Model.ModalId)Label">
+                    <i class="fas fa-search me-2"></i>Buscar Estudiante
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" 
+                               class="form-control" 
+                               id="txtBusqueda@(Model.ModalId.Replace("modal", ""))" 
+                               placeholder="Escriba nombre, apellido o identificación..."
+                               autocomplete="off">
+                        <button class="btn btn-outline-secondary" 
+                                type="button" 
+                                id="btnLimpiar@(Model.ModalId.Replace("modal", ""))"
+                                title="Limpiar búsqueda">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="form-text">
+                        <i class="fas fa-info-circle"></i>
+                        Escriba al menos 2 caracteres para iniciar la búsqueda
+                    </div>
+                </div>
+                
+                <div id="loading@(Model.ModalId.Replace("modal", ""))" class="text-center" style="display: none;">
+                    <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                    Buscando estudiantes...
+                </div>
+                
+                <div class="table-responsive" id="containerTabla@(Model.ModalId.Replace("modal", ""))">
+                    <table class="table table-hover table-striped" id="tablaResultados@(Model.ModalId.Replace("modal", ""))">
+                        <thead class="table-dark">
+                            <tr>
+                                <th width="10%">ID</th>
+                                <th width="25%">Apellidos</th>
+                                <th width="25%">Nombre</th>
+                                <th width="20%">Identificación</th>
+                                <th width="20%">Institución</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Resultados dinámicos -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="mensajeBusqueda@(Model.ModalId.Replace("modal", ""))" 
+                     class="alert alert-info text-center" 
+                     style="display: none;">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Utilice el campo de búsqueda para encontrar estudiantes
+                </div>
+                
+                <div id="mensajeSinResultados@(Model.ModalId.Replace("modal", ""))" 
+                     class="alert alert-warning text-center" 
+                     style="display: none;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    No se encontraron estudiantes que coincidan con la búsqueda
+                </div>
+                
+                <div id="mensajeError@(Model.ModalId.Replace("modal", ""))" 
+                     class="alert alert-danger text-center" 
+                     style="display: none;">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span class="error-message">Error al cargar los datos</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button type="button" 
+                        class="btn btn-primary" 
+                        id="btnSeleccionar@(Model.ModalId.Replace("modal", ""))"
+                        style="display: none;">
+                    <i class="fas fa-check me-2"></i>Seleccionar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/components/busqueda-estudiante.js" asp-append-version="true"></script>
+    <script>
+        // Inicializar el componente cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof initBusquedaEstudiante === 'function') {
+                initBusquedaEstudiante({
+                    selectId: '@Model.SelectId',
+                    modalId: '@Model.ModalId',
+                    controllerUrl: '@Url.Action("BuscarEstudiantes", "Evaluaciones")'
+                });
+            }
+        });
+    </script>
+}

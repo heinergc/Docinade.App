@@ -1,0 +1,532 @@
+@model RubricasApp.Web.ViewModels.ProfesorViewModel
+@{
+    ViewData["Title"] = "Nuevo Profesor - Configuración Final";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Header con progreso -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h1 class="h4 mb-0 text-gray-800">
+                                <i class="fas fa-user-plus"></i> Nuevo Profesor: @Model.NombreCompleto
+                            </h1>
+                            <p class="mb-0 text-muted">Paso 6 de 6: Configuración Final</p>
+                        </div>
+                        <div>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver a Lista
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Barra de progreso -->
+                    <div class="progress mb-3" style="height: 8px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    
+                    <!-- Indicadores de pasos -->
+                    <div class="row text-center small">
+                        <div class="col-2">
+                            <a href="@Url.Action("CreateStep1", controller: "Profesores")" class="text-decoration-none text-success step-link" title="Ver información personal">
+                                <i class="fas fa-check-circle"></i><br>Personal
+                            </a>
+                        </div>
+                        <div class="col-2">
+                            <a href="@Url.Action("CreateStep2", controller: "Profesores")" class="text-decoration-none text-success step-link" title="Ver información de contacto">
+                                <i class="fas fa-check-circle"></i><br>Contacto
+                            </a>
+                        </div>
+                        <div class="col-2">
+                            <a href="@Url.Action("CreateStep3", "Profesores")" class="text-decoration-none text-success step-link" title="Ver información de dirección">
+                                <i class="fas fa-check-circle"></i><br>Dirección
+                            </a>
+                        </div>
+                        <div class="col-2">
+                            <a href="@Url.Action("CreateStep4", "Profesores")" class="text-decoration-none text-success step-link" title="Ver información académica">
+                                <i class="fas fa-check-circle"></i><br>Académica
+                            </a>
+                        </div>
+                        <div class="col-2">
+                            <a href="@Url.Action("CreateStep5", "Profesores")" class="text-decoration-none text-success step-link" title="Ver experiencia laboral">
+                                <i class="fas fa-check-circle"></i><br>Laboral
+                            </a>
+                        </div>
+                        <div class="col-2">
+                            <div class="text-success font-weight-bold">
+                                <i class="fas fa-check-circle"></i><br>Configuración
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <form asp-action="CreateStep6" method="post" id="formStep6" novalidate>
+        <!-- Campos ocultos para todos los datos de pasos anteriores -->
+        @Html.HiddenFor(m => m.Id)
+        @Html.HiddenFor(m => m.Estado)
+        
+        <!-- Datos personales -->
+        @Html.HiddenFor(m => m.Nombres)
+        @Html.HiddenFor(m => m.PrimerApellido)
+        @Html.HiddenFor(m => m.SegundoApellido)
+        @Html.HiddenFor(m => m.Cedula)
+        @Html.HiddenFor(m => m.FechaNacimiento)
+        @Html.HiddenFor(m => m.Sexo)
+        @Html.HiddenFor(m => m.EstadoCivil)
+        @Html.HiddenFor(m => m.Nacionalidad)
+        
+        <!-- Datos de contacto -->
+        @Html.HiddenFor(m => m.EmailPersonal)
+        @Html.HiddenFor(m => m.EmailInstitucional)
+        @Html.HiddenFor(m => m.TelefonoFijo)
+        @Html.HiddenFor(m => m.TelefonoCelular)
+        @Html.HiddenFor(m => m.TelefonoOficina)
+        
+        <!-- Dirección -->
+        @Html.HiddenFor(m => m.ProvinciaId)
+        @Html.HiddenFor(m => m.CantonId)
+        @Html.HiddenFor(m => m.DistritoId)
+        @Html.HiddenFor(m => m.DireccionExacta)
+        
+        @* Campos para el modo edición *@
+        @if (ViewBag.FromEdit != null && ViewBag.FromEdit)
+        {
+            <input type="hidden" name="fromEdit" value="true" />
+            <input type="hidden" name="profesorId" value="@ViewBag.ProfesorId" />
+        }
+
+        <div class="row">
+            <!-- Asignación de Grupos y Materias -->
+            <div class="col-lg-6">
+                <div class="card shadow mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chalkboard-teacher text-primary"></i> Asignación de Grupos
+                        </h5>
+                        <button type="button" class="btn btn-success btn-sm" id="btnAgregarGrupo">
+                            <i class="fas fa-plus"></i> Agregar Grupo
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">
+                            <i class="fas fa-info-circle"></i> 
+                            Asigne los grupos y materias que impartirá el profesor.
+                        </p>
+                        
+                        <!-- Container para grupos -->
+                        <div id="gruposContainer">
+                            @if (Model.ProfesorGrupos != null && Model.ProfesorGrupos.Any())
+                            {
+                                @for (int i = 0; i < Model.ProfesorGrupos.Count; i++)
+                                {
+                                    <div class="grupo-item border rounded p-3 mb-3 bg-light" data-index="@i">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="text-primary mb-0">Asignación #@(i + 1)</h6>
+                                            <button type="button" class="btn btn-danger btn-sm btnEliminarGrupo">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-12 mb-3">
+                                                <label class="form-label">Grupo *</label>
+                                                <select asp-for="ProfesorGrupos[i].GrupoId" class="form-control" asp-items="Model.GruposDisponibles">
+                                                    <option value="">-- Seleccione un grupo --</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <label class="form-label">Materia *</label>
+                                                <select asp-for="ProfesorGrupos[i].MateriaId" class="form-control" asp-items="Model.MateriasDisponibles">
+                                                    <option value="">-- Seleccione una materia --</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label">Periodo *</label>
+                                                <select asp-for="ProfesorGrupos[i].PeriodoId" class="form-control" asp-items="Model.PeriodosDisponibles">
+                                                    <option value="">-- Seleccione un período --</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-check mt-2">
+                                            <input asp-for="ProfesorGrupos[i].EsProfesorGuia" type="checkbox" class="form-check-input" />
+                                            <label asp-for="ProfesorGrupos[i].EsProfesorGuia" class="form-check-label">
+                                                Es profesor guía de este grupo
+                                            </label>
+                                        </div>
+                                        
+                                        @Html.HiddenFor(m => m.ProfesorGrupos[i].ProfesorGrupoId)
+                                        @Html.HiddenFor(m => m.ProfesorGrupos[i].ProfessorId)
+                                        @Html.HiddenFor(m => m.ProfesorGrupos[i].Estado)
+                                    </div>
+                                }
+                            }
+                        </div>
+                        
+                        <!-- Mensaje cuando no hay grupos -->
+                        <div id="noGruposMessage" class="alert alert-info text-center" style="display: none;">
+                            <i class="fas fa-chalkboard-teacher fa-2x text-primary mb-2"></i>
+                            <p class="mb-0">No se ha asignado ningún grupo.</p>
+                            <small class="text-muted">Haga clic en "Agregar Grupo" para comenzar.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información Adicional y Contacto de Emergencia -->
+            <div class="col-lg-6">
+                <!-- Contacto de Emergencia -->
+                <div class="card shadow mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-phone-alt text-danger"></i> Contacto de Emergencia
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label asp-for="ContactoEmergenciaNombre" class="form-label">Nombre del Contacto</label>
+                                <input asp-for="ContactoEmergenciaNombre" class="form-control" placeholder="Nombre completo del contacto de emergencia" />
+                                <span asp-validation-for="ContactoEmergenciaNombre" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label asp-for="ContactoEmergenciaTelefono" class="form-label">Teléfono</label>
+                                <input asp-for="ContactoEmergenciaTelefono" class="form-control" placeholder="Número de teléfono" />
+                                <span asp-validation-for="ContactoEmergenciaTelefono" class="text-danger"></span>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label asp-for="ContactoEmergenciaParentesco" class="form-label">Relación</label>
+                                <select asp-for="ContactoEmergenciaParentesco" class="form-control">
+                                    <option value="">-- Seleccione relación --</option>
+                                    <option value="Esposo/a">Esposo/a</option>
+                                    <option value="Padre">Padre</option>
+                                    <option value="Madre">Madre</option>
+                                    <option value="Hijo/a">Hijo/a</option>
+                                    <option value="Hermano/a">Hermano/a</option>
+                                    <option value="Amigo/a">Amigo/a</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                                <span asp-validation-for="ContactoEmergenciaParentesco" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información Adicional -->
+                <div class="card shadow mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-clipboard-list text-info"></i> Información Adicional
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group mb-3">
+                            <label asp-for="AreasEspecializacion" class="form-label">Áreas de Especialización</label>
+                            <textarea asp-for="AreasEspecializacion" class="form-control" rows="4" placeholder="Áreas de especialización del profesor"></textarea>
+                            <span asp-validation-for="AreasEspecializacion" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label asp-for="IdiomasHabla" class="form-label">Idiomas que Habla</label>
+                            <textarea asp-for="IdiomasHabla" class="form-control" rows="2" placeholder="Idiomas que domina el profesor"></textarea>
+                            <span asp-validation-for="IdiomasHabla" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <label asp-for="NivelIngles" class="form-label">Nivel de Inglés</label>
+                                <select asp-for="NivelIngles" class="form-control">
+                                    <option value="">-- Seleccione nivel --</option>
+                                    <option value="Básico">Básico</option>
+                                    <option value="Intermedio">Intermedio</option>
+                                    <option value="Avanzado">Avanzado</option>
+                                    <option value="Nativo">Nativo</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label asp-for="ExperienciaDocente" class="form-label">Años Experiencia Docente</label>
+                                <input asp-for="ExperienciaDocente" type="number" class="form-control" min="0" max="50" placeholder="0" />
+                            </div>
+                        </div>
+
+                        <!-- Configuración de Notificaciones -->
+                        <hr>
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-bell"></i> Preferencias de Notificación
+                        </h6>
+                        
+                        <div class="form-check mb-2">
+                            <input asp-for="NotificacionesEmail" type="checkbox" class="form-check-input" />
+                            <label asp-for="NotificacionesEmail" class="form-check-label">
+                                Recibir notificaciones por correo electrónico
+                            </label>
+                        </div>
+                        
+                        <div class="form-check mb-2">
+                            <input asp-for="NotificacionesSMS" type="checkbox" class="form-check-input" />
+                            <label asp-for="NotificacionesSMS" class="form-check-label">
+                                Recibir notificaciones por SMS
+                            </label>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input asp-for="Estado" type="checkbox" class="form-check-input" checked />
+                            <label asp-for="Estado" class="form-check-label">
+                                Profesor activo
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumen Final -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow bg-gradient-primary text-white">
+                    <div class="card-body">
+                        <h5 class="mb-3">
+                            <i class="fas fa-check-circle"></i> Resumen del Registro
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Profesor:</strong> @Model.NombreCompleto</p>
+                                <p class="mb-1"><strong>Cédula:</strong> @Model.Cedula</p>
+                                <p class="mb-1"><strong>Email:</strong> @Model.EmailPersonal</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Formaciones:</strong> @(Model.FormacionAcademica?.Count ?? 0)</p>
+                                <p class="mb-1"><strong>Experiencias:</strong> @(Model.ExperienciaLaboral?.Count ?? 0)</p>
+                                <p class="mb-1"><strong>Grupos Asignados:</strong> @(Model.ProfesorGrupos?.Count ?? 0)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Botones de navegación -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="CreateStep5" class="btn btn-outline-secondary">
+                                <i class="fas fa-chevron-left"></i> Anterior
+                            </a>
+                            <button type="submit" class="btn btn-success btn-lg" id="btnFinalizar">
+                                <i class="fas fa-save"></i> Guardar Profesor
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Template para nuevo grupo -->
+<template id="grupoTemplate">
+    <div class="grupo-item border rounded p-3 mb-3 bg-light" data-index="{INDEX}">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <h6 class="text-primary mb-0">Asignación #{NUMBER}</h6>
+            <button type="button" class="btn btn-danger btn-sm btnEliminarGrupo">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+        
+        <div class="row">
+            <div class="col-12 mb-3">
+                <label class="form-label">Grupo *</label>
+                <select name="ProfesorGrupos[{INDEX}].GrupoId" class="form-control">
+                    <option value="">-- Seleccione un grupo --</option>
+                    @if (Model?.GruposDisponibles != null)
+                    {
+                        @foreach (var grupo in Model.GruposDisponibles)
+                        {
+                            <option value="@grupo.Value">@grupo.Text</option>
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-6">
+                <label class="form-label">Materia *</label>
+                <select name="ProfesorGrupos[{INDEX}].MateriaId" class="form-control">
+                    <option value="">-- Seleccione una materia --</option>
+                    @if (Model?.MateriasDisponibles != null)
+                    {
+                        @foreach (var materia in Model.MateriasDisponibles)
+                        {
+                            <option value="@materia.Value">@materia.Text</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-6">
+                <label class="form-label">Periodo *</label>
+                <select name="ProfesorGrupos[{INDEX}].PeriodoId" class="form-control">
+                    <option value="">-- Seleccione un período --</option>
+                    @if (Model?.PeriodosDisponibles != null)
+                    {
+                        @foreach (var periodo in Model.PeriodosDisponibles)
+                        {
+                            <option value="@periodo.Value">@periodo.Text</option>
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-check mt-2">
+            <input name="ProfesorGrupos[{INDEX}].EsProfesorGuia" type="checkbox" class="form-check-input" />
+            <label class="form-check-label">
+                Es profesor guía de este grupo
+            </label>
+        </div>
+        
+        <input type="hidden" name="ProfesorGrupos[{INDEX}].ProfesorGrupoId" value="0" />
+        <input type="hidden" name="ProfesorGrupos[{INDEX}].ProfessorId" value="0" />
+        <input type="hidden" name="ProfesorGrupos[{INDEX}].Estado" value="true" />
+    </div>
+</template>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            var grupoIndex = @((Model?.ProfesorGrupos?.Count ?? 0));
+            
+            // Mostrar/ocultar mensaje de no grupos
+            function toggleNoGruposMessage() {
+                var hasGrupos = $('.grupo-item').length > 0;
+                $('#noGruposMessage').toggle(!hasGrupos);
+            }
+            
+            // Inicializar estado del mensaje
+            toggleNoGruposMessage();
+            
+            // Agregar nuevo grupo
+            $('#btnAgregarGrupo').click(function() {
+                var template = $('#grupoTemplate').html();
+                var newGrupo = template
+                    .replace(/{INDEX}/g, grupoIndex)
+                    .replace(/{NUMBER}/g, grupoIndex + 1);
+                
+                $('#gruposContainer').append(newGrupo);
+                grupoIndex++;
+                
+                toggleNoGruposMessage();
+                
+                // Scroll al nuevo elemento
+                var newItem = $('.grupo-item:last');
+                $('html, body').animate({
+                    scrollTop: newItem.offset().top - 100
+                }, 500);
+            });
+            
+            // Eliminar grupo
+            $(document).on('click', '.btnEliminarGrupo', function() {
+                var $item = $(this).closest('.grupo-item');
+                
+                if (confirm('¿Está seguro de eliminar esta asignación?')) {
+                    $item.remove();
+                    
+                    // Reindexar elementos
+                    $('.grupo-item').each(function(index) {
+                        var $this = $(this);
+                        $this.attr('data-index', index);
+                        $this.find('h6').text('Asignación #' + (index + 1));
+                        
+                        // Reindexar inputs
+                        $this.find('input, select').each(function() {
+                            var name = $(this).attr('name');
+                            if (name) {
+                                var newName = name.replace(/ProfesorGrupos\[\d+\]/, 'ProfesorGrupos[' + index + ']');
+                                $(this).attr('name', newName);
+                            }
+                        });
+                    });
+                    
+                    grupoIndex = $('.grupo-item').length;
+                    toggleNoGruposMessage();
+                }
+            });
+            
+            // Validar que solo hay un profesor guía por grupo
+            $(document).on('change', 'input[name*="EsProfesorGuia"]', function() {
+                if ($(this).is(':checked')) {
+                    var $currentItem = $(this).closest('.grupo-item');
+                    var grupoId = $currentItem.find('select[name*="GrupoId"]').val();
+                    
+                    if (grupoId) {
+                        // Desmarcar otros checkboxes del mismo grupo
+                        $('.grupo-item').each(function() {
+                            var $item = $(this);
+                            if ($item[0] !== $currentItem[0]) {
+                                var otroGrupoId = $item.find('select[name*="GrupoId"]').val();
+                                if (otroGrupoId === grupoId) {
+                                    $item.find('input[name*="EsProfesorGuia"]').prop('checked', false);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+            
+            // Validación del formulario
+            $('#formStep6').on('submit', function(e) {
+                var isValid = true;
+                
+                // Mostrar confirmación antes de guardar
+                if (!confirm('¿Está seguro de que desea guardar el profesor con toda la información ingresada?')) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Cambiar texto del botón para indicar procesamiento
+                $('#btnFinalizar')
+                    .prop('disabled', true)
+                    .html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+            });
+        });
+    </script>
+    
+    <style>
+        .step-link {
+            display: block;
+            padding: 5px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .step-link:hover {
+            background-color: #f8f9fc;
+            color: #4e73df !important;
+            transform: translateY(-2px);
+        }
+        
+        .step-link i {
+            transition: transform 0.3s ease;
+        }
+        
+        .step-link:hover i {
+            transform: scale(1.1);
+        }
+    </style>
+}

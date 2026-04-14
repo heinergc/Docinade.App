@@ -1,0 +1,128 @@
+﻿@model RubricasApp.Web.Models.NivelCalificacion
+
+@{
+    ViewData["Title"] = "Editar Nivel de Calificación";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-edit"></i> Editar Nivel de Calificación
+                </h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    
+                    <input type="hidden" asp-for="IdNivel" />
+
+                    <div class="mb-3">
+                        <label asp-for="NombreNivel" class="form-label"></label>
+                        <input asp-for="NombreNivel" class="form-control" />
+                        <span asp-validation-for="NombreNivel" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Descripcion" class="form-label"></label>
+                        <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="OrdenNivel" class="form-label"></label>
+                        <input asp-for="OrdenNivel" class="form-control" type="number" />
+                        <span asp-validation-for="OrdenNivel" class="text-danger"></span>
+                        <div class="form-text">Orden de presentación del nivel (opcional)</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save"></i> Actualizar
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            var timeoutId;
+            var idNivelActual = $('#IdNivel').val();
+            var nombreOriginal = $('#NombreNivel').val();
+            
+            $('#NombreNivel').on('input', function() {
+                clearTimeout(timeoutId);
+                var nombreNivel = $(this).val().trim();
+                
+                // Si es el mismo nombre original, no verificar
+                if (nombreNivel === nombreOriginal) {
+                    $('#validacion-nombre').remove();
+                    $('#NombreNivel').removeClass('is-invalid is-valid');
+                    return;
+                }
+                
+                if (nombreNivel.length < 2) {
+                    $('#validacion-nombre').remove();
+                    return;
+                }
+                
+                // Debounce para evitar muchas peticiones
+                timeoutId = setTimeout(function() {
+                    verificarNombreDuplicado(nombreNivel, idNivelActual);
+                }, 500);
+            });
+            
+            function verificarNombreDuplicado(nombreNivel, idNivel) {
+                $.ajax({
+                    url: '@Url.Action("VerificarNombreDuplicado", "NivelesCalificacion")',
+                    type: 'POST',
+                    data: { nombreNivel: nombreNivel, idNivel: idNivel },
+                    beforeSend: function() {
+                        $('#validacion-nombre').remove();
+                        $('#NombreNivel').after('<div id="validacion-nombre" class="text-info"><i class="fas fa-spinner fa-spin"></i> Verificando...</div>');
+                    },
+                    success: function(response) {
+                        $('#validacion-nombre').remove();
+                        
+                        if (response.error) {
+                            $('#NombreNivel').after('<div id="validacion-nombre" class="text-warning">Error al verificar: ' + response.error + '</div>');
+                            return;
+                        }
+                        
+                        if (response.existe) {
+                            $('#NombreNivel').after('<div id="validacion-nombre" class="text-danger"><i class="fas fa-exclamation-triangle"></i> ' + response.mensaje + '</div>');
+                            $('#NombreNivel').addClass('is-invalid');
+                        } else {
+                            $('#NombreNivel').after('<div id="validacion-nombre" class="text-success"><i class="fas fa-check"></i> Nombre disponible.</div>');
+                            $('#NombreNivel').removeClass('is-invalid').addClass('is-valid');
+                        }
+                    },
+                    error: function() {
+                        $('#validacion-nombre').remove();
+                        $('#NombreNivel').after('<div id="validacion-nombre" class="text-warning">Error al verificar disponibilidad del nombre.</div>');
+                    }
+                });
+            }
+            
+            // Validación antes de enviar el formulario
+            $('form').on('submit', function(e) {
+                var hayDuplicado = $('#validacion-nombre').hasClass('text-danger');
+                if (hayDuplicado) {
+                    e.preventDefault();
+                    alert('No se puede actualizar porque ya existe un nivel con ese nombre.');
+                    return false;
+                }
+            });
+        });
+    </script>
+}

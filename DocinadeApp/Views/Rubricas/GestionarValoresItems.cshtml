@@ -1,0 +1,495 @@
+﻿@model GestionarValoresItemsViewModel
+@{
+    ViewData["Title"] = $"Gestionar Valores - {Model.Rubrica.NombreRubrica}";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2>@ViewData["Title"]</h2>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a asp-action="Index">Rúbricas</a></li>
+                            <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@Model.Rubrica.IdRubrica">@Model.Rubrica.NombreRubrica</a></li>
+                            <li class="breadcrumb-item active">Gestionar Valores</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-info" onclick="diagnosticarItems(@Model.Rubrica.IdRubrica)">
+                        <i class="fas fa-search"></i> Diagnosticar Items
+                    </button>
+                    <a href="@Url.Action("Details", new { id = Model.Rubrica.IdRubrica })" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </div>
+
+            <!-- Mensajes de alerta -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <!-- Resumen de estado -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Items</h5>
+                            <h3>@Model.Rubrica.ItemsEvaluacion.Count</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Items Configurados</h5>
+                            <h3 id="itemsConfigurados">@(Model.Rubrica.ItemsEvaluacion.Count - Model.ItemsSinValores.Count)</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Items Sin Configurar</h5>
+                            <h3 id="itemsSinConfigurar">@Model.ItemsSinValores.Count</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Items sin valores configurados -->
+            @if (Model.ItemsSinValores.Any())
+            {
+                <div class="alert alert-warning">
+                    <h5><i class="fas fa-exclamation-triangle"></i> Items que necesitan configuración</h5>
+                    <p>Los siguientes items no aparecerán en las evaluaciones porque no tienen niveles de calificación asignados:</p>
+                    <div class="row">
+                        @foreach (var item in Model.ItemsSinValores)
+                        {
+                            <div class="col-md-6 mb-2">
+                                <div class="card border-warning">
+                                    <div class="card-body p-2">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <h6 class="card-title mb-1">@item.NombreItem</h6>
+                                                <small class="text-muted">ID: @item.IdItem | Orden: @(item.OrdenItem?.ToString() ?? "Sin orden")</small>
+                                            </div>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <button type="button" class="btn btn-success btn-sm" 
+                                                        onclick="asignarNivelesAutomatico(@Model.Rubrica.IdRubrica, @item.IdItem)"
+                                                        title="Asignar niveles automáticamente">
+                                                    <i class="fas fa-magic"></i> Auto
+                                                </button>
+                                                <button type="button" class="btn btn-primary btn-sm" 
+                                                        onclick="mostrarModalPersonalizado(@Model.Rubrica.IdRubrica, @item.IdItem, '@item.NombreItem')"
+                                                        title="Configurar valores personalizados">
+                                                    <i class="fas fa-cog"></i> Manual
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Matriz de valores -->
+            @if (Model.NivelesDisponibles.Any())
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-table"></i> Matriz de Valores de Rúbrica</h5>
+                        <small class="text-muted">Valores configurados para cada item y nivel de calificación</small>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width: 40%;">Item de Evaluación</th>
+                                        @foreach (var nivel in Model.NivelesDisponibles)
+                                        {
+                                            <th class="text-center" style="width: @(60.0 / Model.NivelesDisponibles.Count)%;">
+                                                @nivel.NombreNivel
+                                                <br><small class="text-muted">Orden: @(nivel.OrdenNivel?.ToString() ?? "Sin orden")</small>
+                                            </th>
+                                        }
+                                        <th style="width: 10%;">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Rubrica.ItemsEvaluacion.OrderBy(i => i.OrdenItem ?? 999))
+                                    {
+                                        <tr id="item-row-@item.IdItem">
+                                            <td>
+                                                <strong>@item.NombreItem</strong>
+                                                <br><small class="text-muted">ID: @item.IdItem | Peso: @item.Peso%</small>
+                                            </td>
+                                            @foreach (var nivel in Model.NivelesDisponibles)
+                                            {
+                                                <td class="text-center">
+                                                    @if (Model.MatrizValores.ContainsKey(item.IdItem) && Model.MatrizValores[item.IdItem].ContainsKey(nivel.IdNivel) && Model.MatrizValores[item.IdItem][nivel.IdNivel] != null)
+                                                    {
+                                                        <span class="badge bg-success">@Model.MatrizValores[item.IdItem][nivel.IdNivel].ValorPuntos pts</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-danger">Sin valor</span>
+                                                    }
+                                                </td>
+                                            }
+                                            <td class="text-center">
+                                                @if (Model.ItemsSinValores.Any(i => i.IdItem == item.IdItem))
+                                                {
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <button type="button" class="btn btn-success btn-sm" 
+                                                                onclick="asignarNivelesAutomatico(@Model.Rubrica.IdRubrica, @item.IdItem)"
+                                                                title="Asignar automáticamente">
+                                                            <i class="fas fa-magic"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-primary btn-sm" 
+                                                                onclick="mostrarModalPersonalizado(@Model.Rubrica.IdRubrica, @item.IdItem, '@item.NombreItem')"
+                                                                title="Configurar manualmente">
+                                                            <i class="fas fa-cog"></i>
+                                                        </button>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <button type="button" class="btn btn-warning btn-sm" 
+                                                            onclick="mostrarModalPersonalizado(@Model.Rubrica.IdRubrica, @item.IdItem, '@item.NombreItem')"
+                                                            title="Editar valores">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <h5><i class="fas fa-info-circle"></i> Sin niveles de calificación</h5>
+                    <p>Esta rúbrica no tiene niveles de calificación configurados. Debe configurar niveles antes de asignar valores a los items.</p>
+                    <a href="@Url.Action("ConfigureQualificationLevels", new { id = Model.Rubrica.IdRubrica })" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Configurar Niveles
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Modal para configuración personalizada -->
+<div class="modal fade" id="modalPersonalizado" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Configurar Valores Personalizados</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formPersonalizado">
+                    <input type="hidden" id="modalRubricaId" />
+                    <input type="hidden" id="modalItemId" />
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Item de Evaluación:</label>
+                        <div id="modalItemNombre" class="fw-bold"></div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Configurar puntos por nivel:</label>
+                        <div id="nivelesPersonalizados">
+                            <!-- Se llena dinámicamente -->
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <small><i class="fas fa-info-circle"></i> Los valores deben ser números decimales (ej: 4.0, 3.5, 2.0, 1.0)</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="guardarValoresPersonalizados()">
+                    <i class="fas fa-save"></i> Guardar Valores
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de diagnóstico -->
+<div class="modal fade" id="modalDiagnostico" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Diagnóstico de Items</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="diagnosticoContent">
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Función para asignar niveles automáticamente
+        async function asignarNivelesAutomatico(rubricaId, itemId) {
+            try {
+                const response = await fetch('@Url.Action("AsignarNivelesAutomatico")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({ rubricaId, itemId })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('success', result.message);
+                    location.reload(); // Recargar para ver los cambios
+                } else {
+                    showAlert('danger', result.message);
+                }
+            } catch (error) {
+                showAlert('danger', 'Error de conexión: ' + error.message);
+            }
+        }
+
+        // Función para mostrar modal de configuración personalizada
+        function mostrarModalPersonalizado(rubricaId, itemId, itemNombre) {
+            document.getElementById('modalRubricaId').value = rubricaId;
+            document.getElementById('modalItemId').value = itemId;
+            document.getElementById('modalItemNombre').textContent = itemNombre;
+            
+            // Construir campos para cada nivel
+            const nivelesContainer = document.getElementById('nivelesPersonalizados');
+            nivelesContainer.innerHTML = '';
+            
+            @foreach (var nivel in Model.NivelesDisponibles)
+            {
+                <text>
+                const div@(nivel.IdNivel) = document.createElement('div');
+                div@(nivel.IdNivel).className = 'row mb-2';
+                div@(nivel.IdNivel).innerHTML = `
+                    <div class="col-md-6">
+                        <label class="form-label">@nivel.NombreNivel:</label>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="number" step="0.1" min="0" max="10" 
+                               class="form-control" 
+                               id="nivel_@(nivel.IdNivel)" 
+                               placeholder="Ej: 4.0" />
+                    </div>
+                `;
+                nivelesContainer.appendChild(div@(nivel.IdNivel));
+                </text>
+            }
+            
+            new bootstrap.Modal(document.getElementById('modalPersonalizado')).show();
+        }
+
+        // Función para guardar valores personalizados
+        async function guardarValoresPersonalizados() {
+            const rubricaId = parseInt(document.getElementById('modalRubricaId').value);
+            const itemId = parseInt(document.getElementById('modalItemId').value);
+            
+            const valoresPorNivel = {};
+            
+            @foreach (var nivel in Model.NivelesDisponibles)
+            {
+                <text>
+                const valor@(nivel.IdNivel) = document.getElementById('nivel_@(nivel.IdNivel)').value;
+                if (valor@(nivel.IdNivel) && valor@(nivel.IdNivel) !== '') {
+                    valoresPorNivel[@(nivel.IdNivel)] = parseFloat(valor@(nivel.IdNivel));
+                }
+                </text>
+            }
+            
+            if (Object.keys(valoresPorNivel).length === 0) {
+                showAlert('warning', 'Debe especificar al menos un valor');
+                return;
+            }
+            
+            try {
+                const response = await fetch('@Url.Action("AsignarNivelesPersonalizado")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({ rubricaId, itemId, valoresPorNivel })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('modalPersonalizado')).hide();
+                    showAlert('success', result.message);
+                    location.reload();
+                } else {
+                    showAlert('danger', result.message);
+                }
+            } catch (error) {
+                showAlert('danger', 'Error de conexión: ' + error.message);
+            }
+        }
+
+        // Función para diagnosticar items
+        async function diagnosticarItems(rubricaId) {
+            try {
+                const modal = new bootstrap.Modal(document.getElementById('modalDiagnostico'));
+                modal.show();
+                
+                const response = await fetch(`@Url.Action("DiagnosticarItems")/${rubricaId}`);
+                const result = await response.json();
+                
+                if (result.error) {
+                    document.getElementById('diagnosticoContent').innerHTML = `
+                        <div class="alert alert-danger">
+                            <h5>Error</h5>
+                            <p>${result.error}</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = `
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <h5>Total Items</h5>
+                                    <h3>${result.totalItems}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h5>Configurados</h5>
+                                    <h3>${result.itemsConValores}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body text-center">
+                                    <h5>Sin Configurar</h5>
+                                    <h3>${result.itemsSinValores}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Item</th>
+                                    <th>Estado</th>
+                                    <th>Niveles</th>
+                                    <th>Valores</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                result.detalleItems.forEach(item => {
+                    const badgeClass = item.problema === 'OK' ? 'bg-success' : 'bg-danger';
+                    const estado = item.problema === 'OK' ? 'Configurado' : 'Sin Configurar';
+                    
+                    let valoresHtml = '';
+                    if (item.niveles && item.niveles.length > 0) {
+                        item.niveles.forEach(nivel => {
+                            valoresHtml += `<span class="badge bg-info me-1">${nivel.nombreNivel}: ${nivel.valorPuntos} pts</span>`;
+                        });
+                    }
+                    
+                    html += `
+                        <tr>
+                            <td>${item.idItem}</td>
+                            <td>${item.nombreItem}</td>
+                            <td><span class="badge ${badgeClass}">${estado}</span></td>
+                            <td>${item.cantidadNiveles}</td>
+                            <td>${valoresHtml}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+                document.getElementById('diagnosticoContent').innerHTML = html;
+                
+            } catch (error) {
+                document.getElementById('diagnosticoContent').innerHTML = `
+                    <div class="alert alert-danger">
+                        <h5>Error de conexión</h5>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Función auxiliar para mostrar alertas
+        function showAlert(type, message) {
+            const alertContainer = document.querySelector('.container-fluid .row .col-12');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            alertContainer.insertBefore(alert, alertContainer.firstChild.nextSibling);
+            
+            // Auto-dismiss después de 5 segundos
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+    </script>
+}
+
+<!-- Token CSRF -->
+@Html.AntiForgeryToken()

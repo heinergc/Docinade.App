@@ -1,0 +1,523 @@
+﻿@model RubricasApp.Web.ViewModels.Grupos.EditarGrupoViewModel
+
+@{
+    ViewData["Title"] = $"Editar Grupo: {Model.Codigo}";
+}
+<link rel="stylesheet" href="~/css/estilos_genericos.css" />
+
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="page-title">
+                <i class="fas fa-edit text-warning me-2"></i>
+                Editar Grupo
+            </h1>
+            <h6 class="text-muted-white">
+                <span class="badge bg-primary">@Model.Codigo</span> @Model.Nombre
+            </h6>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-white">
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index")" style="color: white !important;">
+                            <i class="fas fa-users-cog"></i> Grupos
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Details", new { id = Model.GrupoId })" style="color: white !important;">
+                            @Model.Codigo
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" style="color: white !important;">Editar</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card card-modern">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Modificar Información del Grupo
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post" id="editGroupForm">
+                    <input type="hidden" asp-for="GrupoId" />
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <!-- Información básica -->
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label asp-for="Codigo" class="form-label required">Código del Grupo</label>
+                                <input asp-for="Codigo" class="form-control" maxlength="20" />
+                                <span asp-validation-for="Codigo" class="text-danger"></span>
+                                <div class="form-text">Código único identificador del grupo</div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="form-group mb-3">
+                                <label asp-for="Nombre" class="form-label required">Nombre del Grupo</label>
+                                <input asp-for="Nombre" class="form-control" maxlength="100" />
+                                <span asp-validation-for="Nombre" class="text-danger"></span>
+                                <div class="form-text">Nombre descriptivo del grupo</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="IdTipoGrupo" class="form-label required">Tipo de Grupo</label>
+                                <select asp-for="IdTipoGrupo" asp-items="Model.TiposGrupo" class="form-select" id="IdTipoGrupo">
+                                    <option value="">Seleccione un tipo</option>
+                                </select>
+                                <span asp-validation-for="IdTipoGrupo" class="text-danger"></span>
+                                <div class="form-text">Seleccione el tipo de grupo desde el catálogo</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Nivel" class="form-label">Nivel Académico</label>
+                                <input asp-for="Nivel" class="form-control" maxlength="50" />
+                                <span asp-validation-for="Nivel" class="text-danger"></span>
+                                <div class="form-text">Opcional: Especifica el nivel académico</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="PeriodoAcademicoId" class="form-label required">Período Académico</label>
+                                <select asp-for="PeriodoAcademicoId" asp-items="Model.PeriodosDisponibles" class="form-select" id="PeriodoAcademicoId">
+                                    <option value="">Seleccione un período</option>
+                                </select>
+                                <span asp-validation-for="PeriodoAcademicoId" class="text-danger"></span>
+                                <div class="form-text text-warning">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    Cambiar el período puede afectar las asignaciones de estudiantes
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="CapacidadMaxima" class="form-label">Capacidad Máxima</label>
+                                <input asp-for="CapacidadMaxima" type="number" class="form-control"
+                                       min="1" max="200" />
+                                <span asp-validation-for="CapacidadMaxima" class="text-danger"></span>
+                                <div class="form-text">
+                                    Dejar vacío para capacidad ilimitada.
+                                    @if (Model.CantidadEstudiantesActuales > 0)
+                                    {
+                                        <br>
+                                    
+                                        <strong>Actualmente hay @Model.CantidadEstudiantesActuales estudiante(s) asignado(s).</strong>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group mb-3">
+                                <label asp-for="InstitucionId" class="form-label">
+                                    <i class="fas fa-school me-1"></i>Institución
+                                </label>
+                                <select asp-for="InstitucionId" class="form-select" id="InstitucionId" name="InstitucionId">
+                                    <option value="">-- Sin institución asignada --</option>
+                                    @if (Model.InstitucionesDisponibles != null)
+                                    {
+                                        @foreach (var institucion in Model.InstitucionesDisponibles)
+                                        {
+                                            <option value="@institucion.Value" selected="@institucion.Selected">@institucion.Text</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="InstitucionId" class="text-danger"></span>
+                                <div class="form-text">Opcional: Asigne el grupo a una institución educativa</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Estado" class="form-label required">Estado</label>
+                                <select asp-for="Estado" class="form-select" id="Estado">
+                                    <option value="Activo" selected="@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Activo)">Activo</option>
+                                    <option value="Inactivo" selected="@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Inactivo)">Inactivo</option>
+                                    <option value="Cerrado" selected="@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Cerrado)">Cerrado</option>
+                                    <option value="Suspendido" selected="@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Suspendido)">Suspendido</option>
+                                </select>
+                                <span asp-validation-for="Estado" class="text-danger"></span>
+                                <div class="form-text" id="estadoHelp">
+                                    <!-- Se actualiza dinámicamente con JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Información del Grupo</label>
+                                <div class="card bg-light border-0">
+                                    <div class="card-body py-2">
+                                        <small class="text-muted">
+                                            <strong>Creado:</strong> @Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")
+                                            @if (!string.IsNullOrEmpty(Model.CreadoPor))
+                                            {
+                                                <br>
+                                                <strong>por:</strong>
+ 
+                                                @Model.CreadoPor
+                                            }
+                                            @if (Model.FechaModificacion.HasValue)
+                                            {
+                                                <br>
+                                                <strong>Modificado:</strong>
+ 
+                                                @Model.FechaModificacion.Value.ToString("dd/MM/yyyy HH:mm")
+                                            }
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Descripcion" class="form-label">Descripción</label>
+                        <textarea asp-for="Descripcion" class="form-control" rows="3" maxlength="500"></textarea>
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                        <div class="form-text">
+                            <span id="descripcionCounter">0</span>/500 caracteres
+                        </div>
+                    </div>
+
+                    <!-- Materias asociadas -->
+                    <div class="form-group mb-4">
+                        <label class="form-label">Materias Asociadas</label>
+                        <div class="card border-light bg-light">
+                            <div class="card-header bg-transparent border-0">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Seleccione las materias que estarán asociadas a este grupo
+                                </small>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    @if (ViewBag.MateriasDisponibles != null)
+                                    {
+                                        @foreach (var materia in ViewBag.MateriasDisponibles)
+                                        {
+                                            <div class="col-md-6 mb-2">
+                                                <div class="form-check">
+                                                    <input type="checkbox" name="MateriasSeleccionadas"
+                                                           value="@materia.MateriaId" class="form-check-input"
+                                                           id="materia_@materia.MateriaId"
+                                                           checked="@(Model.MateriasSeleccionadas != null && Model.MateriasSeleccionadas.Contains(materia.MateriaId))" />
+                                                    <label class="form-check-label" for="materia_@materia.MateriaId">
+                                                        @materia.Nombre
+                                                        <br><small class="text-muted">@materia.Codigo</small>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="col-12">
+                                            <p class="text-muted mb-0">No hay materias disponibles</p>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Observaciones" class="form-label">Observaciones</label>
+                        <textarea asp-for="Observaciones" class="form-control" rows="2" maxlength="1000"></textarea>
+                        <span asp-validation-for="Observaciones" class="text-danger"></span>
+                        <div class="form-text">
+                            <span id="observacionesCounter">0</span>/1000 caracteres
+                        </div>
+                    </div>
+
+                    <!-- Alertas de validación -->
+                    <div id="validationAlerts">
+                        <!-- Se llenan dinámicamente con JavaScript -->
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="row">
+                        <div class="col-12">
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <a href="@Url.Action("Details", new { id = Model.GrupoId })" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left"></i> Cancelar
+                                    </a>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-info me-2" id="resetFormBtn">
+                                        <i class="fas fa-undo"></i> Restablecer
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Guardar Cambios
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            const originalFormData = $('#editGroupForm').serialize();
+            const cantidadEstudiantesActuales = @Model.CantidadEstudiantesActuales;
+            let isSubmitting = false; // Flag para controlar el submit
+
+            // Contador de caracteres para descripción
+            $('#Descripcion').on('input', function() {
+                const length = $(this).val().length;
+                $('#descripcionCounter').text(length);
+
+                if (length > 450) {
+                    $('#descripcionCounter').addClass('text-warning');
+                } else {
+                    $('#descripcionCounter').removeClass('text-warning');
+                }
+            });
+
+            // Contador de caracteres para observaciones
+            $('#Observaciones').on('input', function() {
+                const length = $(this).val().length;
+                $('#observacionesCounter').text(length);
+
+                if (length > 900) {
+                    $('#observacionesCounter').addClass('text-warning');
+                } else {
+                    $('#observacionesCounter').removeClass('text-warning');
+                }
+            });
+
+            // Actualizar ayuda del estado
+            function updateEstadoHelp() {
+                const estado = $('#Estado').val();
+                const help = $('#estadoHelp');
+
+                switch(estado) {
+                    case 'Activo':
+                        help.html('<span class="text-success">El grupo está activo y acepta nuevos estudiantes.</span>');
+                        break;
+                    case 'Inactivo':
+                        help.html('<span class="text-secondary">El grupo está inactivo temporalmente.</span>');
+                        break;
+                    case 'Cerrado':
+                        help.html('<span class="text-danger">El grupo está cerrado permanentemente.</span>');
+                        break;
+                    case 'Suspendido':
+                        help.html('<span class="text-warning">El grupo está suspendido temporalmente.</span>');
+                        break;
+                    default:
+                        help.html('');
+                }
+            }
+
+            $('#Estado').change(updateEstadoHelp);
+
+            // Validación de capacidad
+            $('#CapacidadMaxima').on('input', function() {
+                const capacidad = parseInt($(this).val()) || 0;
+                const alerts = $('#validationAlerts');
+
+                alerts.empty();
+
+                if (capacidad > 0 && capacidad < cantidadEstudiantesActuales) {
+                    alerts.append(`
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Error:</strong> La capacidad no puede ser menor al número actual de estudiantes asignados (${cantidadEstudiantesActuales}).
+                        </div>
+                    `);
+                } else if (capacidad > 0 && capacidad < cantidadEstudiantesActuales + 10) {
+                    alerts.append(`
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Atención:</strong> La nueva capacidad deja poco margen para nuevos estudiantes.
+                        </div>
+                    `);
+                }
+            });
+
+            // Restablecer formulario
+            $('#resetFormBtn').click(function() {
+                Swal.fire({
+                    title: '¿Restablecer cambios?',
+                    text: 'Se perderán todos los cambios no guardados.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#6c757d',
+                    cancelButtonColor: '#007bff',
+                    confirmButtonText: 'Sí, restablecer',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }
+                });
+            });
+
+            // Detectar cambios en el formulario
+            function hasFormChanged() {
+                return $('#editGroupForm').serialize() !== originalFormData && !isSubmitting;
+            }
+
+            // Validación del formulario antes de envío
+            $('#editGroupForm').on('submit', function(e) {
+                const codigo = $('#Codigo').val().trim();
+                const nombre = $('#Nombre').val().trim();
+                const tipo = $('#IdTipoGrupo').val();
+                const periodo = $('#PeriodoAcademicoId').val();
+                const capacidad = parseInt($('#CapacidadMaxima').val()) || 0;
+
+                if (!codigo || !nombre || !tipo || !periodo) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Campos requeridos',
+                        text: 'Por favor, complete todos los campos obligatorios marcados con *',
+                        icon: 'error'
+                    });
+                    return false;
+                }
+
+                if (capacidad > 0 && capacidad < cantidadEstudiantesActuales) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Capacidad insuficiente',
+                        text: `La capacidad no puede ser menor al número actual de estudiantes asignados (${cantidadEstudiantesActuales}).`,
+                        icon: 'error'
+                    });
+                    return false;
+                }
+
+                if (!hasFormChanged()) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Sin cambios',
+                        text: 'No se han detectado cambios en el formulario.',
+                        icon: 'info'
+                    });
+                    return false;
+                }
+
+                // Mostrar loading
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Guardando cambios...',
+                    text: 'Por favor espere',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Enviar formulario después de un breve delay
+                setTimeout(() => {
+                    isSubmitting = true; // Marcamos que estamos enviando el formulario
+                    // Desactivar temporalmente el listener de beforeunload
+                    $(window).off('beforeunload');
+                    this.submit();
+                }, 500);
+
+                return false;
+            });
+
+            // Advertencia antes de salir si hay cambios sin guardar
+            $(window).on('beforeunload', function(e) {
+                if (hasFormChanged() && !isSubmitting) {
+                    return 'Tiene cambios sin guardar. ¿Está seguro de que desea salir?';
+                }
+            });
+
+            // Inicializar
+            updateEstadoHelp();
+            $('#Descripcion').trigger('input');
+            $('#Observaciones').trigger('input');
+            $('#CapacidadMaxima').trigger('input');
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        /* Estilos específicos adicionales para esta vista */
+        .text-warning {
+            font-weight: bold;
+        }
+
+        /* Estilos para breadcrumb blanco */
+        .breadcrumb-white {
+            background: transparent;
+        }
+
+        .breadcrumb-white .breadcrumb-item {
+            color: white !important;
+        }
+
+        .breadcrumb-white .breadcrumb-item a {
+            color: white !important;
+            text-decoration: none;
+        }
+
+        .breadcrumb-white .breadcrumb-item a:hover {
+            color: #f8f9fa !important;
+            text-decoration: underline;
+        }
+
+        .breadcrumb-white .breadcrumb-item.active {
+            color: white !important;
+        }
+
+        .breadcrumb-white .breadcrumb-item + .breadcrumb-item::before {
+            color: white !important;
+            content: var(--bs-breadcrumb-divider, "/");
+        }
+
+        /* Estilos adicionales para asegurar visibilidad en header */
+        .page-header .breadcrumb-item,
+        .page-header .breadcrumb-item a,
+        .page-header .breadcrumb-item.active {
+            color: white !important;
+        }
+
+        .page-header .breadcrumb-item + .breadcrumb-item::before {
+            color: white !important;
+        }
+
+        .page-header .breadcrumb a {
+            color: white !important;
+            text-decoration: none;
+            opacity: 0.9;
+        }
+
+        .page-header .breadcrumb a:hover {
+            color: white !important;
+            text-decoration: underline;
+            opacity: 1;
+        }
+    </style>
+}

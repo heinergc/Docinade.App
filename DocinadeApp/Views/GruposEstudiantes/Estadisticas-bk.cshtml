@@ -1,0 +1,420 @@
+@model RubricasApp.Web.ViewModels.Grupos.GrupoEstadisticasViewModel
+
+@{
+    ViewData["Title"] = "Estadísticas de Grupos";
+}
+
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="page-title">
+                <i class="fas fa-chart-bar text-info me-2"></i>
+                Estadísticas de Grupos
+            </h1>
+            <p class="text-muted">Resumen y análisis del sistema de grupos de estudiantes</p>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index")">
+                            <i class="fas fa-users-cog"></i> Grupos
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">Estadísticas</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-auto">
+            <a href="@Url.Action("Index")" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Volver a Grupos
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Métricas principales -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="modern-card stat-card">
+            <div class="card-body text-center">
+                <div class="stat-icon mb-2">
+                    <i class="fas fa-layer-group fa-2x text-primary"></i>
+                </div>
+                <h3 class="stat-number text-primary">@Model.TotalGrupos</h3>
+                <p class="stat-label">Total de Grupos</p>
+                <small class="text-muted">@Model.GruposActivos activos</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="modern-card stat-card">
+            <div class="card-body text-center">
+                <div class="stat-icon mb-2">
+                    <i class="fas fa-users fa-2x text-success"></i>
+                </div>
+                <h3 class="stat-number text-success">@Model.TotalEstudiantes</h3>
+                <p class="stat-label">Estudiantes Asignados</p>
+                <small class="text-muted">@Model.EstudiantesSinGrupo sin grupo</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="modern-card stat-card">
+            <div class="card-body text-center">
+                <div class="stat-icon mb-2">
+                    <i class="fas fa-percentage fa-2x text-warning"></i>
+                </div>
+                <h3 class="stat-number text-warning">
+                    @(Model.TotalGrupos > 0 ? ((double)Model.TotalEstudiantes / Model.TotalGrupos).ToString("F1") : "0")
+                </h3>
+                <p class="stat-label">Promedio por Grupo</p>
+                <small class="text-muted">estudiantes</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="modern-card stat-card">
+            <div class="card-body text-center">
+                <div class="stat-icon mb-2">
+                    <i class="fas fa-check-circle fa-2x text-info"></i>
+                </div>
+                <h3 class="stat-number text-info">@Model.GruposCompletos.Count</h3>
+                <p class="stat-label">Grupos Completos</p>
+                <small class="text-muted">capacidad máxima</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Distribución por tipo -->
+    <div class="col-md-6 mb-4">
+        <div class="modern-card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>
+                    Distribución por Tipo
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (Model.GruposPorTipo.Any())
+                {
+                    @foreach (var tipo in Model.GruposPorTipo)
+                    {
+                        var porcentaje = Model.TotalGrupos > 0 ? (double)tipo.Value / Model.TotalGrupos * 100 : 0;
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-semibold">@tipo.Key.ToString()</span>
+                                <span class="text-muted">@tipo.Value (@porcentaje.ToString("F1")%)</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-@(GetColorForTipo(tipo.Key))" 
+                                     style="width: @porcentaje.ToString("F1")%"></div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center py-3">
+                        <i class="fas fa-chart-pie fa-2x text-muted mb-2"></i>
+                        <p class="text-muted mb-0">No hay datos para mostrar</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Distribución por estado -->
+    <div class="col-md-6 mb-4">
+        <div class="modern-card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-donut me-2"></i>
+                    Distribución por Estado
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (Model.GruposPorEstado.Any())
+                {
+                    @foreach (var estado in Model.GruposPorEstado)
+                    {
+                        var porcentaje = Model.TotalGrupos > 0 ? (double)estado.Value / Model.TotalGrupos * 100 : 0;
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-semibold">@estado.Key.ToString()</span>
+                                <span class="text-muted">@estado.Value (@porcentaje.ToString("F1")%)</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-@(GetColorForEstado(estado.Key))" 
+                                     style="width: @porcentaje.ToString("F1")%"></div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center py-3">
+                        <i class="fas fa-chart-donut fa-2x text-muted mb-2"></i>
+                        <p class="text-muted mb-0">No hay datos para mostrar</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Grupos con más estudiantes -->
+    <div class="col-md-6 mb-4">
+        <div class="modern-card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-trophy me-2"></i>
+                    Grupos con Más Estudiantes
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (Model.GruposConMasEstudiantes.Any())
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var grupo in Model.GruposConMasEstudiantes.Take(5))
+                        {
+                            <div class="list-group-item border-0 px-0">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">
+                                            <span class="badge bg-primary me-2">@grupo.Codigo</span>
+                                            @grupo.Nombre
+                                        </h6>
+                                        <small class="text-muted">
+                                            @grupo.CantidadEstudiantes estudiantes
+                                            @if (grupo.CapacidadMaxima.HasValue)
+                                            {
+                                                @($" de {grupo.CapacidadMaxima} máximo")
+                                            }
+                                        </small>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-info">@grupo.PorcentajeOcupacion.ToString("F1")%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-3">
+                        <i class="fas fa-trophy fa-2x text-muted mb-2"></i>
+                        <p class="text-muted mb-0">No hay grupos para mostrar</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Grupos completos -->
+    <div class="col-md-6 mb-4">
+        <div class="modern-card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Grupos Completos
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (Model.GruposCompletos.Any())
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var grupo in Model.GruposCompletos.Take(5))
+                        {
+                            <div class="list-group-item border-0 px-0">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">
+                                            <span class="badge bg-warning me-2">@grupo.Codigo</span>
+                                            @grupo.Nombre
+                                        </h6>
+                                        <small class="text-muted">
+                                            Capacidad: @grupo.CapacidadMaxima estudiantes
+                                        </small>
+                                    </div>
+                                    <div class="text-end">
+                                        @if (grupo.FechaCompletado.HasValue)
+                                        {
+                                            <small class="text-muted">
+                                                @grupo.FechaCompletado.Value.ToString("dd/MM/yyyy")
+                                            </small>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-3">
+                        <i class="fas fa-check-circle fa-2x text-muted mb-2"></i>
+                        <p class="text-muted mb-0">No hay grupos completos</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Acciones rápidas -->
+<div class="modern-card">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-lightning-bolt me-2"></i>
+            Acciones Rápidas
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <a href="@Url.Action("Create")" class="btn btn-success btn-action w-100">
+                    <i class="fas fa-plus fa-2x mb-2"></i>
+                    <br>Crear Nuevo Grupo
+                </a>
+            </div>
+            <div class="col-md-3 mb-2">
+                <a href="@Url.Action("Index", new { Filtros = new { Estado = "Activo" } })" class="btn btn-primary btn-action w-100">
+                    <i class="fas fa-list fa-2x mb-2"></i>
+                    <br>Ver Grupos Activos
+                </a>
+            </div>
+            <div class="col-md-3 mb-2">
+                <a href="@Url.Action("ExportarExcel")" class="btn btn-info btn-action w-100">
+                    <i class="fas fa-download fa-2x mb-2"></i>
+                    <br>Exportar Datos
+                </a>
+            </div>
+            <div class="col-md-3 mb-2">
+                <a href="@Url.Action("Index", "Estudiantes")" class="btn btn-warning btn-action w-100">
+                    <i class="fas fa-users fa-2x mb-2"></i>
+                    <br>Gestionar Estudiantes
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Animar las barras de progreso
+            $('.progress-bar').each(function() {
+                const width = $(this).css('width');
+                $(this).css('width', '0%').animate({ width: width }, 1000);
+            });
+
+            // Efectos hover para las tarjetas
+            $('.stat-card').hover(
+                function() { $(this).addClass('shadow-lg'); },
+                function() { $(this).removeClass('shadow-lg'); }
+            );
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .stat-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-icon {
+            opacity: 0.8;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .stat-label {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .modern-card {
+            border: none;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .modern-card:hover {
+            box-shadow: 0 0 30px rgba(0,0,0,0.15);
+        }
+        
+        .progress {
+            border-radius: 10px;
+            background-color: #e9ecef;
+        }
+        
+        .progress-bar {
+            border-radius: 10px;
+            transition: width 1s ease-in-out;
+        }
+        
+        .btn-action {
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .list-group-item {
+            transition: background-color 0.2s ease;
+        }
+        
+        .list-group-item:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
+}
+
+@functions {
+    string GetColorForTipo(RubricasApp.Web.Models.TipoGrupo tipo)
+    {
+        return tipo switch
+        {
+            RubricasApp.Web.Models.TipoGrupo.Seccion => "primary",
+            RubricasApp.Web.Models.TipoGrupo.Nivel => "success",
+            RubricasApp.Web.Models.TipoGrupo.Modalidad => "warning",
+            RubricasApp.Web.Models.TipoGrupo.Custom => "info",
+            _ => "secondary"
+        };
+    }
+    
+    string GetColorForEstado(RubricasApp.Web.Models.EstadoGrupo estado)
+    {
+        return estado switch
+        {
+            RubricasApp.Web.Models.EstadoGrupo.Activo => "success",
+            RubricasApp.Web.Models.EstadoGrupo.Inactivo => "secondary",
+            RubricasApp.Web.Models.EstadoGrupo.Cerrado => "danger",
+            RubricasApp.Web.Models.EstadoGrupo.Suspendido => "warning",
+            _ => "secondary"
+        };
+    }
+}

@@ -1,0 +1,528 @@
+@model RubricasApp.Web.ViewModels.EstudianteEmpadronamientoViewModel
+@{
+    ViewData["Title"] = "Detalles del Empadronamiento";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">@ViewData["Title"]</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index")">Empadronamiento</a></li>
+                        <li class="breadcrumb-item active">Detalles</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Información del Estudiante -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="mdi mdi-account-circle me-2"></i>
+                        Información del Estudiante
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="avatar-lg mx-auto mb-3">
+                            <span class="avatar-title rounded-circle bg-soft-primary text-primary font-size-24">
+                                @(Model.NombreCompletoEstudiante?.Substring(0, 1).ToUpper() ?? "E")
+                            </span>
+                        </div>
+                        <h5 class="font-size-16 mb-1">@Model.NombreCompletoEstudiante</h5>
+                        <p class="text-muted mb-0">@Model.CorreoEstudiante</p>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <th class="ps-0">ID Estudiante:</th>
+                                    <td class="text-muted">@Model.IdEstudiante</td>
+                                </tr>
+                                <tr>
+                                    <th class="ps-0">Número ID:</th>
+                                    <td class="text-muted">@(Model.DatosEmpadronamiento?.NumeroId ?? "No disponible")</td>
+                                </tr>
+                                <tr>
+                                    <th class="ps-0">Institución:</th>
+                                    <td class="text-muted">@Model.InstitucionEstudiante</td>
+                                </tr>
+                                <tr>
+                                    <th class="ps-0">Completitud:</th>
+                                    <td>
+                                        <div class="progress progress-sm">
+                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                 style="width: @(Model.PorcentajeCompletitud())%" 
+                                                 aria-valuenow="@Model.PorcentajeCompletitud()" 
+                                                 aria-valuemin="0" aria-valuemax="100">
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">@(Model.PorcentajeCompletitud().ToString("F0"))% completado</small>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-4">
+                        <div class="d-grid gap-2">
+                            @if (Model.DatosEmpadronamiento != null)
+                            {
+                                <a href="@Url.Action("Edit", new { id = Model.IdEstudiante })" class="btn btn-primary">
+                                    <i class="mdi mdi-pencil-outline me-1"></i> Editar Empadronamiento
+                                </a>
+                            }
+                            else
+                            {
+                                <a href="@Url.Action("Create", new { id = Model.IdEstudiante })" class="btn btn-success">
+                                    <i class="mdi mdi-plus-circle-outline me-1"></i> Crear Empadronamiento
+                                </a>
+                            }
+                            <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                                <i class="mdi mdi-arrow-left me-1"></i> Volver al Listado
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Proceso y Detalles -->
+        <div class="col-lg-8">
+            @if (Model.DatosEmpadronamiento != null)
+            {
+                <!-- Progreso del Proceso -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="mdi mdi-timeline-clock-outline me-2"></i>
+                            Progreso del Empadronamiento
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            @foreach (var etapa in Model.EtapasDisponibles.OrderBy(e => e.Orden))
+                            {
+                                <div class="timeline-item @(etapa.EsActual ? "timeline-item-current" : "")">
+                                    <div class="timeline-marker">
+                                        @if (etapa.EsActual)
+                                        {
+                                            <div class="timeline-marker-icon bg-primary">
+                                                <i class="mdi mdi-clock-outline text-white"></i>
+                                            </div>
+                                        }
+                                        else if (etapa.Orden < Model.EtapasDisponibles.FirstOrDefault(e => e.EsActual)?.Orden)
+                                        {
+                                            <div class="timeline-marker-icon bg-success">
+                                                <i class="mdi mdi-check text-white"></i>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="timeline-marker-icon bg-light">
+                                                <i class="mdi mdi-circle-outline text-muted"></i>
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="timeline-content">
+                                        <h6 class="timeline-title">@etapa.Nombre</h6>
+                                        @if (etapa.EsActual)
+                                        {
+                                            <p class="text-muted mb-0">Estado actual</p>
+                                            @if (Model.DatosEmpadronamiento.FechaEtapa.HasValue)
+                                            {
+                                                <small class="text-muted">
+                                                    Actualizado: @Model.DatosEmpadronamiento.FechaEtapa.Value.ToString("dd/MM/yyyy HH:mm")
+                                                    @if (!string.IsNullOrEmpty(Model.DatosEmpadronamiento.UsuarioEtapa))
+                                                    {
+                                                        <text> por @Model.DatosEmpadronamiento.UsuarioEtapa</text>
+                                                    }
+                                                </small>
+                                            }
+                                        }
+                                        else if (etapa.Orden < Model.EtapasDisponibles.FirstOrDefault(e => e.EsActual)?.Orden)
+                                        {
+                                            <p class="text-success mb-0">Completado</p>
+                                        }
+                                        else
+                                        {
+                                            <p class="text-muted mb-0">Pendiente</p>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Cambiar Etapa -->
+                        <div class="mt-4">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <select class="form-select" id="nuevaEtapa">
+                                        @foreach (var etapa in Model.EtapasDisponibles)
+                                        {
+                                            @if (etapa.EsActual)
+                                            {
+                                                <option value="@etapa.Id" selected>@etapa.Nombre</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@etapa.Id">@etapa.Nombre</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-outline-primary w-100" id="btnCambiarEtapa">
+                                        <i class="mdi mdi-update me-1"></i> Cambiar Etapa
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información Detallada -->
+                <div class="card">
+                    <div class="card-header">
+                        <ul class="nav nav-pills" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-bs-toggle="tab" href="#datos-personales" role="tab">
+                                    <i class="mdi mdi-account me-1"></i> Datos Personales
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#contacto-residencia" role="tab">
+                                    <i class="mdi mdi-map-marker me-1"></i> Contacto y Residencia
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#responsables" role="tab">
+                                    <i class="mdi mdi-account-group me-1"></i> Responsables
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#salud" role="tab">
+                                    <i class="mdi mdi-medical-bag me-1"></i> Salud
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#academico" role="tab">
+                                    <i class="mdi mdi-school me-1"></i> Académico
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <!-- Datos Personales -->
+                            <div class="tab-pane fade show active" id="datos-personales" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Fecha de Nacimiento</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.FechaNacimiento?.ToString("dd/MM/yyyy") ?? "No especificada")</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Género</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.Genero ?? "No especificado")</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Nacionalidad</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.Nacionalidad ?? "No especificada")</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Estado Civil</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.EstadoCivil ?? "No especificado")</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contacto y Residencia -->
+                            <div class="tab-pane fade" id="contacto-residencia" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Provincia</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.Provincia ?? "No especificada")</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Cantón</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.Canton ?? "No especificado")</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Distrito</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.Distrito ?? "No especificado")</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Barrio</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.Barrio ?? "No especificado")</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Señas</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.Senas ?? "No especificadas")</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Teléfono Alterno</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.TelefonoAlterno ?? "No especificado")</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Correo Alterno</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.CorreoAlterno ?? "No especificado")</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Responsables -->
+                            <div class="tab-pane fade" id="responsables" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Nombre del Padre</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.NombrePadre ?? "No especificado")</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Nombre de la Madre</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.NombreMadre ?? "No especificado")</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Nombre del Tutor</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.NombreTutor ?? "No especificado")</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Contacto de Emergencia</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.ContactoEmergencia ?? "No especificado")</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Teléfono de Emergencia</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.TelefonoEmergencia ?? "No especificado")</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Relación de Emergencia</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.RelacionEmergencia ?? "No especificada")</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Salud -->
+                            <div class="tab-pane fade" id="salud" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Alergias</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.Alergias ?? "Ninguna reportada")</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Condiciones Médicas</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.CondicionesMedicas ?? "Ninguna reportada")</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Medicamentos</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.Medicamentos ?? "Ninguno reportado")</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Seguro Médico</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.SeguroMedico ?? "No especificado")</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Centro Médico Habitual</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.CentroMedicoHabitual ?? "No especificado")</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Académico -->
+                            <div class="tab-pane fade" id="academico" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Institución de Procedencia</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.InstitucionProcedencia ?? "No especificada")</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Último Nivel Cursado</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.UltimoNivelCursado ?? "No especificado")</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Promedio Anterior</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.PromedioAnterior?.ToString("F2") ?? "No especificado")</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Adaptaciones Previas</label>
+                                            <p class="text-muted">@(Model.DatosEmpadronamiento.AdaptacionesPrevias ?? "Ninguna reportada")</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notas Internas -->
+                        @if (!string.IsNullOrEmpty(Model.DatosEmpadronamiento.NotasInternas))
+                        {
+                            <div class="mt-4">
+                                <div class="alert alert-info">
+                                    <h6><i class="mdi mdi-note-text-outline me-1"></i> Notas Internas</h6>
+                                    <p class="mb-0">@Model.DatosEmpadronamiento.NotasInternas</p>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Información de Auditoría -->
+                        <div class="mt-4">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <small class="text-muted">
+                                        <strong>Creado:</strong> @Model.DatosEmpadronamiento.FechaCreacion.ToString("dd/MM/yyyy HH:mm")
+                                        @if (!string.IsNullOrEmpty(Model.DatosEmpadronamiento.UsuarioCreacion))
+                                        {
+                                            <text> por @Model.DatosEmpadronamiento.UsuarioCreacion</text>
+                                        }
+                                    </small>
+                                </div>
+                                @if (Model.DatosEmpadronamiento.FechaModificacion.HasValue)
+                                {
+                                    <div class="col-md-6">
+                                        <small class="text-muted">
+                                            <strong>Modificado:</strong> @Model.DatosEmpadronamiento.FechaModificacion.Value.ToString("dd/MM/yyyy HH:mm")
+                                            @if (!string.IsNullOrEmpty(Model.DatosEmpadronamiento.UsuarioModificacion))
+                                            {
+                                                <text> por @Model.DatosEmpadronamiento.UsuarioModificacion</text>
+                                            }
+                                        </small>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- Sin Empadronamiento -->
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <div class="mb-4">
+                            <i class="mdi mdi-account-plus-outline display-4 text-muted"></i>
+                        </div>
+                        <h5>No hay datos de empadronamiento</h5>
+                        <p class="text-muted">Este estudiante aún no tiene información de empadronamiento registrada.</p>
+                        <a href="@Url.Action("Create", new { id = Model.IdEstudiante })" class="btn btn-primary">
+                            <i class="mdi mdi-plus-circle-outline me-1"></i> Crear Empadronamiento
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .timeline {
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .timeline-item:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: -9px;
+            top: 30px;
+            height: calc(100% - 10px);
+            width: 2px;
+            background: #e9ecef;
+        }
+
+        .timeline-item-current:not(:last-child)::before {
+            background: #74788d;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -20px;
+            top: 0;
+        }
+
+        .timeline-marker-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 2px #e9ecef;
+        }
+
+        .timeline-content {
+            margin-left: 10px;
+        }
+
+        .timeline-title {
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Cambiar etapa
+            $('#btnCambiarEtapa').click(function() {
+                var nuevaEtapa = $('#nuevaEtapa').val();
+                var estudianteId = @Model.IdEstudiante;
+
+                if (confirm('¿Está seguro de que desea cambiar la etapa del empadronamiento?')) {
+                    $.ajax({
+                        url: '@Url.Action("CambiarEtapa")',
+                        type: 'POST',
+                        data: {
+                            id: estudianteId,
+                            nuevaEtapa: nuevaEtapa,
+                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                toastr.success(response.message);
+                                location.reload();
+                            } else {
+                                toastr.error(response.message);
+                            }
+                        },
+                        error: function() {
+                            toastr.error('Error al cambiar la etapa.');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,551 @@
+
+@model RubricasApp.Web.ViewModels.ProfesorViewModel
+
+
+@{
+    ViewData["Title"] = "Editar Profesor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="h4 mb-0 text-gray-800">
+                                <i class="fas fa-user-edit"></i> Editar Profesor: @Model.NombreCompleto
+                            </h1>
+                            <p class="mb-0 text-muted">Modificar información del profesor</p>
+                        </div>
+                        <div>
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-info">
+                                <i class="fas fa-eye"></i> Ver Detalles
+                            </a>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver a Lista
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de edición -->
+    <form asp-action="Edit" method="post" novalidate>
+        @Html.HiddenFor(m => m.Id)
+        
+        <!-- Resumen de Validación -->
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <!-- Mensajes de TempData -->
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong><i class="fas fa-exclamation-triangle"></i> Error:</strong> @TempData["Error"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong><i class="fas fa-check-circle"></i> Éxito:</strong> @TempData["Success"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+        
+        <div class="row">
+            <!-- Información Personal -->
+            <div class="col-lg-6">
+                <div class="card shadow mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user text-primary"></i> Información Personal
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Nombres" class="form-label">Nombres *</label>
+                                    <input asp-for="Nombres" class="form-control" />
+                                    <span asp-validation-for="Nombres" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="PrimerApellido" class="form-label">Primer Apellido *</label>
+                                    <input asp-for="PrimerApellido" class="form-control" />
+                                    <span asp-validation-for="PrimerApellido" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="SegundoApellido" class="form-label">Segundo Apellido</label>
+                                    <input asp-for="SegundoApellido" class="form-control" />
+                                    <span asp-validation-for="SegundoApellido" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Cedula" class="form-label">Cédula *</label>
+                                    <input asp-for="Cedula" class="form-control" />
+                                    <span asp-validation-for="Cedula" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="FechaNacimiento" class="form-label">Fecha de Nacimiento *</label>
+                                    <input asp-for="FechaNacimiento" type="date" class="form-control" />
+                                    <span asp-validation-for="FechaNacimiento" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Sexo" class="form-label">Sexo *</label>
+                                    <select asp-for="Sexo" class="form-control">
+                                        <option value="">-- Seleccione sexo --</option>
+                                        <option value="Masculino">Masculino</option>
+                                        <option value="Femenino">Femenino</option>
+                                    </select>
+                                    <span asp-validation-for="Sexo" class="text-danger"></span>
+                                </div>
+
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="EstadoCivil" class="form-label">Estado Civil</label>
+                                    <select asp-for="EstadoCivil" class="form-control">
+                                        <option value="">-- Seleccione estado civil --</option>
+                                        <option value="Soltero">Soltero</option>
+                                        <option value="Casado">Casado</option>
+                                        <option value="Divorciado">Divorciado</option>
+                                        <option value="Viudo">Viudo</option>
+                                        <option value="Union Libre">Unión Libre</option>
+                                    </select>
+                                    <span asp-validation-for="EstadoCivil" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Nacionalidad" class="form-label">Nacionalidad</label>
+                                    <input asp-for="Nacionalidad" class="form-control" />
+                                    <span asp-validation-for="Nacionalidad" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input asp-for="Estado" type="checkbox" class="form-check-input" />
+                                <label asp-for="Estado" class="form-check-label">
+                                    Profesor activo
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información de Contacto -->
+            <div class="col-lg-6">
+                <div class="card shadow mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-phone text-info"></i> Información de Contacto
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            @if (Model?.GetType().GetProperty("EmailPersonal") != null)
+                            {
+                                <label asp-for="EmailPersonal" class="form-label">Email *</label>
+                                <input asp-for="EmailPersonal" type="email" class="form-control" />
+                                <span asp-validation-for="EmailPersonal" class="text-danger"></span>
+                            }
+                            else
+                            {
+                                <label for="EmailPersonal" class="form-label">Email *</label>
+                                <input name="EmailPersonal" id="EmailPersonal" type="email" class="form-control" value="@(ViewContext?.HttpContext?.Request?.Form["EmailPersonal"] ?? "")" />
+                            }
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="TelefonoFijo" class="form-label">Teléfono Fijo</label>
+                                    <input asp-for="TelefonoFijo" class="form-control" />
+                                    <span asp-validation-for="TelefonoFijo" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="TelefonoCelular" class="form-label">Teléfono Celular</label>
+                                    <input asp-for="TelefonoCelular" class="form-control" />
+                                    <span asp-validation-for="TelefonoCelular" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="TelefonoOficina" class="form-label">Teléfono Trabajo</label>
+                                    <input asp-for="TelefonoOficina" class="form-control" />
+                                    <span asp-validation-for="TelefonoOficina" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        <h6 class="text-danger mb-3">Contacto de Emergencia</h6>
+                        
+                        <div class="form-group">
+                            <label asp-for="ContactoEmergenciaNombre" class="form-label">Nombre del Contacto</label>
+                            <input asp-for="ContactoEmergenciaNombre" class="form-control" />
+                            <span asp-validation-for="ContactoEmergenciaNombre" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="ContactoEmergenciaTelefono" class="form-label">Teléfono</label>
+                                    <input asp-for="ContactoEmergenciaTelefono" class="form-control" />
+                                    <span asp-validation-for="ContactoEmergenciaTelefono" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="ContactoEmergenciaParentesco" class="form-label">Relación</label>
+                                    <select asp-for="ContactoEmergenciaParentesco" class="form-control">
+                                        <option value="">-- Seleccione relación --</option>
+                                        <option value="Esposo/a">Esposo/a</option>
+                                        <option value="Padre">Padre</option>
+                                        <option value="Madre">Madre</option>
+                                        <option value="Hijo/a">Hijo/a</option>
+                                        <option value="Hermano/a">Hermano/a</option>
+                                        <option value="Amigo/a">Amigo/a</option>
+                                        <option value="Otro">Otro</option>
+                                    </select>
+                                    <span asp-validation-for="ContactoEmergenciaParentesco" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dirección -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-map-marker-alt text-success"></i> Dirección
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="ProvinciaId" class="form-label">Provincia *</label>
+                                    <select asp-for="ProvinciaId" class="form-control" id="provinciaSelect" asp-items="Model.Provincias">
+                                        <option value="">-- Seleccione una provincia --</option>
+                                    </select>
+                                    <span asp-validation-for="ProvinciaId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="CantonId" class="form-label">Cantón *</label>
+                                    <select asp-for="CantonId" class="form-control" id="cantonSelect">
+                                        <option value="">-- Seleccione un cantón --</option>
+                                    </select>
+                                    <span asp-validation-for="CantonId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="DistritoId" class="form-label">Distrito *</label>
+                                    <select asp-for="DistritoId" class="form-control" id="distritoSelect">
+                                        <option value="">-- Seleccione un distrito --</option>
+                                    </select>
+                                    <span asp-validation-for="DistritoId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label asp-for="DireccionExacta" class="form-label">Dirección Exacta</label>
+                            <textarea asp-for="DireccionExacta" class="form-control" rows="3" placeholder="Dirección exacta, señas, referencias"></textarea>
+                            <span asp-validation-for="DireccionExacta" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información Adicional -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-clipboard-list text-warning"></i> Información Adicional
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="AreasEspecializacion" class="form-label">Áreas de Especialización</label>
+                                    <textarea asp-for="AreasEspecializacion" class="form-control" rows="3" placeholder="Especialidades, certificaciones o habilidades adicionales"></textarea>
+                                    <span asp-validation-for="AreasEspecializacion" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="IdiomasHabla" class="form-label">Idiomas que Habla</label>
+                                    <textarea asp-for="IdiomasHabla" class="form-control" rows="3" placeholder="Idiomas que domina el profesor"></textarea>
+                                    <span asp-validation-for="IdiomasHabla" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-bell"></i> Preferencias de Notificación
+                        </h6>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input asp-for="NotificacionesEmail" type="checkbox" class="form-check-input" />
+                                    <label asp-for="NotificacionesEmail" class="form-check-label">
+                                        Recibir notificaciones por email
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input asp-for="NotificacionesSMS" type="checkbox" class="form-check-input" />
+                                    <label asp-for="NotificacionesSMS" class="form-check-label">
+                                        Recibir notificaciones por SMS
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <div>
+                                <a href="#" onclick="mostrarFormacionAcademica()" class="btn btn-info mr-2">
+                                    <i class="fas fa-graduation-cap"></i> Gestionar Formación
+                                </a>
+                                <a href="#" onclick="mostrarExperienciaLaboral()" class="btn btn-warning mr-2">
+                                    <i class="fas fa-briefcase"></i> Gestionar Experiencia
+                                </a>
+                                <a href="#" onclick="mostrarGruposAsignados()" class="btn btn-success mr-2">
+                                    <i class="fas fa-chalkboard-teacher"></i> Gestionar Grupos
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Guardar Cambios
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Modal para gestión de formación académica -->
+<div class="modal fade" id="modalFormacion" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-graduation-cap"></i> Gestionar Formación Académica
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>La gestión detallada de formación académica está disponible desde la página de creación multi-paso.</p>
+                <p>Formaciones actuales: <strong>@(Model.FormacionAcademica?.Count ?? 0)</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <a asp-action="CreateStep4" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Gestionar en Formulario Completo
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para gestión de experiencia laboral -->
+<div class="modal fade" id="modalExperiencia" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-briefcase"></i> Gestionar Experiencia Laboral
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>La gestión detallada de experiencia laboral está disponible desde la página de creación multi-paso.</p>
+                <p>Experiencias actuales: <strong>@(Model.ExperienciaLaboral?.Count ?? 0)</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <a asp-action="CreateStep5" asp-route-profesorId="@Model.Id" class="btn btn-warning">
+                    <i class="fas fa-plus"></i> Gestionar en Formulario Completo
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para gestión de grupos -->
+<div class="modal fade" id="modalGrupos" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-chalkboard-teacher"></i> Gestionar Grupos Asignados
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>La gestión detallada de grupos asignados está disponible desde la página de creación multi-paso.</p>
+                <p>Grupos actuales: <strong>@(Model.ProfesorGrupos?.Count ?? 0)</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <a asp-action="CreateStep6" asp-route-profesorId="@Model.Id" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Gestionar en Formulario Completo
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Manejar cambio de provincia
+            $('#provinciaSelect').change(function() {
+                var provinciaId = $(this).val();
+                var cantonSelect = $('#cantonSelect');
+                var distritoSelect = $('#distritoSelect');
+                
+                // Limpiar cantones y distritos
+                cantonSelect.empty().append('<option value="">-- Seleccione un cantón --</option>');
+                distritoSelect.empty().append('<option value="">-- Seleccione un distrito --</option>');
+                
+                if (provinciaId) {
+                    // Cargar cantones
+                    $.get('@Url.Action("GetCantonesByProvincia")', { provinciaId: provinciaId })
+                        .done(function(data) {
+                            $.each(data, function(index, item) {
+                                cantonSelect.append('<option value="' + item.value + '">' + item.text + '</option>');
+                            });
+                            
+                            // Si hay un cantón seleccionado, trigger change
+                            var selectedCanton = '@Model.CantonId';
+                            if (selectedCanton) {
+                                cantonSelect.val(selectedCanton).trigger('change');
+                            }
+                        })
+                        .fail(function() {
+                            console.error('Error al cargar cantones');
+                        });
+                }
+            });
+
+            // Manejar cambio de cantón
+            $('#cantonSelect').change(function() {
+                var cantonId = $(this).val();
+                var distritoSelect = $('#distritoSelect');
+                
+                // Limpiar distritos
+                distritoSelect.empty().append('<option value="">-- Seleccione un distrito --</option>');
+                
+                if (cantonId) {
+                    // Cargar distritos
+                    $.get('@Url.Action("GetDistritosByCanton")', { cantonId: cantonId })
+                        .done(function(data) {
+                            $.each(data, function(index, item) {
+                                distritoSelect.append('<option value="' + item.value + '">' + item.text + '</option>');
+                            });
+                            
+                            // Si hay un distrito seleccionado, seleccionarlo
+                            var selectedDistrito = '@Model.DistritoId';
+                            if (selectedDistrito) {
+                                distritoSelect.val(selectedDistrito);
+                            }
+                        })
+                        .fail(function() {
+                            console.error('Error al cargar distritos');
+                        });
+                }
+            });
+
+            // Trigger inicial para cargar datos si ya hay valores seleccionados
+            if ($('#provinciaSelect').val()) {
+                $('#provinciaSelect').trigger('change');
+            }
+        });
+
+        function mostrarFormacionAcademica() {
+            $('#modalFormacion').modal('show');
+        }
+
+        function mostrarExperienciaLaboral() {
+            $('#modalExperiencia').modal('show');
+        }
+
+        function mostrarGruposAsignados() {
+            $('#modalGrupos').modal('show');
+        }
+    </script>
+}

@@ -1,0 +1,132 @@
+@{
+    ViewData["Title"] = "Sincronizar Permisos";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Home", new { area = "" })">
+                    <i class="fas fa-home"></i> Inicio
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Permissions")">
+                    <i class="fas fa-shield-alt"></i> Permisos
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-sync"></i> Sincronizar
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="mb-0">
+                <i class="fas fa-sync text-primary"></i>
+                Sincronizar Permisos del Sistema
+            </h2>
+            <p class="text-muted mt-2">Actualiza y valida todos los permisos y roles del sistema</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Volver a Permisos
+            </a>
+        </div>
+    </div>
+
+    <!-- Warning Alert -->
+    <div class="alert alert-warning">
+        <h5 class="alert-heading">
+            <i class="fas fa-exclamation-triangle"></i> Atención
+        </h5>
+        <p>Esta operación:</p>
+        <ul class="mb-0">
+            <li>Validará todos los permisos asignados a los roles</li>
+            <li>Eliminará permisos obsoletos que ya no existen en el código</li>
+            <li>Asegurará que el rol SuperAdministrador tenga todos los permisos</li>
+            <li>Puede tomar algunos minutos completarse</li>
+        </ul>
+    </div>
+
+    <!-- Sync Card -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-cogs"></i>
+                Operación de Sincronización
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <h6>¿Qué hace esta operación?</h6>
+                    <ul>
+                        <li><strong>Valida permisos:</strong> Verifica que todos los permisos asignados existan en el código</li>
+                        <li><strong>Limpia obsoletos:</strong> Remueve permisos que ya no están definidos</li>
+                        <li><strong>Actualiza SuperAdmin:</strong> Garantiza que tenga acceso completo</li>
+                        <li><strong>Genera logs:</strong> Registra todas las operaciones realizadas</li>
+                    </ul>
+                    
+                    <h6 class="mt-4">¿Cuándo ejecutar?</h6>
+                    <ul>
+                        <li>Después de agregar nuevos permisos al código</li>
+                        <li>Cuando se modifican los roles del sistema</li>
+                        <li>Si hay problemas de autorización</li>
+                        <li>Como mantenimiento periódico</li>
+                    </ul>
+                </div>
+                <div class="col-md-4 text-center">
+                    <i class="fas fa-sync fa-5x text-primary mb-3"></i>
+                    <form method="post" action="@Url.Action("Sync")" id="syncForm">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-primary btn-lg" id="syncButton">
+                            <i class="fas fa-sync"></i>
+                            Ejecutar Sincronización
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Process Status (Hidden initially) -->
+    <div class="card mt-4 d-none" id="statusCard">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-spinner fa-spin"></i>
+                Sincronización en Progreso
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="progress mb-3">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                     role="progressbar" style="width: 100%"></div>
+            </div>
+            <p class="mb-0">Por favor espere mientras se procesan los permisos...</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#syncForm').submit(function() {
+                // Mostrar indicador de progreso
+                $('#syncButton').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Sincronizando...');
+                $('#statusCard').removeClass('d-none');
+                
+                // Scroll to status card
+                $('html, body').animate({
+                    scrollTop: $("#statusCard").offset().top
+                }, 500);
+                
+                return true; // Permitir envío del form
+            });
+        });
+    </script>
+}

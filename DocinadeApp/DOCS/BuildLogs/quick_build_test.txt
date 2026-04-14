@@ -1,0 +1,2 @@
+cd "C:\Users\hguido\Desktop\RubricasApp\src\RubricasApp.Web"
+dotnet build --no-restore

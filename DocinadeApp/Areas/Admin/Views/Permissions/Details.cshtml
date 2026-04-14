@@ -1,0 +1,402 @@
+@model RubricasApp.Web.ViewModels.Admin.PermissionDetailsViewModel
+
+@{
+    ViewData["Title"] = $"Detalles del Permiso - {Model.DisplayName}";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a asp-area="Admin" asp-controller="Admin" asp-action="Index">
+                    <i class="fas fa-home"></i> Administración
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a asp-area="Admin" asp-controller="Permissions" asp-action="Index">
+                    <i class="fas fa-shield-alt"></i> Permisos
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-eye"></i> Detalles del Permiso
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="fas fa-key text-primary"></i>
+                        Detalles del Permiso
+                    </h2>
+                    <p class="text-muted mb-0">
+                        Información completa del permiso <strong>@Model.DisplayName</strong>
+                    </p>
+                </div>
+                <div>
+                    <a asp-area="Admin" asp-controller="Permissions" asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver a Lista
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Información del Permiso -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle"></i>
+                        Información del Permiso
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong><i class="fas fa-tag text-muted"></i> Nombre:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            <code class="bg-light p-1 rounded">@Model.Name</code>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong><i class="fas fa-eye text-muted"></i> Nombre Visible:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            <span class="fw-bold">@Model.DisplayName</span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong><i class="fas fa-folder text-muted"></i> Categoría:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            <span class="badge bg-info">@Model.Category</span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong><i class="fas fa-cube text-muted"></i> Módulo:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            <span class="badge bg-secondary">@Model.Module</span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong><i class="fas fa-cog text-muted"></i> Tipo:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            <span class="badge @(Model.IsSystemPermission ? "bg-success" : "bg-warning")">
+                                @(Model.IsSystemPermission ? "Sistema" : "Personalizado")
+                                <i class="fas @(Model.IsSystemPermission ? "fa-check" : "fa-exclamation-triangle") ms-1"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <strong><i class="fas fa-align-left text-muted"></i> Descripción:</strong>
+                            </div>
+                            <div class="col-sm-8">
+                                <p class="mb-0">@Model.Description</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar"></i>
+                        Estadísticas de Uso
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h3 class="text-primary mb-1">@Model.TotalRoles</h3>
+                                <small class="text-muted">Roles</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h3 class="text-success mb-1">@Model.TotalUsers</h3>
+                            <small class="text-muted">Usuarios</small>
+                        </div>
+                    </div>
+
+                    <hr class="my-3">
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Estado del Permiso:</span>
+                        <span class="badge @(Model.TotalRoles > 0 ? "bg-success" : "bg-warning") fs-6">
+                            @(Model.TotalRoles > 0 ? "En Uso" : "Sin Asignar")
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Roles con este Permiso -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user-shield"></i>
+                        Roles con este Permiso (@Model.RolesWithPermission.Count)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.RolesWithPermission.Any())
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var role in Model.RolesWithPermission)
+                            {
+                                <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <div>
+                                        <h6 class="mb-1 fw-bold">@role.RoleName</h6>
+                                        <small class="text-muted">
+                                            @role.UserCount usuario(s) en este rol
+                                        </small>
+                                        @if (role.IsSystemRole)
+                                        {
+                                            <span class="badge bg-info ms-2">Sistema</span>
+                                        }
+                                    </div>
+                                    <div>
+                                        <a asp-area="Admin" asp-controller="Roles" asp-action="Details" asp-route-id="@role.RoleId"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-user-slash text-muted" style="font-size: 3rem;"></i>
+                            <h6 class="text-muted mt-3">Sin Roles Asignados</h6>
+                            <p class="text-muted small">Este permiso no está asignado a ningún rol actualmente.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Usuarios con este Permiso -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-users"></i>
+                        Usuarios con este Permiso (@Model.UsersWithPermission.Count)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.UsersWithPermission.Any())
+                    {
+                        @if (Model.UsersWithPermission.Count > 10)
+                        {
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle"></i>
+                                    Mostrando los primeros 10 usuarios. Total: @Model.UsersWithPermission.Count
+                                </small>
+                            </div>
+                        }
+
+                        <div class="list-group list-group-flush">
+                            @foreach (var user in Model.UsersWithPermission.Take(10))
+                            {
+                                <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <div>
+                                        <h6 class="mb-1">@user.NombreCompleto</h6>
+                                        <small class="text-muted d-block">@user.Email</small>
+                                        <small class="text-info">A través del rol: @user.ThroughRole</small>
+                                    </div>
+                                    <div>
+                                        <span class="badge @(user.Activo ? "bg-success" : "bg-danger")">
+                                            @(user.Activo ? "Activo" : "Inactivo")
+                                        </span>
+                                        <a asp-area="Admin" asp-controller="Users" asp-action="Details" asp-route-id="@user.UserId"
+                                           class="btn btn-sm btn-outline-primary ms-1">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        @if (Model.UsersWithPermission.Count > 10)
+                        {
+                            <div class="text-center mt-3">
+                                <small class="text-muted">
+                                    y @(Model.UsersWithPermission.Count - 10) usuario(s) más...
+                                </small>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-user-slash text-muted" style="font-size: 3rem;"></i>
+                            <h6 class="text-muted mt-3">Sin Usuarios</h6>
+                            <p class="text-muted small">Ningún usuario tiene este permiso actualmente.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-tools"></i>
+                        Acciones Disponibles
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        <a asp-area="Admin" asp-controller="Permissions" asp-action="SelectRoleForAssignment"
+                           class="btn btn-primary">
+                            <i class="fas fa-user-shield"></i> Asignar a Roles
+                        </a>
+
+                        <a asp-area="Admin" asp-controller="Permissions" asp-action="ExportMatrix"
+                           class="btn btn-success">
+                            <i class="fas fa-download"></i> Exportar Matriz
+                        </a>
+
+                        <a asp-area="Admin" asp-controller="Permissions" asp-action="Index"
+                           class="btn btn-outline-secondary">
+                            <i class="fas fa-list"></i> Volver a Lista de Permisos
+                        </a>
+                    </div>
+
+                    <!-- Información adicional -->
+                    <div class="alert alert-info mt-3">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h6 class="alert-heading mb-2">
+                                    <i class="fas fa-info-circle"></i>
+                                    Información sobre este Permiso
+                                </h6>
+                                <ul class="mb-0 small">
+                                    <li><strong>Código Interno:</strong> <code>@Model.Name</code></li>
+                                    <li><strong>Categoría:</strong> @Model.Category</li>
+                                    <li><strong>Nivel de Acceso:</strong> @(Model.IsSystemPermission ? "Sistema (predefinido)" : "Personalizado")</li>
+                                    <li><strong>Impacto:</strong> Afecta a @Model.TotalUsers usuario(s) en @Model.TotalRoles rol(es)</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="d-flex flex-column gap-1">
+                                    <span class="badge bg-primary">
+                                        <i class="fas fa-shield-alt"></i> Permiso de @Model.Module
+                                    </span>
+                                    @if (Model.IsSystemPermission)
+                                    {
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-lock"></i> Protegido por Sistema
+                                        </span>
+                                    }
+                                    @if (Model.TotalRoles == 0)
+                                    {
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-exclamation-triangle"></i> Sin Asignar
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .card {
+            border: none;
+            border-radius: 10px;
+        }
+
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+        }
+
+        .badge {
+            font-size: 0.85em;
+        }
+
+        .border-end {
+            border-right: 1px solid #dee2e6 !important;
+        }
+
+        .breadcrumb {
+            background-color: #f8f9fa;
+            border-radius: 0.375rem;
+            padding: 0.75rem 1rem;
+        }
+
+        .breadcrumb-item a {
+            text-decoration: none;
+            color: #6c757d;
+        }
+
+            .breadcrumb-item a:hover {
+                color: #0d6efd;
+            }
+
+        .list-group-item {
+            border-left: none;
+            border-right: none;
+        }
+
+            .list-group-item:first-child {
+                border-top: none;
+            }
+
+            .list-group-item:last-child {
+                border-bottom: none;
+            }
+
+        code {
+            font-size: 0.9em;
+        }
+
+        .gap-2 > * {
+            margin-right: 0.5rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+    </style>
+}

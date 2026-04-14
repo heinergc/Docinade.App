@@ -1,0 +1,242 @@
+@model List<RubricasApp.Web.ViewModels.Admin.RoleViewModel>
+@{
+    ViewData["Title"] = "Gestión de Roles";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2><i class="fas fa-user-tag text-primary"></i> Gestión de Roles</h2>
+                <p class="text-muted">Administra los roles y permisos del sistema</p>
+            </div>
+            <div>
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Nuevo Rol
+                </a>
+                <button type="button" class="btn btn-info" onclick="syncPermissions()">
+                    <i class="fas fa-sync"></i> Sincronizar Permisos
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list"></i> Lista de Roles
+                    <span class="badge bg-secondary ms-2">@Model.Count</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (Model.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Rol</th>
+                                    <th class="text-center">Permisos</th>
+                                    <th class="text-center">Usuarios</th>
+                                    <th class="text-center">Estado</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var role in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-user-tag text-primary me-2"></i>
+                                                <div>
+                                                    <strong>@role.Name</strong>
+                                                    @if (role.IsSystemRole)
+                                                    {
+                                                        <span class="badge bg-warning text-dark ms-2">Sistema</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-info">@role.PermissionCount</span>
+                                        </td>
+                                        <td class="text-center">
+                                            @if (role.UserCount > 0)
+                                            {
+                                                <a href="#" onclick="showRoleUsers('@role.Id')" class="text-decoration-none">
+                                                    <span class="badge bg-success">@role.UserCount</span>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">0</span>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            @if (role.IsSystemRole)
+                                            {
+                                                <span class="badge bg-secondary">Protegido</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-success">Editable</span>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group" role="group">
+                                                <a asp-action="Edit" asp-route-id="@role.Id" 
+                                                   class="btn btn-sm btn-outline-primary" 
+                                                   data-bs-toggle="tooltip" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                @if (!role.IsSystemRole)
+                                                {
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-outline-danger" 
+                                                            onclick="deleteRole('@role.Id', '@role.Name')"
+                                                            data-bs-toggle="tooltip" title="Eliminar">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <i class="fas fa-user-tag fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No hay roles configurados</h5>
+                        <p class="text-muted">Comienza creando tu primer rol del sistema</p>
+                        <a asp-action="Create" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Crear Primer Rol
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para mostrar usuarios del rol -->
+<div class="modal fade" id="roleUsersModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-users"></i> Usuarios del Rol
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="roleUsersContent">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Función para eliminar rol
+        function deleteRole(roleId, roleName) {
+            if (confirm('¿Está seguro que desea eliminar el rol "' + roleName + '"?')) {
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '@Url.Action("Delete")/' + roleId;
+                
+                var token = document.createElement('input');
+                token.type = 'hidden';
+                token.name = '__RequestVerificationToken';
+                token.value = '@Html.AntiForgeryToken().ToString().Replace("<input name=\"__RequestVerificationToken\" type=\"hidden\" value=\"", "").Replace("\" />", "")';
+                
+                form.appendChild(token);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        // Función para sincronizar permisos
+        function syncPermissions() {
+            if (confirm('¿Desea sincronizar los permisos de todos los roles con las definiciones actuales?')) {
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '@Url.Action("SyncPermissions")';
+                
+                var token = document.createElement('input');
+                token.type = 'hidden';
+                token.name = '__RequestVerificationToken';
+                token.value = '@Html.AntiForgeryToken().ToString().Replace("<input name=\"__RequestVerificationToken\" type=\"hidden\" value=\"", "").Replace("\" />", "")';
+                
+                form.appendChild(token);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        // Función para mostrar usuarios del rol
+        function showRoleUsers(roleId) {
+            $('#roleUsersModal').modal('show');
+            $('#roleUsersContent').html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></div>');
+            
+            $.get('@Url.Action("GetRoleUsers")/' + roleId)
+                .done(function(result) {
+                    if (result.success && result.users && result.users.length > 0) {
+                        var html = '<div class="table-responsive"><table class="table table-sm">';
+                        html += '<thead><tr><th>Usuario</th><th>Nombre Completo</th><th>Institución</th><th>Estado</th></tr></thead><tbody>';
+                        
+                        result.users.forEach(function(user) {
+                            html += '<tr>';
+                            html += '<td>' + user.email + '</td>';
+                            html += '<td>' + (user.nombreCompleto || '-') + '</td>';
+                            html += '<td>' + (user.institucion || '-') + '</td>';
+                            html += '<td>' + (user.activo ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Inactivo</span>') + '</td>';
+                            html += '</tr>';
+                        });
+                        
+                        html += '</tbody></table></div>';
+                        $('#roleUsersContent').html(html);
+                    } else {
+                        $('#roleUsersContent').html('<div class="text-center text-muted"><i class="fas fa-users fa-2x mb-2"></i><p>No hay usuarios asignados a este rol</p></div>');
+                    }
+                })
+                .fail(function() {
+                    $('#roleUsersContent').html('<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Error al cargar los usuarios</div>');
+                });
+        }
+
+        // Inicializar tooltips
+        $(document).ready(function() {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+    </script>
+}

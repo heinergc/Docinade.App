@@ -1,0 +1,365 @@
+@model RubricasApp.Web.ViewModels.Conducta.HistorialConductaEstudianteViewModel
+
+@{
+    ViewData["Title"] = "Historial de Conducta - " + Model.NombreEstudiante;
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller="NotaConducta" asp-action="Dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Historial de Conducta</li>
+                </ol>
+            </nav>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2><i class="fas fa-history text-primary"></i> Historial de Conducta del Estudiante</h2>
+                    <p class="text-muted mb-0">Registro completo de conducta a través de períodos académicos</p>
+                </div>
+                <div>
+                    <button onclick="window.print()" class="btn btn-info">
+                        <i class="fas fa-print"></i> Imprimir
+                    </button>
+                    <button onclick="exportarPDF()" class="btn btn-danger">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del estudiante -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-user-graduate"></i> Datos del Estudiante</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <p><strong>Nombre Completo:</strong> @Model.NombreEstudiante</p>
+                    <p><strong>Número de Identificación:</strong> @Model.NumeroIdentificacion</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>Grupo Actual:</strong> @Model.GrupoActual</p>
+                    <p><strong>Profesor Guía:</strong> @Model.ProfesorGuiaActual</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>Fecha de Consulta:</strong> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
+                    <p><strong>Total Períodos:</strong> @Model.NotasPorPeriodo.Count()</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumen estadístico -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-info shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Total Boletas</h6>
+                    <h2 class="text-info">@Model.TotalBoletasHistorico</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-danger shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Total Rebajos</h6>
+                    <h2 class="text-danger">@Model.TotalRebajosHistorico</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-success shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Promedio Histórico</h6>
+                    <h2 class="text-success">@Model.PromedioHistorico.ToString("F2")</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-warning shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Períodos Aplazados</h6>
+                    <h2 class="text-warning">@Model.NotasPorPeriodo.Count(n => n.Estado == "Aplazado")</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico de evolución -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-chart-line"></i> Evolución de la Nota de Conducta</h5>
+        </div>
+        <div class="card-body">
+            <canvas id="chartEvolucion" height="80"></canvas>
+        </div>
+    </div>
+
+    <!-- Historial por período -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Historial por Período Académico</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.NotasPorPeriodo != null && Model.NotasPorPeriodo.Any())
+            {
+                <div class="accordion" id="accordionPeriodos">
+                    @for (int i = 0; i < Model.NotasPorPeriodo.Count; i++)
+                    {
+                        var nota = Model.NotasPorPeriodo[i];
+                        var isFirst = i == 0;
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading@i">
+                                <button class="accordion-button @(isFirst ? "" : "collapsed")" type="button" 
+                                        data-bs-toggle="collapse" data-bs-target="#collapse@i" 
+                                        aria-expanded="@(isFirst ? "true" : "false")" aria-controls="collapse@i">
+                                    <strong>@nota.NombrePeriodo</strong>
+                                    <span class="ms-3">Nota: <strong class="@(nota.Estado == "Aprobado" ? "text-success" : nota.Estado == "Riesgo" ? "text-warning" : "text-danger")">@nota.NotaFinal.ToString("F2")</strong></span>
+                                    <span class="ms-2">
+                                        @if (nota.Estado == "Aprobado")
+                                        {
+                                            <span class="badge bg-success">@nota.Estado</span>
+                                        }
+                                        else if (nota.Estado == "Riesgo")
+                                        {
+                                            <span class="badge bg-warning">@nota.Estado</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">@nota.Estado</span>
+                                        }
+                                    </span>
+                                </button>
+                            </h2>
+                            <div id="collapse@i" class="accordion-collapse collapse @(isFirst ? "show" : "")" 
+                                 aria-labelledby="heading@i" data-bs-parent="#accordionPeriodos">
+                                <div class="accordion-body">
+                                    <!-- Estadísticas del período -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-3">
+                                            <div class="card bg-light">
+                                                <div class="card-body text-center">
+                                                    <small class="text-muted">Boletas</small>
+                                                    <h4>@nota.CantidadBoletas</h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="card bg-light">
+                                                <div class="card-body text-center">
+                                                    <small class="text-muted">Rebajos</small>
+                                                    <h4 class="text-danger">@nota.TotalRebajos</h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="card bg-light">
+                                                <div class="card-body text-center">
+                                                    <small class="text-muted">Nota Final</small>
+                                                    <h4 class="@(nota.Estado == "Aprobado" ? "text-success" : nota.Estado == "Riesgo" ? "text-warning" : "text-danger")">
+                                                        @nota.NotaFinal.ToString("F2")
+                                                    </h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="card bg-light">
+                                                <div class="card-body text-center">
+                                                    <small class="text-muted">Estado</small>
+                                                    <h5>
+                                                        @if (nota.Estado == "Aprobado")
+                                                        {
+                                                            <span class="badge bg-success">@nota.Estado</span>
+                                                        }
+                                                        else if (nota.Estado == "Riesgo")
+                                                        {
+                                                            <span class="badge bg-warning">@nota.Estado</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge bg-danger">@nota.Estado</span>
+                                                        }
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Boletas del período -->
+                                    @if (nota.Boletas != null && nota.Boletas.Any())
+                                    {
+                                        <h6 class="text-primary mt-3"><i class="fas fa-file-alt"></i> Boletas Emitidas:</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-bordered">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Fecha</th>
+                                                        <th>Tipo de Falta</th>
+                                                        <th>Rebajo</th>
+                                                        <th>Emitida Por</th>
+                                                        <th>Estado</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var boleta in nota.Boletas.OrderByDescending(b => b.FechaEmision))
+                                                    {
+                                                        <tr class="@(boleta.Estado == "Anulada" ? "table-secondary" : "")">
+                                                            <td>@boleta.FechaEmision.ToString("dd/MM/yyyy")</td>
+                                                            <td>
+                                                                <span class="badge bg-warning">@boleta.TipoFalta</span>
+                                                            </td>
+                                                            <td><strong class="text-danger">-@boleta.Rebajo</strong></td>
+                                                            <td>@boleta.EmitidaPor</td>
+                                                            <td>
+                                                                @if (boleta.Estado == "Activa")
+                                                                {
+                                                                    <span class="badge bg-success">Activa</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span class="badge bg-secondary">Anulada</span>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-success">
+                                            <i class="fas fa-check-circle"></i> No se registraron boletas en este período
+                                        </div>
+                                    }
+
+                                    <!-- Programa o decisión -->
+                                    @if (nota.TienePrograma)
+                                    {
+                                        <div class="alert alert-info mt-3">
+                                            <h6><i class="fas fa-clipboard-list"></i> Programa de Acciones</h6>
+                                            <p class="mb-0">Estado: <strong>@nota.EstadoPrograma</strong></p>
+                                        </div>
+                                    }
+                                    @if (nota.TieneDecision)
+                                    {
+                                        <div class="alert alert-info mt-3">
+                                            <h6><i class="fas fa-gavel"></i> Decisión Profesional</h6>
+                                            <p class="mb-0">Decisión: <strong>@nota.DecisionAplicada</strong></p>
+                                        </div>
+                                    }
+
+                                    <!-- Botón ver detalle -->
+                                    <div class="text-end mt-3">
+                                        <a asp-controller="NotaConducta" asp-action="EstudianteNota" 
+                                           asp-route-idEstudiante="@Model.IdEstudiante" asp-route-idPeriodo="@nota.IdPeriodo" 
+                                           class="btn btn-primary btn-sm">
+                                            <i class="fas fa-external-link-alt"></i> Ver Detalle Completo
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle fa-3x mb-3"></i>
+                    <p class="mb-0">No hay historial de conducta registrado para este estudiante.</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="card">
+        <div class="card-body">
+            <a asp-controller="NotaConducta" asp-action="Dashboard" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver al Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Gráfico de evolución
+            const ctx = document.getElementById('chartEvolucion').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.NotasPorPeriodo.Select(n => n.NombrePeriodo))),
+                    datasets: [{
+                        label: 'Nota de Conducta',
+                        data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.NotasPorPeriodo.Select(n => n.NotaFinal))),
+                        borderColor: 'rgb(13, 110, 253)',
+                        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Nota Mínima (65)',
+                        data: Array(@Model.NotasPorPeriodo.Count).fill(65),
+                        borderColor: 'rgb(220, 53, 69)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        fill: false,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 10
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        function exportarPDF() {
+            toastr.info('Generando PDF...');
+            window.location.href = '@Url.Action("ExportarHistorialPDF", new { idEstudiante = Model.IdEstudiante })';
+        }
+    </script>
+}
+
+<style>
+    @@media print {
+        .btn, nav, .breadcrumb {
+            display: none !important;
+        }
+        .accordion-button:not(.collapsed) {
+            color: inherit;
+            background-color: inherit;
+        }
+        .accordion-collapse {
+            display: block !important;
+        }
+    }
+</style>

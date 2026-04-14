@@ -1,0 +1,290 @@
+@model RubricasApp.Web.ViewModels.EstudianteACSConfigViewModel
+
+@{
+    ViewData["Title"] = "Configurar ACS - " + Model.NombreCompleto;
+}
+
+<div class="container-fluid">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-user-graduate me-2"></i>
+                            Configuración de Adecuación Curricular Significativa (ACS)
+                        </h4>
+                        <a asp-controller="Estudiantes" asp-action="Edit" asp-route-id="@Model.EstudianteId" class="btn btn-sm btn-outline-dark">
+                            <i class="fas fa-arrow-left me-1"></i> Volver al Estudiante
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>@Model.NombreCompleto</h5>
+                            <p class="mb-0">
+                                <strong>Identificación:</strong> @Model.NumeroIdentificacion<br>
+                                <strong>Tipo de Adecuación:</strong> 
+                                <span class="badge bg-warning text-dark">@Model.TipoAdecuacion</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <p class="mb-0">
+                                <strong>Período:</strong> @Model.NombrePeriodo<br>
+                                @if (!string.IsNullOrEmpty(Model.NombreMateria))
+                                {
+                                    <strong>Materia:</strong> @Model.NombreMateria<br>
+                                }
+                                <strong>Grupo:</strong> @Model.NombreGrupo
+                            </p>
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.DetallesACS))
+                    {
+                        <div class="alert alert-info mt-3 mb-0">
+                            <i class="fas fa-notes-medical me-2"></i>
+                            <strong>Detalles de la Adecuación:</strong><br>
+                            @Model.DetallesACS
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de Configuración -->
+    <form asp-action="GuardarConfiguracionACS" method="post">
+        <input type="hidden" asp-for="EstudianteId" />
+        <input type="hidden" asp-for="PeriodoAcademicoId" />
+        <input type="hidden" asp-for="MateriaId" />
+
+        <!-- Instrumentos de Evaluación -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-clipboard-list me-2"></i>
+                            Configuración por Instrumento de Evaluación
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Importante:</strong> Configure aquí los ajustes específicos para cada instrumento de evaluación.
+                            Puede eximir al estudiante de instrumentos, asignar rúbricas adaptadas o modificar ponderaciones.
+                        </div>
+
+                        @if (Model.Instrumentos != null && Model.Instrumentos.Any())
+                        {
+                            <div class="accordion" id="accordionInstrumentos">
+                                @for (int i = 0; i < Model.Instrumentos.Count; i++)
+                                {
+                                    var instrumento = Model.Instrumentos[i];
+                                    var collapseId = $"collapse{i}";
+                                    
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="heading@(i)">
+                                            <button class="accordion-button @(i == 0 ? "" : "collapsed")" type="button" 
+                                                    data-bs-toggle="collapse" data-bs-target="#@collapseId" 
+                                                    aria-expanded="@(i == 0 ? "true" : "false")" aria-controls="@collapseId">
+                                                <strong>@instrumento.Nombre</strong>
+                                                <span class="badge bg-primary ms-2">@instrumento.PonderacionOriginal.ToString("F1")%</span>
+                                            </button>
+                                        </h2>
+                                        <div id="@collapseId" class="accordion-collapse collapse @(i == 0 ? "show" : "")" 
+                                             aria-labelledby="heading@(i)" data-bs-parent="#accordionInstrumentos">
+                                            <div class="accordion-body">
+                                                <input type="hidden" name="Instrumentos[@i].InstrumentoId" value="@instrumento.InstrumentoId" />
+                                                
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="form-check form-switch mb-3">
+                                                            <input class="form-check-input" type="checkbox" 
+                                                                   name="Instrumentos[@i].Exento" 
+                                                                   id="exento@(i)" 
+                                                                   value="true"
+                                                                   @(instrumento.Exento ? "checked" : "")
+                                                                   onchange="toggleInstrumentoConfig(@i)">
+                                                            <label class="form-check-label" for="exento@(i)">
+                                                                <strong>Eximir al estudiante de este instrumento</strong>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div id="configInstrumento@(i)" style="display: @(instrumento.Exento ? "none" : "block")">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">
+                                                                    <i class="fas fa-tasks me-1"></i>
+                                                                    Rúbrica a Utilizar
+                                                                </label>
+                                                                <select class="form-select" name="Instrumentos[@i].RubricaModificadaId">
+                                                                    <option value="">Usar rúbrica original del grupo</option>
+                                                                    @if (instrumento.RubricasDisponibles != null)
+                                                                    {
+                                                                        @foreach (var rubrica in instrumento.RubricasDisponibles)
+                                                                        {
+                                                                            <option value="@rubrica.Id" 
+                                                                                    selected="@(rubrica.Id == instrumento.RubricaModificadaId)">
+                                                                                @rubrica.Nombre 
+                                                                                @(rubrica.EsModificadaACS ? " [ACS]" : "")
+                                                                                (@rubrica.TotalItems items)
+                                                                            </option>
+                                                                        }
+                                                                    }
+                                                                    <option value="nueva">+ Crear nueva rúbrica adaptada</option>
+                                                                </select>
+                                                                <small class="form-text text-muted">
+                                                                    Seleccione una rúbrica existente o cree una nueva adaptada específicamente
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">
+                                                                    <i class="fas fa-percentage me-1"></i>
+                                                                    Ponderación Personalizada (%)
+                                                                </label>
+                                                                <input type="number" class="form-control" 
+                                                                       name="Instrumentos[@i].PonderacionPersonalizada"
+                                                                       value="@instrumento.PonderacionPersonalizada"
+                                                                       min="0.01" max="100" step="0.01"
+                                                                       placeholder="Original: @instrumento.PonderacionOriginal.ToString("F2")%">
+                                                                <small class="form-text text-muted">
+                                                                    Dejar vacío para usar la ponderación original (@instrumento.PonderacionOriginal.ToString("F2")%)
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">
+                                                                    <i class="fas fa-list-alt me-1"></i>
+                                                                    Criterios de Evaluación Adaptados
+                                                                </label>
+                                                                <textarea class="form-control" rows="3"
+                                                                          name="Instrumentos[@i].CriteriosAdaptados"
+                                                                          placeholder="Describa los criterios o ajustes específicos para este instrumento...">@instrumento.CriteriosAdaptados</textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">
+                                                                    <i class="fas fa-comment me-1"></i>
+                                                                    Observaciones Adicionales
+                                                                </label>
+                                                                <textarea class="form-control" rows="2"
+                                                                          name="Instrumentos[@i].Observaciones"
+                                                                          placeholder="Cualquier nota adicional sobre la adaptación...">@instrumento.Observaciones</textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div id="motivoExencion@(i)" style="display: @(instrumento.Exento ? "block" : "none")">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="mb-3">
+                                                                <label class="form-label">
+                                                                    <i class="fas fa-clipboard me-1"></i>
+                                                                    Motivo de la Exención
+                                                                </label>
+                                                                <textarea class="form-control" rows="3"
+                                                                          name="Instrumentos[@i].MotivoExencion"
+                                                                          placeholder="Explique por qué el estudiante está exento de este instrumento...">@instrumento.MotivoExencion</textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                No hay instrumentos de evaluación configurados para este período y materia.
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Opciones Adicionales -->
+        @if (!Model.EsPrimerPeriodo)
+        {
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" 
+                                       asp-for="AplicarPeriodosAnteriores" 
+                                       id="aplicarRetroactivo">
+                                <label class="form-check-label" for="aplicarRetroactivo">
+                                    <strong>Aplicar esta configuración a períodos anteriores del año lectivo</strong>
+                                </label>
+                                <small class="form-text text-muted d-block ms-4">
+                                    <i class="fas fa-clock me-1"></i>
+                                    Esto aplicará las mismas configuraciones ACS a todos los períodos anteriores del mismo año
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Botones de Acción -->
+        <div class="row mt-4 mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between">
+                    <a asp-controller="Estudiantes" asp-action="Edit" asp-route-id="@Model.EstudianteId" 
+                       class="btn btn-secondary">
+                        <i class="fas fa-times me-1"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save me-1"></i> Guardar Configuración ACS
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleInstrumentoConfig(index) {
+            const exentoCheckbox = document.getElementById(`exento${index}`);
+            const configDiv = document.getElementById(`configInstrumento${index}`);
+            const motivoDiv = document.getElementById(`motivoExencion${index}`);
+            
+            if (exentoCheckbox.checked) {
+                configDiv.style.display = 'none';
+                motivoDiv.style.display = 'block';
+            } else {
+                configDiv.style.display = 'block';
+                motivoDiv.style.display = 'none';
+            }
+        }
+
+        // Inicializar tooltips si Bootstrap los requiere
+        $(document).ready(function() {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+    </script>
+}

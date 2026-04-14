@@ -1,0 +1,418 @@
+@model RubricasApp.Web.ViewModels.Grupos.CrearGrupoViewModel
+
+@{
+    ViewData["Title"] = "Crear Grupo";
+}
+
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="page-title">
+                <i class="fas fa-plus-circle text-primary me-2"></i>
+                Crear Nuevo Grupo
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index")">
+                            <i class="fas fa-users-cog"></i> Grupos
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">Crear Grupo</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="modern-card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Información del Grupo
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post" id="createGroupForm">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                    
+                    <!-- Información básica -->
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label asp-for="Codigo" class="form-label required">Código del Grupo</label>
+                                <input asp-for="Codigo" class="form-control" placeholder="Ej: 7-1, G1, VIRT-A" maxlength="20" />
+                                <span asp-validation-for="Codigo" class="text-danger"></span>
+                                <div class="form-text">Código único identificador del grupo</div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="form-group mb-3">
+                                <label asp-for="Nombre" class="form-label required">Nombre del Grupo</label>
+                                <input asp-for="Nombre" class="form-control" placeholder="Ej: Séptimo Sección 1" maxlength="100" />
+                                <span asp-validation-for="Nombre" class="text-danger"></span>
+                                <div class="form-text">Nombre descriptivo del grupo</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="TipoGrupo" class="form-label required">Tipo de Grupo</label>
+                                <select asp-for="TipoGrupo" class="form-select" id="tipoGrupoSelect">
+                                    <option value="">Seleccione un tipo</option>
+                                    <option value="Seccion">Sección</option>
+                                    <option value="Nivel">Nivel</option>
+                                    <option value="Modalidad">Modalidad</option>
+                                    <option value="Custom">Personalizado</option>
+                                </select>
+                                <span asp-validation-for="TipoGrupo" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Nivel" class="form-label">Nivel Académico</label>
+                                <input asp-for="Nivel" class="form-control" placeholder="Ej: SEPTIMO, OCTAVO, VIRTUAL" maxlength="50" />
+                                <span asp-validation-for="Nivel" class="text-danger"></span>
+                                <div class="form-text">Opcional: Especifica el nivel académico</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="PeriodoAcademicoId" class="form-label required">Período Académico</label>
+                                <select asp-for="PeriodoAcademicoId" class="form-select" id="periodoSelect">
+                                    <option value="">Seleccione un período</option>
+                                    @if (ViewBag.PeriodosAcademicos != null)
+                                    {
+                                        @foreach (var periodo in (List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.PeriodosAcademicos)
+                                        {
+                                            <option value="@periodo.Value" selected="@(periodo.Value == Model.PeriodoAcademicoId.ToString())">
+                                                @periodo.Text
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="PeriodoAcademicoId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="CapacidadMaxima" class="form-label">Capacidad Máxima</label>
+                                <input asp-for="CapacidadMaxima" type="number" class="form-control" 
+                                       placeholder="Opcional: Límite de estudiantes" min="1" max="200" />
+                                <span asp-validation-for="CapacidadMaxima" class="text-danger"></span>
+                                <div class="form-text">Dejar vacío para capacidad ilimitada</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Descripcion" class="form-label">Descripción</label>
+                        <textarea asp-for="Descripcion" class="form-control" rows="3" 
+                                  placeholder="Descripción opcional del grupo..." maxlength="500"></textarea>
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                        <div class="form-text">
+                            <span id="descripcionCounter">0</span>/500 caracteres
+                        </div>
+                    </div>
+
+                    <!-- Materias asociadas -->
+                    <div class="form-group mb-4">
+                        <label class="form-label">Materias Asociadas (Opcional)</label>
+                        <div class="card border-light bg-light">
+                            <div class="card-body">
+                                <div class="row">
+                                    @if (ViewBag.MateriasDisponibles != null)
+                                    {
+                                        @foreach (var materia in (List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.MateriasDisponibles)
+                                        {
+                                            <div class="col-md-6 mb-2">
+                                                <div class="form-check">
+                                                    <input type="checkbox" name="MateriasSeleccionadas" 
+                                                           value="@materia.Value" class="form-check-input" 
+                                                           id="materia_@materia.Value" />
+                                                    <label class="form-check-label" for="materia_@materia.Value">
+                                                        @materia.Text
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="col-12">
+                                            <p class="text-muted mb-0">No hay materias disponibles</p>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="form-text mt-2">
+                                    Seleccione las materias que estarán asociadas a este grupo
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Observaciones" class="form-label">Observaciones</label>
+                        <textarea asp-for="Observaciones" class="form-control" rows="2" 
+                                  placeholder="Observaciones adicionales..." maxlength="1000"></textarea>
+                        <span asp-validation-for="Observaciones" class="text-danger"></span>
+                        <div class="form-text">
+                            <span id="observacionesCounter">0</span>/1000 caracteres
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="row">
+                        <div class="col-12">
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <a href="@Url.Action("Index")" class="btn btn-modern secondary">
+                                    <i class="fas fa-arrow-left"></i> Cancelar
+                                </a>
+                                <div>
+                                    <button type="button" class="btn btn-modern info me-2" id="generateNameBtn">
+                                        <i class="fas fa-magic"></i> Auto-generar Nombre
+                                    </button>
+                                    <button type="submit" class="btn btn-modern primary">
+                                        <i class="fas fa-save"></i> Crear Grupo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Contador de caracteres para descripción
+            $('#Descripcion').on('input', function() {
+                const length = $(this).val().length;
+                $('#descripcionCounter').text(length);
+                
+                if (length > 450) {
+                    $('#descripcionCounter').addClass('text-warning');
+                } else {
+                    $('#descripcionCounter').removeClass('text-warning');
+                }
+            });
+
+            // Contador de caracteres para observaciones
+            $('#Observaciones').on('input', function() {
+                const length = $(this).val().length;
+                $('#observacionesCounter').text(length);
+                
+                if (length > 900) {
+                    $('#observacionesCounter').addClass('text-warning');
+                } else {
+                    $('#observacionesCounter').removeClass('text-warning');
+                }
+            });
+
+            // Auto-generar nombre basado en tipo y código
+            $('#generateNameBtn').click(function() {
+                const codigo = $('#Codigo').val();
+                const tipo = $('#TipoGrupo').val();
+                const nivel = $('#Nivel').val();
+                
+                if (!codigo || !tipo) {
+                    Swal.fire({
+                        title: 'Información faltante',
+                        text: 'Por favor, complete el código y tipo de grupo antes de auto-generar el nombre.',
+                        icon: 'warning'
+                    });
+                    return;
+                }
+                
+                let nombreGenerado = '';
+                
+                switch(tipo) {
+                    case 'Seccion':
+                        if (nivel) {
+                            nombreGenerado = `${nivel} Sección ${codigo}`;
+                        } else {
+                            nombreGenerado = `Sección ${codigo}`;
+                        }
+                        break;
+                    case 'Nivel':
+                        nombreGenerado = `Grupo Nivel ${codigo}`;
+                        if (nivel) {
+                            nombreGenerado = `${nivel} - Grupo ${codigo}`;
+                        }
+                        break;
+                    case 'Modalidad':
+                        nombreGenerado = `Modalidad ${codigo}`;
+                        if (nivel) {
+                            nombreGenerado = `${nivel} ${codigo}`;
+                        }
+                        break;
+                    case 'Custom':
+                        nombreGenerado = `Grupo ${codigo}`;
+                        if (nivel) {
+                            nombreGenerado = `${nivel} - Grupo ${codigo}`;
+                        }
+                        break;
+                    default:
+                        nombreGenerado = `Grupo ${codigo}`;
+                }
+                
+                $('#Nombre').val(nombreGenerado);
+                
+                Swal.fire({
+                    title: 'Nombre generado',
+                    text: `Se ha generado el nombre: "${nombreGenerado}"`,
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            });
+
+            // Validación en tiempo real del código
+            $('#Codigo').on('blur', function() {
+                const codigo = $(this).val();
+                const periodoId = $('#PeriodoAcademicoId').val();
+                
+                if (codigo && periodoId) {
+                    // Aquí podrías implementar validación AJAX para verificar código único
+                    console.log('Validando código único:', codigo, 'en período:', periodoId);
+                }
+            });
+
+            // Sugerencias de nivel basadas en tipo
+            $('#TipoGrupo').change(function() {
+                const tipo = $(this).val();
+                const nivelInput = $('#Nivel');
+                
+                // Limpiar valor actual
+                nivelInput.val('');
+                
+                // Sugerir placeholder basado en tipo
+                switch(tipo) {
+                    case 'Seccion':
+                        nivelInput.attr('placeholder', 'Ej: SEPTIMO, OCTAVO, NOVENO');
+                        break;
+                    case 'Nivel':
+                        nivelInput.attr('placeholder', 'Ej: BASICO, MEDIO, AVANZADO');
+                        break;
+                    case 'Modalidad':
+                        nivelInput.attr('placeholder', 'Ej: PRESENCIAL, VIRTUAL, HIBRIDA');
+                        break;
+                    case 'Custom':
+                        nivelInput.attr('placeholder', 'Ej: ESPECIAL, REFUERZO, HONOR');
+                        break;
+                    default:
+                        nivelInput.attr('placeholder', 'Opcional: Especifica el nivel');
+                }
+            });
+
+            // Validación del formulario antes de envío
+            $('#createGroupForm').on('submit', function(e) {
+                const codigo = $('#Codigo').val().trim();
+                const nombre = $('#Nombre').val().trim();
+                const tipo = $('#TipoGrupo').val();
+                const periodo = $('#PeriodoAcademicoId').val();
+                
+                if (!codigo || !nombre || !tipo || !periodo) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Campos requeridos',
+                        text: 'Por favor, complete todos los campos obligatorios marcados con *',
+                        icon: 'error'
+                    });
+                    return false;
+                }
+                
+                // Mostrar loading
+                Swal.fire({
+                    title: 'Creando grupo...',
+                    text: 'Por favor espere',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                return true;
+            });
+
+            // Inicializar contadores
+            $('#Descripcion').trigger('input');
+            $('#Observaciones').trigger('input');
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .required::after {
+            content: ' *';
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .form-check {
+            padding: 0.25rem 0;
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .card-body {
+            background-color: #f8f9fa;
+        }
+        
+        .text-warning {
+            font-weight: bold;
+        }
+        
+        .modern-card {
+            border: none;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        
+        .modern-card .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .btn-modern.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+        }
+        
+        .btn-modern.secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            color: white;
+        }
+        
+        .btn-modern.info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border: none;
+            color: white;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+    </style>
+}

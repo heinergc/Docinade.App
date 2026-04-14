@@ -1,0 +1,510 @@
+@model RubricasApp.Web.ViewModels.Admin.PermissionMatrixViewModel
+
+@{
+    ViewData["Title"] = "Matriz de Permisos";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Home", new { area = "" })">
+                    <i class="fas fa-home"></i> Inicio
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Permissions")">
+                    <i class="fas fa-shield-alt"></i> Permisos
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-table"></i> Matriz de Permisos
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="mb-0">
+                <i class="fas fa-table text-success"></i>
+                Matriz de Permisos del Sistema
+            </h2>
+            <p class="text-muted mt-2">
+                Vista completa de todos los permisos y su asignación por roles
+                <br><small>Generado el: @Model.GeneratedDate.ToString("dd/MM/yyyy HH:mm:ss")</small>
+            </p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="btn-group">
+                <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-download"></i> Exportar
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="@Url.Action("ExportToExcel")" id="btnExportExcel">
+                                <i class="fas fa-file-excel text-success"></i> Exportar Excel
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="@Url.Action("ExportToCsv")" id="btnExportCsv">
+                                <i class="fas fa-file-csv text-primary"></i> Exportar CSV
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="@Url.Action("PrintMatrix")" target="_blank" id="btnPrintMatrix">
+                                <i class="fas fa-print text-info"></i> Imprimir
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas rápidas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center bg-primary text-white">
+                <div class="card-body">
+                    <i class="fas fa-shield-alt fa-2x mb-2"></i>
+                    <h4>@Model.Matrix.Count</h4>
+                    <p class="mb-0">Total Permisos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-success text-white">
+                <div class="card-body">
+                    <i class="fas fa-users fa-2x mb-2"></i>
+                    <h4>@Model.Roles.Count</h4>
+                    <p class="mb-0">Roles del Sistema</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-info text-white">
+                <div class="card-body">
+                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                    <h4>@Model.Matrix.Sum(m => m.RoleAssignments.Count(ra => ra.Value))</h4>
+                    <p class="mb-0">Asignaciones Activas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-warning text-white">
+                <div class="card-body">
+                    <i class="fas fa-layer-group fa-2x mb-2"></i>
+                    <h4>@Model.Matrix.Select(m => m.Category).Distinct().Count()</h4>
+                    <p class="mb-0">Categorías</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-filter"></i> Filtros de Vista
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="categoryFilter" class="form-label">Filtrar por Categoría:</label>
+                    <select id="categoryFilter" class="form-select">
+                        <option value="">Todas las categorías</option>
+                        @foreach (var category in Model.Matrix.Select(m => m.Category).Distinct().OrderBy(c => c))
+                        {
+                            <option value="@category">@category</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="roleFilter" class="form-label">Filtrar por Rol:</label>
+                    <select id="roleFilter" class="form-select">
+                        <option value="">Todos los roles</option>
+                        @foreach (var role in Model.Roles.OrderBy(r => r))
+                        {
+                            <option value="@role">@role</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="assignmentFilter" class="form-label">Estado de Asignación:</label>
+                    <select id="assignmentFilter" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="assigned">Solo Asignados</option>
+                        <option value="unassigned">Solo No Asignados</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="searchFilter" class="form-label">Buscar Permiso:</label>
+                    <input type="text" id="searchFilter" class="form-control" placeholder="Buscar por nombre...">
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <button type="button" id="clearFilters" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-times"></i> Limpiar Filtros
+                    </button>
+                    <span class="ms-3 text-muted">
+                        <i class="fas fa-info-circle"></i>
+                        Registros mostrados: <span id="visibleRows" class="fw-bold">@Model.Matrix.Count</span> de @Model.Matrix.Count
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Matriz de permisos -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-table"></i>
+                Matriz de Permisos por Rol
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive" style="max-height: 70vh;">
+                <table class="table table-bordered table-hover mb-0" id="permissionMatrix">
+                    <thead class="table-dark sticky-top">
+                        <tr>
+                            <th rowspan="2" class="align-middle" style="min-width: 200px;">
+                                <strong>Categoría / Permiso</strong>
+                            </th>
+                            <th rowspan="2" class="align-middle" style="min-width: 300px;">
+                                <strong>Descripción</strong>
+                            </th>
+                            <th colspan="@Model.Roles.Count" class="text-center">
+                                <strong>Roles del Sistema</strong>
+                            </th>
+                        </tr>
+                        <tr>
+                            @foreach (var role in Model.Roles.OrderBy(r => r))
+                            {
+                                <th class="text-center" style="min-width: 100px; writing-mode: vertical-lr; text-orientation: mixed;">
+                                    <small>@role</small>
+                                </th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var currentCategory = "";
+                        }
+                        @foreach (var permission in Model.Matrix.OrderBy(m => m.Category).ThenBy(m => m.Permission))
+                        {
+                            <tr data-category="@permission.Category"
+                                data-permission="@permission.Permission.ToLower()"
+                                data-permission-name="@permission.PermissionName.ToLower()"
+                                data-description="@(permission.Description?.ToLower() ?? "")">
+                                <td>
+                                    @if (currentCategory != permission.Category)
+                                    {
+                                        currentCategory = permission.Category;
+                                        <div class="fw-bold text-primary mb-1">
+                                            <i class="fas fa-folder"></i> @permission.Category
+                                        </div>
+                                    }
+                                    <div class="ms-3">
+                                        <strong>@permission.Permission</strong>
+                                        <br><small class="text-muted">@permission.PermissionName</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <small>@permission.Description</small>
+                                </td>
+                                @foreach (var role in Model.Roles.OrderBy(r => r))
+                                {
+                                    <td class="text-center" data-role="@role">
+                                        @if (permission.RoleAssignments.ContainsKey(role) && permission.RoleAssignments[role])
+                                        {
+                                            <span class="badge bg-success assignment-badge" data-assigned="true" title="Permiso asignado a @role">
+                                                <i class="fas fa-check"></i>
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-light text-dark assignment-badge" data-assigned="false" title="Permiso NO asignado a @role">
+                                                <i class="fas fa-times"></i>
+                                            </span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="row">
+                <div class="col-md-6">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle"></i>
+                        Total de registros mostrados: <span id="visibleRowsFooter">@Model.Matrix.Count</span>
+                    </small>
+                </div>
+                <div class="col-md-6 text-end">
+                    <small class="text-muted">
+                        <span class="badge bg-success me-2">
+                            <i class="fas fa-check"></i> Asignado
+                        </span>
+                        <span class="badge bg-light text-dark">
+                            <i class="fas fa-times"></i> No Asignado
+                        </span>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            console.log('🚀 Matriz de Permisos - Inicializando filtros...');
+
+            // Variables globales
+            const totalRows = @Model.Matrix.Count;
+
+            // Manejar indicadores de carga para exportación
+            $('#btnExportExcel, #btnExportCsv').on('click', function(e) {
+                const btn = $(this);
+                const originalText = btn.html();
+                const isExcel = btn.attr('id') === 'btnExportExcel';
+                const loadingText = isExcel ?
+                    '<i class="fas fa-spinner fa-spin"></i> Exportando Excel...' :
+                    '<i class="fas fa-spinner fa-spin"></i> Exportando CSV...';
+
+                btn.html(loadingText).addClass('disabled');
+
+                // Restaurar botón después de 3 segundos
+                setTimeout(() => {
+                    btn.html(originalText).removeClass('disabled');
+                }, 3000);
+            });
+
+            // Event listeners para filtros
+            $('#categoryFilter, #roleFilter, #assignmentFilter').change(function() {
+                console.log('🔄 Aplicando filtros...');
+                filterMatrix();
+            });
+
+            $('#searchFilter').on('input', function() {
+                console.log('🔍 Aplicando búsqueda:', $(this).val());
+                filterMatrix();
+            });
+
+            $('#clearFilters').click(function() {
+                console.log('🧹 Limpiando filtros...');
+                clearAllFilters();
+            });
+
+            function filterMatrix() {
+                const categoryFilter = $('#categoryFilter').val().trim();
+                const roleFilter = $('#roleFilter').val().trim();
+                const assignmentFilter = $('#assignmentFilter').val().trim();
+                const searchFilter = $('#searchFilter').val().trim().toLowerCase();
+
+                let visibleCount = 0;
+
+                $('#permissionMatrix tbody tr').each(function() {
+                    const $row = $(this);
+                    const category = $row.data('category') || '';
+                    const permission = $row.data('permission') || '';
+                    const permissionName = $row.data('permission-name') || '';
+                    const description = $row.data('description') || '';
+
+                    let showRow = true;
+
+                    // Filtro por categoría
+                    if (categoryFilter && category !== categoryFilter) {
+                        showRow = false;
+                    }
+
+                    // Filtro de búsqueda
+                    if (searchFilter) {
+                        const searchText = searchFilter;
+                        if (!permission.includes(searchText) &&
+                            !permissionName.includes(searchText) &&
+                            !description.includes(searchText)) {
+                            showRow = false;
+                        }
+                    }
+
+                    // Filtro por rol y estado de asignación
+                    if (roleFilter && assignmentFilter) {
+                        const $roleCell = $row.find(`td[data-role="${roleFilter}"]`);
+                        if ($roleCell.length > 0) {
+                            const $badge = $roleCell.find('.assignment-badge');
+                            const isAssigned = $badge.data('assigned') === true;
+
+                            if (assignmentFilter === 'assigned' && !isAssigned) {
+                                showRow = false;
+                            } else if (assignmentFilter === 'unassigned' && isAssigned) {
+                                showRow = false;
+                            }
+                        } else {
+                            showRow = false;
+                        }
+                    } else if (roleFilter && !assignmentFilter) {
+                        // Solo mostrar filas que tengan el rol (sin filtro de asignación específico)
+                        const $roleCell = $row.find(`td[data-role="${roleFilter}"]`);
+                        if ($roleCell.length === 0) {
+                            showRow = false;
+                        }
+                    } else if (!roleFilter && assignmentFilter) {
+                        // Filtro de asignación sin rol específico - mostrar según asignación general
+                        const assignedRoles = $row.find('.assignment-badge[data-assigned="true"]').length;
+                        const totalRoles = $row.find('.assignment-badge').length;
+
+                        if (assignmentFilter === 'assigned' && assignedRoles === 0) {
+                            showRow = false;
+                        } else if (assignmentFilter === 'unassigned' && assignedRoles === totalRoles) {
+                            showRow = false;
+                        }
+                    }
+
+                    // Mostrar u ocultar fila
+                    if (showRow) {
+                        $row.show();
+                        visibleCount++;
+                    } else {
+                        $row.hide();
+                    }
+                });
+
+                // Actualizar contadores
+                updateVisibleCount(visibleCount);
+
+                console.log(`📊 Filtros aplicados: ${visibleCount} de ${totalRows} registros visibles`);
+            }
+
+            function clearAllFilters() {
+                $('#categoryFilter').val('');
+                $('#roleFilter').val('');
+                $('#assignmentFilter').val('');
+                $('#searchFilter').val('');
+
+                // Mostrar todas las filas
+                $('#permissionMatrix tbody tr').show();
+
+                // Actualizar contadores
+                updateVisibleCount(totalRows);
+
+                console.log('✅ Filtros limpiados');
+            }
+
+            function updateVisibleCount(count) {
+                $('#visibleRows').text(count);
+                $('#visibleRowsFooter').text(count);
+
+                // Cambiar color según cantidad visible
+                const percentage = (count / totalRows) * 100;
+                const $counter = $('#visibleRows');
+
+                $counter.removeClass('text-success text-warning text-danger');
+                if (percentage === 100) {
+                    $counter.addClass('text-success');
+                } else if (percentage >= 50) {
+                    $counter.addClass('text-warning');
+                } else {
+                    $counter.addClass('text-danger');
+                }
+            }
+
+            // Inicialización completa
+            console.log('✅ Filtros inicializados correctamente');
+            console.log(`📈 Total de permisos cargados: ${totalRows}`);
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        /* Estilos para impresión */
+        @@media print
+            {
+                .no-print{
+                display: none !important;
+            }
+            .table {
+                font-size: 10px;
+            }
+            .card {
+                border: none;
+                box-shadow: none;
+            }
+        }
+
+
+        /* Mejorar legibilidad de la tabla */
+        #permissionMatrix th {
+            background-color: #343a40 !important;
+            color: white !important;
+            font-weight: bold;
+        }
+
+        #permissionMatrix tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Hacer sticky el header */
+        .sticky-top {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        /* Estilos para filtros */
+        .assignment-badge {
+            cursor: help;
+        }
+
+        #visibleRows.text-success {
+            color: #198754 !important;
+        }
+
+        #visibleRows.text-warning {
+            color: #ffc107 !important;
+        }
+
+        #visibleRows.text-danger {
+            color: #dc3545 !important;
+        }
+
+        /* Mejorar espaciado de filtros */
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-select, .form-control {
+            border-radius: 0.375rem;
+        }
+
+        /* Estilos para dropdown de exportación */
+        .dropdown-item {
+            padding: 0.5rem 1rem;
+        }
+
+            .dropdown-item:hover {
+                background-color: #f8f9fa;
+            }
+
+            .dropdown-item i {
+                width: 1.2rem;
+                margin-right: 0.5rem;
+            }
+    </style>
+}

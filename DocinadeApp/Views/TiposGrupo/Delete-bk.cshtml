@@ -1,0 +1,285 @@
+@model RubricasApp.Web.ViewModels.Grupos.DeleteTipoGrupoViewModel
+
+@{
+    ViewData["Title"] = $"Eliminar Tipo: {Model.Nombre}";
+}
+
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="page-title">
+                <i class="fas fa-trash text-danger me-2"></i>
+                Eliminar Tipo de Grupo
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index", "Home")">
+                            <i class="fas fa-home"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index")">
+                            <i class="fas fa-tags"></i> Tipos de Grupo
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">Eliminar: @Model.Nombre</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        @if (Model.PuedeEliminar)
+        {
+            <!-- Confirmación de eliminación -->
+            <div class="modern-card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmar Eliminación
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>¿Está seguro que desea eliminar este tipo de grupo?</strong>
+                        <br>Esta acción no se puede deshacer.
+                    </div>
+
+                    <!-- Información del tipo a eliminar -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>ID:</strong></td>
+                                    <td><span class="badge bg-secondary">@Model.IdTipoGrupo</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Nombre:</strong></td>
+                                    <td>@Model.Nombre</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Estado:</strong></td>
+                                    <td>
+                                        <span class="badge bg-@(Model.Estado == "Activo" ? "success" : "secondary")">
+                                            @Model.Estado
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Grupos Asociados:</strong></td>
+                                    <td>
+                                        <span class="badge bg-success">@Model.CantidadGrupos grupos</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><strong>Fecha de Registro:</strong></h6>
+                            <p class="text-muted">@Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</p>
+                        </div>
+                    </div>
+
+                    <!-- Formulario de confirmación -->
+                    <form asp-action="Delete" method="post" id="deleteForm">
+                        <input asp-for="IdTipoGrupo" type="hidden" />
+                        
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a href="@Url.Action("Details", new { id = Model.IdTipoGrupo })" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left"></i> Cancelar
+                                </a>
+                                <a href="@Url.Action("Index")" class="btn btn-outline-info">
+                                    <i class="fas fa-list"></i> Volver a Lista
+                                </a>
+                            </div>
+                            <button type="submit" class="btn btn-danger" id="confirmDeleteBtn">
+                                <i class="fas fa-trash"></i> Confirmar Eliminación
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        }
+        else
+        {
+            <!-- No se puede eliminar -->
+            <div class="modern-card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lock me-2"></i>
+                        No se puede eliminar
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-times-circle me-2"></i>
+                        <strong>Este tipo de grupo no se puede eliminar</strong>
+                        <br>Tiene @Model.CantidadGrupos grupo(s) asociado(s).
+                    </div>
+
+                    <!-- Información del tipo -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>ID:</strong></td>
+                                    <td><span class="badge bg-secondary">@Model.IdTipoGrupo</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Nombre:</strong></td>
+                                    <td>@Model.Nombre</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Estado:</strong></td>
+                                    <td>
+                                        <span class="badge bg-@(Model.Estado == "Activo" ? "success" : "secondary")">
+                                            @Model.Estado
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Grupos Asociados:</strong></td>
+                                    <td>
+                                        <span class="badge bg-danger">@Model.CantidadGrupos grupos</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><strong>Fecha de Registro:</strong></h6>
+                            <p class="text-muted">@Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</p>
+                        </div>
+                    </div>
+
+                    @if (Model.GruposAsociados.Any())
+                    {
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle me-2"></i>Grupos que usan este tipo:</h6>
+                            <ul class="mb-0">
+                                @foreach (var grupo in Model.GruposAsociados)
+                                {
+                                    <li><code>@grupo</code></li>
+                                }
+                                @if (Model.CantidadGrupos > Model.GruposAsociados.Count)
+                                {
+                                    <li class="text-muted">... y @(Model.CantidadGrupos - Model.GruposAsociados.Count) más</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-lightbulb me-2"></i>Para eliminar este tipo:</h6>
+                        <ol class="mb-0">
+                            <li>Elimine o cambie el tipo de todos los grupos asociados</li>
+                            <li>Vuelva a intentar la eliminación</li>
+                        </ol>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <a href="@Url.Action("Details", new { id = Model.IdTipoGrupo })" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver a Detalles
+                            </a>
+                            <a href="@Url.Action("Index")" class="btn btn-outline-info">
+                                <i class="fas fa-list"></i> Volver a Lista
+                            </a>
+                        </div>
+                        <div>
+                            <a href="@Url.Action("Index", "GruposEstudiantes", new { tipoGrupo = Model.IdTipoGrupo })" 
+                               class="btn btn-warning">
+                                <i class="fas fa-users"></i> Ver Grupos Asociados
+                            </a>
+                            <a href="@Url.Action("Edit", new { id = Model.IdTipoGrupo })" class="btn btn-primary">
+                                <i class="fas fa-edit"></i> Editar Tipo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            @if (Model.PuedeEliminar)
+            {
+                <text>
+                // Confirmación adicional para eliminación
+                $('#deleteForm').on('submit', function(e) {
+                    e.preventDefault();
+                    
+                    Swal.fire({
+                        title: '¿Está completamente seguro?',
+                        text: 'Esta acción eliminará permanentemente el tipo "@Model.Nombre"',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Mostrar loading
+                            Swal.fire({
+                                title: 'Eliminando...',
+                                text: 'Por favor espere',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+                            
+                            // Enviar formulario
+                            this.submit();
+                        }
+                    });
+                });
+                </text>
+            }
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .modern-card {
+            border: none;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+
+        .border-danger {
+            border: 2px solid #dc3545 !important;
+        }
+
+        .border-warning {
+            border: 2px solid #ffc107 !important;
+        }
+
+        .table-borderless td {
+            border: none;
+            padding: 0.5rem 0;
+        }
+
+        .alert {
+            border-radius: 8px;
+        }
+
+        .alert ul {
+            padding-left: 1.5rem;
+        }
+
+        .alert ol {
+            padding-left: 1.5rem;
+        }
+    </style>
+}

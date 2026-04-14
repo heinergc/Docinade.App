@@ -1,0 +1,263 @@
+@model IEnumerable<RubricasApp.Web.Models.Asistencia>
+
+@{
+    ViewData["Title"] = "Reporte de Ausencias";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-user-times me-2"></i>@ViewData["Title"]
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Filtros -->
+                    <form asp-action="Ausencias" method="get" class="mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Grupo</label>
+                                <select name="grupoId" class="form-select" required>
+                                    <option value="">-- Seleccione un grupo --</option>
+                                    @foreach (var item in ViewBag.Grupos as IEnumerable<SelectListItem>)
+                                    {
+                                        <option value="@item.Value" selected="@item.Selected">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Fecha Inicio</label>
+                                <input type="date" name="fechaInicio" class="form-control" 
+                                       value="@ViewBag.FechaInicio?.ToString("yyyy-MM-dd")" required />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Fecha Fin</label>
+                                <input type="date" name="fechaFin" class="form-control" 
+                                       value="@ViewBag.FechaFin?.ToString("yyyy-MM-dd")" required />
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Incluir Justificadas</label>
+                                <select name="incluirJustificadas" class="form-select">
+                                    <option value="false" selected="@(ViewBag.IncluirJustificadas == false)">No</option>
+                                    <option value="true" selected="@(ViewBag.IncluirJustificadas == true)">Sí</option>
+                                </select>
+                            </div>
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="submit" class="btn btn-danger w-100">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    @if (ViewBag.GrupoSeleccionado != null)
+                    {
+                        <!-- Información del grupo -->
+                        <div class="alert alert-info mb-4">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <strong><i class="fas fa-users me-1"></i>Grupo:</strong> @ViewBag.Grupo?.Nombre
+                                </div>
+                                <div class="col-md-4">
+                                    <strong><i class="fas fa-calendar me-1"></i>Período:</strong> 
+                                    @ViewBag.FechaInicio?.ToString("dd/MM/yyyy") - @ViewBag.FechaFin?.ToString("dd/MM/yyyy")
+                                </div>
+                                <div class="col-md-4">
+                                    <strong><i class="fas fa-user-times me-1"></i>Total Ausencias:</strong> 
+                                    <span class="badge bg-danger fs-6">@Model.Count()</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (Model != null && Model.Any())
+                        {
+                            <!-- Resumen por estudiante -->
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Resumen por Estudiante</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th>Estudiante</th>
+                                                    <th class="text-center">Total Ausencias</th>
+                                                    <th class="text-center">Sin Justificar</th>
+                                                    <th class="text-center">Justificadas</th>
+                                                    <th>Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var grupo in Model.GroupBy(a => a.EstudianteId).OrderByDescending(g => g.Count()))
+                                                {
+                                                    var estudiante = grupo.First().Estudiante;
+                                                    var totalAusencias = grupo.Count();
+                                                    var sinJustificar = grupo.Count(a => a.Estado == "A");
+                                                    var justificadas = grupo.Count(a => a.Estado == "AJ");
+
+                                                    <tr>
+                                                        <td>
+                                                            <strong>@estudiante?.NombreCompleto</strong>
+                                                            <br />
+                                                            <small class="text-muted">@estudiante?.NumeroId</small>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span class="badge bg-danger fs-6">@totalAusencias</span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span class="badge bg-danger">@sinJustificar</span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span class="badge bg-info">@justificadas</span>
+                                                        </td>
+                                                        <td>
+                                                            <a asp-action="Historial" 
+                                                               asp-route-estudianteId="@estudiante?.IdEstudiante"
+                                                               asp-route-grupoId="@ViewBag.GrupoSeleccionado"
+                                                               asp-route-fechaInicio="@ViewBag.FechaInicio?.ToString("yyyy-MM-dd")"
+                                                               asp-route-fechaFin="@ViewBag.FechaFin?.ToString("yyyy-MM-dd")"
+                                                               class="btn btn-sm btn-info">
+                                                                <i class="fas fa-history me-1"></i>Ver Historial
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Detalle de ausencias -->
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Detalle de Ausencias</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-hover">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th>Fecha</th>
+                                                    <th>Estudiante</th>
+                                                    <th>Materia</th>
+                                                    <th>Lección</th>
+                                                    <th>Estado</th>
+                                                    <th>Observaciones</th>
+                                                    <th>Justificación</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var ausencia in Model.OrderBy(a => a.Estudiante.Apellidos).ThenBy(a => a.Estudiante.Nombre).ThenBy(a => a.Fecha))
+                                                {
+                                                    <tr class="@(ausencia.Estado == "A" ? "table-danger" : "table-info")">
+                                                        <td>@ausencia.Fecha.ToString("dd/MM/yyyy")</td>
+                                                        <td>
+                                                            <strong>@ausencia.Estudiante?.NombreCompleto</strong>
+                                                        </td>
+                                                        <td>@ausencia.Materia?.Nombre</td>
+                                                        <td>
+                                                            @if (ausencia.Leccion != null)
+                                                            {
+                                                                <small>
+                                                                    @switch (ausencia.Leccion.DiaSemana)
+                                                                    {
+                                                                        case DayOfWeek.Monday: <text>Lun</text> break;
+                                                                        case DayOfWeek.Tuesday: <text>Mar</text> break;
+                                                                        case DayOfWeek.Wednesday: <text>Mié</text> break;
+                                                                        case DayOfWeek.Thursday: <text>Jue</text> break;
+                                                                        case DayOfWeek.Friday: <text>Vie</text> break;
+                                                                        case DayOfWeek.Saturday: <text>Sáb</text> break;
+                                                                        case DayOfWeek.Sunday: <text>Dom</text> break;
+                                                                    }
+                                                                    @ausencia.Leccion.HorarioFormateado
+                                                                </small>
+                                                            }
+                                                        </td>
+                                                        <td>
+                                                            @if (ausencia.Estado == "A")
+                                                            {
+                                                                <span class="badge bg-danger">Ausente</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="badge bg-info">Justificada</span>
+                                                            }
+                                                        </td>
+                                                        <td>
+                                                            @if (!string.IsNullOrEmpty(ausencia.Observaciones))
+                                                            {
+                                                                <small>@ausencia.Observaciones</small>
+                                                            }
+                                                        </td>
+                                                        <td>
+                                                            @if (!string.IsNullOrEmpty(ausencia.Justificacion))
+                                                            {
+                                                                <small class="text-muted">@ausencia.Justificacion</small>
+                                                            }
+                                                            else if (ausencia.Estado == "A")
+                                                            {
+                                                                <span class="badge bg-warning text-dark">
+                                                                    <i class="fas fa-exclamation-triangle me-1"></i>Sin justificar
+                                                                </span>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-success text-center">
+                                <i class="fas fa-check-circle me-2"></i>
+                                ¡Excelente! No hay ausencias registradas en el período seleccionado.
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning text-center">
+                            <i class="fas fa-search me-2"></i>
+                            Por favor, seleccione un grupo y el período para generar el reporte de ausencias.
+                        </div>
+                    }
+
+                    <div class="mt-4">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Volver
+                        </a>
+                        @if (ViewBag.GrupoSeleccionado != null && Model != null && Model.Any())
+                        {
+                            <button onclick="window.print()" class="btn btn-danger">
+                                <i class="fas fa-print me-1"></i>Imprimir Reporte
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        @@media print {
+            .btn, form, .card-header {
+                display: none !important;
+            }
+            .table-danger {
+                background-color: #f8d7da !important;
+            }
+            .table-info {
+                background-color: #d1ecf1 !important;
+            }
+        }
+    </style>
+}

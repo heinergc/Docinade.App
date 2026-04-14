@@ -1,0 +1,38 @@
+﻿@model RubricasApp.Web.Models.NivelCalificacion
+
+@{
+    ViewData["Title"] = "Detalles del Nivel de Calificación";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-info-circle"></i> Detalles del Nivel de Calificación
+                </h4>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.NombreNivel)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.NombreNivel)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Descripcion)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Descripcion)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.OrdenNivel)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.OrdenNivel)</dd>
+                </dl>
+
+                <div class="mt-4">
+                    <a asp-action="Edit" asp-route-id="@Model?.IdNivel" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver a la lista
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

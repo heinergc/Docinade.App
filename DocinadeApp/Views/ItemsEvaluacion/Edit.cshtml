@@ -1,0 +1,64 @@
+﻿@model RubricasApp.Web.Models.ItemEvaluacion
+
+@{
+    ViewData["Title"] = "Editar Item de Evaluación";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-edit"></i> Editar Item de Evaluación
+                </h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    
+                    <input type="hidden" asp-for="IdItem" />
+
+                    <div class="mb-3">
+                        <label asp-for="IdRubrica" class="form-label">Rúbrica</label>
+                        <select asp-for="IdRubrica" class="form-select" asp-items="ViewBag.IdRubrica">
+                            <option value="">Seleccione una rúbrica</option>
+                        </select>
+                        <span asp-validation-for="IdRubrica" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="NombreItem" class="form-label"></label>
+                        <input asp-for="NombreItem" class="form-control" />
+                        <span asp-validation-for="NombreItem" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Descripcion" class="form-label"></label>
+                        <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="OrdenItem" class="form-label"></label>
+                        <input asp-for="OrdenItem" class="form-control" type="number" />
+                        <span asp-validation-for="OrdenItem" class="text-danger"></span>
+                        <div class="form-text">Orden de presentación del item (opcional)</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save"></i> Actualizar
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

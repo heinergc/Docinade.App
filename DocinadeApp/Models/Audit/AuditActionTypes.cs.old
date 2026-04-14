@@ -1,0 +1,195 @@
+namespace RubricasApp.Web.Models.Audit
+{
+    /// <summary>
+    /// Tipos de acciones de auditoría
+    /// </summary>
+    public static class AuditActionTypes
+    {
+        /// <summary>
+        /// Acciones de autenticación
+        /// </summary>
+        public static class Auth
+        {
+            public const string Login = "Auth.Login";
+            public const string Logout = "Auth.Logout";
+            public const string FailedLogin = "Auth.FailedLogin";
+            public const string PasswordChange = "Auth.PasswordChange";
+            public const string PasswordReset = "Auth.PasswordReset";
+            public const string AccountLockout = "Auth.AccountLockout";
+            public const string AccountUnlock = "Auth.AccountUnlock";
+        }
+
+        /// <summary>
+        /// Acciones de rúbricas
+        /// </summary>
+        public static class Rubricas
+        {
+            public const string Crear = "Rubricas.Crear";
+            public const string Ver = "Rubricas.Ver";
+            public const string Editar = "Rubricas.Editar";
+            public const string Eliminar = "Rubricas.Eliminar";
+            public const string Duplicar = "Rubricas.Duplicar";
+            public const string Importar = "Rubricas.Importar";
+            public const string Exportar = "Rubricas.Exportar";
+            public const string Aprobar = "Rubricas.Aprobar";
+            public const string Publicar = "Rubricas.Publicar";
+        }
+
+        /// <summary>
+        /// Acciones de evaluaciones
+        /// </summary>
+        public static class Evaluaciones
+        {
+            public const string Crear = "Evaluaciones.Crear";
+            public const string Ver = "Evaluaciones.Ver";
+            public const string Editar = "Evaluaciones.Editar";
+            public const string Eliminar = "Evaluaciones.Eliminar";
+            public const string Evaluar = "Evaluaciones.Evaluar";
+            public const string Aprobar = "Evaluaciones.Aprobar";
+            public const string Finalizar = "Evaluaciones.Finalizar";
+            public const string Reabrir = "Evaluaciones.Reabrir";
+            public const string Exportar = "Evaluaciones.Exportar";
+            public const string VerResultados = "Evaluaciones.VerResultados";
+        }
+
+        /// <summary>
+        /// Acciones de estudiantes
+        /// </summary>
+        public static class Estudiantes
+        {
+            public const string Crear = "Estudiantes.Crear";
+            public const string Ver = "Estudiantes.Ver";
+            public const string Editar = "Estudiantes.Editar";
+            public const string Eliminar = "Estudiantes.Eliminar";
+            public const string Importar = "Estudiantes.Importar";
+            public const string Exportar = "Estudiantes.Exportar";
+            public const string VerHistorial = "Estudiantes.VerHistorial";
+            public const string VerNotas = "Estudiantes.VerNotas";
+            public const string EditarNotas = "Estudiantes.EditarNotas";
+        }
+
+        /// <summary>
+        /// Acciones de períodos académicos
+        /// </summary>
+        public static class Periodos
+        {
+            public const string Crear = "Periodos.Crear";
+            public const string Ver = "Periodos.Ver";
+            public const string Editar = "Periodos.Editar";
+            public const string Eliminar = "Periodos.Eliminar";
+            public const string Activar = "Periodos.Activar";
+            public const string Cerrar = "Periodos.Cerrar";
+        }
+
+        /// <summary>
+        /// Acciones de niveles de calificación
+        /// </summary>
+        public static class Niveles
+        {
+            public const string Crear = "Niveles.Crear";
+            public const string Ver = "Niveles.Ver";
+            public const string Editar = "Niveles.Editar";
+            public const string Eliminar = "Niveles.Eliminar";
+            public const string Reordenar = "Niveles.Reordenar";
+        }
+
+        /// <summary>
+        /// Acciones de ítems de evaluación
+        /// </summary>
+        public static class Items
+        {
+            public const string Crear = "Items.Crear";
+            public const string Ver = "Items.Ver";
+            public const string Editar = "Items.Editar";
+            public const string Eliminar = "Items.Eliminar";
+            public const string Reordenar = "Items.Reordenar";
+        }
+
+        /// <summary>
+        /// Acciones de configuración
+        /// </summary>
+        public static class Configuracion
+        {
+            public const string Ver = "Configuracion.Ver";
+            public const string EditarSistema = "Configuracion.EditarSistema";
+            public const string EditarSeguridad = "Configuracion.EditarSeguridad";
+            public const string GestionarRoles = "Configuracion.GestionarRoles";
+            public const string GestionarPermisos = "Configuracion.GestionarPermisos";
+            public const string Backup = "Configuracion.Backup";
+            public const string Restaurar = "Configuracion.Restaurar";
+            public const string ModoMantenimiento = "Configuracion.ModoMantenimiento";
+            public const string Initialize = "Configuracion.Initialize";
+            public const string SyncPermissions = "Configuracion.SyncPermissions";
+            public const string HealthCheck = "Configuracion.HealthCheck";
+        }
+
+        /// <summary>
+        /// Acciones de auditoría
+        /// </summary>
+        public static class Auditoria
+        {
+            public const string Ver = "Auditoria.Ver";
+            public const string VerAccesos = "Auditoria.VerAccesos";
+            public const string VerCambios = "Auditoria.VerCambios";
+            public const string VerErrores = "Auditoria.VerErrores";
+            public const string VerMetricas = "Auditoria.VerMetricas";
+            public const string Exportar = "Auditoria.Exportar";
+            public const string Limpiar = "Auditoria.Limpiar";
+        }
+
+        /// <summary>
+        /// Acciones de usuarios
+        /// </summary>
+        public static class Usuarios
+        {
+            public const string Crear = "Usuarios.Crear";
+            public const string Ver = "Usuarios.Ver";
+            public const string Editar = "Usuarios.Editar";
+            public const string Eliminar = "Usuarios.Eliminar";
+            public const string Activar = "Usuarios.Activar";
+            public const string Desactivar = "Usuarios.Desactivar";
+            public const string CambiarPassword = "Usuarios.CambiarPassword";
+            public const string ResetearPassword = "Usuarios.ResetearPassword";
+            public const string GestionarRoles = "Usuarios.GestionarRoles";
+            public const string VerActividad = "Usuarios.VerActividad";
+        }
+
+        /// <summary>
+        /// Acciones de roles
+        /// </summary>
+        public static class Roles
+        {
+            public const string Crear = "Roles.Crear";
+            public const string Ver = "Roles.Ver";
+            public const string Editar = "Roles.Editar";
+            public const string Eliminar = "Roles.Eliminar";
+            public const string GestionarPermisos = "Roles.GestionarPermisos";
+            public const string SincronizarPermisos = "Roles.SincronizarPermisos";
+        }
+
+        /// <summary>
+        /// Acciones de reportes
+        /// </summary>
+        public static class Reportes
+        {
+            public const string VerBasicos = "Reportes.VerBasicos";
+            public const string VerAvanzados = "Reportes.VerAvanzados";
+            public const string CrearPersonalizados = "Reportes.CrearPersonalizados";
+            public const string Exportar = "Reportes.Exportar";
+            public const string Programar = "Reportes.Programar";
+        }
+
+        /// <summary>
+        /// Acciones administrativas
+        /// </summary>
+        public static class Admin
+        {
+            public const string ViewDashboard = "Admin.ViewDashboard";
+            public const string ManageUsers = "Admin.ManageUsers";
+            public const string ManageRoles = "Admin.ManageRoles";
+            public const string ManagePermissions = "Admin.ManagePermissions";
+            public const string ViewAudit = "Admin.ViewAudit";
+            public const string SystemHealth = "Admin.SystemHealth";
+        }
+    }
+}

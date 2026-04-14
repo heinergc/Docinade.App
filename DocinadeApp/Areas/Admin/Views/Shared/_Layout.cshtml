@@ -1,0 +1,272 @@
+@{
+    ViewData["Title"] = ViewData["Title"] ?? "Panel de Administración";
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - RubricasApp Admin</title>
+
+     <!-- CSS desde CDN (igual que el layout principal) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+     <link rel="stylesheet" href="~/RubricasApp.Web.styles.css" asp-append-version="true" /> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="~/lib/toastr/toastr.min.css" />
+    @await RenderSectionAsync("Styles", required: false)
+
+    <!-- Estilos específicos del Admin -->
+    <style>
+        .admin-sidebar {
+            min-height: calc(100vh - 56px);
+            background: linear-gradient(135deg, #2b3e5e 0%, #1e293b 30%, #334155 60%, #475569 100%);
+            color: white;
+        }
+        
+        .admin-sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            margin: 2px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .admin-sidebar .nav-link:hover,
+        .admin-sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .admin-content {
+            background-color: #f8f9fa;
+            min-height: calc(100vh - 56px);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            transition: box-shadow 0.15s ease-in-out;
+        }
+        
+        .card:hover {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        
+        .border-left-primary {
+            border-left: 0.25rem solid #4e73df !important;
+        }
+        
+        .border-left-success {
+            border-left: 0.25rem solid #1cc88a !important;
+        }
+        
+        .border-left-info {
+            border-left: 0.25rem solid #36b9cc !important;
+        }
+        
+        .border-left-warning {
+            border-left: 0.25rem solid #f6c23e !important;
+        }
+        
+        .text-gray-800 {
+            color: #5a5c69 !important;
+        }
+        
+        .text-gray-300 {
+            color: #dddfeb !important;
+        }
+        
+        .admin-header {
+            background: linear-gradient(135deg, #2b3e5e 0%, #1e293b 30%, #334155 60%, #475569 100%);
+            color: white;
+            padding: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Admin Header -->
+    <header class="admin-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h4 class="mb-0">
+                        <i class="fas fa-cogs me-2"></i>
+                        Panel de Administración
+                    </h4>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i>
+                            @User.Identity?.Name
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="@Url.Action("Index", "Home", new { area = "" })">
+                                <i class="fas fa-home me-2"></i>Ir a la App
+                            </a></li>
+                            <li><a class="dropdown-item" href="@Url.Action("DebugRoles", "Home", new { area = "" })">
+                                <i class="fas fa-bug me-2"></i>Debug Roles
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Admin Sidebar -->
+            <div class="col-md-2 admin-sidebar p-3">
+                <nav class="nav flex-column">
+                    <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" && ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "active" : "")" 
+                       href="@Url.Action("Index", "Admin")">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Users" ? "active" : "")" 
+                       href="@Url.Action("Index", "Users")">
+                        <i class="fas fa-users me-2"></i>Usuarios
+                    </a>
+                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Roles" ? "active" : "")" 
+                       href="@Url.Action("Index", "Roles")">
+                        <i class="fas fa-user-tag me-2"></i>Roles
+                    </a>
+                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Permissions" ? "active" : "")" 
+                       href="@Url.Action("Index", "Permissions")">
+                        <i class="fas fa-key me-2"></i>Permisos
+                    </a>
+                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Configuracion" ? "active" : "")" 
+                       href="@Url.Action("Index", "Configuracion")">
+                        <i class="fas fa-cogs me-2"></i>Configuración
+                    </a>
+                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Audit" ? "active" : "")" 
+                       href="@Url.Action("Index", "Audit")">
+                        <i class="fas fa-clipboard-list me-2"></i>Auditoría
+                    </a>
+                    <hr class="my-3 opacity-50">
+                    <a class="nav-link" href="@Url.Action("Health", "Admin")" target="_blank">
+                        <i class="fas fa-heartbeat me-2"></i>Estado del Sistema
+                    </a>
+                </nav>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-10 admin-content p-4">
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>
+                        @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                @if (TempData["WarningMessage"] != null)
+                {
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        @TempData["WarningMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                @if (TempData["InfoMessage"] != null)
+                {
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        @TempData["InfoMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                <main role="main">
+                    @RenderBody()
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript desde CDN (igual que el layout principal) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastr/build/toastr.min.js"></script>
+    <script src="https://cdn.tiny.cloud/1/gkqx9c7er31mxkqpn09gqpnbxz0mo2uvog0742wmj3jdd6dm/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- Scripts específicos del Admin -->
+    <script>
+        // Configurar toastr para admin
+        if (typeof toastr !== 'undefined') {
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": true,
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+        }
+
+        // Auto-refresh stats cada 30 segundos
+        function refreshStats() {
+            fetch('/Admin/Stats')
+                .then(response => response.json())
+                .then(data => {
+                    // Actualizar estadísticas en tiempo real si están disponibles
+                    if (data.totalUsers !== undefined) {
+                        const element = document.querySelector('[data-stat="totalUsers"]');
+                        if (element) element.textContent = data.totalUsers;
+                    }
+                })
+                .catch(error => console.warn('Error refreshing stats:', error));
+        }
+
+        // Iniciar auto-refresh solo en el dashboard
+        if (window.location.pathname.includes('/Admin') && !window.location.pathname.includes('/Admin/')) {
+            setInterval(refreshStats, 30000);
+        }
+
+        // Confirmaciones para acciones destructivas
+        document.addEventListener('click', function(e) {
+            if (e.target.matches('[data-confirm]')) {
+                if (!confirm(e.target.getAttribute('data-confirm'))) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        });
+
+        // Tooltips de Bootstrap
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

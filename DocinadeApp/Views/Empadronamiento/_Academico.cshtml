@@ -1,0 +1,213 @@
+@model RubricasApp.Web.ViewModels.EstudianteEmpadronamientoViewModel
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.InstitucionProcedencia" class="form-label">
+                <i class="mdi mdi-school me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.InstitucionProcedencia)
+            </label>
+            <input asp-for="DatosEmpadronamiento.InstitucionProcedencia" class="form-control" 
+                   placeholder="Nombre de la institución educativa anterior" />
+            <div class="form-text">
+                <i class="mdi mdi-information-outline me-1"></i>
+                Colegio, universidad o instituto del que proviene
+            </div>
+            <span asp-validation-for="DatosEmpadronamiento.InstitucionProcedencia" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.UltimoNivelCursado" class="form-label">
+                <i class="mdi mdi-certificate me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.UltimoNivelCursado)
+            </label>
+            <select asp-for="DatosEmpadronamiento.UltimoNivelCursado" class="form-select">
+                <option value="">Seleccione...</option>
+                
+                <!-- Educación Secundaria -->
+                <optgroup label="Educación Secundaria">
+                    <option value="Séptimo año">Séptimo año</option>
+                    <option value="Octavo año">Octavo año</option>
+                    <option value="Noveno año">Noveno año</option>
+                    <option value="Décimo año">Décimo año</option>
+                    <option value="Undécimo año">Undécimo año</option>
+                    <option value="Bachillerato en Educación Media">Bachillerato en Educación Media</option>
+                </optgroup>
+                
+                <!-- Educación Técnica -->
+                <optgroup label="Educación Técnica">
+                    <option value="Técnico Medio">Técnico Medio</option>
+                    <option value="Técnico Especializado">Técnico Especializado</option>
+                    <option value="Tecnólogo">Tecnólogo</option>
+                </optgroup>
+                
+                <!-- Educación Superior -->
+                <optgroup label="Educación Superior">
+                    <option value="Diplomado">Diplomado</option>
+                    <option value="Bachillerato Universitario">Bachillerato Universitario</option>
+                    <option value="Licenciatura">Licenciatura</option>
+                    <option value="Maestría">Maestría</option>
+                    <option value="Doctorado">Doctorado</option>
+                </optgroup>
+                
+                <!-- Otros -->
+                <optgroup label="Otros">
+                    <option value="Educación para Adultos">Educación para Adultos</option>
+                    <option value="Educación Abierta">Educación Abierta</option>
+                    <option value="Otro">Otro</option>
+                </optgroup>
+            </select>
+            <span asp-validation-for="DatosEmpadronamiento.UltimoNivelCursado" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.PromedioAnterior" class="form-label">
+                <i class="mdi mdi-chart-line me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.PromedioAnterior)
+            </label>
+            <div class="input-group">
+                <input asp-for="DatosEmpadronamiento.PromedioAnterior" class="form-control" 
+                       type="number" step="0.01" min="0" max="100" placeholder="85.50" />
+                <span class="input-group-text">%</span>
+            </div>
+            <div class="form-text">
+                <i class="mdi mdi-information-outline me-1"></i>
+                Promedio final del último nivel completado (escala 0-100)
+            </div>
+            <span asp-validation-for="DatosEmpadronamiento.PromedioAnterior" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <!-- Espacio para futuras adiciones -->
+        <div class="mb-3">
+            <label class="form-label text-muted">
+                <i class="mdi mdi-calendar-clock me-1"></i>
+                Año de Graduación (Opcional)
+            </label>
+            <input type="number" class="form-control" min="1990" max="2030" 
+                   placeholder="2024" disabled />
+            <div class="form-text">
+                <i class="mdi mdi-wrench me-1"></i>
+                Campo en desarrollo - próxima actualización
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.AdaptacionesPrevias" class="form-label">
+                <i class="mdi mdi-human-wheelchair me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.AdaptacionesPrevias)
+            </label>
+            <textarea asp-for="DatosEmpadronamiento.AdaptacionesPrevias" class="form-control" rows="3" 
+                      placeholder="Describa cualquier adaptación curricular, metodológica o de acceso que haya recibido..."></textarea>
+            <div class="form-text">
+                <i class="mdi mdi-information-outline me-1"></i>
+                Incluya adaptaciones por discapacidades, dificultades de aprendizaje, condiciones médicas, etc.
+            </div>
+            <span asp-validation-for="DatosEmpadronamiento.AdaptacionesPrevias" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+<!-- Sección de Documentación Académica -->
+<hr class="my-4">
+<h6 class="mb-3">
+    <i class="mdi mdi-file-document-multiple-outline me-2"></i>
+    Documentación Académica
+</h6>
+
+<div class="row">
+    <div class="col-12">
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th width="40%">Documento</th>
+                        <th width="20%" class="text-center">¿Posee?</th>
+                        <th width="40%">Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <i class="mdi mdi-certificate me-1"></i>
+                            Certificado de Notas/Título
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="certNotas">
+                                <label class="form-check-label" for="certNotas">Sí</label>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control form-control-sm" 
+                                   placeholder="Estado del documento, fecha de emisión, etc.">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="mdi mdi-account-school me-1"></i>
+                            Constancia de Buena Conducta
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="constConducta">
+                                <label class="form-check-label" for="constConducta">Sí</label>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control form-control-sm" 
+                                   placeholder="Estado del documento, fecha de emisión, etc.">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="mdi mdi-file-document-outline me-1"></i>
+                            Expediente Académico
+                        </td>
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="expediente">
+                                <label class="form-check-label" for="expediente">Sí</label>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control form-control-sm" 
+                                   placeholder="Estado del documento, completitud, etc.">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-info mt-3">
+    <h6><i class="mdi mdi-information-outline me-2"></i>Información Académica</h6>
+    <p class="mb-2">Esta información nos ayuda a:</p>
+    <ul class="mb-0">
+        <li><strong>Ubicación académica:</strong> Determinar el nivel de entrada más apropiado</li>
+        <li><strong>Reconocimiento de estudios:</strong> Procesar equivalencias y convalidaciones</li>
+        <li><strong>Apoyo personalizado:</strong> Identificar necesidades de refuerzo o adaptaciones</li>
+        <li><strong>Requisitos de graduación:</strong> Planificar la ruta académica más eficiente</li>
+    </ul>
+</div>
+
+<div class="alert alert-warning mt-3">
+    <h6><i class="mdi mdi-alert-triangle-outline me-2"></i>Documentos Requeridos</h6>
+    <p class="mb-2">Para completar el proceso de matrícula, deberá presentar:</p>
+    <ul class="mb-0">
+        <li>Certificado de notas o título original y copia</li>
+        <li>Constancia de buena conducta (si aplica)</li>
+        <li>Expediente académico completo</li>
+        <li>Cualquier documento que respalde adaptaciones curriculares previas</li>
+    </ul>
+</div>

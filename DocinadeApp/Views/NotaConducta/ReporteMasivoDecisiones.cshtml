@@ -1,0 +1,105 @@
+@model RubricasApp.Web.ViewModels.Conducta.ReporteMasivoDecisionesViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte Masivo - Decisiones Profesionales</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        @@page { size: landscape; }
+        body { font-family: 'Arial', sans-serif; font-size: 9pt; line-height: 1.3; color: #333; padding: 20px; }
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #8e44ad; padding-bottom: 10px; }
+        .header h1 { color: #8e44ad; font-size: 18pt; margin-bottom: 5px; }
+        .header h2 { color: #7f8c8d; font-size: 12pt; font-weight: normal; }
+        .filters { background-color: #f4ecf7; padding: 10px; margin-bottom: 15px; border-left: 4px solid #9b59b6; }
+        .filters strong { color: #8e44ad; }
+        .summary { background-color: #9b59b6; color: white; padding: 10px; margin-bottom: 15px; text-align: center; font-size: 12pt; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background-color: #34495e; color: white; padding: 8px; text-align: left; font-size: 9pt; font-weight: bold; }
+        td { padding: 7px; border: 1px solid #ddd; font-size: 9pt; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f8e8f5; }
+        .estado-pendiente { color: #e67e22; font-weight: bold; }
+        .estado-registrado { color: #27ae60; font-weight: bold; }
+        .decision-mantener { color: #e74c3c; }
+        .decision-asignar { color: #27ae60; }
+        .footer { margin-top: 20px; padding-top: 10px; border-top: 1px solid #bdc3c7; text-align: center; font-size: 8pt; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>REPORTE MASIVO: DECISIONES PROFESIONALES DOCENTES</h1>
+        <h2>@Model.NombreInstitucion</h2>
+    </div>
+
+    <div class="filters">
+        <strong>Período Académico:</strong> @Model.PeriodoAcademico &nbsp;|&nbsp;
+        <strong>Estado:</strong> @Model.EstadoFiltro &nbsp;|&nbsp;
+        <strong>Fecha de Generación:</strong> @Model.FechaGeneracion.ToString("dd/MM/yyyy HH:mm")
+    </div>
+
+    <div class="summary">
+        Total de Decisiones: @Model.TotalRegistros
+    </div>
+
+    @if (Model.Decisiones.Any())
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 8%;">N° Acta</th>
+                    <th style="width: 10%;">Fecha Reunión</th>
+                    <th style="width: 22%;">Estudiante</th>
+                    <th style="width: 10%;">Carnet</th>
+                    <th style="width: 10%;">Grado/Sección</th>
+                    <th style="width: 15%;">Decisión Tomada</th>
+                    <th style="width: 8%;">Estado</th>
+                    <th style="width: 12%;">Tomada Por</th>
+                    <th style="width: 8%;">Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var decision in Model.Decisiones)
+                {
+                    var estadoClass = decision.Estado == "Registrado" ? "estado-registrado" : "estado-pendiente";
+                    var decisionClass = decision.DecisionTomada.Contains("Mantener") ? "decision-mantener" : "decision-asignar";
+
+                    <tr>
+                        <td>@decision.NumeroActa</td>
+                        <td>@decision.FechaReunion.ToString("dd/MM/yyyy")</td>
+                        <td>@decision.NombreEstudiante</td>
+                        <td>@decision.Carnet</td>
+                        <td>@decision.GradoSeccion</td>
+                        <td class="@decisionClass" style="font-weight: bold;">@decision.DecisionTomada</td>
+                        <td class="@estadoClass">@decision.Estado</td>
+                        <td style="font-size: 8pt;">@decision.TomaDecisionPor</td>
+                        <td>@decision.FechaDecision.ToString("dd/MM/yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div style="text-align: center; padding: 30px; color: #7f8c8d; font-size: 12pt;">
+            No se encontraron decisiones profesionales con los filtros aplicados.
+        </div>
+    }
+
+    <div class="footer">
+        <strong>Leyenda de Estados:</strong>
+        <span class="estado-pendiente">Pendiente</span> |
+        <span class="estado-registrado">Registrado</span>
+        <br/><br/>
+        <strong>Decisiones:</strong>
+        <span class="decision-mantener">■ Mantener Aplazado</span> |
+        <span class="decision-asignar">■ Asignar Aprobado</span>
+        <br/>
+        Conforme al Art. 132 del Reglamento de Evaluación de los Aprendizajes
+    </div>
+</body>
+</html>

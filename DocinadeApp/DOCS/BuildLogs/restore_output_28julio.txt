@@ -1,0 +1,9 @@
+Comando: dotnet restore
+Fecha: 2025-07-28 12:42:51.286833
+==================================================
+STDOUT:
+  Determinando los proyectos que se van a restaurar...
+  Todos los proyectos estÃ¡n actualizados para la restauraciÃ³n.
+
+
+STDERR:

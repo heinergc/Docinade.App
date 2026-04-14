@@ -1,0 +1,211 @@
+/* ===== ESTILOS PARA COMPONENTE DE B�SQUEDA DE ESTUDIANTES ===== */
+
+/* Animaciones para el componente */
+.estudiante-row {
+    transition: all 0.2s ease-in-out;
+}
+
+.estudiante-row:hover {
+    background-color: var(--bs-primary-bg-subtle, #e7f1ff) !important;
+    transform: translateX(2px);
+}
+
+.estudiante-row.selected-row {
+    background-color: var(--bs-primary, #0d6efd) !important;
+    color: white !important;
+}
+
+.estudiante-row.selected-row td {
+    color: white !important;
+}
+
+.estudiante-row.selected-row .badge {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+}
+
+.estudiante-row.selected-row .text-muted {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Estilo para el bot�n de b�squeda */
+.btn-outline-secondary {
+    border-color: var(--bs-border-color);
+    transition: all 0.15s ease-in-out;
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Animaci�n de carga */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.loading-row {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Estilos para mensajes */
+.alert {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+/* Input de b�squeda mejorado */
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Tabla responsiva mejorada */
+.table-responsive {
+    border-radius: 0.375rem;
+    border: 1px solid var(--bs-border-color);
+}
+
+.table thead th {
+    background-color: var(--bs-dark);
+    color: white;
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid var(--bs-border-color-translucent);
+}
+
+.table tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* Badge personalizado */
+.badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Modal mejorado */
+.modal-content {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--bs-border-color);
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--bs-border-color);
+    border-radius: 0 0 0.5rem 0.5rem;
+}
+
+/* Indicadores de estado */
+.text-primary {
+    color: var(--bs-white) !important;
+    font-weight: 600;
+}
+
+/* Animacin para notificaciones */
+.alert.position-fixed {
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Mejoras para dispositivos m�viles */
+@media (max-width: 768px) {
+    .modal-dialog {
+        margin: 0.5rem;
+        max-width: calc(100% - 1rem);
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .estudiante-row:hover {
+        transform: none;
+    }
+    
+    .btn-outline-secondary:hover {
+        transform: none;
+    }
+}
+
+/* Estado de carga para el modal */
+.modal-loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.modal-loading .modal-body {
+    position: relative;
+}
+
+.modal-loading .spinner-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
+
+/* Mejoras de accesibilidad */
+.estudiante-row:focus {
+    outline: 2px solid var(--bs-primary);
+    outline-offset: -2px;
+}
+
+.btn:focus {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Estilos para el input group */
+.input-group .btn {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    z-index: 3;
+}
+
+.input-group .form-select {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.input-group .btn + .form-select {
+    border-left: 0;
+}
+
+.input-group:focus-within .btn {
+    border-color: var(--bs-primary);
+}
+
+/* Transiciones suaves */
+* {
+    transition: border-color 0.15s ease-in-out, 
+                box-shadow 0.15s ease-in-out,
+                background-color 0.15s ease-in-out,
+                color 0.15s ease-in-out;
+}

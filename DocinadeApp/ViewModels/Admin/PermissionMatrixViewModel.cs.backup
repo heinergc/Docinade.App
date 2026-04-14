@@ -1,0 +1,132 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace RubricasApp.Web.ViewModels.Admin
+{
+    /// <summary>
+    /// ViewModel para mostrar la matriz de permisos
+    /// </summary>
+    public class PermissionMatrixViewModel
+    {
+        /// <summary>
+        /// Lista de permisos con sus asignaciones por rol
+        /// </summary>
+        public List<PermissionMatrixRow> Matrix { get; set; } = new();
+
+        /// <summary>
+        /// Lista de todos los roles del sistema
+        /// </summary>
+        public List<string> Roles { get; set; } = new();
+
+        /// <summary>
+        /// Fecha de generación de la matriz
+        /// </summary>
+        public DateTime GeneratedDate { get; set; } = DateTime.Now;
+
+        /// <summary>
+        /// Total de permisos en el sistema
+        /// </summary>
+        public int TotalPermissions => Matrix.Count;
+
+        /// <summary>
+        /// Total de roles en el sistema
+        /// </summary>
+        public int TotalRoles => Roles.Count;
+
+        /// <summary>
+        /// Total de asignaciones de permisos
+        /// </summary>
+        public int TotalAssignments => Matrix.Sum(m => m.RoleAssignments.Count(ra => ra.Value));
+
+        /// <summary>
+        /// Categorías únicas de permisos
+        /// </summary>
+        public List<string> Categories => Matrix.Select(m => m.Category).Distinct().OrderBy(c => c).ToList();
+    }
+
+    /// <summary>
+    /// Representa una fila en la matriz de permisos
+    /// </summary>
+    public class PermissionMatrixRow
+    {
+        /// <summary>
+        /// Categoría del permiso
+        /// </summary>
+        public string Category { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Nombre legible del permiso
+        /// </summary>
+        public string Permission { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Nombre técnico del permiso
+        /// </summary>
+        public string PermissionName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Descripción del permiso
+        /// </summary>
+        public string Description { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Diccionario que indica si cada rol tiene el permiso asignado
+        /// Key: Nombre del rol
+        /// Value: true si tiene el permiso, false si no
+        /// </summary>
+        public Dictionary<string, bool> RoleAssignments { get; set; } = new();
+
+        /// <summary>
+        /// Cantidad de roles que tienen este permiso
+        /// </summary>
+        public int AssignedRolesCount => RoleAssignments.Count(ra => ra.Value);
+
+        /// <summary>
+        /// Porcentaje de roles que tienen este permiso
+        /// </summary>
+        public double AssignmentPercentage => RoleAssignments.Count > 0 
+            ? (double)AssignedRolesCount / RoleAssignments.Count * 100 
+            : 0;
+    }
+
+    /// <summary>
+    /// ViewModel para exportar matriz a Excel
+    /// </summary>
+    public class PermissionMatrixExportViewModel
+    {
+        /// <summary>
+        /// Datos de la matriz para exportación
+        /// </summary>
+        public List<PermissionMatrixExportRow> Data { get; set; } = new();
+
+        /// <summary>
+        /// Metadatos de la exportación
+        /// </summary>
+        public PermissionMatrixExportMetadata Metadata { get; set; } = new();
+    }
+
+    /// <summary>
+    /// Fila de datos para exportación de matriz
+    /// </summary>
+    public class PermissionMatrixExportRow
+    {
+        public string Categoria { get; set; } = string.Empty;
+        public string Permiso { get; set; } = string.Empty;
+        public string NombreTecnico { get; set; } = string.Empty;
+        public string Descripcion { get; set; } = string.Empty;
+        public Dictionary<string, string> AsignacionesPorRol { get; set; } = new();
+    }
+
+    /// <summary>
+    /// Metadatos para la exportación
+    /// </summary>
+    public class PermissionMatrixExportMetadata
+    {
+        public DateTime FechaGeneracion { get; set; } = DateTime.Now;
+        public string GeneradoPor { get; set; } = string.Empty;
+        public int TotalPermisos { get; set; }
+        public int TotalRoles { get; set; }
+        public int TotalAsignaciones { get; set; }
+        public List<string> Roles { get; set; } = new();
+        public List<string> Categorias { get; set; } = new();
+    }
+}

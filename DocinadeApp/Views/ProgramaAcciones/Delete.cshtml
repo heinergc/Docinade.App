@@ -1,0 +1,92 @@
+@model RubricasApp.Web.ViewModels.Conducta.EliminarProgramaViewModel
+
+@{
+    ViewData["Title"] = "Eliminar Programa de Acciones";
+}
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col">
+            <h2 class="text-danger"><i class="fas fa-trash-alt me-2"></i>@ViewData["Title"]</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index">Programas de Acciones</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@Model.IdPrograma">Detalles</a></li>
+                    <li class="breadcrumb-item active">Eliminar</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>¿Confirmar Eliminación?</h4>
+                <p>
+                    Esta acción no se puede deshacer. Se eliminará permanentemente el programa de acciones.
+                </p>
+                <hr>
+                <p class="mb-0">
+                    <strong>Nota:</strong> Los programas verificados no pueden ser eliminados.
+                </p>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Datos del Programa</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Título:</dt>
+                        <dd class="col-sm-8">@Model.TituloPrograma</dd>
+
+                        <dt class="col-sm-4">Estudiante:</dt>
+                        <dd class="col-sm-8">@Model.NombreEstudiante</dd>
+
+                        <dt class="col-sm-4">Período:</dt>
+                        <dd class="col-sm-8">@Model.NombrePeriodo</dd>
+
+                        <dt class="col-sm-4">Supervisor:</dt>
+                        <dd class="col-sm-8">@Model.NombreSupervisor</dd>
+
+                        <dt class="col-sm-4">Estado:</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.Estado == "Pendiente")
+                            {
+                                <span class="badge bg-secondary">@Model.Estado</span>
+                            }
+                            else if (Model.Estado == "En Proceso")
+                            {
+                                <span class="badge bg-warning text-dark">@Model.Estado</span>
+                            }
+                            else if (Model.Estado == "Completado")
+                            {
+                                <span class="badge bg-success">@Model.Estado</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">@Model.Estado</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">Fecha de Creación:</dt>
+                        <dd class="col-sm-8">@Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</dd>
+                    </dl>
+
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" asp-for="IdPrograma" />
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i> Sí, Eliminar Programa
+                            </button>
+                            <a asp-action="Details" asp-route-id="@Model.IdPrograma" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

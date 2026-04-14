@@ -1,0 +1,220 @@
+@model RubricasApp.Web.ViewModels.EmpadronamientoPublicoViewModel
+
+@{
+    ViewData["Title"] = "Paso 5: Información de Salud";
+}
+
+<!-- Barra de progreso -->
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="progress" style="height: 30px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" 
+                     role="progressbar" 
+                     style="width: 100%;" 
+                     aria-valuenow="100" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                    Paso @Model.PasoActual de @Model.TotalPasos (100%) - ÚLTIMO PASO
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-heartbeat"></i> Paso 5: Información de Salud
+                    </h3>
+                    <small>Complete su información médica (Opcional pero recomendada)</small>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Finalizar" method="post">
+                        @Html.AntiForgeryToken()
+                        
+                        <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+                        
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-shield-alt"></i> Privacidad y Confidencialidad</h6>
+                            <p class="mb-0">
+                                La información médica que proporcione es <strong>voluntaria</strong> pero muy importante 
+                                para poder brindarle la atención adecuada en caso de emergencia. Todos los datos serán 
+                                tratados de manera confidencial según la legislación vigente.
+                            </p>
+                        </div>
+                        
+                        <h5 class="text-danger mb-3"><i class="fas fa-notes-medical"></i> Información Médica</h5>
+                        
+                        <!-- Alergias -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="Alergias" class="form-label fw-bold">
+                                    <i class="fas fa-allergies"></i> Alergias Conocidas
+                                </label>
+                                <textarea asp-for="Alergias" class="form-control" rows="2" 
+                                          placeholder="Ej: Alergia al polen, mariscos, medicamentos específicos..."></textarea>
+                                <span asp-validation-for="Alergias" class="text-danger"></span>
+                                <small class="form-text text-muted">
+                                    Indique cualquier alergia a alimentos, medicamentos, sustancias, etc.
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- Condiciones Médicas -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="CondicionesMedicas" class="form-label fw-bold">
+                                    <i class="fas fa-stethoscope"></i> Condiciones Médicas o Diagnósticos
+                                </label>
+                                <textarea asp-for="CondicionesMedicas" class="form-control" rows="2" 
+                                          placeholder="Ej: Asma, diabetes, epilepsia, condiciones cardíacas..."></textarea>
+                                <span asp-validation-for="CondicionesMedicas" class="text-danger"></span>
+                                <small class="form-text text-muted">
+                                    Indique cualquier condición médica crónica o diagnóstico importante
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- Medicamentos -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="Medicamentos" class="form-label fw-bold">
+                                    <i class="fas fa-pills"></i> Medicamentos que Toma Regularmente
+                                </label>
+                                <textarea asp-for="Medicamentos" class="form-control" rows="2" 
+                                          placeholder="Ej: Antihistamínicos, insulina, medicamentos para presión arterial..."></textarea>
+                                <span asp-validation-for="Medicamentos" class="text-danger"></span>
+                                <small class="form-text text-muted">
+                                    Incluya nombre del medicamento y dosis si la conoce
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <h5 class="text-danger mb-3"><i class="fas fa-hospital"></i> Información del Seguro Médico</h5>
+                        
+                        <!-- Seguro Médico -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="SeguroMedico" class="form-label fw-bold">
+                                    Compañía de Seguro Médico
+                                </label>
+                                <input asp-for="SeguroMedico" class="form-control" 
+                                       placeholder="Ej: CCSS, INS, seguro privado..." />
+                                <span asp-validation-for="SeguroMedico" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CentroMedicoHabitual" class="form-label fw-bold">
+                                    Centro Médico o Clínica Habitual
+                                </label>
+                                <input asp-for="CentroMedicoHabitual" class="form-control" 
+                                       placeholder="Ej: EBAIS, Clínica Católica..." />
+                                <span asp-validation-for="CentroMedicoHabitual" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <!-- Términos y Condiciones -->
+                        <div class="row">
+                            <div class="col-md-12 mb-4">
+                                <div class="form-check p-3 border rounded bg-light">
+                                    <input asp-for="AceptaTerminos" class="form-check-input" type="checkbox" required />
+                                    <label asp-for="AceptaTerminos" class="form-check-label fw-bold">
+                                        <span class="text-danger">*</span> Acepto los Términos y Condiciones
+                                    </label>
+                                    <span asp-validation-for="AceptaTerminos" class="text-danger d-block"></span>
+                                    <small class="form-text text-muted d-block mt-2">
+                                        Al marcar esta casilla, declaro que:
+                                        <ul class="mt-2">
+                                            <li>Toda la información proporcionada es verdadera y correcta</li>
+                                            <li>Autorizo el uso de mis datos para fines académicos y administrativos</li>
+                                            <li>Acepto las políticas de privacidad y protección de datos</li>
+                                            <li>Comprendo que la información falsa puede resultar en la cancelación de mi matrícula</li>
+                                        </ul>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Campos ocultos -->
+                        <input type="hidden" asp-for="PasoActual" />
+                        <input type="hidden" asp-for="TotalPasos" />
+                        <input type="hidden" asp-for="SessionId" />
+                        
+                        <hr class="my-4">
+                        
+                        <div class="alert alert-success">
+                            <h6 class="mb-1"><i class="fas fa-check-circle"></i> ¡Último Paso!</h6>
+                            <p class="mb-0">
+                                Al presionar <strong>"Finalizar Empadronamiento"</strong>, su solicitud será enviada 
+                                y recibirá un código de confirmación por correo electrónico.
+                            </p>
+                        </div>
+                        
+                        <!-- Botones de navegación -->
+                        <div class="row">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                                    <i class="fas fa-arrow-left"></i> Anterior
+                                </button>
+                            </div>
+                            <div class="col-6 text-end">
+                                <button type="submit" class="btn btn-success btn-lg px-5">
+                                    <i class="fas fa-check"></i> Finalizar Empadronamiento
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        $(document).ready(function() {
+            // Confirmación antes de enviar
+            $('form').on('submit', function(e) {
+                if (!$('#AceptaTerminos').is(':checked')) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Términos y Condiciones',
+                        text: 'Debe aceptar los términos y condiciones para continuar',
+                        confirmButtonText: 'Entendido'
+                    });
+                    return false;
+                }
+                
+                // Confirmación final
+                e.preventDefault();
+                Swal.fire({
+                    title: '¿Finalizar Empadronamiento?',
+                    html: '<p>Está a punto de enviar su solicitud de empadronamiento.</p><p class="text-muted">Recibirá un código de confirmación por correo electrónico.</p>',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fas fa-check"></i> Sí, Finalizar',
+                    cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+                    showLoaderOnConfirm: true,
+                    allowOutsideClick: () => !Swal.isLoading()
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('form')[0].submit();
+                    }
+                });
+            });
+        });
+    </script>
+}

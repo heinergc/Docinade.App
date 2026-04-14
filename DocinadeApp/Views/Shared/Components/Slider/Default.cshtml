@@ -1,0 +1,210 @@
+@model IEnumerable<RubricasApp.Web.Models.SliderItem>
+
+@if (Model != null && Model.Any())
+{
+    <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
+        <!-- Indicadores -->
+        <div class="carousel-indicators">
+            @foreach (var (item, index) in Model.Select((item, i) => (item, i)))
+            {
+                <button type="button" 
+                        data-bs-target="#heroCarousel" 
+                        data-bs-slide-to="@index" 
+                        class="@(index == 0 ? "active" : "")"
+                        aria-current="@(index == 0 ? "true" : "false")"
+                        aria-label="Slide @(index + 1)">
+                </button>
+            }
+        </div>
+
+        <!-- Slides -->
+        <div class="carousel-inner">
+            @foreach (var (item, index) in Model.Select((item, i) => (item, i)))
+            {
+                <div class="carousel-item @(index == 0 ? "active" : "")">
+                    @if (!string.IsNullOrEmpty(item.ImagenUrl))
+                    {
+                        <img src="@item.ImagenUrl" 
+                             class="d-block w-100 carousel-image" 
+                             alt="@item.Titulo"
+                             loading="@(index == 0 ? "eager" : "lazy")">
+                    }
+                    else
+                    {
+                        <!-- Imagen placeholder si no hay imagen -->
+                        <div class="carousel-placeholder d-flex align-items-center justify-content-center bg-secondary text-white">
+                            <i class="fas fa-image fa-5x opacity-50"></i>
+                        </div>
+                    }
+
+                    <!-- Caption con título, subtítulo y botón opcional -->
+                    <div class="carousel-caption d-md-block">
+                        <div class="carousel-caption-content">
+                            <h1 class="carousel-title animate__animated animate__fadeInDown">
+                                @item.Titulo
+                            </h1>
+                            
+                            @if (!string.IsNullOrEmpty(item.Subtitulo))
+                            {
+                                <p class="carousel-subtitle animate__animated animate__fadeInUp animate__delay-1s">
+                                    @item.Subtitulo
+                                </p>
+                            }
+
+                            @if (!string.IsNullOrEmpty(item.EnlaceUrl))
+                            {
+                                <div class="mt-3 animate__animated animate__fadeInUp animate__delay-2s">
+                                    <a href="@item.EnlaceUrl" 
+                                       class="btn btn-primary btn-lg carousel-btn"
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+                                        @(item.TextoBoton ?? "Ver más")
+                                        <i class="fas fa-arrow-right ms-2"></i>
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Controles de navegación -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Siguiente</span>
+        </button>
+    </div>
+
+    <style>
+        /* Estilos del carrusel - Ancho completo pegado al header */
+        #heroCarousel {
+            position: relative;
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            margin-bottom: 2rem;
+            margin-top: 0;
+        }
+
+        .carousel-image {
+            height: 500px;
+            width: 100%;
+            object-fit: cover;
+            filter: brightness(0.7);
+        }
+
+        .carousel-placeholder {
+            height: 500px;
+            width: 100%;
+        }
+
+        .carousel-caption {
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 3rem 1rem;
+        }
+
+        .carousel-caption-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .carousel-title {
+            font-size: 3rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .carousel-subtitle {
+            font-size: 1.5rem;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+            margin-bottom: 1.5rem;
+            color: #f8f9fa;
+        }
+
+        .carousel-btn {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .carousel-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+
+        .carousel-indicators button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 0 5px;
+        }
+
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            width: 3rem;
+            height: 3rem;
+            background-color: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            padding: 0.5rem;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .carousel-image,
+            .carousel-placeholder {
+                height: 300px;
+            }
+
+            .carousel-title {
+                font-size: 2rem;
+            }
+
+            .carousel-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .carousel-caption {
+                padding: 2rem 0.5rem;
+            }
+
+            .carousel-btn {
+                font-size: 1rem;
+                padding: 10px 25px;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .carousel-image,
+            .carousel-placeholder {
+                height: 250px;
+            }
+
+            .carousel-title {
+                font-size: 1.5rem;
+            }
+
+            .carousel-subtitle {
+                font-size: 1rem;
+            }
+
+            .carousel-caption {
+                padding: 1.5rem 0.5rem;
+            }
+        }
+    </style>
+
+    <!-- Agregar Animate.css si no está incluido globalmente -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+}

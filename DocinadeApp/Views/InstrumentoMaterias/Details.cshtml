@@ -1,0 +1,192 @@
+﻿@model RubricasApp.Web.ViewModels.InstrumentoMateriaViewModel
+
+@{
+    ViewData["Title"] = "Detalles de la Relación Instrumento-Materia";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-eye"></i> @ViewData["Title"]
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Información del Instrumento -->
+                        <div class="col-md-6">
+                            <div class="card h-100 border-primary">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-clipboard-list"></i> Instrumento de Evaluación
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <dl class="row">
+                                        <dt class="col-sm-4">ID:</dt>
+                                        <dd class="col-sm-8">@Model.InstrumentoId</dd>
+                                        
+                                        <dt class="col-sm-4">Nombre:</dt>
+                                        <dd class="col-sm-8">
+                                            <strong>@Model.InstrumentoNombre</strong>
+                                        </dd>
+                                        
+                                        <dt class="col-sm-4">Estado:</dt>
+                                        <dd class="col-sm-8">
+                                            @if (Model.InstrumentoActivo == true)
+                                            {
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check"></i> Activo
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">
+                                                    <i class="fas fa-times"></i> Inactivo
+                                                </span>
+                                            }
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Información de la Materia -->
+                        <div class="col-md-6">
+                            <div class="card h-100 border-info">
+                                <div class="card-header bg-info text-white">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-book"></i> Materia
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <dl class="row">
+                                        <dt class="col-sm-4">ID:</dt>
+                                        <dd class="col-sm-8">@Model.MateriaId</dd>
+                                        
+                                        <dt class="col-sm-4">Nombre:</dt>
+                                        <dd class="col-sm-8">
+                                            <strong>@Model.MateriaNombre</strong>
+                                        </dd>
+                                        
+                                        @if (!string.IsNullOrEmpty(Model.MateriaDescripcion))
+                                        {
+                                            <dt class="col-sm-4">Descripción:</dt>
+                                            <dd class="col-sm-8">
+                                                <small class="text-muted">@Model.MateriaDescripcion</small>
+                                            </dd>
+                                        }
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Información de la Relación -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card border-warning">
+                                <div class="card-header bg-warning text-dark">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-link"></i> Información de la Relación
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <dl class="row">
+                                                <dt class="col-sm-6">Período Académico:</dt>
+                                                <dd class="col-sm-6">
+                                                    <span class="badge bg-warning text-dark fs-6">
+                                                        <i class="fas fa-calendar-alt"></i> @Model.PeriodoAcademicoNombre
+                                                    </span>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <dl class="row">
+                                                <dt class="col-sm-6">Clave Compuesta:</dt>
+                                                <dd class="col-sm-6">
+                                                    <code>@Model.InstrumentoId-@Model.MateriaId</code>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información adicional -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="alert alert-light border">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-info-circle text-info"></i> Información Adicional
+                                </h6>
+                                <ul class="mb-0">
+                                    <li>Esta relación vincula el instrumento <strong>@Model.InstrumentoNombre</strong> con la materia <strong>@Model.MateriaNombre</strong>.</li>
+                                    <li>La relación está configurada para el período académico <strong>@Model.PeriodoAcademicoNombre</strong>.</li>
+                                    <li>Las evaluaciones realizadas con este instrumento se aplicarán específicamente a esta materia.</li>
+                                    @if (!Model.InstrumentoActivo == true)
+                                    {
+                                        <li class="text-warning">
+                                            <i class="fas fa-exclamation-triangle"></i> 
+                                            <strong>Atención:</strong> El instrumento está inactivo y no puede ser utilizado para nuevas evaluaciones.
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver a la Lista
+                        </a>
+                        <div>
+                            <a asp-action="Edit" 
+                               asp-route-instrumentoId="@Model.InstrumentoId" 
+                               asp-route-materiaId="@Model.MateriaId" 
+                               class="btn btn-warning">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <a asp-action="Delete" 
+                               asp-route-instrumentoId="@Model.InstrumentoId" 
+                               asp-route-materiaId="@Model.MateriaId" 
+                               class="btn btn-danger ms-2">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Confirmación para eliminar
+            $('.btn-danger').click(function(e) {
+                if (!confirm('¿Está seguro de que desea eliminar esta relación instrumento-materia?')) {
+                    e.preventDefault();
+                }
+            });
+
+            // Efecto hover en las tarjetas
+            $('.card.border-primary, .card.border-info, .card.border-warning').hover(
+                function() {
+                    $(this).addClass('shadow-sm');
+                },
+                function() {
+                    $(this).removeClass('shadow-sm');
+                }
+            );
+        });
+    </script>
+}

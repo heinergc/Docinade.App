@@ -1,0 +1,267 @@
+@model RubricasApp.Web.ViewModels.Conducta.ProgramaAccionesDetalleViewModel
+
+@{
+    ViewData["Title"] = "Detalles del Programa de Acciones";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller="NotaConducta" asp-action="Dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Index">Programas</a></li>
+                    <li class="breadcrumb-item active">Programa #@Model.IdPrograma</li>
+                </ol>
+            </nav>
+            <h2><i class="fas fa-clipboard-list"></i> Detalles del Programa de Acciones</h2>
+        </div>
+    </div>
+
+    <!-- Estado del programa -->
+    <div class="row mb-4">
+        <div class="col-12">
+            @if (Model.Estado == "Pendiente")
+            {
+                <div class="alert alert-warning border-warning">
+                    <i class="fas fa-clock fa-2x float-start me-3"></i>
+                    <h5 class="alert-heading">Programa Pendiente</h5>
+                    <p class="mb-0">Este programa aún no ha sido iniciado por el estudiante.</p>
+                </div>
+            }
+            else if (Model.Estado == "En Proceso")
+            {
+                <div class="alert alert-primary border-primary">
+                    <i class="fas fa-spinner fa-2x float-start me-3"></i>
+                    <h5 class="alert-heading">Programa En Proceso</h5>
+                    <p class="mb-0">El estudiante está realizando las actividades del programa.</p>
+                </div>
+            }
+            else if (Model.Estado == "Completado")
+            {
+                <div class="alert alert-success border-success">
+                    <i class="fas fa-check-circle fa-2x float-start me-3"></i>
+                    <h5 class="alert-heading">Programa Completado</h5>
+                    <p class="mb-0">El estudiante completó satisfactoriamente el programa de acciones.</p>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-danger border-danger">
+                    <i class="fas fa-times-circle fa-2x float-start me-3"></i>
+                    <h5 class="alert-heading">Programa No Completado</h5>
+                    <p class="mb-0">El estudiante no completó satisfactoriamente el programa de acciones.</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Columna izquierda -->
+        <div class="col-lg-6">
+            <!-- Información del estudiante -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-graduate"></i> Información del Estudiante</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Nombre:</strong> @Model.NombreEstudiante</p>
+                    <p><strong>Identificación:</strong> @Model.NumeroIdentificacion</p>
+                    <p><strong>Grupo:</strong> @Model.NombreGrupo</p>
+                    <p><strong>Período:</strong> @Model.NombrePeriodo</p>
+                    <p class="mb-0"><strong>Nota de Conducta:</strong> <span class="badge bg-danger">@Model.NotaConducta.ToString("F2")</span></p>
+                </div>
+            </div>
+
+            <!-- Descripción del programa -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-file-alt"></i> Descripción del Programa</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-justify">@Model.Descripcion</p>
+                </div>
+            </div>
+
+            <!-- Objetivos -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-bullseye"></i> Objetivos</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-justify">@Model.Objetivos</p>
+                </div>
+            </div>
+
+            <!-- Actividades -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0"><i class="fas fa-tasks"></i> Actividades Propuestas</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-justify">@Model.ActividadesPropuestas</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna derecha -->
+        <div class="col-lg-6">
+            <!-- Fechas y supervisor -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Fechas y Supervisión</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Fecha de Inicio:</strong> @Model.FechaInicio.ToString("dd/MM/yyyy")</p>
+                    <p><strong>Fecha Fin Prevista:</strong> @Model.FechaFinPrevista.ToString("dd/MM/yyyy")</p>
+                    @if (Model.FechaFinReal.HasValue)
+                    {
+                        <p><strong>Fecha Fin Real:</strong> @Model.FechaFinReal.Value.ToString("dd/MM/yyyy")</p>
+                    }
+                    <p><strong>Supervisor:</strong> @Model.NombreSupervisor</p>
+                    <p class="mb-0">
+                        <strong>Estado:</strong>
+                        @if (Model.Estado == "Pendiente")
+                        {
+                            <span class="badge bg-warning">Pendiente</span>
+                        }
+                        else if (Model.Estado == "En Proceso")
+                        {
+                            <span class="badge bg-primary">En Proceso</span>
+                        }
+                        else if (Model.Estado == "Completado")
+                        {
+                            <span class="badge bg-success">Completado</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">No Completado</span>
+                        }
+                    </p>
+                </div>
+            </div>
+
+            <!-- Compromisos -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header" style="background-color: #6610f2; color: white;">
+                    <h5 class="mb-0"><i class="fas fa-handshake"></i> Compromisos</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="text-primary">Del Estudiante:</h6>
+                    <p class="text-justify">@Model.CompromisosEstudiante</p>
+                    
+                    <hr />
+                    
+                    <h6 class="text-primary">De la Familia:</h6>
+                    <p class="text-justify mb-0">@Model.CompromisosFamilia</p>
+                </div>
+            </div>
+
+            <!-- Criterios de evaluación -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header" style="background-color: #fd7e14; color: white;">
+                    <h5 class="mb-0"><i class="fas fa-check-square"></i> Criterios de Evaluación</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-justify">@Model.CriteriosEvaluacion</p>
+                </div>
+            </div>
+
+            <!-- Verificación del comité -->
+            @if (Model.FechaVerificacion.HasValue)
+            {
+                <div class="card mb-4 shadow-sm border-success">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-certificate"></i> Verificación del Comité</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Fecha de Verificación:</strong> @Model.FechaVerificacion.Value.ToString("dd/MM/yyyy")</p>
+                        <p><strong>Verificado Por:</strong> @Model.NombreVerificador</p>
+                        <p><strong>Resultado:</strong> 
+                            @if (Model.Resultado == "Exitoso")
+                            {
+                                <span class="badge bg-success">Exitoso</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">No Exitoso</span>
+                            }
+                        </p>
+                        @if (!string.IsNullOrEmpty(Model.ObservacionesVerificacion))
+                        {
+                            <hr />
+                            <h6 class="text-success">Observaciones:</h6>
+                            <p class="text-justify mb-0">@Model.ObservacionesVerificacion</p>
+                        }
+                    </div>
+                </div>
+            }
+            else if (Model.Estado == "En Proceso")
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Pendiente de Verificación</strong>
+                    <p class="mb-0 mt-2">Este programa aún no ha sido verificado por el Comité de Apoyo Educativo.</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver a la Lista
+                </a>
+                <div>
+                    @if (!Model.FechaVerificacion.HasValue)
+                    {
+                        <a asp-action="Edit" asp-route-id="@Model.IdPrograma" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@Model.IdPrograma" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </a>
+                    }
+                    @if (!Model.FechaVerificacion.HasValue && Model.Estado == "En Proceso")
+                    {
+                        <a asp-action="Verificar" asp-route-id="@Model.IdPrograma" class="btn btn-success">
+                            <i class="fas fa-check"></i> Verificar Programa
+                        </a>
+                    }
+                    <a asp-controller="NotaConducta" asp-action="EstudianteNota" 
+                       asp-route-idEstudiante="@Model.IdEstudiante" asp-route-idPeriodo="@Model.IdPeriodo" 
+                       class="btn btn-primary">
+                        <i class="fas fa-user"></i> Ver Nota del Estudiante
+                    </a>
+                    <button onclick="window.print()" class="btn btn-info">
+                        <i class="fas fa-print"></i> Imprimir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Mejorar impresión
+        window.addEventListener('beforeprint', function() {
+            document.title = 'Programa_@(Model.IdPrograma)_@(Model.NombreEstudiante).pdf';
+        });
+    </script>
+}
+
+<style>
+    @@media print {
+        .btn, nav, .breadcrumb, .alert {
+            display: none !important;
+        }
+        .card {
+            border: 1px solid #ddd !important;
+            page-break-inside: avoid;
+        }
+    }
+</style>

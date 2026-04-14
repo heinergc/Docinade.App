@@ -1,0 +1,595 @@
+﻿@model RubricasApp.Web.ViewModels.EditarEvaluacionViewModel
+
+@{
+    ViewData["Title"] = "Editar Evaluación";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-edit"></i> Editar Evaluación
+                </h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post" id="formEvaluacion">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <input type="hidden" asp-for="IdEvaluacion" />
+                    <input type="hidden" asp-for="IdEstudiante" />
+                    <input type="hidden" asp-for="IdRubrica" />
+
+                    <!-- Información de solo lectura -->
+                    <div class="alert alert-info alert-permanent">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong><i class="fas fa-user me-1"></i> Estudiante:</strong>
+                                <span>@ViewBag.EstudianteNombre</span>
+                            </div>
+                            <div class="col-md-6">
+                                <strong><i class="fas fa-clipboard-list me-1"></i> Rúbrica:</strong>
+                                <span>@ViewBag.RubricaNombre</span>
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle"></i>
+                            No es posible cambiar el estudiante o la rúbrica en una evaluación existente.
+                        </small>
+                    </div>
+
+                    <!-- DEMO: Componente de Búsqueda Avanzada (para pruebas) - OCULTO -->
+                    @* <div class="card mb-3 border-info">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                <i class="fas fa-flask text-info"></i> 
+                                Demo: Componente de Búsqueda Avanzada
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted small mb-3">
+                                <i class="fas fa-info-circle"></i>
+                                Este es un ejemplo del componente de búsqueda avanzada. En producción, 
+                                estaría integrado directamente en los formularios de creación.
+                            </p>
+                            
+                            @await Component.InvokeAsync("BusquedaEstudiante", new { 
+                                selectName = "estudianteDemo", 
+                                selectId = "estudianteDemo", 
+                                modalId = "modalBusquedaEstudianteDemo",
+                                label = "Buscar Estudiante (Demo):",
+                                placeholder = "-- Buscar y seleccionar estudiante --",
+                                selectedValue = (int?)null,
+                                required = false,
+                                disabled = false
+                            })
+                        </div>
+                    </div> *@
+
+                    <!-- DEMO: Componente de Búsqueda Avanzada con ViewComponent -->
+                    @* <div class="card mb-3 border-info">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                <i class="fas fa-flask text-info"></i> 
+                                Demo: Componente de Búsqueda Avanzada con ViewComponent
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted small mb-3">
+                                <i class="fas fa-info-circle"></i>
+                                Este es el nuevo ViewComponent de búsqueda avanzada. Más robusto y reutilizable.
+                            </p>
+                            
+                            <!-- Select con botón de búsqueda integrado -->
+                            <div class="mb-3">
+                                <label for="estudianteDemoNew" class="form-label">Estudiante (ViewComponent):</label>
+                                <div class="input-group">
+                                    <button class="btn btn-outline-primary" 
+                                            type="button" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#modalBuscadorDemo"
+                                            title="Buscar Estudiante Avanzado">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                    <select name="estudianteDemoNew" id="estudianteDemoNew" class="form-select">
+                                        <option value="">-- Buscar y seleccionar estudiante --</option>
+                                        <!-- Opciones se cargarán dinámicamente -->
+                                    </select>
+                                </div>
+                                <div class="form-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-lightbulb"></i>
+                                        Haga clic en el botón de búsqueda para abrir el modal avanzado
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- Invocar el ViewComponent -->
+                            @await Component.InvokeAsync("BuscadorEstudiante", new { 
+                                selectId = "estudianteDemoNew", 
+                                modalId = "modalBuscadorDemo",
+                                controllerName = "Evaluaciones",
+                                actionName = "BuscarEstudiantes",
+                                incluirScripts = true
+                            })
+                        </div>
+                    </div> *@
+
+                    <!-- Demo del componente original (mantener para comparación) -->
+                    @* <div class="card mb-3 border-warning">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                <i class="fas fa-code text-warning"></i> 
+                                Demo: Componente Original (Comparación)
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted small mb-3">
+                                <i class="fas fa-info-circle"></i>
+                                Este es el componente original para comparar funcionalidades.
+                            </p>
+                            
+                            @await Component.InvokeAsync("BusquedaEstudiante", new { 
+                                selectName = "estudianteDemo", 
+                                selectId = "estudianteDemo", 
+                                modalId = "modalBusquedaEstudianteDemo",
+                                label = "Buscar Estudiante (Original):",
+                                placeholder = "-- Buscar y seleccionar estudiante --",
+                                selectedValue = (int?)null,
+                                required = false,
+                                disabled = false
+                            })
+                        </div>
+                    </div> *@
+
+                    <!-- Campos editables -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="FechaEvaluacion" class="form-label"></label>
+                                <input asp-for="FechaEvaluacion" type="datetime-local" class="form-control" />
+                                <span asp-validation-for="FechaEvaluacion" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Observaciones" class="form-label"></label>
+                                <textarea asp-for="Observaciones" class="form-control" rows="2"
+                                          maxlength="3000"
+                                          placeholder="Observaciones generales sobre la evaluación (opcional)"></textarea>
+                                <span asp-validation-for="Observaciones" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección de evaluación de items -->
+                    <div id="seccionEvaluacion">
+                        <hr>
+                        <h5><i class="fas fa-clipboard-list"></i> Evaluación de Items</h5>
+                        <div id="itemsEvaluacion">
+                            <!-- Los items se cargarán aquí dinámicamente -->
+                        </div>
+
+                        <!-- Resumen de puntuación -->
+                        <div class="alert alert-info" id="resumenPuntuacion">
+                            <h6><i class="fas fa-calculator"></i> Resumen de Puntuación</h6>
+                            <div id="detallesPuntuacion"></div>
+                            <hr>
+                            <strong>Total: <span id="totalPuntos">0</span> puntos</strong>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 mt-4">
+
+                        <input type="hidden" name="submitAction" id="submitActionHidden" value="guardarBorrador" />
+
+                        <button type="submit" name="submitAction" value="guardarCompleta" data-action="guardarCompleta" class="btn btn-success" id="btnGuardar">
+                            <i class="fas fa-check"></i> Completar
+                        </button>
+                        <button type="submit" name="submitAction" value="guardarBorrador" data-action="guardarBorrador"  class="btn btn-warning me-2" id="btnGuardarBorrador">
+                            <i class="fas fa-save"></i> Actualizar
+                        </button>
+                        <a asp-action="Details" asp-route-id="@Model.IdEvaluacion" class="btn btn-success">
+                            <i class="fas fa-eye"></i> Ver Detalles
+                        </a>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Cancelar
+                        </a>
+                        <div class="form-text mt-2">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Borrador:</strong> Puede guardar la evaluación sin completar todos los items y continuarla más tarde.
+                            </small>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <!-- Script del componente de búsqueda de estudiantes -->
+    <script src="~/js/components/busqueda-estudiante.js" asp-append-version="true"></script>
+
+    <script>
+        $(document).ready(function() {
+            console.log('🚀 Iniciando aplicación de edición de evaluaciones...');
+
+            // Inicializar TinyMCE
+            if (typeof tinymce !== 'undefined') {
+                tinymce.init({
+                    selector: '#Observaciones',
+                    
+                    // Plugins recomendados para observaciones educativas
+                    plugins: [
+                        'lists', 'link', 'autolink', 'charmap', 
+                        'fullscreen', 'wordcount', 'emoticons', 
+                        'insertdatetime', 'table', 'searchreplace'
+                    ],
+                    
+                    // Barra de herramientas optimizada
+                    toolbar: 'undo redo | formatselect | bold italic underline | ' +
+                             'forecolor | alignleft aligncenter alignright | ' +
+                             'bullist numlist | outdent indent | ' +
+                             'table link emoticons | fullscreen',
+                    
+                    // Formatos de bloque
+                    block_formats: 'Párrafo=p; Título 1=h3; Título 2=h4',
+                    
+                    // Tamaños de fuente
+                    fontsize_formats: '10pt 12pt 14pt 16pt 18pt',
+                    
+                    // Idioma español
+                    language: 'es',
+                    
+                    // Apariencia
+                    menubar: false,
+                    branding: false,
+                    height: 250,
+                    resize: true,
+                    statusbar: true,
+                    
+                    // Placeholder
+                    placeholder: 'Observaciones sobre el desempeño del estudiante...',
+                    
+                    // Corrector ortográfico
+                    browser_spellcheck: true,
+                    
+                    // Pegado limpio
+                    paste_as_text: false,
+                    
+                    // Seguridad
+                    valid_elements: 'p,br,strong,em,u,h3,h4,ul,ol,li,a[href],table,tr,td,th,span[style]'
+                });
+            }
+
+            // Inicializar variables globales con valores por defecto
+            var itemsRubrica = [];
+            var nivelesRubrica = [];
+            var detallesActuales = @Html.Raw(Json.Serialize(Model.DetallesEvaluacion));
+
+            console.log('📋 Variables inicializadas - Items:', itemsRubrica, 'Niveles:', nivelesRubrica);
+            console.log('📊 Detalles actuales:', detallesActuales);
+
+            // Cargar items de la rúbrica al inicio
+            cargarItemsRubrica(@Model.IdRubrica);
+
+            // Verificar validación cuando cambian los niveles
+            $(document).on('change', '.nivel-select', function() {
+                calcularPuntuacion();
+            });
+
+            function cargarItemsRubrica(rubricaId) {
+                console.log('🔄 Cargando items para rúbrica ID:', rubricaId);
+                
+                // Reinicializar arrays
+                itemsRubrica = [];
+                nivelesRubrica = [];
+
+                $.ajax({
+                    url: '@Url.Action("ObtenerItemsPorRubrica", "Evaluaciones")',
+                    type: 'GET',
+                    data: { rubricaId: rubricaId },
+                    dataType: 'json',
+                    beforeSend: function() {
+                        console.log('📡 Enviando petición AJAX...');
+                        $('#itemsEvaluacion').html('<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Cargando items...</div>');
+                    },
+                    success: function(response) {
+                        console.log('✅ Respuesta del servidor recibida:', response);
+
+                        // Validar que la respuesta sea válida
+                        if (!response) {
+                            console.error('❌ Respuesta vacía del servidor');
+                            $('#itemsEvaluacion').html('<div class="alert alert-danger">Error: Respuesta vacía del servidor</div>');
+                            return;
+                        }
+
+                        if (response.error) {
+                            console.error('❌ Error en la respuesta:', response.error);
+                            $('#itemsEvaluacion').html('<div class="alert alert-danger">Error: ' + response.error + '</div>');
+                            return;
+                        }
+
+                        // Validar que existan las propiedades esperadas
+                        if (!response.hasOwnProperty('items') || !response.hasOwnProperty('niveles')) {
+                            console.error('❌ Estructura de respuesta inválida:', response);
+                            $('#itemsEvaluacion').html('<div class="alert alert-danger">Error: Estructura de respuesta inválida</div>');
+                            return;
+                        }
+
+                        console.log('📋 Items recibidos:', response.items);
+                        console.log('🎯 Niveles recibidos:', response.niveles);
+
+                        // Asegurar que sean arrays válidos
+                        itemsRubrica = Array.isArray(response.items) ? response.items : [];
+                        nivelesRubrica = Array.isArray(response.niveles) ? response.niveles : [];
+
+                        console.log('📊 Items almacenados localmente:', itemsRubrica);
+                        console.log('🎚️ Niveles almacenados localmente:', nivelesRubrica);
+
+                        generarFormularioEvaluacion();
+                        cargarValoresActuales();
+                        calcularPuntuacion();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('❌ Error AJAX:', {
+                            status: status,
+                            error: error,
+                            responseText: xhr.responseText
+                        });
+                        
+                        // Reinicializar arrays en caso de error
+                        itemsRubrica = [];
+                        nivelesRubrica = [];
+                        
+                        var mensajeError = 'Error al cargar los items de la rúbrica';
+                        if (xhr.responseText) {
+                            try {
+                                var errorResponse = JSON.parse(xhr.responseText);
+                                if (errorResponse.message) {
+                                    mensajeError += ': ' + errorResponse.message;
+                                }
+                            } catch (e) {
+                                mensajeError += ': ' + error;
+                            }
+                        } else {
+                            mensajeError += ': ' + error;
+                        }
+                        
+                        $('#itemsEvaluacion').html('<div class="alert alert-danger">' + mensajeError + '</div>');
+                    }
+                });
+            }
+
+            function generarFormularioEvaluacion() {
+                console.log('🎨 Iniciando generación del formulario...');
+                console.log('📁 Items disponibles:', itemsRubrica);
+                console.log('🎆 Niveles disponibles:', nivelesRubrica);
+
+                var html = '';
+
+                // CORRECCIÓN: Verificar que itemsRubrica sea un array válido antes de acceder a .length
+                if (!Array.isArray(itemsRubrica) || itemsRubrica.length === 0) {
+                    console.warn('⚠️ No hay items en la rúbrica');
+                    html = '<div class="alert alert-warning">Esta rúbrica no tiene items de evaluación configurados.</div>';
+                } else {
+                    console.log('📝 Generando tabla con', itemsRubrica.length, 'items');
+                    html = '<div class="table-responsive"><table class="table table-bordered">';
+                    html += '<thead class="table-dark">';
+                    html += '<tr><th>Item de Evaluación</th><th>Peso</th><th>Nivel de Calificación</th><th>Puntos</th></tr>';
+                    html += '</thead><tbody>';
+
+                    itemsRubrica.forEach(function(item, index) {
+                        // Validar que item sea un objeto válido
+                        if (!item || typeof item !== 'object') {
+                            console.warn('⚠️ Item inválido en índice', index, ':', item);
+                            return; // Saltar este item
+                        }
+
+                        console.log(`🔍 Procesando item ${index + 1}:`, item);
+
+                        // Manejar propiedades con diferentes casos (camelCase vs PascalCase)
+                        var itemId = item.idItem || item.IdItem;
+                        var descripcion = item.nombreItem || item.NombreItem || item.descripcion || item.Descripcion || 'Sin descripción';
+                        var peso = item.peso || item.Peso || 0;
+
+                        // Verificar que nivelesRubrica sea un array válido
+                        var nivelesItem = [];
+                        if (Array.isArray(nivelesRubrica)) {
+                            nivelesItem = nivelesRubrica.filter(function(n) {
+                                var nivelItemId = n.idItem || n.IdItem;
+                                return nivelItemId === itemId;
+                            });
+                        }
+
+                        console.log(`  - Niveles para este item (${nivelesItem.length}):`, nivelesItem);
+
+                        html += '<tr>';
+                        html += '<td><strong>' + descripcion + '</strong></td>';
+                        html += '<td>' + peso + '%</td>';
+                        html += '<td>';
+                        html += '<select name="DetallesEvaluacion[' + index + '].IdNivel" class="form-select nivel-select" data-item-id="' + itemId + '" required>';
+                        html += '<option value="">-- Seleccionar nivel --</option>';
+
+                        nivelesItem.forEach(function(nivel) {
+                            // Manejar propiedades con diferentes casos
+                            var nivelId = nivel.idNivel || nivel.IdNivel;
+                            var nombreNivel = nivel.nombreNivel || nivel.NombreNivel || 'Sin nombre';
+                            var valor = nivel.valor || nivel.Valor || 0;
+
+                            console.log('    * Agregando nivel:', {
+                                IdNivel: nivelId,
+                                NombreNivel: nombreNivel,
+                                Valor: valor
+                            });
+                            html += '<option value="' + nivelId + '" data-valor="' + valor + '">' + nombreNivel + ' (' + valor + ' pts)</option>';
+                        });
+
+                        html += '</select>';
+                        html += '<input type="hidden" name="DetallesEvaluacion[' + index + '].IdItem" value="' + itemId + '" />';
+                        html += '</td>';
+                        html += '<td><span class="puntos-item badge bg-secondary" data-item-id="' + itemId + '">0</span></td>';
+                        html += '</tr>';
+                    });
+
+                    html += '</tbody></table></div>';
+                }
+
+                console.log('🎉 HTML generado exitosamente');
+                $('#itemsEvaluacion').html(html);
+                console.log('✅ Formulario insertado en el DOM');
+            }
+
+            function cargarValoresActuales() {
+                console.log('📥 Cargando valores actuales...');
+                console.log('📊 Detalles actuales:', detallesActuales);
+
+                // Verificar que detallesActuales sea un array válido
+                if (!Array.isArray(detallesActuales) || detallesActuales.length === 0) {
+                    console.warn('⚠️ No se encontraron detalles de evaluación existentes');
+                    return;
+                }
+
+                detallesActuales.forEach(function(detalle) {
+                    if (!detalle || typeof detalle !== 'object') {
+                        console.warn('⚠️ Detalle inválido:', detalle);
+                        return;
+                    }
+
+                    var itemId = detalle.idItem || detalle.IdItem;
+                    var nivelId = detalle.idNivel || detalle.IdNivel;
+
+                    console.log('🔄 Procesando detalle - ItemId:', itemId, 'NivelId:', nivelId);
+
+                    var select = $('.nivel-select[data-item-id="' + itemId + '"]');
+                    if (select.length > 0) {
+                        var valorNivel = String(nivelId);
+                        var opcion = select.find('option[value="' + valorNivel + '"]');
+                        if (opcion.length > 0) {
+                            select.val(valorNivel).trigger('change');
+                            console.log('✅ Valor cargado para item', itemId, ':', valorNivel);
+                        } else {
+                            console.warn('⚠️ No se encontró opción para idNivel:', valorNivel, 'en item:', itemId);
+                        }
+                    } else {
+                        console.warn('⚠️ No se encontró select para idItem:', itemId);
+                    }
+                });
+            }
+
+            function verificarValidacion() {
+                var todosCompletos = true;
+
+                $('.nivel-select').each(function() {
+                    if (!$(this).val()) {
+                        todosCompletos = false;
+                    }
+                });
+
+                // Solo deshabilitar el botón "Completar", no el "Actualizar"
+                $('#btnGuardar').prop('disabled', !todosCompletos);
+                // El botón "Actualizar" (guardarBorrador) siempre debe estar habilitado
+                $('#btnGuardarBorrador').prop('disabled', false);
+            }
+
+            function calcularPuntuacion() {
+                var totalPuntos = 0;
+                var detalles = [];
+
+                $('.nivel-select').each(function() {
+                    var select = $(this);
+                    var itemId = select.data('item-id');
+                    var opcionSeleccionada = select.find('option:selected');
+                    var valor = parseFloat(opcionSeleccionada.data('valor') || 0);
+                    var nombreNivel = opcionSeleccionada.text();
+
+                    // Actualizar puntos del item
+                    $('.puntos-item[data-item-id="' + itemId + '"]').text(valor.toFixed(2));
+
+                    if (valor > 0) {
+                        totalPuntos += valor;
+                        
+                        // Buscar el item correspondiente
+                        var item = null;
+                        if (Array.isArray(itemsRubrica)) {
+                            item = itemsRubrica.find(function(i) {
+                                var iId = i.idItem || i.IdItem;
+                                return iId === itemId;
+                            });
+                        }
+                        
+                        if (item) {
+                            var descripcion = item.descripcion || item.Descripcion || item.nombreItem || item.NombreItem || 'Sin descripción';
+                            detalles.push({
+                                descripcion: descripcion,
+                                nivel: nombreNivel,
+                                puntos: valor
+                            });
+                        }
+                    }
+                });
+
+                $('#totalPuntos').text(totalPuntos.toFixed(2));
+
+                // Mostrar detalles
+                var htmlDetalles = '';
+                detalles.forEach(function(detalle) {
+                    htmlDetalles += '<div class="row"><div class="col-8">' + detalle.descripcion + '</div>';
+                    htmlDetalles += '<div class="col-2">' + detalle.nivel.split('(')[0].trim() + '</div>';
+                    htmlDetalles += '<div class="col-2 text-end">' + detalle.puntos.toFixed(2) + ' pts</div></div>';
+                });
+
+                $('#detallesPuntuacion').html(htmlDetalles);
+            }
+
+            // Capturar el botón presionado y validar según corresponda
+            $(document).on('click', 'button[type=submit]', function(e) {
+                var action = $(this).val(); // Usar val() para obtener el value del botón
+                console.log("Botón clickeado:", action);
+                $('#submitActionHidden').val(action);
+                
+                // Solo validar si es "guardarCompleta"
+                if (action === 'guardarCompleta') {
+                    console.log("Validando niveles para completar...");
+                    var nivelesSinSeleccionar = $('.nivel-select').filter(function() {
+                        return !$(this).val();
+                    }).length;
+
+                    if (nivelesSinSeleccionar > 0) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        alert('Debe seleccionar un nivel de calificación para todos los items para completar la evaluación.');
+                        return false;
+                    }
+                } else {
+                    console.log("Permitiendo acción sin validación (actualizar)");
+                }
+            });
+
+            // Función de depuración global para probar desde la consola
+            window.debugEvaluacionEdit = function() {
+                console.log('🔧 DEBUG - Estado actual de la aplicación de edición:');
+                console.log('  📋 Items en memoria:', itemsRubrica);
+                console.log('  🎆 Niveles en memoria:', nivelesRubrica);
+                console.log('  📊 Detalles actuales:', detallesActuales);
+                console.log('  🎯 Rúbrica ID:', @Model.IdRubrica);
+                console.log('  📝 Elementos .nivel-select encontrados:', $('.nivel-select').length);
+
+                return {
+                    items: itemsRubrica,
+                    niveles: nivelesRubrica,
+                    detalles: detallesActuales,
+                    rubricaId: @Model.IdRubrica
+                };
+            };
+
+            console.log('🛠️ Función de debug disponible: window.debugEvaluacionEdit()');
+        });
+    </script>
+}

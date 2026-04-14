@@ -1,0 +1,562 @@
+﻿@model RubricasApp.Web.Controllers.BuscadorEstudianteViewModel
+@{
+    ViewData["Title"] = "Prueba del Componente BuscadorEstudiante";
+}
+
+<div class="container-fluid px-4">
+    <!-- Header de la p�gina -->
+    <div class="page-header mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="page-title text-primary">
+                    <i class="fas fa-search me-2"></i>
+                    Prueba del Componente BuscadorEstudiante
+                </h2>
+                <p class="text-muted-white mb-0">
+                    Demostración de funcionalidades del modal de busqueda avanzada de estudiantes
+                </p>
+            </div>
+            <div class="text-end">
+                <span class="badge bg-info fs-6">
+                    <i class="fas fa-users me-1"></i>
+                    @Model.TotalEstudiantes estudiantes registrados
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estad�sticas r�pidas -->
+    @if (Model.EstudiantesPorPeriodo != null && Model.EstudiantesPorPeriodo.Any())
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h6 class="card-title text-secondary mb-3">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Distribución por Periodo Académico
+                        </h6>
+                        <div class="row">
+                            @foreach (var periodo in Model.EstudiantesPorPeriodo)
+                            {
+                                <div class="col-md-3 col-sm-6 mb-2">
+                                    <div class="d-flex align-items-center p-2 bg-light rounded">
+                                        <div class="flex-grow-1">
+                                            <small class="text-muted">@periodo.Periodo</small>
+                                        </div>
+                                        <span class="badge bg-primary">@periodo.Cantidad</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Casos de prueba -->
+    <div class="row">
+        <!-- Caso 1: Uso básico -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-play me-2"></i>
+                        Caso 1: Uso Básico
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        Implementación estandar del componente con un select tradicional.
+                    </p>
+                    
+                    <form id="form1" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="estudiante1" class="form-label">
+                                <i class="fas fa-user me-1"></i>
+                                Seleccionar Estudiante
+                            </label>
+                            <div class="input-group">
+                                <select id="estudiante1" name="estudianteId" class="form-select" required>
+                                    <option value="">-- Seleccione un estudiante --</option>
+                                </select>
+                                <button type="button" 
+                                        class="btn btn-outline-primary" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalBasico"
+                                        title="Buscar estudiante">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">
+                                Haga clic en el botón de busqueda para abrir el modal
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check me-1"></i>
+                            Procesar Selección
+                        </button>
+                    </form>
+
+                    <!-- �rea de resultados -->
+                    <div id="resultado1" class="mt-3" style="display: none;">
+                        <div class="alert alert-success">
+                            <h6><i class="fas fa-check-circle me-2"></i>Estudiante Seleccionado:</h6>
+                            <div id="datosEstudiante1"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Caso 2: M�ltiples instancias -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clone me-2"></i>
+                        Caso 2: Multiples Instancias
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        Demostracion de multiples componentes en la misma pagina.
+                    </p>
+                    
+                    <form id="form2" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="estudiante2a" class="form-label">
+                                <i class="fas fa-user me-1"></i>
+                                Estudiante Principal
+                            </label>
+                            <div class="input-group">
+                                <select id="estudiante2a" name="estudiantePrincipalId" class="form-select" required>
+                                    <option value="">-- Seleccione estudiante principal --</option>
+                                </select>
+                                <button type="button" 
+                                        class="btn btn-outline-success" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalPrincipal">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="estudiante2b" class="form-label">
+                                <i class="fas fa-user-friends me-1"></i>
+                                Estudiante Suplente
+                            </label>
+                            <div class="input-group">
+                                <select id="estudiante2b" name="estudianteSuplenteId" class="form-select">
+                                    <option value="">-- Seleccione estudiante suplente --</option>
+                                </select>
+                                <button type="button" 
+                                        class="btn btn-outline-success" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalSuplente">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">Este campo es opcional</div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-users me-1"></i>
+                            Procesar Equipo
+                        </button>
+                    </form>
+
+                    <!-- �rea de resultados -->
+                    <div id="resultado2" class="mt-3" style="display: none;">
+                        <div class="alert alert-success">
+                            <h6><i class="fas fa-users me-2"></i>Equipo Formado:</h6>
+                            <div id="datosEquipo"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Caso 3: Demostraci�n avanzada -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cogs me-2"></i>
+                        Caso 3: Funcionalidades Avanzadas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-info">
+                                <i class="fas fa-list me-2"></i>
+                                Caracteristicas del Componente
+                            </h6>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex align-items-center">
+                                    <i class="fas fa-search text-primary me-2"></i>
+                                    <span>Búsqueda en tiempo real (mínimo 2 caracteres)</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <i class="fas fa-sort-alpha-down text-success me-2"></i>
+                                    <span>Búsqueda por nombre, apellidos o identificación</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <i class="fas fa-table text-info me-2"></i>
+                                    <span>Resultados en tabla responsive</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <i class="fas fa-mouse-pointer text-warning me-2"></i>
+                                    <span>Selección por clic en fila</span>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <i class="fas fa-mobile-alt text-secondary me-2"></i>
+                                    <span>Diseño responsive y accesible</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h6 class="text-info">
+                                <i class="fas fa-keyboard me-2"></i>
+                                Instrucciones de Uso
+                            </h6>
+                            <div class="alert alert-light">
+                                <ol class="mb-0">
+                                    <li>Haga clic en el botón de búsqueda <i class="fas fa-search text-primary"></i></li>
+                                    <li>Escriba al menos 2 caracteres en el campo de búsqueda</li>
+                                    <li>Los resultados aparecerán automáticamente</li>
+                                    <li>Haga clic en una fila para seleccionar el estudiante</li>
+                                    <li>Confirme la selección o cierre el modal</li>
+                                </ol>
+                            </div>
+                            
+                            <h6 class="text-info mt-3">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                Consejos de Búsqueda
+                            </h6>
+                            <div class="row">
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        <strong>Por nombre:</strong><br>
+                                        "Juan", "María"
+                                    </small>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        <strong>Por apellido:</strong><br>
+                                        "García", "López"
+                                    </small>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        <strong>Por cédula:</strong><br>
+                                        "1234567890"
+                                    </small>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        <strong>Nombre completo:</strong><br>
+                                        "Juan García"
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log de eventos para desarrolladores -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-secondary">
+                <div class="card-header bg-secondary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">
+                            <i class="fas fa-terminal me-2"></i>
+                            Log de Eventos (Desarrolladores)
+                        </h6>
+                        <button type="button" class="btn btn-outline-light btn-sm" onclick="limpiarLog()">
+                            <i class="fas fa-trash me-1"></i>
+                            Limpiar
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-2">
+                    <div id="logEventos" class="bg-dark text-light p-2 rounded" style="height: 150px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 0.85em;">
+                        <div class="text-success">? Página cargada - Esperando interacciones...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Componentes BuscadorEstudiante -->
+@await Component.InvokeAsync("BuscadorEstudiante", new { 
+    selectId = "estudiante1", 
+    modalId = "modalBasico",
+    controllerName = "Test",
+    actionName = "BuscarEstudiantes",
+    incluirScripts = false 
+})
+
+@await Component.InvokeAsync("BuscadorEstudiante", new { 
+    selectId = "estudiante2a", 
+    modalId = "modalPrincipal",
+    controllerName = "Test",
+    actionName = "BuscarEstudiantes",
+    incluirScripts = false 
+})
+
+@await Component.InvokeAsync("BuscadorEstudiante", new { 
+    selectId = "estudiante2b", 
+    modalId = "modalSuplente",
+    controllerName = "Test",
+    actionName = "BuscarEstudiantes",
+    incluirScripts = false 
+})
+
+@section Scripts {
+<!-- Cargar el archivo JavaScript del buscador -->
+<script src="~/js/components/buscador-estudiante.js" asp-append-version="true"></script>
+
+<script>
+$(document).ready(function() {
+    console.log('Iniciando pruebas del componente BuscadorEstudiante');
+    
+    // ===== INICIALIZACIÓN DE TODOS LOS COMPONENTES BUSCADOR =====
+    if (typeof BuscadorEstudiante !== 'undefined') {
+        // Inicializar componente 1 - Uso Básico
+        const buscador1 = new BuscadorEstudiante({
+            selectId: 'estudiante1',
+            modalId: 'modalBasico',
+            buscarUrl: '/Test/BuscarEstudiantes',
+            debug: true
+        });
+        console.log('✅ Buscador inicializado: modalBasico -> estudiante1');
+        
+        // Inicializar componente 2a - Múltiples instancias (Principal)
+        const buscador2a = new BuscadorEstudiante({
+            selectId: 'estudiante2a',
+            modalId: 'modalPrincipal',
+            buscarUrl: '/Test/BuscarEstudiantes',
+            debug: true
+        });
+        console.log('✅ Buscador inicializado: modalPrincipal -> estudiante2a');
+        
+        // Inicializar componente 2b - Múltiples instancias (Suplente)
+        const buscador2b = new BuscadorEstudiante({
+            selectId: 'estudiante2b',
+            modalId: 'modalSuplente',
+            buscarUrl: '/Test/BuscarEstudiantes',
+            debug: true
+        });
+        console.log('✅ Buscador inicializado: modalSuplente -> estudiante2b');
+    } else {
+        console.error('❌ La clase BuscadorEstudiante no está disponible');
+    }
+    // ===== FIN INICIALIZACIÓN BUSCADORES =====
+    
+    // Funci�n para agregar logs
+    function agregarLog(mensaje, tipo = 'info') {
+        const iconos = {
+            'info': 'ℹ️',
+            'success': '✔️',
+            'warning': '⚠️', 
+            'error': '❌'
+        };
+            
+        const colores = {
+            'info': 'text-info',
+            'success': 'text-success',
+            'warning': 'text-warning',
+            'error': 'text-danger'
+        };
+        
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = `<div class="${colores[tipo]}">[${timestamp}] ${iconos[tipo]} ${mensaje}</div>`;
+        
+        $('#logEventos').append(logEntry);
+        $('#logEventos').scrollTop($('#logEventos')[0].scrollHeight);
+    }
+    
+    // Hacer la función global para el botón limpiar
+    window.limpiarLog = function() {
+        $('#logEventos').empty();
+        agregarLog('Log limpiado', 'info');
+    };
+    
+    // Event listeners para los formularios
+    $('#form1').on('submit', function(e) {
+        e.preventDefault();
+        const estudianteId = $('#estudiante1').val();
+        const estudianteTexto = $('#estudiante1 option:selected').text();
+        
+        if (!estudianteId) {
+            agregarLog('Error: Debe seleccionar un estudiante', 'error');
+            return;
+        }
+        
+        // Simular procesamiento
+        agregarLog(`Procesando selecci�n del estudiante: ${estudianteTexto}`, 'info');
+        
+        // Mostrar datos del estudiante
+        setTimeout(function() {
+            const datosHTML = `
+                <strong>ID:</strong> ${estudianteId}<br>
+                <strong>Nombre:</strong> ${estudianteTexto}<br>
+                <strong>Seleccionado en:</strong> ${new Date().toLocaleString()}
+            `;
+            $('#datosEstudiante1').html(datosHTML);
+            $('#resultado1').show();
+            agregarLog('✔️ Estudiante procesado exitosamente', 'success');
+        }, 1000);
+    });
+    
+    $('#form2').on('submit', function(e) {
+        e.preventDefault();
+        const principal = $('#estudiante2a').val();
+        const suplente = $('#estudiante2b').val();
+        const principalTexto = $('#estudiante2a option:selected').text();
+        const suplenteTexto = $('#estudiante2b option:selected').text();
+        
+        if (!principal) {
+            agregarLog('Error: Debe seleccionar un estudiante principal', 'error');
+            return;
+        }
+        
+        agregarLog(`Formando equipo - Principal: ${principalTexto}${suplente ? ', Suplente: ' + suplenteTexto : ' (sin suplente)'}`, 'info');
+        
+        setTimeout(function() {
+            let equipoHTML = `
+                <div class="d-flex align-items-center mb-2">
+                    <i class="fas fa-user text-primary me-2"></i>
+                    <div>
+                        <strong>Principal:</strong> ${principalTexto}<br>
+                        <small class="text-muted">ID: ${principal}</small>
+                    </div>
+                </div>
+            `;
+            
+            if (suplente) {
+                equipoHTML += `
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-user-plus text-success me-2"></i>
+                        <div>
+                            <strong>Suplente:</strong> ${suplenteTexto}<br>
+                            <small class="text-muted">ID: ${suplente}</small>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            $('#datosEquipo').html(equipoHTML);
+            $('#resultado2').show();
+            agregarLog('? Equipo formado exitosamente', 'success');
+        }, 1000);
+    });
+    
+    // Interceptar eventos del componente (si est�n disponibles)
+    $(document).on('estudiante.seleccionado', function(e, data) {
+        agregarLog(`Evento: Estudiante seleccionado - ${data.nombre} ${data.apellidos} (${data.numeroId})`, 'success');
+    });
+    
+    $(document).on('modal.abierto', function(e, modalId) {
+        agregarLog(`Evento: Modal abierto - ${modalId}`, 'info');
+    });
+    
+    $(document).on('busqueda.realizada', function(e, data) {
+        agregarLog(`Evento: B�squeda realizada - "${data.termino}" (${data.resultados} resultados)`, 'info');
+    });
+    
+    // Simular algunos eventos de demostración después de un momento
+    setTimeout(function() {
+        agregarLog('Sistema listo para pruebas. Interactúe con los componentes para ver más eventos.', 'success');
+    }, 1500);
+    
+    // Agregar logging adicional para debugging
+    agregarLog('Event listeners configurados', 'info');
+    agregarLog(`Componentes BuscadorEstudiante detectados: ${$('.modal[id*="modal"]').length}`, 'info');
+});
+</script>
+
+<!-- Script de prueba/debug -->
+<script src="~/js/test-buscador.js" asp-append-version="true"></script>
+}
+
+<style>
+/* Estilos adicionales para la página de pruebas */
+.page-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem 0;
+    margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+    color: white;
+}
+
+.page-header .page-title {
+    color: white !important;
+}
+
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.border-primary {
+    border-left: 4px solid var(--bs-primary) !important;
+}
+
+.border-success {
+    border-left: 4px solid var(--bs-success) !important;
+}
+
+.border-info {
+    border-left: 4px solid var(--bs-info) !important;
+}
+
+.border-secondary {
+    border-left: 4px solid var(--bs-secondary) !important;
+}
+
+#logEventos {
+    scrollbar-width: thin;
+    scrollbar-color: #6c757d #212529;
+}
+
+#logEventos::-webkit-scrollbar {
+    width: 6px;
+}
+
+#logEventos::-webkit-scrollbar-track {
+    background: #212529;
+}
+
+#logEventos::-webkit-scrollbar-thumb {
+    background: #6c757d;
+    border-radius: 3px;
+}
+
+/* Animaciones para los resultados */
+#resultado1, #resultado2 {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* CSS adicional para animaciones sin problemas de Razor */
+@{
+    WriteLiteral("@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }");
+    WriteLiteral("@media (max-width: 768px) { .page-header { text-align: center; } .page-header .d-flex { flex-direction: column; gap: 1rem; } }");
+}
+</style>

@@ -1,0 +1,218 @@
+﻿@model RubricasApp.Web.Models.ValorRubrica
+
+@{
+    ViewData["Title"] = "Detalles del Valor de Rúbrica";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-eye"></i> @ViewData["Title"]
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Información principal -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card border-primary">
+                                <div class="card-header bg-primary text-white">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-clipboard-list"></i> Rúbrica
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">@Model.Rubrica.NombreRubrica</h5>
+                                    @if (!string.IsNullOrEmpty(Model.Rubrica.Descripcion))
+                                    {
+                                        <p class="card-text text-muted">@Model.Rubrica.Descripcion</p>
+                                    }
+                                    <small class="text-muted">
+                                        <strong>ID:</strong> @Model.Rubrica.IdRubrica
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-info">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-tasks"></i> Item de Evaluación
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">@Model.ItemEvaluacion.NombreItem</h5>
+                                    @if (!string.IsNullOrEmpty(Model.ItemEvaluacion.Descripcion))
+                                    {
+                                        <p class="card-text text-muted">@Model.ItemEvaluacion.Descripcion</p>
+                                    }
+                                    <small class="text-muted">
+                                        <strong>ID:</strong> @Model.ItemEvaluacion.IdItem
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card border-warning">
+                                <div class="card-header bg-warning text-dark">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-star"></i> Nivel de Calificación
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">@Model.NivelCalificacion.NombreNivel</h5>
+                                    @if (!string.IsNullOrEmpty(Model.NivelCalificacion.Descripcion))
+                                    {
+                                        <p class="card-text text-muted">@Model.NivelCalificacion.Descripcion</p>
+                                    }
+                                    <div class="mb-2">
+                                        <span class="badge bg-secondary">
+                                            Orden: @Model.NivelCalificacion.OrdenNivel
+                                        </span>
+                                    </div>
+                                    <small class="text-muted">
+                                        <strong>ID:</strong> @Model.NivelCalificacion.IdNivel
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-success">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-calculator"></i> Valor Asignado
+                                    </h6>
+                                </div>
+                                <div class="card-body text-center">
+                                    <h1 class="display-3 text-success mb-0">@Model.ValorPuntos.ToString("F1")</h1>
+                                    <h5 class="text-muted">puntos</h5>
+                                    <div class="progress mt-3" style="height: 20px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: @Model.ValorPuntos%" aria-valuenow="@Model.ValorPuntos" aria-valuemin="0" aria-valuemax="100">
+                                            @Model.ValorPuntos%
+                                        </div>
+                                    </div>
+                                    <small class="text-muted mt-2">de 100 puntos máximos</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información técnica -->
+                    <div class="card bg-light">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-info-circle"></i> Información Técnica
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <strong>ID del Valor:</strong><br>
+                                    <span class="badge bg-dark">@Model.IdValor</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <strong>ID Rúbrica:</strong><br>
+                                    <span class="badge bg-primary">@Model.IdRubrica</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <strong>ID Item:</strong><br>
+                                    <span class="badge bg-info">@Model.IdItem</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <strong>ID Nivel:</strong><br>
+                                    <span class="badge bg-warning text-dark">@Model.IdNivel</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resumen de la configuración -->
+                    <div class="alert alert-info mt-4">
+                        <h6><i class="fas fa-clipboard-check"></i> Resumen de la Configuración</h6>
+                        <p class="mb-0">
+                            Cuando un estudiante sea evaluado en el item <strong>"@Model.ItemEvaluacion.NombreItem"</strong> 
+                            de la rúbrica <strong>"@Model.Rubrica.NombreRubrica"</strong> 
+                            con el nivel <strong>"@Model.NivelCalificacion.NombreNivel"</strong>, 
+                            recibirá <strong>@Model.ValorPuntos puntos</strong>.
+                        </p>
+                    </div>
+
+                    <hr>
+                    
+                    <!-- Acciones -->
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver a la Lista
+                            </a>
+                            <a asp-action="Index" asp-route-idRubrica="@Model.IdRubrica" class="btn btn-outline-primary">
+                                <i class="fas fa-filter"></i> Ver Otros Valores de esta Rúbrica
+                            </a>
+                        </div>
+                        <div>
+                            <a asp-action="Edit" asp-route-id="@Model.IdValor" class="btn btn-warning">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@Model.IdValor" class="btn btn-outline-danger">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card con valores relacionados -->
+            @if (ViewBag.ValoresRelacionados != null && ((IEnumerable<dynamic>)ViewBag.ValoresRelacionados).Any())
+            {
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-link"></i> Otros Valores de la Misma Rúbrica e Item
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Nivel</th>
+                                        <th>Puntos</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var valor in (IEnumerable<dynamic>)ViewBag.ValoresRelacionados)
+                                    {
+                                        <tr class="@(valor.IdValor == Model.IdValor ? "table-warning" : "")">
+                                            <td>
+                                                @valor.NivelCalificacion.NombreNivel
+                                                @if (valor.IdValor == Model.IdValor)
+                                                {
+                                                    <span class="badge bg-primary ms-1">Actual</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success">@valor.ValorPuntos pts</span>
+                                            </td>
+                                            <td>
+                                                @if (valor.IdValor != Model.IdValor)
+                                                {
+                                                    <a asp-action="Details" asp-route-id="@valor.IdValor" class="btn btn-sm btn-outline-info">Ver</a>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

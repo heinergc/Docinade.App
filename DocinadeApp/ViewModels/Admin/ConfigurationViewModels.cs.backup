@@ -1,0 +1,300 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace RubricasApp.Web.ViewModels.Admin
+{
+    /// <summary>
+    /// ViewModel para configuración del sistema
+    /// </summary>
+    public class SystemConfigurationViewModel : AdminBaseViewModel
+    {
+        [Display(Name = "Nombre de la aplicación")]
+        [Required(ErrorMessage = "El nombre de la aplicación es requerido")]
+        [StringLength(100, ErrorMessage = "El nombre no puede tener más de 100 caracteres")]
+        public string ApplicationName { get; set; } = string.Empty;
+
+        [Display(Name = "Versión")]
+        [StringLength(20, ErrorMessage = "La versión no puede tener más de 20 caracteres")]
+        public string? Version { get; set; }
+
+        [Display(Name = "Descripción")]
+        [StringLength(500, ErrorMessage = "La descripción no puede tener más de 500 caracteres")]
+        public string? Description { get; set; }
+
+        [Display(Name = "Email del administrador")]
+        [EmailAddress(ErrorMessage = "Formato de email inválido")]
+        public string? AdminEmail { get; set; }
+
+        [Display(Name = "Modo de mantenimiento")]
+        public bool MaintenanceMode { get; set; }
+
+        [Display(Name = "Mensaje de mantenimiento")]
+        [StringLength(1000, ErrorMessage = "El mensaje no puede tener más de 1000 caracteres")]
+        public string? MaintenanceMessage { get; set; }
+
+        [Display(Name = "Registros habilitados")]
+        public bool LoggingEnabled { get; set; } = true;
+
+        [Display(Name = "Nivel de log")]
+        public string LogLevel { get; set; } = "Information";
+
+        [Display(Name = "Retener logs por (días)")]
+        [Range(1, 365, ErrorMessage = "Debe estar entre 1 y 365 días")]
+        public int LogRetentionDays { get; set; } = 30;
+
+        [Display(Name = "Sesiones simultáneas permitidas")]
+        [Range(1, 10, ErrorMessage = "Debe estar entre 1 y 10 sesiones")]
+        public int MaxConcurrentSessions { get; set; } = 3;
+
+        [Display(Name = "Timeout de sesión (minutos)")]
+        [Range(5, 1440, ErrorMessage = "Debe estar entre 5 y 1440 minutos")]
+        public int SessionTimeoutMinutes { get; set; } = 60;
+
+        public List<string> AvailableLogLevels { get; set; } = new() 
+        { 
+            "Trace", "Debug", "Information", "Warning", "Error", "Critical" 
+        };
+    }
+
+    /// <summary>
+    /// ViewModel para configuración de seguridad
+    /// </summary>
+    public class SecurityConfigurationViewModel : AdminBaseViewModel
+    {
+        [Display(Name = "Requerir confirmación de email")]
+        public bool RequireEmailConfirmation { get; set; }
+
+        [Display(Name = "Habilitar Two-Factor Authentication")]
+        public bool EnableTwoFactorAuth { get; set; }
+
+        [Display(Name = "Longitud mínima de contraseña")]
+        [Range(6, 128, ErrorMessage = "Debe estar entre 6 y 128 caracteres")]
+        public int PasswordMinLength { get; set; } = 6;
+
+        [Display(Name = "Requerir dígitos")]
+        public bool PasswordRequireDigit { get; set; } = true;
+
+        [Display(Name = "Requerir minúsculas")]
+        public bool PasswordRequireLowercase { get; set; } = true;
+
+        [Display(Name = "Requerir mayúsculas")]
+        public bool PasswordRequireUppercase { get; set; } = true;
+
+        [Display(Name = "Requerir caracteres especiales")]
+        public bool PasswordRequireNonAlphanumeric { get; set; }
+
+        [Display(Name = "Caracteres únicos requeridos")]
+        [Range(1, 10, ErrorMessage = "Debe estar entre 1 y 10 caracteres")]
+        public int PasswordRequiredUniqueChars { get; set; } = 1;
+
+        [Display(Name = "Máximo intentos fallidos")]
+        [Range(3, 10, ErrorMessage = "Debe estar entre 3 y 10 intentos")]
+        public int MaxFailedAccessAttempts { get; set; } = 5;
+
+        [Display(Name = "Tiempo de bloqueo (minutos)")]
+        [Range(1, 1440, ErrorMessage = "Debe estar entre 1 y 1440 minutos")]
+        public int LockoutTimeSpanMinutes { get; set; } = 5;
+
+        [Display(Name = "Habilitar bloqueo para nuevos usuarios")]
+        public bool AllowedForNewUsers { get; set; } = true;
+
+        [Display(Name = "IPs permitidas (una por línea)")]
+        public string? AllowedIpAddresses { get; set; }
+
+        [Display(Name = "IPs bloqueadas (una por línea)")]
+        public string? BlockedIpAddresses { get; set; }
+    }
+
+    /// <summary>
+    /// ViewModel para configuración de email
+    /// </summary>
+    public class EmailConfigurationViewModel : AdminBaseViewModel
+    {
+        [Display(Name = "Servidor SMTP")]
+        [Required(ErrorMessage = "El servidor SMTP es requerido")]
+        [StringLength(255, ErrorMessage = "No puede tener más de 255 caracteres")]
+        public string SmtpServer { get; set; } = string.Empty;
+
+        [Display(Name = "Puerto SMTP")]
+        [Range(1, 65535, ErrorMessage = "Debe estar entre 1 y 65535")]
+        public int SmtpPort { get; set; } = 587;
+
+        [Display(Name = "Habilitar SSL")]
+        public bool EnableSsl { get; set; } = true;
+
+        [Display(Name = "Usuario SMTP")]
+        [StringLength(255, ErrorMessage = "No puede tener más de 255 caracteres")]
+        public string? SmtpUsername { get; set; }
+
+        [Display(Name = "Contraseña SMTP")]
+        [DataType(DataType.Password)]
+        [StringLength(255, ErrorMessage = "No puede tener más de 255 caracteres")]
+        public string? SmtpPassword { get; set; }
+
+        [Display(Name = "Email remitente")]
+        [Required(ErrorMessage = "El email remitente es requerido")]
+        [EmailAddress(ErrorMessage = "Formato de email inválido")]
+        public string FromEmail { get; set; } = string.Empty;
+
+        [Display(Name = "Nombre del remitente")]
+        [StringLength(100, ErrorMessage = "No puede tener más de 100 caracteres")]
+        public string? FromName { get; set; }
+
+        [Display(Name = "Habilitar envío de emails")]
+        public bool EnableEmailSending { get; set; } = true;
+
+        [Display(Name = "Plantilla de bienvenida")]
+        public string? WelcomeEmailTemplate { get; set; }
+
+        [Display(Name = "Plantilla de reset de contraseña")]
+        public string? PasswordResetTemplate { get; set; }
+    }
+
+    /// <summary>
+    /// ViewModel para configuración de base de datos
+    /// </summary>
+    public class DatabaseConfigurationViewModel : AdminBaseViewModel
+    {
+        public string ConnectionString { get; set; } = string.Empty;
+        public string DatabaseType { get; set; } = string.Empty;
+        public string DatabaseVersion { get; set; } = string.Empty;
+        public bool CanConnect { get; set; }
+        public long DatabaseSize { get; set; }
+        public int TableCount { get; set; }
+        public int UserCount { get; set; }
+        public int AuditLogCount { get; set; }
+        public DateTime LastBackup { get; set; }
+        public List<DatabaseTableInfo> Tables { get; set; } = new();
+
+        [Display(Name = "Backup automático habilitado")]
+        public bool AutoBackupEnabled { get; set; }
+
+        [Display(Name = "Intervalo de backup (horas)")]
+        [Range(1, 168, ErrorMessage = "Debe estar entre 1 y 168 horas")]
+        public int BackupIntervalHours { get; set; } = 24;
+
+        [Display(Name = "Retener backups por (días)")]
+        [Range(1, 365, ErrorMessage = "Debe estar entre 1 y 365 días")]
+        public int BackupRetentionDays { get; set; } = 30;
+
+        [Display(Name = "Ruta de backups")]
+        [StringLength(500, ErrorMessage = "No puede tener más de 500 caracteres")]
+        public string? BackupPath { get; set; }
+    }
+
+    /// <summary>
+    /// Información de tabla de base de datos
+    /// </summary>
+    public class DatabaseTableInfo
+    {
+        public string Name { get; set; } = string.Empty;
+        public long RowCount { get; set; }
+        public long SizeInBytes { get; set; }
+        public DateTime LastModified { get; set; }
+        public string FormattedSize => FormatBytes(SizeInBytes);
+
+        private static string FormatBytes(long bytes)
+        {
+            string[] suffixes = { "B", "KB", "MB", "GB", "TB" };
+            int counter = 0;
+            decimal number = bytes;
+            while (Math.Round(number / 1024) >= 1)
+            {
+                number /= 1024;
+                counter++;
+            }
+            return $"{number:n1} {suffixes[counter]}";
+        }
+    }
+
+    /// <summary>
+    /// ViewModel para estado del sistema
+    /// </summary>
+    public class SystemHealthViewModel : AdminBaseViewModel
+    {
+        public SystemHealthStatus OverallHealth { get; set; }
+        public DatabaseHealthInfo Database { get; set; } = new();
+        public EmailHealthInfo Email { get; set; } = new();
+        public SecurityHealthInfo Security { get; set; } = new();
+        public PerformanceHealthInfo Performance { get; set; } = new();
+        public List<SystemHealthAlert> Alerts { get; set; } = new();
+        public DateTime LastChecked { get; set; }
+    }
+
+    /// <summary>
+    /// Estado de salud del sistema
+    /// </summary>
+    public enum SystemHealthStatus
+    {
+        Healthy,
+        Warning,
+        Critical,
+        Unknown
+    }
+
+    /// <summary>
+    /// Información de salud de base de datos
+    /// </summary>
+    public class DatabaseHealthInfo
+    {
+        public SystemHealthStatus Status { get; set; }
+        public bool CanConnect { get; set; }
+        public double ResponseTimeMs { get; set; }
+        public long TotalSize { get; set; }
+        public double FreeSpacePercentage { get; set; }
+        public int ActiveConnections { get; set; }
+        public List<string> Issues { get; set; } = new();
+    }
+
+    /// <summary>
+    /// Información de salud de email
+    /// </summary>
+    public class EmailHealthInfo
+    {
+        public SystemHealthStatus Status { get; set; }
+        public bool CanSendEmail { get; set; }
+        public double LastTestResponseTimeMs { get; set; }
+        public int QueuedEmails { get; set; }
+        public int FailedEmailsToday { get; set; }
+        public List<string> Issues { get; set; } = new();
+    }
+
+    /// <summary>
+    /// Información de salud de seguridad
+    /// </summary>
+    public class SecurityHealthInfo
+    {
+        public SystemHealthStatus Status { get; set; }
+        public int FailedLoginsToday { get; set; }
+        public int LockedAccounts { get; set; }
+        public int SuspiciousActivities { get; set; }
+        public bool HasUnconfirmedAdmins { get; set; }
+        public List<string> Issues { get; set; } = new();
+    }
+
+    /// <summary>
+    /// Información de salud de rendimiento
+    /// </summary>
+    public class PerformanceHealthInfo
+    {
+        public SystemHealthStatus Status { get; set; }
+        public double CpuUsagePercentage { get; set; }
+        public double MemoryUsagePercentage { get; set; }
+        public double DiskUsagePercentage { get; set; }
+        public double AverageResponseTimeMs { get; set; }
+        public int ActiveUsers { get; set; }
+        public List<string> Issues { get; set; } = new();
+    }
+
+    /// <summary>
+    /// Alerta de salud del sistema
+    /// </summary>
+    public class SystemHealthAlert
+    {
+        public string Type { get; set; } = string.Empty; // Critical, Warning, Info
+        public string Title { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
+        public DateTime Timestamp { get; set; }
+        public string? ActionUrl { get; set; }
+        public bool IsResolved { get; set; }
+    }
+}

@@ -1,0 +1,89 @@
+@model RubricasApp.Web.ViewComponents.SearchableSelectViewModel
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@inject IHtmlGenerator HtmlGenerator
+
+@{
+    // Configurar clases CSS
+    var cssClasses = new List<string> { "form-select", "searchable-select" };
+    if (!string.IsNullOrEmpty(Model.CssClass))
+    {
+        cssClasses.AddRange(Model.CssClass.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+    }
+
+    // Configurar atributos del select
+    var selectAttributes = new Dictionary<string, object>
+    {
+        ["name"] = Model.ActualName,
+        ["id"] = Model.ActualId,
+        ["class"] = string.Join(" ", cssClasses),
+        ["data-searchable-library"] = Model.Library.ToLowerInvariant(),
+        ["data-searchable-placeholder"] = Model.Placeholder,
+        ["data-searchable-allow-clear"] = Model.AllowClear.ToString().ToLowerInvariant(),
+        ["data-searchable-debounce"] = Model.DebounceMs.ToString(),
+        ["data-searchable-minimum-input"] = Model.MinimumInputLength.ToString()
+    };
+
+    if (Model.Multiple)
+        selectAttributes["multiple"] = "multiple";
+    
+    if (Model.Disabled)
+        selectAttributes["disabled"] = "disabled";
+    
+    if (Model.Required)
+        selectAttributes["required"] = "required";
+
+    if (!string.IsNullOrEmpty(Model.DataEndpoint))
+        selectAttributes["data-searchable-endpoint"] = Model.DataEndpoint;
+
+    if (Model.MaxOptions.HasValue)
+        selectAttributes["data-searchable-max-options"] = Model.MaxOptions.Value.ToString();
+
+    if (!string.IsNullOrEmpty(Model.DataExtra))
+        selectAttributes["data-searchable-extra"] = Model.DataExtra;
+
+    // Agregar atributos de validación si se usa AspFor
+    if (Model.AspFor != null)
+    {
+        // Note: GetValidationAttributes no está disponible en .NET 8
+        // Los atributos de validación se manejarán automáticamente por el framework
+        selectAttributes["data-val"] = "true";
+        selectAttributes["data-val-required"] = $"El campo {Model.AspFor.Name} es requerido.";
+    }
+}
+
+<select @Html.Raw(string.Join(" ", selectAttributes.Select(attr => $"{attr.Key}=\"{Html.Encode(attr.Value)}\"")))>
+    @* Opción placeholder si está permitido *@
+    @if (Model.AllowClear && !Model.Multiple)
+    {
+        <option value="">@Model.Placeholder</option>
+    }
+
+    @* Si hay items locales, agregarlos *@
+    @if (Model.Items != null)
+    {
+        @foreach (var item in Model.Items)
+        {
+            var selected = Model.IsSelected(item.Value);
+            <option value="@item.Value" selected="@selected" disabled="@item.Disabled">
+                @item.Text
+            </option>
+        }
+    }
+    @* Si es remoto y hay valor preseleccionado, agregar opción temporal *@
+    else if (!string.IsNullOrEmpty(Model.DataEndpoint) && !Model.IsEmptyValue())
+    {
+        var valueStr = Model.ActualValue?.ToString();
+        if (!string.IsNullOrEmpty(valueStr))
+        {
+            <option value="@valueStr" selected="selected">
+                Cargando... (ID: @valueStr)
+            </option>
+        }
+    }
+</select>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    SearchableSelect.init('#@Model.ActualId');
+});
+</script>

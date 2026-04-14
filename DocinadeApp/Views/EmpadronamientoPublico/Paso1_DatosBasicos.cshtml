@@ -1,0 +1,229 @@
+@model RubricasApp.Web.ViewModels.EmpadronamientoPublicoViewModel
+
+@{
+    ViewData["Title"] = "Paso 1: Datos Básicos";
+}
+
+<!-- Barra de progreso -->
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="progress" style="height: 30px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                     role="progressbar" 
+                     style="width: 20%;" 
+                     aria-valuenow="20" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                    Paso @Model.PasoActual de @Model.TotalPasos (20%)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-user"></i> Paso 1: Datos Básicos del Estudiante
+                    </h3>
+                    <small>Complete su información personal</small>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Paso1" method="post" id="formPaso1">
+                        @Html.AntiForgeryToken()
+                        
+                        <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+                        
+                        <!-- Número de Cédula -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="NumeroId" class="form-label fw-bold">
+                                    <i class="fas fa-id-card text-primary"></i> Número de Cédula
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input asp-for="NumeroId" class="form-control form-control-lg" id="numeroIdInput" 
+                                           placeholder="Ejemplo: 603130190" maxlength="20" required />
+                                    <button type="button" class="btn btn-primary" id="btnBuscarCedula">
+                                        <i class="fas fa-search"></i> Buscar
+                                    </button>
+                                </div>
+                                <span asp-validation-for="NumeroId" class="text-danger"></span>
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-info-circle"></i> Ingrese su número de cédula costarricense y presione Buscar para autocompletar
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- Nombre y Apellidos -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Nombre" class="form-label fw-bold">
+                                    Nombre(s) <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Nombre" class="form-control" id="nombreInput" 
+                                       placeholder="Ingrese su(s) nombre(s)" required />
+                                <span asp-validation-for="Nombre" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Apellidos" class="form-label fw-bold">
+                                    Apellido(s) <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Apellidos" class="form-control" id="apellidosInput" 
+                                       placeholder="Ingrese sus apellidos" required />
+                                <span asp-validation-for="Apellidos" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Fecha de Nacimiento y Género -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FechaNacimiento" class="form-label fw-bold">
+                                    Fecha de Nacimiento <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="FechaNacimiento" type="date" class="form-control" required />
+                                <span asp-validation-for="FechaNacimiento" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Genero" class="form-label fw-bold">
+                                    Género <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="Genero" class="form-select" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="Masculino">Masculino</option>
+                                    <option value="Femenino">Femenino</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                                <span asp-validation-for="Genero" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Nacionalidad y Estado Civil -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Nacionalidad" class="form-label fw-bold">
+                                    Nacionalidad
+                                </label>
+                                <input asp-for="Nacionalidad" class="form-control" 
+                                       placeholder="Ej: Costarricense" value="Costarricense" />
+                                <span asp-validation-for="Nacionalidad" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="EstadoCivil" class="form-label fw-bold">
+                                    Estado Civil
+                                </label>
+                                <select asp-for="EstadoCivil" class="form-select">
+                                    <option value="">Seleccione...</option>
+                                    <option value="Soltero(a)">Soltero(a)</option>
+                                    <option value="Casado(a)">Casado(a)</option>
+                                    <option value="Divorciado(a)">Divorciado(a)</option>
+                                    <option value="Viudo(a)">Viudo(a)</option>
+                                    <option value="Unión Libre">Unión Libre</option>
+                                </select>
+                                <span asp-validation-for="EstadoCivil" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Campos ocultos -->
+                        <input type="hidden" asp-for="PasoActual" />
+                        <input type="hidden" asp-for="TotalPasos" />
+                        <input type="hidden" asp-for="SessionId" />
+                        
+                        <hr class="my-4">
+                        
+                        <!-- Botones de navegación -->
+                        <div class="row">
+                            <div class="col-6">
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Cancelar
+                                </a>
+                            </div>
+                            <div class="col-6 text-end">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    Siguiente <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        $(document).ready(function() {
+            // Búsqueda de cédula en API
+            $('#btnBuscarCedula').on('click', function() {
+                const cedula = $('#numeroIdInput').val().trim();
+                
+                if (!cedula) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Atención',
+                        text: 'Por favor ingrese un número de cédula'
+                    });
+                    return;
+                }
+                
+                $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Buscando...');
+                
+                $.ajax({
+                    url: '@Url.Action("BuscarPorCedula", "Estudiantes")',
+                    type: 'GET',
+                    data: { cedula: cedula },
+                    success: function(response) {
+                        if (response.success && response.data) {
+                            $('#nombreInput').val(response.data.nombre || '');
+                            $('#apellidosInput').val(response.data.apellidos || '');
+                            
+                            Swal.fire({
+                                icon: 'success',
+                                title: '¡Datos encontrados!',
+                                text: 'Los campos de nombre y apellidos han sido autocompletados',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Cédula no encontrada',
+                                text: 'Por favor complete los datos manualmente'
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'No se pudo consultar la información. Por favor complete los datos manualmente.'
+                        });
+                    },
+                    complete: function() {
+                        $('#btnBuscarCedula').prop('disabled', false).html('<i class="fas fa-search"></i> Buscar');
+                    }
+                });
+            });
+            
+            // Validación de cédula al perder el foco
+            $('#numeroIdInput').on('blur', function() {
+                const cedula = $(this).val().trim();
+                if (cedula.length > 0 && cedula.length < 9) {
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,115 @@
+# PROMPT: Implementar Control de Acceso por Usuario en Sistema de Rúbricas
+
+## OBJETIVO
+Implementar un sistema de control de acceso granular que permita a los usuarios solo gestionar (crear, leer, actualizar, eliminar) los datos que les pertenecen según su rol y nivel de autorización.
+
+## CONTEXTO DEL SISTEMA
+Sistema web ASP.NET Core con Identity para gestión de rúbricas académicas con los siguientes roles:
+- SuperAdministrador: Acceso completo
+- Administrador: Gestión de usuarios y sistema
+- Coordinador: Gestión de área/departamento  
+- Profesor: Creación y gestión de sus rúbricas
+- Evaluador: Realización de evaluaciones
+- Observador: Solo lectura
+
+## TABLAS CRÍTICAS QUE REQUIEREN CONTROL POR USUARIO
+
+### NIVEL CRÍTICO (Control Estricto por Usuario):
+1. **Evaluaciones** - Solo sus evaluaciones
+2. **DetallesEvaluacion** - Solo detalles de sus evaluaciones
+3. **Rubricas** - Solo rúbricas que creó
+4. **InstrumentosEvaluacion** - Solo instrumentos que creó
+5. **ItemsEvaluacion** - Solo items de sus instrumentos
+6. **ValoresRubrica** - Solo valores de sus rúbricas
+7. **RubricaNiveles** - Solo niveles de sus rúbricas
+8. **CuadernosCalificadores** - Solo sus cuadernos
+9. **CuadernoInstrumentos** - Solo relaciones de sus cuadernos
+10. **Asistencias** - Solo registros que creó
+
+### NIVEL INTERMEDIO (Control por Rol y Área):
+11. **Estudiantes** - Según área/departamento
+12. **EstudianteGrupos** - Según grupos que gestiona
+13. **GruposCalificacion** - Según grupos asignados
+14. **GruposEstudiantes** - Según grupos que gestiona
+15. **InstrumentoMaterias** - Según materias asignadas
+
+## REQUERIMIENTOS DE IMPLEMENTACIÓN
+
+### 1. MODELOS (Models)
+- Agregar campos de auditoría: `CreadoPorUsuarioId`, `ModificadoPorUsuarioId`, `FechaCreacion`, `FechaModificacion`
+- Implementar interfaces: `IAuditable`, `IUserOwned`, `IDepartmentScoped` , revise que no existan, si existe se editan , si no se crean
+- Agregar propiedades de navegación hacia ApplicationUser
+- Validar que el usuario tenga permisos sobre el recurso
+
+### 2. CONTROLADORES (Controllers)
+- Implementar filtros de autorización automáticos
+- Agregar validación de propiedad antes de operaciones CRUD
+- Implementar métodos helper para verificar permisos
+- Usar claims del usuario para filtrar consultas
+- Manejar excepciones de acceso no autorizado
+
+### 3. SERVICIOS (Services)
+- Crear `IUserContextService` para obtener información del usuario actual
+- Implementar `IAccessControlService` para validar permisos
+- Crear filtros de consulta automáticos por usuario/rol
+- Implementar logging de intentos de acceso no autorizado
+
+### 4. VIEWMODELS (ViewModels)
+- Filtrar datos según permisos del usuario
+- Incluir solo acciones permitidas (Edit, Delete, etc.)
+- Agregar propiedades que indiquen permisos del usuario
+- Validar datos de entrada según el contexto del usuario
+
+### 5. VISTAS (Views)
+- Mostrar/ocultar botones según permisos
+- Implementar mensajes informativos sobre limitaciones
+- Agregar indicadores visuales de propiedad de datos
+- Personalizar interfaz según rol del usuario
+
+### 6. FILTROS Y MIDDLEWARE
+- Crear `UserScopeFilter` para aplicar filtros automáticamente
+- Implementar `OwnershipAuthorizationHandler`
+- Agregar middleware de auditoría de accesos
+- Validar permisos a nivel de acción
+
+### 7. BASE DE DATOS
+- Agregar campos de auditoría faltantes
+- Crear índices en campos de filtrado por usuario
+- Implementar triggers para auditoría automática
+- Agregar constraints de integridad referencial
+
+## CASOS DE USO ESPECÍFICOS
+
+### Docente:
+- Solo puede ver/editar/eliminar sus propias rúbricas
+- Solo puede evaluar con instrumentos que creó o que le fueron asignados
+- Solo puede ver estudiantes de sus grupos asignados
+
+### Coordinador:
+- Puede gestionar todos los datos de su departamento/área
+- Puede asignar instrumentos a docentes de su área
+- Puede ver reportes consolidados de su área
+
+### Evaluador:
+- Solo puede realizar evaluaciones con instrumentos existentes
+- Solo puede ver sus propias evaluaciones realizadas
+- No puede modificar instrumentos de evaluación
+
+## PUNTOS CRÍTICOS DE SEGURIDAD
+
+1. **Validación en Servidor**: Nunca confiar solo en validaciones del cliente
+2. **Filtros Automáticos**: Aplicar filtros de usuario en todas las consultas
+3. **Logging de Auditoría**: Registrar todos los intentos de acceso
+4. **Manejo de Errores**: No revelar información sensible en errores
+5. **Validación de Referencias**: Verificar que las FK pertenezcan al usuario
+
+## RESULTADO ESPERADO
+
+Un sistema donde:
+- Cada usuario solo puede gestionar sus propios datos
+- Los permisos se validan tanto en backend como frontend
+- Se mantiene un log completo de accesos y modificaciones
+- La interfaz se adapta automáticamente a los permisos del usuario
+- Se previenen escaladas de privilegios y accesos no autorizados
+
+Implementar esta solución de forma sistemática, comenzando por las tablas más críticas y expandiendo gradualmente a todas las tablas identificadas.

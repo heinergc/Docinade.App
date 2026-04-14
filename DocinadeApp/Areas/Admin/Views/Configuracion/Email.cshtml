@@ -1,0 +1,248 @@
+@model RubricasApp.Web.ViewModels.Admin.EmailConfigurationViewModel
+
+@{
+    ViewData["Title"] = "Configuración de Email";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Home", new { area = "" })">
+                    <i class="fas fa-home"></i> Inicio
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index")">
+                    <i class="fas fa-cogs"></i> Configuración
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-envelope"></i> Email
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="mb-0">
+                <i class="fas fa-envelope text-primary"></i>
+                Configuración de Email
+            </h2>
+            <p class="text-muted mt-2">Configurar los parámetros SMTP para el envío de correos del sistema</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <form asp-action="Email" method="post" id="emailConfigForm">
+        @Html.AntiForgeryToken()
+
+        <div class="row">
+            <!-- Servidor SMTP -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-server me-2"></i>Servidor SMTP
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="SmtpServer" class="form-label fw-semibold"></label>
+                            <input asp-for="SmtpServer" class="form-control" placeholder="smtp.gmail.com" />
+                            <span asp-validation-for="SmtpServer" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="SmtpPort" class="form-label fw-semibold"></label>
+                            <input asp-for="SmtpPort" type="number" class="form-control" placeholder="587" />
+                            <span asp-validation-for="SmtpPort" class="text-danger small"></span>
+                            <div class="form-text">Puertos comunes: 25, 465 (SSL), 587 (TLS)</div>
+                        </div>
+                        <div class="mb-0">
+                            <div class="form-check form-switch">
+                                <input asp-for="EnableSsl" class="form-check-input" type="checkbox" role="switch" />
+                                <label asp-for="EnableSsl" class="form-check-label fw-semibold"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Habilitar envío -->
+                <div class="card mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-toggle-on me-2"></i>Estado del servicio
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check form-switch">
+                            <input asp-for="EnableEmailSending" class="form-check-input" type="checkbox" role="switch" />
+                            <label asp-for="EnableEmailSending" class="form-check-label fw-semibold"></label>
+                        </div>
+                        <div class="form-text">Si está deshabilitado, ningún correo será enviado por el sistema.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Credenciales y remitente -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h6 class="mb-0">
+                            <i class="fas fa-key me-2"></i>Credenciales
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="SmtpUsername" class="form-label fw-semibold"></label>
+                            <input asp-for="SmtpUsername" class="form-control" placeholder="usuario@gmail.com" />
+                            <span asp-validation-for="SmtpUsername" class="text-danger small"></span>
+                            <div class="form-text">Generalmente es la misma dirección del remitente.</div>
+                        </div>
+                        <div class="mb-0">
+                            <label asp-for="SmtpPassword" class="form-label fw-semibold"></label>
+                            <input asp-for="SmtpPassword" class="form-control" placeholder="Dejar vacío para conservar la contraseña actual" />
+                            <span asp-validation-for="SmtpPassword" class="text-danger small"></span>
+                            <div class="form-text text-warning">
+                                <i class="fas fa-info-circle"></i>
+                                Deje este campo vacío si no desea cambiar la contraseña guardada.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-at me-2"></i>Remitente
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="FromEmail" class="form-label fw-semibold"></label>
+                            <input asp-for="FromEmail" class="form-control" placeholder="sistema@midominio.com" />
+                            <span asp-validation-for="FromEmail" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-0">
+                            <label asp-for="FromName" class="form-label fw-semibold"></label>
+                            <input asp-for="FromName" class="form-control" placeholder="Sistema de Rúbricas" />
+                            <span asp-validation-for="FromName" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body d-flex gap-2 justify-content-between align-items-center">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Guardar configuración
+                            </button>
+                            <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                        </div>
+                        <button type="button" class="btn btn-outline-success" onclick="enviarCorreoPrueba()">
+                            <i class="fas fa-paper-plane me-2"></i>Enviar correo de prueba
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Modal correo de prueba -->
+<div class="modal fade" id="modalPrueba" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-paper-plane me-2"></i>Correo de prueba</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small">Se enviará un correo de prueba usando la configuración <strong>actualmente guardada en la base de datos</strong>.</p>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Destinatario</label>
+                    <input type="email" id="destinatarioPrueba" class="form-control" placeholder="destino@ejemplo.com" />
+                </div>
+                <div id="resultadoPrueba"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-success" onclick="confirmarPrueba()">
+                    <i class="fas fa-send me-2"></i>Enviar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function enviarCorreoPrueba() {
+            document.getElementById('destinatarioPrueba').value = '';
+            document.getElementById('resultadoPrueba').innerHTML = '';
+            new bootstrap.Modal(document.getElementById('modalPrueba')).show();
+        }
+
+        async function confirmarPrueba() {
+            const destinatario = document.getElementById('destinatarioPrueba').value.trim();
+            if (!destinatario) {
+                document.getElementById('resultadoPrueba').innerHTML =
+                    '<div class="alert alert-warning mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Ingrese un destinatario.</div>';
+                return;
+            }
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            const formData = new FormData();
+            formData.append('destinatario', destinatario);
+            formData.append('__RequestVerificationToken', token);
+
+            try {
+                const resp = await fetch('@Url.Action("EnviarCorreoPrueba")', { method: 'POST', body: formData });
+                const data = await resp.json();
+                document.getElementById('resultadoPrueba').innerHTML = data.success
+                    ? `<div class="alert alert-success mb-0"><i class="fas fa-check-circle me-2"></i>${data.message}</div>`
+                    : `<div class="alert alert-danger mb-0"><i class="fas fa-times-circle me-2"></i>${data.message}</div>`;
+            } catch {
+                document.getElementById('resultadoPrueba').innerHTML =
+                    '<div class="alert alert-danger mb-0"><i class="fas fa-times-circle me-2"></i>Error de comunicación con el servidor.</div>';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-send me-2"></i>Enviar';
+            }
+        }
+    </script>
+}

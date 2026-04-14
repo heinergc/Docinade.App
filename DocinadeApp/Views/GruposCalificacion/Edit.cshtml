@@ -1,0 +1,89 @@
+﻿@model RubricasApp.Web.Models.GrupoCalificacion
+
+@{
+    ViewData["Title"] = "Editar Grupo de Calificación";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-edit me-2"></i>
+                        Editar Grupo: @Model.NombreGrupo
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit">
+                        <input type="hidden" asp-for="IdGrupo" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="NombreGrupo" class="form-label"></label>
+                            <input asp-for="NombreGrupo" class="form-control" />
+                            <span asp-validation-for="NombreGrupo" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Descripcion" class="form-label"></label>
+                            <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Descripcion" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Estado" class="form-label"></label>
+                            <select asp-for="Estado" class="form-select">
+                                <option value="ACTIVO">ACTIVO</option>
+                                <option value="INACTIVO">INACTIVO</option>
+                            </select>
+                            <span asp-validation-for="Estado" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>
+                                Guardar Cambios
+                            </button>
+                            <a asp-action="Details" asp-route-id="@Model.IdGrupo" class="btn btn-info">
+                                <i class="fas fa-eye me-1"></i>
+                                Ver Detalles
+                            </a>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>
+                                Volver a la Lista
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-info-circle me-2"></i>Información del Grupo</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-6">ID del Grupo:</dt>
+                        <dd class="col-sm-6">@Model.IdGrupo</dd>
+                        
+                        <dt class="col-sm-6">Fecha de Creación:</dt>
+                        <dd class="col-sm-6">@Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</dd>
+                    </dl>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Atención:</strong><br>
+                        Los cambios en este grupo afectarán a todas las rúbricas y niveles asociados.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

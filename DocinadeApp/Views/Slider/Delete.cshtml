@@ -1,0 +1,213 @@
+@model RubricasApp.Web.Models.SliderItem
+
+@{
+    ViewData["Title"] = "Eliminar Slider";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2 class="text-danger">
+                <i class="fas fa-trash-alt"></i> Eliminar Slider
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index">Sliders</a></li>
+                    <li class="breadcrumb-item active">Eliminar</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="alert alert-danger" role="alert">
+        <i class="fas fa-exclamation-triangle fa-2x float-start me-3"></i>
+        <h5 class="alert-heading">¡Advertencia!</h5>
+        <p class="mb-0">
+            Está a punto de eliminar permanentemente este slider. Esta acción <strong>no se puede deshacer</strong>.
+            La imagen asociada también será eliminada del servidor.
+        </p>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-info-circle"></i> Información del Slider a Eliminar
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">ID:</dt>
+                        <dd class="col-sm-8">@Model.Id</dd>
+
+                        <dt class="col-sm-4">Título:</dt>
+                        <dd class="col-sm-8">
+                            <strong>@Model.Titulo</strong>
+                        </dd>
+
+                        <dt class="col-sm-4">Subtítulo:</dt>
+                        <dd class="col-sm-8">
+                            @if (!string.IsNullOrEmpty(Model.Subtitulo))
+                            {
+                                @Model.Subtitulo
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">Sin subtítulo</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">Enlace:</dt>
+                        <dd class="col-sm-8">
+                            @if (!string.IsNullOrEmpty(Model.EnlaceUrl))
+                            {
+                                <a href="@Model.EnlaceUrl" target="_blank" class="text-primary">
+                                    <i class="fas fa-external-link-alt"></i> @Model.EnlaceUrl
+                                </a>
+                                @if (!string.IsNullOrEmpty(Model.TextoBoton))
+                                {
+                                    <br />
+                                    <small class="text-muted">Texto del botón: "@Model.TextoBoton"</small>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">Sin enlace</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">Orden:</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge bg-secondary">@Model.Orden</span>
+                        </dd>
+
+                        <dt class="col-sm-4">Estado:</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.Activo)
+                            {
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle"></i> Activo
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">
+                                    <i class="fas fa-times-circle"></i> Inactivo
+                                </span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">Creado:</dt>
+                        <dd class="col-sm-8">
+                            @Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")
+                        </dd>
+
+                        @if (Model.FechaModificacion.HasValue)
+                        {
+                            <dt class="col-sm-4">Modificado:</dt>
+                            <dd class="col-sm-8">
+                                @Model.FechaModificacion.Value.ToString("dd/MM/yyyy HH:mm")
+                            </dd>
+                        }
+                    </dl>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="text-center">
+                        <p class="text-muted">
+                            <strong>Imagen del Slider:</strong>
+                        </p>
+                        @if (!string.IsNullOrEmpty(Model.ImagenUrl))
+                        {
+                            <div class="border rounded p-3 bg-light">
+                                <img src="@Model.ImagenUrl" alt="@Model.Titulo" class="img-fluid" style="max-width: 100%; max-height: 400px; object-fit: contain;" />
+                            </div>
+                            <p class="text-danger mt-2">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <small>Esta imagen será eliminada permanentemente del servidor</small>
+                            </p>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                No hay imagen asociada
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-4 border-danger">
+        <div class="card-body">
+            <form asp-action="Delete" method="post" id="deleteForm">
+                <input type="hidden" asp-for="Id" />
+                
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="confirmDelete" required />
+                    <label class="form-check-label" for="confirmDelete">
+                        <strong>He leído la advertencia y confirmo que deseo eliminar este slider permanentemente</strong>
+                    </label>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-arrow-left"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-danger btn-lg" id="deleteBtn" disabled>
+                        <i class="fas fa-trash-alt"></i> Confirmar Eliminación
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Habilitar botón de eliminar solo si checkbox está marcado
+            $('#confirmDelete').on('change', function() {
+                $('#deleteBtn').prop('disabled', !this.checked);
+            });
+
+            // Confirmación adicional antes de enviar
+            $('#deleteForm').on('submit', function(e) {
+                if (!confirm('¿Está completamente seguro de eliminar este slider?\n\nEsta acción NO SE PUEDE DESHACER.')) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                // Deshabilitar botón para evitar doble envío
+                $('#deleteBtn')
+                    .prop('disabled', true)
+                    .html('<i class="fas fa-spinner fa-spin"></i> Eliminando...');
+            });
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .card {
+            border-radius: 12px;
+        }
+        .alert {
+            border-radius: 8px;
+        }
+        .btn-lg {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+        }
+        dl dt {
+            font-weight: 600;
+            color: #495057;
+        }
+        dl dd {
+            color: #6c757d;
+        }
+    </style>
+}

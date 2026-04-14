@@ -1,0 +1,323 @@
+@model RubricasApp.Web.ViewModels.Conducta.AplicarDecisionProfesionalViewModel
+
+@{
+    ViewData["Title"] = "Aplicar Decisión Profesional";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-action="EstudiantesAplazados">Estudiantes Aplazados</a></li>
+                    <li class="breadcrumb-item active">Decisión Profesional</li>
+                </ol>
+            </nav>
+            <h2><i class="fas fa-gavel text-info"></i> Decisión Profesional en Conducta</h2>
+            <p class="text-muted">Opción C - REA 40862-V21, Artículo 132</p>
+        </div>
+    </div>
+
+    <!-- Información normativa -->
+    <div class="alert alert-warning border-warning">
+        <h5 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Importante - Marco Normativo</h5>
+        <p>
+            La Decisión Profesional es una facultad del Comité de Apoyo Educativo que permite, 
+            con base en criterios pedagógicos fundamentados:
+        </p>
+        <ul class="mb-2">
+            <li>Modificar la calificación de conducta de un estudiante aplazado</li>
+            <li>Asignar una calificación aprobatoria basada en circunstancias especiales</li>
+            <li>Considerar el contexto integral del estudiante</li>
+        </ul>
+        <p class="mb-0">
+            <strong>Requisitos obligatorios:</strong>
+        </p>
+        <ul class="mb-0">
+            <li>Justificación pedagógica documentada</li>
+            <li>Acta de reunión del comité con número y fecha</li>
+            <li>Identificación de los miembros que aprueban la decisión</li>
+        </ul>
+    </div>
+
+    <!-- Información del estudiante -->
+    <div class="card mb-4">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0"><i class="fas fa-user-graduate"></i> Información del Estudiante</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Nombre:</strong> @Model.NombreEstudiante</p>
+                    <p><strong>Identificación:</strong> @Model.NumeroIdentificacion</p>
+                    <p><strong>Grupo:</strong> @Model.NombreGrupo</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Período:</strong> @Model.NombrePeriodo</p>
+                    <p><strong>Nota Actual:</strong> <span class="badge bg-danger fs-6">@Model.NotaActual.ToString("F2")</span></p>
+                    <p><strong>Estado Actual:</strong> <span class="badge bg-danger">APLAZADO</span></p>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Total de Boletas:</strong> @Model.TotalBoletas</p>
+                    <p><strong>Total Rebajos:</strong> <span class="text-danger">@Model.TotalRebajos puntos</span></p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Profesor Guía:</strong> @Model.NombreProfesorGuia</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <form asp-action="AplicarDecisionProfesional" method="post">
+        <input type="hidden" asp-for="IdEstudiante" />
+        <input type="hidden" asp-for="IdPeriodo" />
+
+        <!-- Datos del acta -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-file-signature"></i> Datos del Acta del Comité</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="NumeroActa" class="form-label required">Número de Acta</label>
+                        <input asp-for="NumeroActa" type="text" class="form-control" required 
+                               placeholder="Ej: 2024-03-15" />
+                        <span asp-validation-for="NumeroActa" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="FechaReunion" class="form-label required">Fecha de la Reunión</label>
+                        <input asp-for="FechaReunion" type="date" class="form-control" required />
+                        <span asp-validation-for="FechaReunion" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="MiembrosComite" class="form-label required">Miembros del Comité</label>
+                    <textarea asp-for="MiembrosComite" class="form-control" rows="3" required 
+                              placeholder="Liste los nombres completos de los miembros del comité que participaron en la decisión..."></textarea>
+                    <span asp-validation-for="MiembrosComite" class="text-danger"></span>
+                    <div class="form-text">
+                        Incluya: Orientador, Psicólogo, Director, Profesores, etc.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Justificación pedagógica -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-book"></i> Justificación Pedagógica</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label asp-for="JustificacionPedagogica" class="form-label required">Justificación Completa</label>
+                    <textarea asp-for="JustificacionPedagogica" class="form-control" rows="6" required 
+                              placeholder="Proporcione una justificación pedagógica detallada y fundamentada..."></textarea>
+                    <span asp-validation-for="JustificacionPedagogica" class="text-danger"></span>
+                    <div class="form-text">
+                        <strong>Debe incluir:</strong>
+                        <ul class="mb-0">
+                            <li>Análisis del contexto del estudiante (familiar, social, emocional)</li>
+                            <li>Evolución del comportamiento durante el período</li>
+                            <li>Esfuerzos del estudiante por mejorar</li>
+                            <li>Circunstancias atenuantes o especiales</li>
+                            <li>Proyección del impacto educativo de la decisión</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CircunstanciasEspeciales" class="form-label required">Circunstancias Especiales</label>
+                    <textarea asp-for="CircunstanciasEspeciales" class="form-control" rows="4" required 
+                              placeholder="Describa las circunstancias especiales que fundamentan esta decisión..."></textarea>
+                    <span asp-validation-for="CircunstanciasEspeciales" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="AccionesRealizadas" class="form-label required">Acciones Realizadas</label>
+                    <textarea asp-for="AccionesRealizadas" class="form-control" rows="4" required 
+                              placeholder="Detalle las acciones previas realizadas con el estudiante..."></textarea>
+                    <span asp-validation-for="AccionesRealizadas" class="text-danger"></span>
+                    <div class="form-text">
+                        Ejemplos: reuniones con padres, seguimiento individualizado, apoyo psicológico, etc.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Decisión -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-balance-scale"></i> Decisión del Comité</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label asp-for="Decision" class="form-label required">Decisión Tomada</label>
+                    <select asp-for="Decision" class="form-select" required onchange="actualizarNota()">
+                        <option value="">-- Seleccione una decisión --</option>
+                        <option value="Mantener Aplazado">Mantener Aplazado (Nota actual: @Model.NotaActual.ToString("F2"))</option>
+                        <option value="Asignar Aprobado">Asignar Aprobado (Nota: 65.00)</option>
+                    </select>
+                    <span asp-validation-for="Decision" class="text-danger"></span>
+                </div>
+
+                <div class="alert alert-info" id="resultadoDecision" style="display:none;">
+                    <h6 class="alert-heading">Resultado de la Decisión:</h6>
+                    <p id="textoResultado" class="mb-0"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Observaciones adicionales -->
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="fas fa-comments"></i> Observaciones Adicionales</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label asp-for="ObservacionesAdicionales" class="form-label">Observaciones (Opcional)</label>
+                    <textarea asp-for="ObservacionesAdicionales" class="form-control" rows="3" 
+                              placeholder="Agregue cualquier observación adicional relevante..."></textarea>
+                    <span asp-validation-for="ObservacionesAdicionales" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirmación -->
+        <div class="card mb-4">
+            <div class="card-body bg-light">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="confirmarDecision" required>
+                    <label class="form-check-label" for="confirmarDecision">
+                        <strong>
+                            Confirmo que esta decisión ha sido tomada en reunión del Comité de Apoyo Educativo, 
+                            está debidamente fundamentada y ha sido registrada en el acta oficial.
+                        </strong>
+                    </label>
+                </div>
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" id="confirmarNotificacion" required>
+                    <label class="form-check-label" for="confirmarNotificacion">
+                        <strong>
+                            Confirmo que se notificará al estudiante, su familia y el profesor guía sobre esta decisión.
+                        </strong>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <a asp-action="EstudiantesAplazados" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-success btn-lg" id="btnAplicar">
+                        <i class="fas fa-gavel"></i> Aplicar Decisión
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        function actualizarNota() {
+            const decision = $('#@Html.IdFor(m => m.Decision)').val();
+            const notaActual = @Model.NotaActual.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+            
+            if (decision === 'Mantener Aplazado') {
+                $('#resultadoDecision').show();
+                $('#textoResultado').html(
+                    '<strong>La nota de conducta se mantendrá en: ' + notaActual + '</strong><br/>' +
+                    'El estudiante conservará el estado de APLAZADO.'
+                ).css('color', '#dc3545');
+            } else if (decision === 'Asignar Aprobado') {
+                $('#resultadoDecision').show();
+                $('#textoResultado').html(
+                    '<strong>La nota de conducta se ajustará a: 65.00</strong><br/>' +
+                    'El estudiante pasará al estado de APROBADO.<br/>' +
+                    '<em>Esta decisión prevalece sobre la calificación calculada.</em>'
+                ).css('color', '#198754');
+            } else {
+                $('#resultadoDecision').hide();
+            }
+        }
+
+        $(document).ready(function() {
+            // Validar fecha no sea futura
+            $('#@Html.IdFor(m => m.FechaReunion)').on('change', function() {
+                const fechaReunion = new Date($(this).val());
+                const hoy = new Date();
+                
+                if (fechaReunion > hoy) {
+                    toastr.error('La fecha de la reunión no puede ser futura');
+                    $(this).val('');
+                }
+            });
+
+            // Validar longitud mínima de textos
+            const camposRequeridos = [
+                { campo: '#@Html.IdFor(m => m.JustificacionPedagogica)', minLength: 100 },
+                { campo: '#@Html.IdFor(m => m.CircunstanciasEspeciales)', minLength: 50 },
+                { campo: '#@Html.IdFor(m => m.AccionesRealizadas)', minLength: 50 },
+                { campo: '#@Html.IdFor(m => m.MiembrosComite)', minLength: 20 }
+            ];
+
+            camposRequeridos.forEach(function(item) {
+                $(item.campo).on('blur', function() {
+                    if ($(this).val().trim().length < item.minLength) {
+                        toastr.warning('Este campo requiere al menos ' + item.minLength + ' caracteres');
+                    }
+                });
+            });
+
+            // Confirmación antes de enviar
+            $('form').on('submit', function(e) {
+                if (!$('#confirmarDecision').is(':checked') || !$('#confirmarNotificacion').is(':checked')) {
+                    e.preventDefault();
+                    toastr.error('Debe confirmar ambas declaraciones');
+                    return false;
+                }
+
+                const decision = $('#@Html.IdFor(m => m.Decision)').val();
+                let mensaje = '¿Está completamente seguro de aplicar esta Decisión Profesional?\n\n';
+                
+                if (decision === 'Asignar Aprobado') {
+                    mensaje += 'Esta decisión cambiará el estado del estudiante de APLAZADO a APROBADO.\n';
+                } else {
+                    mensaje += 'Esta decisión mantendrá el estado del estudiante como APLAZADO.\n';
+                }
+                
+                mensaje += '\nEsta acción quedará registrada permanentemente en el sistema.';
+
+                if (!confirm(mensaje)) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                $('#btnAplicar')
+                    .prop('disabled', true)
+                    .html('<i class="fas fa-spinner fa-spin"></i> Aplicando Decisión...');
+            });
+        });
+    </script>
+}
+
+<style>
+    .required::after {
+        content: " *";
+        color: red;
+    }
+</style>

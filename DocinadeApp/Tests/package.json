@@ -1,0 +1,13 @@
+{
+  "name": "rubricas-app-tests",
+  "version": "1.0.0",
+  "description": "Tests for RubricasApp.Web",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1"
+  }
+}

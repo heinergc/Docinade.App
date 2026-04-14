@@ -1,0 +1,147 @@
+﻿@model RubricasApp.Web.Models.InstrumentoEvaluacion
+
+@{
+    ViewData["Title"] = "Crear Instrumento de Evaluación";
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        Crear Nuevo Instrumento de Evaluación
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="Nombre" class="form-label">
+                                    <i class="fas fa-tag me-1"></i>
+                                    @Html.DisplayNameFor(model => model.Nombre)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Nombre" class="form-control" placeholder="Ingrese el nombre del instrumento" />
+                                <span asp-validation-for="Nombre" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="Descripcion" class="form-label">
+                                    <i class="fas fa-align-left me-1"></i>
+                                    @Html.DisplayNameFor(model => model.Descripcion)
+                                </label>
+                                <textarea asp-for="Descripcion" class="form-control" rows="4" 
+                                         placeholder="Describa el propósito y características del instrumento"></textarea>
+                                <span asp-validation-for="Descripcion" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                             @*    <div class="form-check">
+                                    <!-- ✅ CORRECCIÓN: Mantener el input hidden (es necesario para ASP.NET Core) -->
+                                    <input type="hidden" asp-for="Activo" value="false" />
+                                    <input asp-for="Activo" class="form-check-input" type="checkbox" value="true" checked />
+                                    <label asp-for="Activo" class="form-check-label">
+                                        <i class="fas fa-toggle-on me-1"></i>
+                                        Estado Activo
+                                    </label>
+                                </div> *@
+                                <label asp-for="Activo" class="form-label">Estado</label>
+                                <div class="form-check form-switch">
+                                    <input asp-for="Activo" class="form-check-input" type="checkbox" checked />
+                                    <label class="form-check-label" asp-for="Activo">
+                                        Activo
+                                    </label>
+                                </div>
+
+                                <small class="form-text text-muted">
+                                    Marque esta opción si el instrumento estará disponible para uso inmediato.
+                                </small>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>
+                                Volver a la Lista
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>
+                                Crear Instrumento
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Focus on the first input
+            $('#Nombre').focus();
+            
+            // Character counter for description
+            $('#Descripcion').on('input', function() {
+                var maxLength = 500;
+                var currentLength = $(this).val().length;
+                var remaining = maxLength - currentLength;
+                
+                if (!$('#char-counter').length) {
+                    $(this).after('<small id="char-counter" class="form-text text-muted"></small>');
+                }
+                
+                $('#char-counter').text(remaining + ' caracteres restantes')
+                    .toggleClass('text-danger', remaining < 50)
+                    .toggleClass('text-warning', remaining >= 50 && remaining < 100)
+                    .toggleClass('text-muted', remaining >= 100);
+            });
+            
+            // 🔧 CORRECCIÓN CSS: Ocultar input hidden duplicado visualmente
+            $('input[type="hidden"][name="Activo"]').hide();
+            
+            // Debug form submission
+            $('form').on('submit', function(e) {
+                console.log('📝 Formulario enviado:');
+                console.log('Nombre:', $('#Nombre').val());
+                console.log('Descripcion:', $('#Descripcion').val());
+                console.log('Activo (checkbox checked):', $('input[type="checkbox"][name="Activo"]').is(':checked'));
+                console.log('Activo (hidden value):', $('input[type="hidden"][name="Activo"]').val());
+            });
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        /* 🔧 CORRECCIÓN CSS: Asegurar que solo se muestre un checkbox */
+        input[type="hidden"][name="Activo"] {
+            display: none !important;
+        }
+        
+        /* Asegurar que no hay duplicación del checkbox */
+        .form-check input[type="checkbox"] {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Prevenir cualquier duplicación CSS */
+        .form-check input[type="checkbox"]::before,
+        .form-check input[type="checkbox"]::after {
+            display: none !important;
+        }
+    </style>
+}

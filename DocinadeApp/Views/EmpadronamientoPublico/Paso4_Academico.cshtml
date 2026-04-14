@@ -1,0 +1,158 @@
+@model RubricasApp.Web.ViewModels.EmpadronamientoPublicoViewModel
+
+@{
+    ViewData["Title"] = "Paso 4: Información Académica";
+}
+
+<!-- Barra de progreso -->
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="progress" style="height: 30px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" 
+                     role="progressbar" 
+                     style="width: 80%;" 
+                     aria-valuenow="80" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                    Paso @Model.PasoActual de @Model.TotalPasos (80%)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0">
+                        <i class="fas fa-graduation-cap"></i> Paso 4: Información Académica
+                    </h3>
+                    <small>Complete su historial educativo previo</small>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Paso4" method="post">
+                        @Html.AntiForgeryToken()
+                        
+                        <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+                        
+                        <h5 class="text-warning mb-3"><i class="fas fa-school"></i> Historial Educativo</h5>
+                        
+                        <!-- Institución de Procedencia -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="InstitucionProcedencia" class="form-label fw-bold">
+                                    Institución de Procedencia
+                                </label>
+                                <input asp-for="InstitucionProcedencia" class="form-control" 
+                                       placeholder="Nombre del colegio o institución anterior" />
+                                <span asp-validation-for="InstitucionProcedencia" class="text-danger"></span>
+                                <small class="form-text text-muted">
+                                    Institución donde cursó su último nivel académico
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- Último Nivel Cursado y Promedio -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="UltimoNivelCursado" class="form-label fw-bold">
+                                    Último Nivel Cursado
+                                </label>
+                                <select asp-for="UltimoNivelCursado" class="form-select">
+                                    <option value="">Seleccione...</option>
+                                    <option value="Primaria Completa">Primaria Completa</option>
+                                    <option value="Secundaria Incompleta">Secundaria Incompleta</option>
+                                    <option value="Tercer Ciclo">Tercer Ciclo</option>
+                                    <option value="Educación Diversificada Incompleta">Educación Diversificada Incompleta</option>
+                                    <option value="Bachillerato">Bachillerato</option>
+                                    <option value="Universitaria">Universitaria</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                                <span asp-validation-for="UltimoNivelCursado" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PromedioAnterior" class="form-label fw-bold">
+                                    Promedio del Último Año
+                                </label>
+                                <input asp-for="PromedioAnterior" type="number" step="0.01" min="0" max="100" 
+                                       class="form-control" placeholder="Ej: 85.5" />
+                                <span asp-validation-for="PromedioAnterior" class="text-danger"></span>
+                                <small class="form-text text-muted">Escala de 0 a 100</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Institución Actual -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="Institucion" class="form-label fw-bold">
+                                    Institución a la que se Matricula
+                                </label>
+                                <input asp-for="Institucion" class="form-control" 
+                                       placeholder="Nombre de la institución" />
+                                <span asp-validation-for="Institucion" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <h5 class="text-warning mb-3">
+                            <i class="fas fa-hands-helping"></i> Necesidades Educativas Especiales (Opcional)
+                        </h5>
+                        
+                        <div class="alert alert-light border">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i> Si ha recibido adaptaciones curriculares, 
+                                adecuaciones de acceso o apoyos educativos especiales, por favor indíquelo a continuación. 
+                                Esta información nos ayudará a brindarle mejor atención.
+                            </small>
+                        </div>
+                        
+                        <!-- Adaptaciones Previas -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="AdaptacionesPrevias" class="form-label fw-bold">
+                                    Adaptaciones o Apoyos Educativos Previos
+                                </label>
+                                <textarea asp-for="AdaptacionesPrevias" class="form-control" rows="4" 
+                                          placeholder="Describa brevemente cualquier adaptación, adecuación curricular o apoyo educativo que haya recibido anteriormente..."></textarea>
+                                <span asp-validation-for="AdaptacionesPrevias" class="text-danger"></span>
+                                <small class="form-text text-muted">
+                                    Ejemplo: Adecuaciones significativas, apoyo de psicopedagogía, terapia de lenguaje, etc.
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- Campos ocultos -->
+                        <input type="hidden" asp-for="PasoActual" />
+                        <input type="hidden" asp-for="TotalPasos" />
+                        <input type="hidden" asp-for="SessionId" />
+                        
+                        <hr class="my-4">
+                        
+                        <!-- Botones de navegación -->
+                        <div class="row">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                                    <i class="fas fa-arrow-left"></i> Anterior
+                                </button>
+                            </div>
+                            <div class="col-6 text-end">
+                                <button type="submit" class="btn btn-warning btn-lg">
+                                    Siguiente <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

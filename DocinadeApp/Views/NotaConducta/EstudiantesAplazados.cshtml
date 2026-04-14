@@ -1,0 +1,300 @@
+@model RubricasApp.Web.ViewModels.Conducta.EstudiantesRiesgoViewModel
+
+@{
+    ViewData["Title"] = "Estudiantes Aplazados";
+}
+
+@section Styles {
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Estudiantes Aplazados</li>
+                </ol>
+            </nav>
+            <h2><i class="fas fa-times-circle text-danger"></i> Estudiantes Aplazados en Conducta</h2>
+            <p class="text-muted">Estudiantes con nota de conducta menor a @ViewBag.NotaMinima puntos</p>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" id="formFiltros">
+                <div class="row align-items-end">
+                    <div class="col-md-4">
+                        <label for="idPeriodo" class="form-label">Período Académico</label>
+                        <select id="idPeriodo" name="idPeriodo" class="form-select" onchange="$('#formFiltros').submit()">
+                            @if (ViewBag.Periodos != null)
+                            {
+                                @foreach (var periodo in ViewBag.Periodos)
+                                {
+                                    <option value="@periodo.Value" selected="@(periodo.Value == ViewBag.PeriodoSeleccionado?.ToString())">
+                                        @periodo.Text
+                                    </option>
+                                }
+                            }
+                            else
+                            {
+                                <option value="">No hay períodos disponibles</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="idGrupo" class="form-label">Grupo (Opcional)</label>
+                        <select id="idGrupo" name="idGrupo" class="form-select" onchange="$('#formFiltros').submit()">
+                            <option value="">Todos los grupos</option>
+                            @if (ViewBag.Grupos != null)
+                            {
+                                @foreach (var grupo in ViewBag.Grupos)
+                                {
+                                    <option value="@grupo.Value" selected="@(grupo.Value == ViewBag.IdGrupoSeleccionado)">
+                                        @grupo.Text
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-secondary" onclick="location.href='@Url.Action("EstudiantesAplazados")'">
+                            <i class="fas fa-redo"></i> Limpiar Filtros
+                        </button>
+                        <button type="button" class="btn btn-success" onclick="exportarExcel()">
+                            <i class="fas fa-file-excel"></i> Exportar Excel
+                        </button>
+                        <a asp-action="ReporteMasivoProgramasAcciones" 
+                           asp-route-idPeriodo="@ViewBag.PeriodoSeleccionado" 
+                           asp-route-estado="Pendiente"
+                           class="btn btn-primary" 
+                           target="_blank"
+                           title="Generar reporte PDF de Programas de Acciones">
+                            <i class="fas fa-file-pdf"></i> Reporte PDF
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Alerta normativa -->
+    <div class="alert alert-danger border-danger">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-gavel fa-2x me-3"></i>
+            <div>
+                <h5 class="alert-heading">Requisito del REA 40862-V21 (Art. 132)</h5>
+                <p class="mb-2">
+                    Todo estudiante que aplace conducta debe:
+                </p>
+                <ul class="mb-0">
+                    <li><strong>Opción B:</strong> Participar en un Programa de Acciones Institucional supervisado por el Comité de Apoyo Educativo</li>
+                    <li><strong>Opción C:</strong> El comité puede aplicar una Decisión Profesional basada en criterios pedagógicos documentados</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de estudiantes -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-list"></i> Lista de Estudiantes Aplazados 
+                <span class="badge bg-white text-danger">@(Model?.Estudiantes?.Count ?? 0)</span>
+            </h5>
+        </div>
+        <div class="card-body">
+            @if (Model?.Estudiantes != null && Model.Estudiantes.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tablaAplazados">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Estudiante</th>
+                                <th>Identificación</th>
+                                <th>Grupo</th>
+                                <th>Profesor Guía</th>
+                                <th class="text-center">Nota</th>
+                                <th class="text-center">Boletas</th>
+                                <th class="text-center">Total Rebajos</th>
+                                <th class="text-center">Programa</th>
+                                <th class="text-center">Decisión</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var estudiante in Model.Estudiantes.OrderBy(e => e.NotaFinal))
+                            {
+                                <tr class="@(estudiante.TieneProgramaAcciones || estudiante.DecisionProfesionalAplicada ? "" : "table-warning")">
+                                    <td>
+                                        <strong>@estudiante.NombreCompleto</strong>
+                                        @if (!estudiante.TieneProgramaAcciones && !estudiante.DecisionProfesionalAplicada)
+                                        {
+                                            <br/><small class="text-danger"><i class="fas fa-exclamation-triangle"></i> Requiere atención</small>
+                                        }
+                                    </td>
+                                    <td>@estudiante.NumeroId</td>
+                                    <td>@estudiante.Grupo</td>
+                                    <td>@estudiante.ProfesorGuia</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-danger fs-6">@estudiante.NotaFinal.ToString("F2")</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-info">@estudiante.CantidadBoletas</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <strong class="text-danger">@estudiante.TotalRebajos</strong>
+                                    </td>
+                                    <td class="text-center">
+                                        @if (estudiante.TieneProgramaAcciones)
+                                        {
+                                            <span class="badge bg-success" title="@estudiante.EstadoPrograma">
+                                                <i class="fas fa-check"></i> @(estudiante.EstadoPrograma ?? "Activo")
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Sin programa</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        @if (estudiante.DecisionProfesionalAplicada)
+                                        {
+                                            <span class="badge bg-info">
+                                                <i class="fas fa-gavel"></i> Aplicada
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Sin decisión</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="EstudianteNota" 
+                                               asp-route-idEstudiante="@estudiante.IdEstudiante" 
+                                               asp-route-idPeriodo="@ViewBag.PeriodoSeleccionado" 
+                                               class="btn btn-sm btn-primary" 
+                                               title="Ver detalle">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            @if (!estudiante.TieneProgramaAcciones && !estudiante.DecisionProfesionalAplicada)
+                                            {
+                                                <a asp-action="CrearPrograma" 
+                                                   asp-route-idEstudiante="@estudiante.IdEstudiante" 
+                                                   asp-route-idPeriodo="@ViewBag.PeriodoSeleccionado" 
+                                                   class="btn btn-sm btn-warning" 
+                                                   title="Crear programa">
+                                                    <i class="fas fa-clipboard-list"></i>
+                                                </a>
+                                                <a asp-action="AplicarDecisionProfesional" 
+                                                   asp-route-idEstudiante="@estudiante.IdEstudiante" 
+                                                   asp-route-idPeriodo="@ViewBag.PeriodoSeleccionado" 
+                                                   class="btn btn-sm btn-info" 
+                                                   title="Aplicar decisión">
+                                                    <i class="fas fa-gavel"></i>
+                                                </a>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Resumen -->
+                <div class="row mt-4">
+                    <div class="col-md-3">
+                        <div class="card border-info">
+                            <div class="card-body text-center">
+                                <h6 class="text-muted">Total Aplazados</h6>
+                                <h3>@Model.Estudiantes.Count()</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-success">
+                            <div class="card-body text-center">
+                                <h6 class="text-muted">Con Programa</h6>
+                                <h3>@Model.Estudiantes.Count(e => e.TieneProgramaAcciones)</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-primary">
+                            <div class="card-body text-center">
+                                <h6 class="text-muted">Con Decisión</h6>
+                                <h3>@Model.Estudiantes.Count(e => e.DecisionProfesionalAplicada)</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-warning">
+                            <div class="card-body text-center">
+                                <h6 class="text-muted">Sin Atención</h6>
+                                <h3 class="text-danger">@Model.Estudiantes.Count(e => !e.TieneProgramaAcciones && !e.DecisionProfesionalAplicada)</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-success text-center">
+                    <i class="fas fa-check-circle fa-3x mb-3"></i>
+                    <p class="mb-0">¡Excelente! No hay estudiantes aplazados en este período.</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="mt-4">
+        <a asp-action="Dashboard" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            $('#tablaAplazados').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
+                },
+                order: [[4, 'asc']], // Ordenar por nota ascendente
+                pageLength: 25,
+                dom: 'Bfrtip',
+                buttons: []
+            });
+        });
+
+        function exportarExcel() {
+            toastr.info('Exportando a Excel...');
+            
+            // Obtener los parámetros de filtro actuales
+            const idPeriodo = $('#idPeriodo').val();
+            const idGrupo = $('#idGrupo').val();
+            
+            // Construir URL con parámetros
+            let url = '@Url.Action("ExportarEstudiantesAplazados")?idPeriodo=' + idPeriodo;
+            if (idGrupo) {
+                url += '&idGrupo=' + idGrupo;
+            }
+            
+            // Descargar archivo
+            window.location.href = url;
+        }
+    </script>
+}

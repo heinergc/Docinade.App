@@ -1,0 +1,470 @@
+@model RubricasApp.Web.ViewModels.ProfesorCurriculumViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curriculum Vitae - @Model.NombreCompleto</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #0066cc;
+            padding-bottom: 15px;
+        }
+        
+        .header h1 {
+            color: #0066cc;
+            font-size: 24pt;
+            margin-bottom: 5px;
+        }
+        
+        .header .cedula {
+            font-size: 11pt;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .section {
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+        }
+        
+        .section-title {
+            background-color: #0066cc;
+            color: white;
+            padding: 8px 12px;
+            font-size: 13pt;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-radius: 3px;
+        }
+        
+        .section-content {
+            padding: 0 5px;
+        }
+        
+        .info-grid {
+            display: table;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .info-row {
+            display: table-row;
+        }
+        
+        .info-label {
+            display: table-cell;
+            font-weight: bold;
+            width: 180px;
+            padding: 5px 10px 5px 0;
+            vertical-align: top;
+        }
+        
+        .info-value {
+            display: table-cell;
+            padding: 5px 0;
+            vertical-align: top;
+        }
+        
+        .experience-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-left: 3px solid #0066cc;
+        }
+        
+        .experience-item h4 {
+            color: #0066cc;
+            font-size: 12pt;
+            margin-bottom: 5px;
+        }
+        
+        .experience-item .institution {
+            font-weight: bold;
+            color: #444;
+            margin-bottom: 3px;
+        }
+        
+        .experience-item .period {
+            color: #666;
+            font-size: 10pt;
+            margin-bottom: 5px;
+        }
+        
+        .experience-item .description {
+            font-size: 10pt;
+            color: #555;
+            margin-top: 5px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background-color: #e7f3ff;
+            color: #0066cc;
+            border-radius: 3px;
+            font-size: 9pt;
+            margin-right: 5px;
+            margin-top: 3px;
+        }
+        
+        .badge.cargo {
+            background-color: #ffe7e7;
+            color: #cc0000;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #ccc;
+            font-size: 9pt;
+            color: #666;
+        }
+        
+        ul {
+            margin: 5px 0 5px 20px;
+        }
+        
+        li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- ENCABEZADO -->
+    <div class="header">
+        <h1>@Model.NombreCompleto</h1>
+        <div class="cedula">
+            Cédula @Model.TipoCedula: @Model.Cedula
+            @if (Model.NumeroColegiadoProfesional != null)
+            {
+                <span>| Colegiado: @Model.NumeroColegiadoProfesional</span>
+            }
+        </div>
+    </div>
+
+    <!-- DATOS PERSONALES -->
+    <div class="section">
+        <div class="section-title">DATOS PERSONALES</div>
+        <div class="section-content">
+            <div class="info-grid">
+                <div class="info-row">
+                    <div class="info-label">Fecha de Nacimiento:</div>
+                    <div class="info-value">@(Model.FechaNacimiento?.ToString("dd/MM/yyyy") ?? "No especificada") @(Model.Edad != null ? $"({Model.Edad} años)" : "")</div>
+                </div>
+                @if (Model.Sexo != null)
+                {
+                    <div class="info-row">
+                        <div class="info-label">Sexo:</div>
+                        <div class="info-value">@(Model.Sexo == "M" ? "Masculino" : "Femenino")</div>
+                    </div>
+                }
+                @if (Model.EstadoCivil != null)
+                {
+                    <div class="info-row">
+                        <div class="info-label">Estado Civil:</div>
+                        <div class="info-value">@Model.EstadoCivil</div>
+                    </div>
+                }
+                <div class="info-row">
+                    <div class="info-label">Nacionalidad:</div>
+                    <div class="info-value">@Model.Nacionalidad</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INFORMACIÓN DE CONTACTO -->
+    <div class="section">
+        <div class="section-title">INFORMACIÓN DE CONTACTO</div>
+        <div class="section-content">
+            <div class="info-grid">
+                <div class="info-row">
+                    <div class="info-label">Email Personal:</div>
+                    <div class="info-value">@Model.EmailPersonal</div>
+                </div>
+                @if (Model.EmailInstitucional != null)
+                {
+                    <div class="info-row">
+                        <div class="info-label">Email Institucional:</div>
+                        <div class="info-value">@Model.EmailInstitucional</div>
+                    </div>
+                }
+                <div class="info-row">
+                    <div class="info-label">Teléfono Celular:</div>
+                    <div class="info-value">@Model.TelefonoCelular</div>
+                </div>
+                @if (Model.TelefonoFijo != null)
+                {
+                    <div class="info-row">
+                        <div class="info-label">Teléfono Fijo:</div>
+                        <div class="info-value">@Model.TelefonoFijo</div>
+                    </div>
+                }
+            </div>
+            
+            @if (Model.DireccionExacta != null || Model.ProvinciaNombre != null)
+            {
+                <div style="margin-top: 10px;">
+                    <strong>Dirección:</strong><br/>
+                    @if (Model.DireccionExacta != null)
+                    {
+                        <span>@Model.DireccionExacta<br/></span>
+                    }
+                    @if (Model.ProvinciaNombre != null)
+                    {
+                        <span>@Model.ProvinciaNombre, @Model.CantonNombre, @Model.DistritoNombre</span>
+                        @if (Model.CodigoPostal != null)
+                        {
+                            <span> - CP: @Model.CodigoPostal</span>
+                        }
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- FORMACIÓN ACADÉMICA -->
+    @if (Model.FormacionAcademica.Any())
+    {
+        <div class="section">
+            <div class="section-title">FORMACIÓN ACADÉMICA</div>
+            <div class="section-content">
+                @foreach (var formacion in Model.FormacionAcademica)
+                {
+                    <div class="experience-item">
+                        <h4>@formacion.TituloObtenido</h4>
+                        <div class="institution">@formacion.InstitucionEducativa, @formacion.PaisInstitucion</div>
+                        <div class="period">
+                            @formacion.TipoFormacion 
+                            | @(formacion.AnioInicio ?? 0) - @(formacion.EnCurso ? "En curso" : formacion.AnioFinalizacion?.ToString() ?? "")
+                        </div>
+                        @if (formacion.PromedioGeneral.HasValue)
+                        {
+                            <div style="margin-top: 5px;">
+                                <span class="badge">Promedio: @formacion.PromedioGeneral.Value.ToString("F2")</span>
+                            </div>
+                        }
+                        @if (formacion.EsTituloReconocidoCONARE && !string.IsNullOrEmpty(formacion.NumeroReconocimiento))
+                        {
+                            <div style="margin-top: 5px;">
+                                <span class="badge">CONARE: @formacion.NumeroReconocimiento</span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- INFORMACIÓN LABORAL ACTUAL -->
+    <div class="section">
+        <div class="section-title">INFORMACIÓN LABORAL ACTUAL</div>
+        <div class="section-content">
+            <div class="info-grid">
+                @if (Model.InstitucionNombre != null)
+                {
+                    <div class="info-row">
+                        <div class="info-label">Institución:</div>
+                        <div class="info-value">@Model.InstitucionNombre</div>
+                    </div>
+                }
+                @if (Model.FacultadNombre != null)
+                {
+                    <div class="info-row">
+                        <div class="info-label">Facultad:</div>
+                        <div class="info-value">@Model.FacultadNombre</div>
+                    </div>
+                }
+                @if (Model.EscuelaNombre != null)
+                {
+                    <div class="info-row">
+                        <div class="info-label">Escuela:</div>
+                        <div class="info-value">@Model.EscuelaNombre</div>
+                    </div>
+                }
+                <div class="info-row">
+                    <div class="info-label">Fecha de Ingreso:</div>
+                    <div class="info-value">@Model.FechaIngreso.ToString("dd/MM/yyyy") (@Model.AniosServicio años de servicio)</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Tipo de Contrato:</div>
+                    <div class="info-value">@Model.TipoContrato</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Jornada:</div>
+                    <div class="info-value">@Model.TipoJornada @(Model.HorasLaborales.HasValue ? $"({Model.HorasLaborales} horas)" : "")</div>
+                </div>
+            </div>
+            
+            @if (Model.EsDirector || Model.EsCoordinador || Model.EsDecano || Model.CargoAdministrativo != null)
+            {
+                <div style="margin-top: 10px;">
+                    <strong>Cargos Administrativos:</strong><br/>
+                    @if (Model.EsDirector) { <span class="badge cargo">Director</span> }
+                    @if (Model.EsCoordinador) { <span class="badge cargo">Coordinador</span> }
+                    @if (Model.EsDecano) { <span class="badge cargo">Decano</span> }
+                    @if (Model.CargoAdministrativo != null) { <span class="badge cargo">@Model.CargoAdministrativo</span> }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- EXPERIENCIA LABORAL PREVIA -->
+    @if (Model.ExperienciaLaboral.Any())
+    {
+        <div class="section">
+            <div class="section-title">EXPERIENCIA LABORAL PREVIA</div>
+            <div class="section-content">
+                @foreach (var exp in Model.ExperienciaLaboral)
+                {
+                    <div class="experience-item">
+                        <h4>@exp.CargoDesempenado</h4>
+                        <div class="institution">@exp.NombreInstitucion @(exp.TipoInstitucion != null ? $"({exp.TipoInstitucion})" : "")</div>
+                        <div class="period">
+                            @exp.FechaInicio.ToString("MM/yyyy") - @(exp.TrabajandoActualmente ? "Actualidad" : exp.FechaFin?.ToString("MM/yyyy") ?? "")
+                            | @exp.MesesExperiencia meses
+                        </div>
+                        @if (!string.IsNullOrEmpty(exp.DescripcionFunciones))
+                        {
+                            <div class="description">@exp.DescripcionFunciones</div>
+                        }
+                        @if (exp.TipoContrato != null || exp.JornadaLaboral != null)
+                        {
+                            <div style="margin-top: 5px;">
+                                @if (exp.TipoContrato != null) { <span class="badge">@exp.TipoContrato</span> }
+                                @if (exp.JornadaLaboral != null) { <span class="badge">@exp.JornadaLaboral</span> }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- CAPACITACIONES -->
+    @if (Model.Capacitaciones.Any())
+    {
+        <div class="section">
+            <div class="section-title">CAPACITACIONES Y CURSOS</div>
+            <div class="section-content">
+                @foreach (var cap in Model.Capacitaciones)
+                {
+                    <div class="experience-item">
+                        <h4>@cap.NombreCapacitacion</h4>
+                        @if (cap.InstitucionOrganizadora != null)
+                        {
+                            <div class="institution">@cap.InstitucionOrganizadora</div>
+                        }
+                        <div class="period">
+                            @if (cap.FechaInicio.HasValue)
+                            {
+                                <span>@cap.FechaInicio.Value.ToString("MM/yyyy")</span>
+                                @if (cap.FechaFin.HasValue)
+                                {
+                                    <span> - @cap.FechaFin.Value.ToString("MM/yyyy")</span>
+                                }
+                            }
+                            @if (cap.HorasCapacitacion.HasValue)
+                            {
+                                <span> | @cap.HorasCapacitacion horas</span>
+                            }
+                        </div>
+                        <div style="margin-top: 5px;">
+                            @if (cap.TipoCapacitacion != null) { <span class="badge">@cap.TipoCapacitacion</span> }
+                            @if (cap.Modalidad != null) { <span class="badge">@cap.Modalidad</span> }
+                            @if (cap.CertificadoObtenido) { <span class="badge">Certificado</span> }
+                            @if (cap.AreaConocimiento != null) { <span class="badge">@cap.AreaConocimiento</span> }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- GRUPOS Y MATERIAS ASIGNADAS -->
+    @if (Model.GruposAsignados.Any())
+    {
+        <div class="section">
+            <div class="section-title">GRUPOS Y MATERIAS ASIGNADAS</div>
+            <div class="section-content">
+                @foreach (var grupo in Model.GruposAsignados.Take(10))
+                {
+                    <div style="margin-bottom: 8px;">
+                        <strong>@grupo.NombreMateria</strong> - Grupo: @grupo.NombreGrupo<br/>
+                        <span style="color: #666; font-size: 10pt;">
+                            @grupo.PeriodoAcademico 
+                            @if (grupo.EsProfesorPrincipal) { <span class="badge">Profesor Principal</span> }
+                        </span>
+                    </div>
+                }
+                @if (Model.GruposAsignados.Count > 10)
+                {
+                    <div style="margin-top: 10px; font-size: 10pt; color: #666;">
+                        ... y @(Model.GruposAsignados.Count - 10) grupos más
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- INFORMACIÓN ADICIONAL -->
+    @if (Model.AreasEspecializacion != null || Model.IdiomasHabla != null || Model.ExperienciaDocente.HasValue)
+    {
+        <div class="section">
+            <div class="section-title">INFORMACIÓN ADICIONAL</div>
+            <div class="section-content">
+                <div class="info-grid">
+                    @if (Model.AreasEspecializacion != null)
+                    {
+                        <div class="info-row">
+                            <div class="info-label">Áreas de Especialización:</div>
+                            <div class="info-value">@Model.AreasEspecializacion</div>
+                        </div>
+                    }
+                    @if (Model.IdiomasHabla != null)
+                    {
+                        <div class="info-row">
+                            <div class="info-label">Idiomas:</div>
+                            <div class="info-value">@Model.IdiomasHabla @(Model.NivelIngles != null ? $"(Inglés: {Model.NivelIngles})" : "")</div>
+                        </div>
+                    }
+                    @if (Model.ExperienciaDocente.HasValue)
+                    {
+                        <div class="info-row">
+                            <div class="info-label">Experiencia Docente:</div>
+                            <div class="info-value">@Model.ExperienciaDocente años</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- PIE DE PÁGINA -->
+    <div class="footer">
+        Curriculum Vitae generado el @Model.FechaGeneracion.ToString("dd/MM/yyyy HH:mm")
+    </div>
+</body>
+</html>

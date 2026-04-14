@@ -1,0 +1,113 @@
+@model RubricasApp.Web.ViewModels.EstudianteEmpadronamientoViewModel
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.Provincia" class="form-label">
+                <i class="mdi mdi-map me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.Provincia)
+            </label>
+            <select asp-for="DatosEmpadronamiento.Provincia" class="form-select" id="selectProvincia">
+                <option value="">Seleccione una provincia...</option>
+                <option value="San José">San José</option>
+                <option value="Alajuela">Alajuela</option>
+                <option value="Cartago">Cartago</option>
+                <option value="Heredia">Heredia</option>
+                <option value="Guanacaste">Guanacaste</option>
+                <option value="Puntarenas">Puntarenas</option>
+                <option value="Limón">Limón</option>
+            </select>
+            <span asp-validation-for="DatosEmpadronamiento.Provincia" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.Canton" class="form-label">
+                <i class="mdi mdi-city me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.Canton)
+            </label>
+            <input asp-for="DatosEmpadronamiento.Canton" class="form-control" placeholder="Cantón de residencia" />
+            <span asp-validation-for="DatosEmpadronamiento.Canton" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.Distrito" class="form-label">
+                <i class="mdi mdi-home-city me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.Distrito)
+            </label>
+            <input asp-for="DatosEmpadronamiento.Distrito" class="form-control" placeholder="Distrito de residencia" />
+            <span asp-validation-for="DatosEmpadronamiento.Distrito" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.Barrio" class="form-label">
+                <i class="mdi mdi-home-group me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.Barrio)
+            </label>
+            <input asp-for="DatosEmpadronamiento.Barrio" class="form-control" placeholder="Barrio o comunidad" />
+            <span asp-validation-for="DatosEmpadronamiento.Barrio" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.Senas" class="form-label">
+                <i class="mdi mdi-map-marker-path me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.Senas)
+            </label>
+            <textarea asp-for="DatosEmpadronamiento.Senas" class="form-control" rows="3" 
+                      placeholder="Describa señas específicas para localizar la dirección..."></textarea>
+            <div class="form-text">
+                <i class="mdi mdi-information-outline me-1"></i>
+                Incluya referencias como: color de casa, nombres de negocios cercanos, distancias, etc.
+            </div>
+            <span asp-validation-for="DatosEmpadronamiento.Senas" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.TelefonoAlterno" class="form-label">
+                <i class="mdi mdi-phone me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.TelefonoAlterno)
+            </label>
+            <input asp-for="DatosEmpadronamiento.TelefonoAlterno" class="form-control" 
+                   placeholder="Ej: +506 8888-8888" />
+            <div class="form-text">
+                <i class="mdi mdi-information-outline me-1"></i>
+                Número adicional de contacto (familiar, trabajo, etc.)
+            </div>
+            <span asp-validation-for="DatosEmpadronamiento.TelefonoAlterno" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.CorreoAlterno" class="form-label">
+                <i class="mdi mdi-email-outline me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.CorreoAlterno)
+            </label>
+            <input asp-for="DatosEmpadronamiento.CorreoAlterno" class="form-control" type="email" 
+                   placeholder="correo.alterno@ejemplo.com" />
+            <div class="form-text">
+                <i class="mdi mdi-information-outline me-1"></i>
+                Correo adicional de contacto (familiar, trabajo, etc.)
+            </div>
+            <span asp-validation-for="DatosEmpadronamiento.CorreoAlterno" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-info mt-3">
+    <h6><i class="mdi mdi-information-outline me-2"></i>Información sobre Contacto y Residencia</h6>
+    <p class="mb-0">
+        Esta información será utilizada para envíos postales, contacto en emergencias y verificación de domicilio.
+        Es importante que sea precisa y actualizada.
+    </p>
+</div>

@@ -1,0 +1,369 @@
+﻿@model RubricasApp.Web.Models.Estudiante
+
+@{
+    ViewData["Title"] = "Nuevo Estudiante";
+}
+
+<!-- Contenido Principal -->
+<main class="main-content fade-in">
+    <div class="container-fluid px-4">
+        <!-- Header de Página Mejorado -->
+        <div class="page-header">
+            <h3 class="page-title-white">
+                <i class="fas fa-user-plus"></i>
+                Nuevo Estudiante
+            </h3>
+        </div>
+
+        <!-- Mensajes de alerta modernos -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert-modern success">
+                <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert-modern danger">
+                <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <!-- Formulario Principal -->
+        <div class="modern-card">
+            <form asp-action="Create" method="post">
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert-modern danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <strong>Por favor, corrija los siguientes errores:</strong>
+                        <div asp-validation-summary="All" class="mt-2"></div>
+                    </div>
+                }
+                
+                <!-- Primera fila: Número de ID con botón de búsqueda -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label asp-for="NumeroId" class="form-label">
+                                <i class="fas fa-id-card"></i> @Html.DisplayNameFor(m => m.NumeroId)
+                            </label>
+                            <div class="input-group">
+                                <input asp-for="NumeroId" class="form-control" id="numeroIdInput" placeholder="Ej: 603130190" />
+                                <button type="button" class="btn btn-primary" id="btnBuscarCedula" title="Buscar por cédula">
+                                    <i class="fas fa-search"></i> Buscar
+                                </button>
+                            </div>
+                            <span asp-validation-for="NumeroId" class="text-danger"></span>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle"></i> Ingrese la cédula y presione Buscar para autocompletar datos
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Segunda fila: Nombre y Apellidos -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="Nombre" class="form-label">
+                                <i class="fas fa-user"></i> @Html.DisplayNameFor(m => m.Nombre)
+                            </label>
+                            <input asp-for="Nombre" class="form-control" id="Nombre" placeholder="Ingrese el nombre del estudiante" />
+                            <span asp-validation-for="Nombre" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="Apellidos" class="form-label">
+                                <i class="fas fa-user"></i> @Html.DisplayNameFor(m => m.Apellidos)
+                            </label>
+                            <input asp-for="Apellidos" class="form-control" id="Apellidos" placeholder="Ingrese los apellidos del estudiante" />
+                            <span asp-validation-for="Apellidos" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tercera fila: Correo Electrónico e Institución -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="DireccionCorreo" class="form-label">
+                                <i class="fas fa-envelope"></i> @Html.DisplayNameFor(m => m.DireccionCorreo)
+                            </label>
+                            <input asp-for="DireccionCorreo" class="form-control" id="DireccionCorreo" type="email" placeholder="usuario@email.com" />
+                            <span asp-validation-for="DireccionCorreo" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="Institucion" class="form-label">
+                                <i class="fas fa-building"></i> @Html.DisplayNameFor(m => m.Institucion)
+                            </label>
+                            <input asp-for="Institucion" class="form-control" placeholder="Ej: PALMARES (06)" />
+                            <span asp-validation-for="Institucion" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Cuarta fila: Grupos, Año y Período Académico -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label asp-for="Grupos" class="form-label">
+                                <i class="fas fa-users"></i> @Html.DisplayNameFor(m => m.Grupos)
+                            </label>
+                            <input asp-for="Grupos" class="form-control" placeholder="Información de grupos" />
+                            <span asp-validation-for="Grupos" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label asp-for="Anio" class="form-label">
+                                <i class="fas fa-calendar"></i> @Html.DisplayNameFor(m => m.Anio)
+                            </label>
+                            <input asp-for="Anio" class="form-control" type="number" min="2020" max="2035" placeholder="@DateTime.Now.Year" />
+                            <span asp-validation-for="Anio" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label asp-for="PeriodoAcademicoId" class="form-label">
+                                <i class="fas fa-calendar-check"></i> @Html.DisplayNameFor(m => m.PeriodoAcademico)
+                            </label>
+                            <select asp-for="PeriodoAcademicoId" class="form-select" asp-items="@(ViewBag.PeriodosAcademicos as SelectList)">
+                                <option value="">Seleccionar período académico</option>
+                            </select>
+                            <span asp-validation-for="PeriodoAcademicoId" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-toggle-on"></i> Estado
+                            </label>
+                            <div class="form-check form-switch" style="padding-top: 8px;">
+                                <input asp-for="EstaActivo" class="form-check-input" type="checkbox" id="estadoCheckbox" checked />
+                                <label class="form-check-label" for="estadoCheckbox" id="estadoLabel">
+                                    Activo
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle"></i> Estudiantes activos pueden ver notas
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sección de Adecuación Curricular Significativa (ACS) -->
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="card border-info">
+                            <div class="card-header bg-info text-white">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-universal-access"></i>
+                                    Adecuación Curricular Significativa (ACS)
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="TipoAdecuacion" class="form-label">
+                                                <i class="fas fa-tags"></i> Tipo de Adecuación
+                                            </label>
+                                            <select asp-for="TipoAdecuacion" class="form-select" id="tipoAdecuacionSelect">
+                                                <option value="NoPresenta">No presenta</option>
+                                                <option value="Acceso">Adecuación de Acceso</option>
+                                                <option value="NoSignificativa">Adecuación No Significativa</option>
+                                                <option value="Significativa">Adecuación Curricular Significativa (ACS)</option>
+                                            </select>
+                                            <span asp-validation-for="TipoAdecuacion" class="text-danger"></span>
+                                            <small class="form-text text-muted">
+                                                <i class="fas fa-info-circle"></i> 
+                                                Seleccione el tipo de adecuación según la condición del estudiante
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="DetallesACS" class="form-label">
+                                                <i class="fas fa-file-alt"></i> Detalles de Adecuación
+                                            </label>
+                                            <textarea asp-for="DetallesACS" class="form-control" rows="3" placeholder="Descripción breve de la adecuación aplicada (opcional)"></textarea>
+                                            <span asp-validation-for="DetallesACS" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Opciones adicionales para ACS (solo cuando TipoAdecuacion = "Significativa") -->
+                                <div id="acsOptions" style="display: none;">
+                                    <hr class="my-3" />
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle"></i>
+                                        <strong>ACS Configuración:</strong>
+                                        Para estudiantes con Adecuación Curricular Significativa, puede configurar instrumentos y rúbricas personalizadas después de crear el estudiante.
+                                    </div>
+                                    
+                                    @if (ViewBag.PeriodosAcademicos != null && ((SelectList)ViewBag.PeriodosAcademicos).Any())
+                                    {
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="alert alert-warning">
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                    <strong>Nota importante:</strong>
+                                                    Este es un estudiante nuevo. Al marcar como ACS, la configuración del período actual se aplicará desde este momento. No hay períodos anteriores para aplicar retroactivamente.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Botones de Acción -->
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-4">
+                    <div class="btn-group-responsive">
+                        <button type="submit" class="btn-modern success-dark">
+                            <i class="fas fa-save"></i> Guardar Estudiante
+                        </button>
+                        <a asp-action="Index" class="btn-modern secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </div>
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle"></i>
+                        Todos los campos marcados con * son obligatorios
+                    </small>
+                </div>
+            </form>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="modern-card">
+            <div class="alert-modern info">
+                <i class="fas fa-lightbulb"></i>
+                <strong>Consejo:</strong> 
+                También puedes importar múltiples estudiantes desde un archivo Excel usando la opción 
+                <a asp-action="ImportarExcel" class="text-decoration-none fw-bold">Importar Excel</a>.
+            </div>
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Manejador del checkbox de estado
+            $('#estadoCheckbox').on('change', function() {
+                const estadoLabel = $('#estadoLabel');
+                if ($(this).is(':checked')) {
+                    estadoLabel.text('Activo').removeClass('text-danger').addClass('text-success');
+                } else {
+                    estadoLabel.text('Inactivo').removeClass('text-success').addClass('text-danger');
+                }
+            });
+            
+            // Manejador del botón de búsqueda de cédula
+            $('#btnBuscarCedula').on('click', function() {
+                buscarPorCedula();
+            });
+
+            // También permitir búsqueda con Enter en el campo de cédula
+            $('#numeroIdInput').on('keypress', function(e) {
+                if (e.which === 13) { // Enter key
+                    e.preventDefault();
+                    buscarPorCedula();
+                }
+            });
+
+            function buscarPorCedula() {
+                const cedula = $('#numeroIdInput').val().trim();
+                
+                if (!cedula) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Atención',
+                        text: 'Por favor ingrese una cédula',
+                        confirmButtonText: 'Entendido'
+                    });
+                    return;
+                }
+
+                // Mostrar indicador de carga
+                const btnBuscar = $('#btnBuscarCedula');
+                const btnOriginalHtml = btnBuscar.html();
+                btnBuscar.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Buscando...');
+
+                // Realizar la petición AJAX
+                $.ajax({
+                    url: '@Url.Action("BuscarPorCedula", "Estudiantes")',
+                    type: 'GET',
+                    data: { cedula: cedula },
+                    success: function(response) {
+                        if (response.success && response.data) {
+                            // Autocompletar los campos
+                            $('#Nombre').val(response.data.nombre);
+                            $('#Apellidos').val(response.data.apellidos);
+
+                            // Mostrar notificación de éxito
+                            Swal.fire({
+                                icon: 'success',
+                                title: '¡Datos encontrados!',
+                                html: `<p><strong>Nombre:</strong> ${response.data.nombre}</p>
+                                       <p><strong>Apellidos:</strong> ${response.data.apellidos}</p>
+                                       <p class="text-muted small mt-2">Los datos han sido precargados. Puede editarlos si es necesario.</p>`,
+                                confirmButtonText: 'Continuar',
+                                timer: 5000,
+                                timerProgressBar: true
+                            });
+
+                            // Enfocar el siguiente campo
+                            $('#DireccionCorreo').focus();
+                        } else {
+                            // Mostrar mensaje de error
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'No encontrado',
+                                text: response.message || 'No se encontró información para esta cédula',
+                                confirmButtonText: 'Entendido'
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error en la búsqueda:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error de conexión',
+                            text: 'No se pudo conectar con el servicio de búsqueda. Por favor, intente nuevamente.',
+                            confirmButtonText: 'Entendido'
+                        });
+                    },
+                    complete: function() {
+                        // Restaurar el botón
+                        btnBuscar.prop('disabled', false).html(btnOriginalHtml);
+                    }
+                });
+            }
+            
+            // Manejador del select de Tipo de Adecuación
+            $('#tipoAdecuacionSelect').on('change', function() {
+                const tipoSeleccionado = $(this).val();
+                
+                // Mostrar/ocultar opciones de ACS según el tipo seleccionado
+                if (tipoSeleccionado === 'Significativa') {
+                    $('#acsOptions').slideDown(300);
+                } else {
+                    $('#acsOptions').slideUp(300);
+                }
+            });
+            
+            // Ejecutar al cargar la página para establecer el estado inicial
+            $('#tipoAdecuacionSelect').trigger('change');
+        });
+    </script>
+}

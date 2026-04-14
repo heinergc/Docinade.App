@@ -1,0 +1,47 @@
+﻿@model RubricasApp.Web.Models.ItemEvaluacion
+
+@{
+    ViewData["Title"] = "Eliminar Item de Evaluación";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-trash"></i> Eliminar Item de Evaluación
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    ¿Está seguro que desea eliminar este item de evaluación?
+                </div>
+
+                <dl class="row">
+                    <dt class="col-sm-3">Rúbrica</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Rubrica.NombreRubrica)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.NombreItem)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.NombreItem)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Descripcion)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Descripcion)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.OrdenItem)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.OrdenItem)</dd>
+                </dl>
+
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="IdItem" />
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Cancelar
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

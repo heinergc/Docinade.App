@@ -1,0 +1,327 @@
+﻿@model RubricasApp.Web.Models.Estudiante
+
+@{
+    ViewData["Title"] = "Confirmar Eliminación";
+}
+
+<!-- Contenido Principal -->
+<main class="main-content fade-in">
+    <div class="container-fluid px-4">
+        <!-- Header de Página Mejorado -->
+        <div class="page-header">
+            <h3 class="page-title-white">
+                <i class="fas fa-trash-alt"></i>
+                Confirmar Eliminación de Estudiante
+            </h3>
+        </div>
+
+        <!-- Mensajes de alerta modernos -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert-modern success">
+                <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert-modern danger">
+                <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Card de Confirmación de Eliminación -->
+                <div class="modern-card">
+                    <!-- Alerta de Advertencia Principal -->
+                    <div class="alert-modern danger mb-4">
+                        <i class="fas fa-exclamation-triangle fa-2x float-start me-3"></i>
+                        <div>
+                            <h5 class="mb-2">¡Atención! Esta acción no se puede deshacer</h5>
+                            <p class="mb-0">
+                                Está a punto de eliminar permanentemente este estudiante del sistema. 
+                                Todos los datos asociados también serán eliminados.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Información del Estudiante a Eliminar -->
+                    <div class="student-delete-info">
+                        <h5 class="mb-4">
+                            <i class="fas fa-user-times"></i>
+                            Información del Estudiante a Eliminar
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <label><i class="fas fa-user"></i> Nombre Completo:</label>
+                                    <span class="value">@Model.NombreCompleto</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <label><i class="fas fa-id-card"></i> Número de Identificación:</label>
+                                    <span class="value">@Model.NumeroId</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <label><i class="fas fa-envelope"></i> Correo Electrónico:</label>
+                                    <span class="value">@Model.DireccionCorreo</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <label><i class="fas fa-building"></i> Institución:</label>
+                                    <span class="value">@Model.Institucion</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <label><i class="fas fa-users"></i> Grupos:</label>
+                                    <span class="value">@(Model.Grupos ?? "No asignado")</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <label><i class="fas fa-calendar"></i> Año:</label>
+                                    <span class="value">@Model.Anio</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (Model.PeriodoAcademico != null)
+                        {
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="info-item">
+                                        <label><i class="fas fa-calendar-check"></i> Período Académico:</label>
+                                        <span class="value">@Model.PeriodoAcademico.Nombre (@Model.PeriodoAcademico.Codigo)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Formulario de Confirmación -->
+                    <form asp-action="Delete" method="post" class="mt-4">
+                        <input type="hidden" asp-for="IdEstudiante" />
+                        
+                        <!-- Confirmación requerida -->
+                        <div class="confirmation-section">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="confirmDelete" required>
+                                <label class="form-check-label" for="confirmDelete">
+                                    <strong>Confirmo que deseo eliminar este estudiante permanentemente</strong>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-4">
+                            <div class="btn-group-responsive">
+                                <button type="submit" class="btn-modern danger" id="btnDelete" disabled>
+                                    <i class="fas fa-trash"></i> Confirmar Eliminación
+                                </button>
+                                <a asp-action="Details" asp-route-id="@Model.IdEstudiante" class="btn-modern info">
+                                    <i class="fas fa-eye"></i> Ver Detalles
+                                </a>
+                                <a asp-action="Index" class="btn-modern secondary">
+                                    <i class="fas fa-arrow-left"></i> Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Card de Datos Relacionados -->
+                <div class="modern-card">
+                    <h5 class="mb-3">
+                        <i class="fas fa-database"></i>
+                        Datos Relacionados
+                    </h5>
+                    
+                    @if (Model.Evaluaciones != null && Model.Evaluaciones.Any())
+                    {
+                        <div class="alert-modern danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>@Model.Evaluaciones.Count() Evaluación(es) Registrada(s)</strong><br>
+                            <small>Se eliminarán permanentemente junto con el estudiante</small>
+                        </div>
+
+                        <div class="evaluation-list">
+                            @foreach (var evaluacion in Model.Evaluaciones.Take(5))
+                            {
+                                <div class="evaluation-item">
+                                    <i class="fas fa-clipboard-check"></i>
+                                    <span>@evaluacion.Rubrica?.NombreRubrica ?? "Evaluación"</span>
+                                    <small class="text-muted">(@evaluacion.FechaEvaluacion.ToString("dd/MM/yyyy"))</small>
+                                </div>
+                            }
+                            @if (Model.Evaluaciones.Count() > 5)
+                            {
+                                <small class="text-muted">... y @(Model.Evaluaciones.Count() - 5) más</small>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert-modern success">
+                            <i class="fas fa-check-circle"></i>
+                            <strong>Sin Evaluaciones</strong><br>
+                            <small>No hay evaluaciones registradas para este estudiante</small>
+                        </div>
+                    }
+                </div>
+
+                <!-- Card de Información de Seguridad -->
+                <div class="modern-card">
+                    <h5 class="mb-3">
+                        <i class="fas fa-shield-alt"></i>
+                        Información de Seguridad
+                    </h5>
+                    
+                    <div class="security-info">
+                        <div class="security-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Esta acción es irreversible</span>
+                        </div>
+                        <div class="security-item">
+                            <i class="fas fa-database"></i>
+                            <span>Se eliminarán todos los datos relacionados</span>
+                        </div>
+                        <div class="security-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Los reportes históricos pueden verse afectados</span>
+                        </div>
+                        <div class="security-item">
+                            <i class="fas fa-backup"></i>
+                            <span>Asegúrese de tener respaldos actualizados</span>
+                        </div>
+                    </div>
+
+                    <div class="alert-modern info mt-3">
+                        <i class="fas fa-lightbulb"></i>
+                        <strong>Sugerencia:</strong> Considere desactivar el estudiante en lugar de eliminarlo para preservar el historial.
+                    </div>
+                </div>
+
+                <!-- Card de Acciones Alternativas -->
+                <div class="modern-card">
+                    <h5 class="mb-3">
+                        <i class="fas fa-tools"></i>
+                        Acciones Alternativas
+                    </h5>
+                    
+                    <div class="d-grid gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.IdEstudiante" class="btn-modern warning">
+                            <i class="fas fa-edit"></i> Editar en su lugar
+                        </a>
+                        
+                        <a asp-action="Details" asp-route-id="@Model.IdEstudiante" class="btn-modern info">
+                            <i class="fas fa-eye"></i> Revisar Detalles
+                        </a>
+                        
+                        <hr class="my-3">
+                        
+                        <a asp-action="Index" class="btn-modern primary">
+                            <i class="fas fa-list"></i> Volver a la Lista
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    <script>
+        // Habilitar botón de eliminar solo cuando se confirme
+        document.getElementById('confirmDelete').addEventListener('change', function() {
+            document.getElementById('btnDelete').disabled = !this.checked;
+        });
+
+        // Confirmación adicional antes de enviar
+        document.querySelector('form').addEventListener('submit', function(e) {
+            if (!confirm('¿Está completamente seguro de que desea eliminar este estudiante? Esta acción NO se puede deshacer.')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+    
+    <style>
+        .student-delete-info {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #dc3545;
+        }
+
+        .info-item {
+            margin-bottom: 1rem;
+            padding: 0.5rem 0;
+        }
+
+        .info-item label {
+            font-weight: 600;
+            color: #495057;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-item .value {
+            color: #212529;
+            font-size: 1.1rem;
+        }
+
+        .confirmation-section {
+            background-color: #fff3cd;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #ffeaa7;
+        }
+
+        .evaluation-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .evaluation-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .evaluation-item:last-child {
+            border-bottom: none;
+        }
+
+        .security-info {
+            font-size: 0.9rem;
+        }
+
+        .security-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+            color: #6c757d;
+        }
+
+        .security-item i {
+            color: #dc3545;
+            width: 16px;
+        }
+    </style>
+}

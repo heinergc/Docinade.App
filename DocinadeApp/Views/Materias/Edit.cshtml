@@ -1,0 +1,290 @@
+@model RubricasApp.Web.ViewModels.Academic.EditarMateriaVm
+
+@{
+    ViewData["Title"] = "Editar Materia";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <!-- Header de Página -->
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-edit"></i> Editar Materia
+                    </h3>
+                </div>
+            </div>
+
+            <!-- Mensajes de alerta -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <!-- Formulario Principal -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-book"></i> Información de la Materia
+                        </h5>
+                        <span class="badge bg-info">@Model.Codigo</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <strong>Por favor, corrija los siguientes errores:</strong>
+                                <div asp-validation-summary="ModelOnly" class="mt-2"></div>
+                            </div>
+                        }
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Codigo" class="form-label">
+                                        <i class="fas fa-code"></i> @Html.DisplayNameFor(m => m.Codigo)
+                                    </label>
+                                    <input asp-for="Codigo" class="form-control" placeholder="Ej: MAT101" />
+                                    <span asp-validation-for="Codigo" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Nombre" class="form-label">
+                                        <i class="fas fa-book"></i> @Html.DisplayNameFor(m => m.Nombre)
+                                    </label>
+                                    <input asp-for="Nombre" class="form-control" placeholder="Nombre de la materia" />
+                                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="Creditos" class="form-label">
+                                        <i class="fas fa-star"></i> @Html.DisplayNameFor(m => m.Creditos)
+                                    </label>
+                                    <input asp-for="Creditos" class="form-control" type="number" min="0" max="10" />
+                                    <span asp-validation-for="Creditos" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="Tipo" class="form-label">
+                                        <i class="fas fa-tag"></i> @Html.DisplayNameFor(m => m.Tipo)
+                                    </label>
+                                    <select asp-for="Tipo" class="form-select">
+                                        <option value="">Seleccionar tipo</option>
+                                        <option value="Teórica">Teórica</option>
+                                        <option value="Práctica">Práctica</option>
+                                        <option value="Virtual">Virtual</option>
+                                        <option value="Híbrida">Híbrida</option>
+                                    </select>
+                                    <span asp-validation-for="Tipo" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-toggle-on"></i> Estado
+                                    </label>
+                                    <div class="form-check form-switch mt-2">
+                                        <input asp-for="Activa" class="form-check-input" type="checkbox" />
+                                        <label asp-for="Activa" class="form-check-label">
+                                            Materia Activa
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Descripcion" class="form-label">
+                                <i class="fas fa-align-left"></i> @Html.DisplayNameFor(m => m.Descripcion)
+                            </label>
+                            <textarea asp-for="Descripcion" class="form-control" rows="4" placeholder="Descripción de la materia (opcional)"></textarea>
+                            <span asp-validation-for="Descripcion" class="text-danger"></span>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-4">
+                            <div class="btn-group" role="group">
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fas fa-save"></i> Guardar Cambios
+                                </button>
+                                <a asp-action="Details" asp-route-id="@ViewBag.MateriaId" class="btn btn-info">
+                                    <i class="fas fa-eye"></i> Ver Detalles
+                                </a>
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Cancelar
+                                </a>
+                            </div>
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i>
+                                Última modificación: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+                            </small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar de información -->
+    <div class="row mt-4">
+        <div class="col-md-6 offset-md-2">
+            <!-- Card de Información -->
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle"></i> Información Actual
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-book"></i>
+                        <strong>Materia:</strong> @Model.Nombre
+                    </div>
+
+                    <div class="alert alert-success">
+                        <i class="fas fa-star"></i>
+                        <strong>Créditos:</strong> @Model.Creditos
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Tipo))
+                    {
+                        <div class="alert alert-warning">
+                            <i class="fas fa-tag"></i>
+                            <strong>Tipo:</strong> @Model.Tipo
+                        </div>
+                    }
+
+                    <div class="alert @(Model.Activa ? "alert-success" : "alert-danger")">
+                        <i class="fas fa-@(Model.Activa ? "check-circle" : "times-circle")"></i>
+                        <strong>Estado:</strong> @(Model.Activa ? "Activa" : "Inactiva")
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <!-- Card de Acciones Adicionales -->
+            <div class="card border-warning">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tools"></i> Acciones Adicionales
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a asp-action="Details" asp-route-id="@ViewBag.MateriaId" class="btn btn-info">
+                            <i class="fas fa-eye"></i> Ver Detalles Completos
+                        </a>
+                        
+                        <a asp-action="Index" class="btn btn-primary">
+                            <i class="fas fa-list"></i> Volver a Lista
+                        </a>
+                        
+                        <hr class="my-3">
+                        
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="fas fa-trash"></i> Eliminar Materia
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card de Ayuda -->
+            <div class="card border-secondary mt-3">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-question-circle"></i> Ayuda
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="help-section">
+                        <div class="help-item mb-3 p-2 border rounded">
+                            <i class="fas fa-code text-primary"></i>
+                            <div class="ms-2">
+                                <strong>Código:</strong>
+                                <small class="d-block text-muted">Identificador único de la materia (ej: MAT101)</small>
+                            </div>
+                        </div>
+                        
+                        <div class="help-item mb-3 p-2 border rounded">
+                            <i class="fas fa-star text-primary"></i>
+                            <div class="ms-2">
+                                <strong>Créditos:</strong>
+                                <small class="d-block text-muted">Valor académico entre 0 y 10 créditos</small>
+                            </div>
+                        </div>
+                        
+                        <div class="help-item mb-3 p-2 border rounded">
+                            <i class="fas fa-tag text-primary"></i>
+                            <div class="ms-2">
+                                <strong>Tipo:</strong>
+                                <small class="d-block text-muted">Modalidad de enseñanza de la materia</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación para eliminar -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar la materia <strong>@Model.Codigo - @Model.Nombre</strong>?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Advertencia:</strong> Esta acción no se puede deshacer.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <a asp-action="Delete" asp-route-id="@ViewBag.MateriaId" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Eliminar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <style>
+        .help-section .help-item {
+            display: flex;
+            align-items: flex-start;
+        }
+    </style>
+}

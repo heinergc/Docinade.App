@@ -1,0 +1,300 @@
+@model RubricasApp.Web.Models.Asistencia
+
+@{
+    ViewData["Title"] = "Editar Registro de Asistencia";
+    Layout = "_Layout";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">@ViewData["Title"]</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Inicio</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index")">Asistencias</a></li>
+                        <li class="breadcrumb-item active">Editar</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <div class="card card-warning">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-edit mr-2"></i>Editar Registro de Asistencia
+                            </h3>
+                        </div>
+
+                        <form asp-action="Edit" method="post">
+                            <input type="hidden" asp-for="AsistenciaId" />
+                            
+                            <div class="card-body">
+                                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                                <!-- Información del Estudiante -->
+                                <div class="form-group">
+                                    <label asp-for="EstudianteId" class="form-label required">Estudiante:</label>
+                                    @Html.DropDownListFor(m => m.EstudianteId, ViewBag.Estudiantes as SelectList, "Seleccione un estudiante...", new { @class = "form-control select2", required = "required" })
+                                    <span asp-validation-for="EstudianteId" class="text-danger"></span>
+                                </div>
+
+                                <!-- Información del Grupo -->
+                                <div class="form-group">
+                                    <label asp-for="GrupoId" class="form-label required">Grupo:</label>
+                                    @Html.DropDownListFor(m => m.GrupoId, ViewBag.Grupos as SelectList, "Seleccione un grupo...", new { @class = "form-control select2", required = "required" })
+                                    <span asp-validation-for="GrupoId" class="text-danger"></span>
+                                </div>
+
+                                <!-- Fecha -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="Fecha" class="form-label required">Fecha:</label>
+                                            <input asp-for="Fecha" type="date" class="form-control" required />
+                                            <span asp-validation-for="Fecha" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="HoraLlegada" class="form-label">Hora de Llegada:</label>
+                                            <input asp-for="HoraLlegada" type="time" class="form-control" />
+                                            <small class="form-text text-muted">Requerido para tardanzas</small>
+                                            <span asp-validation-for="HoraLlegada" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Estado de Asistencia -->
+                                <div class="form-group">
+                                    <label asp-for="Estado" class="form-label required">Estado de Asistencia:</label>
+                                    @Html.DropDownListFor(m => m.Estado, ViewBag.Estados as SelectList, "Seleccione el estado...", new { @class = "form-control", required = "required", id = "estadoSelect" })
+                                    <span asp-validation-for="Estado" class="text-danger"></span>
+                                </div>
+
+                                <!-- Justificación (solo para ausencias justificadas) -->
+                                <div class="form-group" id="justificacionGroup" style="@(Model?.Estado == "AJ" ? "display: block;" : "display: none;")">
+                                    <label asp-for="Justificacion" class="form-label">Justificación:</label>
+                                    <textarea asp-for="Justificacion" class="form-control" rows="3" 
+                                              placeholder="Ingrese la justificación de la ausencia..."></textarea>
+                                    <span asp-validation-for="Justificacion" class="text-danger"></span>
+                                </div>
+
+                                <!-- Observaciones -->
+                                <div class="form-group">
+                                    <label asp-for="Observaciones" class="form-label">Observaciones:</label>
+                                    <textarea asp-for="Observaciones" class="form-control" rows="3" 
+                                              placeholder="Observaciones adicionales (opcional)..."></textarea>
+                                    <span asp-validation-for="Observaciones" class="text-danger"></span>
+                                </div>
+
+                                <!-- Información del Registro Original -->
+                                <div class="alert alert-secondary">
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    <strong>Información del Registro:</strong>
+                                    <div class="row mt-2">
+                                        <div class="col-md-6">
+                                            <small>
+                                                <strong>Creado:</strong> @Model?.FechaRegistro.ToString("dd/MM/yyyy HH:mm")<br />
+                                                <strong>Por:</strong> @Model?.RegistradoPorId
+                                            </small>
+                                        </div>
+                                        <div class="col-md-6">
+                                            @if (Model?.EsModificacion == true)
+                                            {
+                                                <small>
+                                                    <strong>Última modificación:</strong> @Model?.FechaModificacion?.ToString("dd/MM/yyyy HH:mm")<br />
+                                                    <strong>Por:</strong> @Model?.ModificadoPorId
+                                                </small>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Información de Estados -->
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    <strong>Estados de Asistencia:</strong>
+                                    <ul class="mb-0 mt-2">
+                                        <li><strong>Presente (P):</strong> El estudiante asistió normalmente a la clase.</li>
+                                        <li><strong>Ausente (A):</strong> El estudiante no asistió a la clase.</li>
+                                        <li><strong>Tardanza (T):</strong> El estudiante llegó tarde. Requiere hora de llegada.</li>
+                                        <li><strong>Ausencia Justificada (AJ):</strong> El estudiante no asistió pero presentó justificación válida.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="card-footer">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <button type="submit" class="btn btn-warning">
+                                            <i class="fas fa-save mr-1"></i>Actualizar Registro
+                                        </button>
+                                        <a href="@Url.Action("Index")" class="btn btn-secondary ml-2">
+                                            <i class="fas fa-times mr-1"></i>Cancelar
+                                        </a>
+                                        <a href="@Url.Action("Details", new { id = Model?.AsistenciaId })" class="btn btn-info ml-2">
+                                            <i class="fas fa-eye mr-1"></i>Ver Detalles
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        <small class="text-muted">
+                                            <i class="fas fa-edit mr-1"></i>
+                                            Editando registro #@Model?.AsistenciaId
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Inicializar Select2
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                placeholder: 'Seleccione...'
+            });
+
+            // Manejar cambio de estado para mostrar/ocultar justificación
+            $('#estadoSelect').change(function() {
+                var estado = $(this).val();
+                var justificacionGroup = $('#justificacionGroup');
+                var justificacionField = $('textarea[name="Justificacion"]');
+                
+                if (estado === 'AJ') {
+                    justificacionGroup.show();
+                    justificacionField.attr('required', 'required');
+                } else {
+                    justificacionGroup.hide();
+                    justificacionField.removeAttr('required');
+                    if (estado !== 'AJ') {
+                        justificacionField.val('');
+                    }
+                }
+            });
+
+            // Validación de hora de llegada para tardanzas
+            $('#estadoSelect').change(function() {
+                var estado = $(this).val();
+                var horaLlegadaField = $('input[name="HoraLlegada"]');
+                
+                if (estado === 'T') {
+                    horaLlegadaField.attr('required', 'required');
+                    if (!horaLlegadaField.val()) {
+                        var now = new Date();
+                        var currentTime = now.getHours().toString().padStart(2, '0') + ':' + 
+                                         now.getMinutes().toString().padStart(2, '0');
+                        horaLlegadaField.val(currentTime);
+                    }
+                } else {
+                    horaLlegadaField.removeAttr('required');
+                    if (estado === 'P' || estado === 'A' || estado === 'AJ') {
+                        horaLlegadaField.val('');
+                    }
+                }
+            });
+
+            // Trigger inicial para mostrar/ocultar campos según el estado actual
+            $('#estadoSelect').trigger('change');
+
+            // Validación del formulario antes del envío
+            $('form').submit(function(e) {
+                var estado = $('#estadoSelect').val();
+                var justificacion = $('textarea[name="Justificacion"]').val();
+                var horaLlegada = $('input[name="HoraLlegada"]').val();
+                
+                // Validar justificación para ausencias justificadas
+                if (estado === 'AJ' && !justificacion.trim()) {
+                    e.preventDefault();
+                    alert('La justificación es requerida para ausencias justificadas.');
+                    $('textarea[name="Justificacion"]').focus();
+                    return false;
+                }
+                
+                // Validar hora de llegada para tardanzas
+                if (estado === 'T' && !horaLlegada) {
+                    e.preventDefault();
+                    alert('La hora de llegada es requerida para registrar tardanzas.');
+                    $('input[name="HoraLlegada"]').focus();
+                    return false;
+                }
+                
+                // Confirmar cambios importantes
+                if (confirm('¿Está seguro de que desea actualizar este registro de asistencia?')) {
+                    return true;
+                } else {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            // Advertencia si se intenta cambiar estudiante o grupo
+            var estudianteOriginal = $('#EstudianteId').val();
+            var grupoOriginal = $('#GrupoId').val();
+            
+            $('#EstudianteId, #GrupoId').change(function() {
+                var currentEstudiante = $('#EstudianteId').val();
+                var currentGrupo = $('#GrupoId').val();
+                
+                if (currentEstudiante !== estudianteOriginal || currentGrupo !== grupoOriginal) {
+                    var confirmMsg = '¡Atención! Está cambiando el estudiante o grupo del registro. ' +
+                                   'Esto puede afectar los reportes de asistencia. ¿Desea continuar?';
+                    
+                    if (!confirm(confirmMsg)) {
+                        $('#EstudianteId').val(estudianteOriginal).trigger('change');
+                        $('#GrupoId').val(grupoOriginal).trigger('change');
+                    }
+                }
+            });
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .required::after {
+            content: " *";
+            color: red;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .card-warning .card-header {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #212529;
+        }
+        
+        .select2-container--bootstrap4 .select2-selection {
+            height: calc(2.25rem + 2px);
+        }
+        
+        .alert-info {
+            border-left: 4px solid #17a2b8;
+        }
+        
+        .alert-secondary {
+            border-left: 4px solid #6c757d;
+        }
+    </style>
+}

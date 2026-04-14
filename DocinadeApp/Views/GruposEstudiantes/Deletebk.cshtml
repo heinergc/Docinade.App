@@ -1,0 +1,386 @@
+@model RubricasApp.Web.ViewModels.Grupos.DetalleGrupoViewModel
+
+@{
+    ViewData["Title"] = $"Eliminar Grupo: {Model.Codigo}";
+}
+
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="page-title">
+                <i class="fas fa-trash text-danger me-2"></i>
+                Eliminar Grupo
+            </h1>
+            <h6 class="text-muted">
+                <span class="badge bg-primary">@Model.Codigo</span> @Model.Nombre
+            </h6>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index")">
+                            <i class="fas fa-users-cog"></i> Grupos
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Details", new { id = Model.GrupoId })">
+                            @Model.Codigo
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">Eliminar</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="modern-card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirmar Eliminación
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger" role="alert">
+                    <h4 class="alert-heading">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        ¡Atención!
+                    </h4>
+                    <p class="mb-0">
+                        Esta acción <strong>eliminará permanentemente</strong> el grupo y no se puede deshacer.
+                        @if (Model.CantidadEstudiantes > 0)
+                        {
+                            <br><strong>El grupo tiene @Model.CantidadEstudiantes estudiante(s) asignado(s) que se desasignarán automáticamente.</strong>
+                        }
+                        @if (Model.Materias.Any())
+                        {
+                            <br><strong>El grupo tiene @Model.Materias.Count materia(s) asociada(s) que se desasociarán automáticamente.</strong>
+                        }
+                    </p>
+                </div>
+
+                <!-- Información del grupo -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card bg-light border-0">
+                            <div class="card-header bg-transparent border-0">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Información del Grupo
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-borderless table-sm">
+                                    <tr>
+                                        <td><strong>Código:</strong></td>
+                                        <td><span class="badge bg-primary">@Model.Codigo</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Nombre:</strong></td>
+                                        <td>@Model.Nombre</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Tipo:</strong></td>
+                                        <td>
+                                            <span class="badge badge-tipo-@(Model.TipoGrupo.ToString().ToLower())">
+                                                @Model.TipoGrupoDisplay
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Estado:</strong></td>
+                                        <td>
+                                            <span class="badge bg-@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Activo ? "success" : Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Inactivo ? "secondary" : "danger")">
+                                                @Model.EstadoDisplay
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Período:</strong></td>
+                                        <td>@Model.PeriodoAcademico</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Creado:</strong></td>
+                                        <td>
+                                            @Model.FechaCreacion.ToString("dd/MM/yyyy")
+                                            @if (!string.IsNullOrEmpty(Model.CreadoPor))
+                                            {
+                                                <br><small class="text-muted">por @Model.CreadoPor</small>
+                                            }
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card bg-light border-0">
+                            <div class="card-header bg-transparent border-0">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-chart-bar me-2"></i>
+                                    Estadísticas
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <div class="stat-box">
+                                            <h4 class="text-primary mb-0">@Model.CantidadEstudiantes</h4>
+                                            <small class="text-muted">Estudiantes</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="stat-box">
+                                            <h4 class="text-info mb-0">@Model.Materias.Count</h4>
+                                            <small class="text-muted">Materias</small>
+                                        </div>
+                                    </div>
+                                    @if (Model.CapacidadMaxima.HasValue)
+                                    {
+                                        <div class="col-12 mt-2">
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar bg-@(Model.EstaCompleto ? "warning" : "success")" 
+                                                     style="width: @(((double)Model.CantidadEstudiantes / Model.CapacidadMaxima.Value * 100).ToString("F1"))%">
+                                                    @Model.CantidadEstudiantes/@Model.CapacidadMaxima
+                                                </div>
+                                            </div>
+                                            <small class="text-muted">Capacidad utilizada</small>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Descripcion))
+                {
+                    <div class="mb-3">
+                        <h6><strong>Descripción:</strong></h6>
+                        <p class="text-muted">@Model.Descripcion</p>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.Observaciones))
+                {
+                    <div class="mb-3">
+                        <h6><strong>Observaciones:</strong></h6>
+                        <p class="text-muted">@Model.Observaciones</p>
+                    </div>
+                }
+
+                <!-- Estudiantes afectados -->
+                @if (Model.Estudiantes.Any())
+                {
+                    <div class="mb-4">
+                        <h6 class="text-warning">
+                            <i class="fas fa-users me-2"></i>
+                            Estudiantes que serán desasignados (@Model.Estudiantes.Count)
+                        </h6>
+                        <div class="table-responsive" style="max-height: 200px; overflow-y: auto;">
+                            <table class="table table-sm table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Estudiante</th>
+                                        <th>Principal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var estudiante in Model.Estudiantes.Take(10))
+                                    {
+                                        <tr>
+                                            <td><code>@estudiante.NumeroId</code></td>
+                                            <td>@estudiante.NombreCompleto</td>
+                                            <td>
+                                                @if (estudiante.EsGrupoPrincipal)
+                                                {
+                                                    <span class="badge bg-success">Sí</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">No</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (Model.Estudiantes.Count > 10)
+                                    {
+                                        <tr>
+                                            <td colspan="3" class="text-center text-muted">
+                                                <small>... y @(Model.Estudiantes.Count - 10) estudiante(s) más</small>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+
+                <!-- Materias afectadas -->
+                @if (Model.Materias.Any())
+                {
+                    <div class="mb-4">
+                        <h6 class="text-info">
+                            <i class="fas fa-book me-2"></i>
+                            Materias que serán desasociadas (@Model.Materias.Count)
+                        </h6>
+                        <div class="row">
+                            @foreach (var materia in Model.Materias)
+                            {
+                                <div class="col-md-6 mb-1">
+                                    <span class="badge bg-light text-dark">@materia.Codigo - @materia.Nombre</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <!-- Formulario de confirmación -->
+                <form asp-action="Delete" method="post" id="deleteForm">
+                    <input type="hidden" asp-for="GrupoId" />
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <a href="@Url.Action("Details", new { id = Model.GrupoId })" class="btn btn-modern secondary">
+                                        <i class="fas fa-arrow-left"></i> Cancelar
+                                    </a>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-modern danger" id="confirmDeleteBtn">
+                                        <i class="fas fa-trash"></i> Confirmar Eliminación
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#confirmDeleteBtn').click(function() {
+                const grupoNombre = '@Model.Codigo - @Model.Nombre';
+                const cantidadEstudiantes = @Model.CantidadEstudiantes;
+                const cantidadMaterias = @Model.Materias.Count;
+                
+                let mensaje = `¿Está seguro de que desea eliminar el grupo "${grupoNombre}"?`;
+                
+                if (cantidadEstudiantes > 0 || cantidadMaterias > 0) {
+                    mensaje += '\n\nEsta acción también:';
+                    if (cantidadEstudiantes > 0) {
+                        mensaje += `\n• Desasignará ${cantidadEstudiantes} estudiante(s)`;
+                    }
+                    if (cantidadMaterias > 0) {
+                        mensaje += `\n• Desasociará ${cantidadMaterias} materia(s)`;
+                    }
+                }
+                
+                mensaje += '\n\nEsta acción no se puede deshacer.';
+                
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: '¿Confirmar eliminación?',
+                        html: mensaje.replace(/\n/g, '<br>'),
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Mostrar loading
+                            Swal.fire({
+                                title: 'Eliminando grupo...',
+                                text: 'Por favor espere',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+                            
+                            document.getElementById('deleteForm').submit();
+                        }
+                    });
+                } else {
+                    // Fallback si SweetAlert no está disponible
+                    if (confirm(mensaje)) {
+                        document.getElementById('deleteForm').submit();
+                    }
+                }
+            });
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .modern-card {
+            border: none;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        
+        .modern-card .card-header {
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .btn-modern.danger {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            border: none;
+            color: white;
+        }
+        
+        .btn-modern.secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            border: none;
+            color: white;
+        }
+        
+        .badge-tipo-seccion { background-color: #0d6efd; }
+        .badge-tipo-nivel { background-color: #198754; }
+        .badge-tipo-modalidad { background-color: #fd7e14; }
+        .badge-tipo-custom { background-color: #6f42c1; }
+        
+        .table-borderless td {
+            border: none;
+            padding: 0.25rem 0;
+        }
+        
+        .stat-box {
+            padding: 0.5rem 0;
+        }
+        
+        .progress {
+            border-radius: 10px;
+        }
+        
+        .progress-bar {
+            border-radius: 10px;
+        }
+        
+        .table-responsive {
+            border-radius: 8px;
+        }
+        
+        code {
+            background-color: #f8f9fa;
+            color: #495057;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+}

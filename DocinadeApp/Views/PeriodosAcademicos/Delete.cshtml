@@ -1,0 +1,119 @@
+﻿@model RubricasApp.Web.Models.PeriodoAcademico
+
+@{
+    ViewData["Title"] = "Eliminar Período Académico";
+}
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-exclamation-triangle"></i> Eliminar Período Académico
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>¡Advertencia!</strong> Está a punto de eliminar el siguiente período académico. Esta acción no se puede deshacer.
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>Código:</strong>
+                            <span class="badge bg-primary fs-6">@Model.Codigo</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Nombre:</strong>
+                            <p class="mb-0">@Model.Nombre</p>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Tipo:</strong>
+                            <span class="badge @(Model.Tipo == RubricasApp.Web.Models.TipoPeriodo.Cuatrimestre ? "bg-info" : "bg-warning")">
+                                @Model.Tipo.ToString()
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>Año:</strong>
+                            <p class="mb-0">@Model.Anio</p>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Ciclo:</strong>
+                            <p class="mb-0">@Model.Ciclo</p>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Estado:</strong>
+                            @if (Model.Activo)
+                            {
+                                <span class="badge bg-success">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactivo</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+                
+                <hr />
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>Fecha de Inicio:</strong>
+                            <p class="mb-0">@Model.FechaInicio.ToString("dd/MM/yyyy")</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>Fecha de Fin:</strong>
+                            <p class="mb-0">@Model.FechaFin.ToString("dd/MM/yyyy")</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <strong>Estudiantes Asignados:</strong>
+                            <span class="badge bg-info fs-6">@Model.Estudiantes.Count</span>
+                        </div>
+                        
+                        @if (Model.Estudiantes.Any())
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                <i class="fas fa-times-circle"></i>
+                                <strong>No se puede eliminar:</strong> Este período académico tiene @Model.Estudiantes.Count estudiante(s) asignado(s).
+                                Debe reasignar o eliminar los estudiantes antes de poder eliminar este período.
+                            </div>
+                        }
+                    </div>
+                </div>
+                
+                <div class="form-group mt-4">
+                    @if (!Model.Estudiantes.Any())
+                    {
+                        <form asp-action="Delete" method="post" class="d-inline">
+                            <input type="hidden" asp-for="Id" />
+                            <button type="submit" class="btn btn-danger me-2" onclick="return confirm('¿Está seguro de que desea eliminar este período académico?')">
+                                <i class="fas fa-trash"></i> Confirmar Eliminación
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-danger me-2" disabled>
+                            <i class="fas fa-ban"></i> No se puede eliminar
+                        </button>
+                    }
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Cancelar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

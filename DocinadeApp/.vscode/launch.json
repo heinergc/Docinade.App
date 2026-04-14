@@ -1,0 +1,87 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (web) - Development",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Build ASP.NET Core Project",
+            "program": "${workspaceFolder}/bin/Debug/net8.0/RubricasApp.Web.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+                "uriFormat": "%s"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_URLS": "https://localhost:18163;http://localhost:18164"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            },
+            "logging": {
+                "moduleLoad": false
+            }
+        },
+        {
+            "name": ".NET Core Launch (web) - Production Local",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Build ASP.NET Core Project",
+            "program": "${workspaceFolder}/bin/Debug/net8.0/RubricasApp.Web.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+                "uriFormat": "%s"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Production",
+                "ASPNETCORE_URLS": "https://localhost:5000;http://localhost:5001",
+                "ConnectionStrings__ProductionConnection": "Server=localhost\\SQLEXPRESS;Database=RubricasDb;User Id=sa;Password=LKSA2014.01.05.14;TrustServerCertificate=true;MultipleActiveResultSets=true;"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            },
+            "logging": {
+                "moduleLoad": false
+            }
+        },
+        {
+            "name": ".NET Core Launch (web) - Custom Port 18163",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Build ASP.NET Core Project",
+            "program": "${workspaceFolder}/bin/Debug/net8.0/RubricasApp.Web.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+                "uriFormat": "%s"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_URLS": "http://localhost:18163"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            },
+            "logging": {
+                "moduleLoad": false
+            }
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}"
+        }
+    ]
+}

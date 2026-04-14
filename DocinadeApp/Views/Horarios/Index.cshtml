@@ -1,0 +1,233 @@
+@model IEnumerable<RubricasApp.Web.Models.Leccion>
+
+@{
+    ViewData["Title"] = "Horarios de Clases";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">
+                        <i class="fas fa-clock me-2"></i>@ViewData["Title"]
+                    </h3>
+                    <a asp-action="Create" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Agregar Horario
+                    </a>
+                </div>
+                <div class="card-body">
+                    <!-- Filtros -->
+                    <form asp-action="Index" method="get" class="mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Grupo</label>
+                                <select name="grupoId" class="form-select">
+                                    <option value="">Todos los grupos</option>
+                                    @foreach (var item in ViewBag.Grupos as IEnumerable<SelectListItem>)
+                                    {
+                                        <option value="@item.Value" selected="@(item.Value == ViewBag.GrupoSeleccionado?.ToString())">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Materia</label>
+                                <select name="materiaId" class="form-select">
+                                    <option value="">Todas las materias</option>
+                                    @foreach (var item in ViewBag.Materias as IEnumerable<SelectListItem>)
+                                    {
+                                        <option value="@item.Value" selected="@(item.Value == ViewBag.MateriaSeleccionada?.ToString())">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Día de la semana</label>
+                                <select name="diaSemana" class="form-select">
+                                    <option value="">Todos los días</option>
+                                    <option value="1" selected="@(ViewBag.DiaSeleccionado == 1)">Lunes</option>
+                                    <option value="2" selected="@(ViewBag.DiaSeleccionado == 2)">Martes</option>
+                                    <option value="3" selected="@(ViewBag.DiaSeleccionado == 3)">Miércoles</option>
+                                    <option value="4" selected="@(ViewBag.DiaSeleccionado == 4)">Jueves</option>
+                                    <option value="5" selected="@(ViewBag.DiaSeleccionado == 5)">Viernes</option>
+                                    <option value="6" selected="@(ViewBag.DiaSeleccionado == 6)">Sábado</option>
+                                    <option value="0" selected="@(ViewBag.DiaSeleccionado == 0)">Domingo</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Estado</label>
+                                <select name="soloActivos" class="form-select">
+                                    <option value="true" selected="@(ViewBag.SoloActivos != false)">Solo activos</option>
+                                    <option value="false" selected="@(ViewBag.SoloActivos == false)">Todos</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-filter me-1"></i>Filtrar
+                                </button>
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i class="fas fa-redo me-1"></i>Limpiar
+                                </a>
+                                <a asp-action="HorarioSemanal" class="btn btn-info text-white">
+                                    <i class="fas fa-calendar-week me-1"></i>Vista Semanal
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Tabla de horarios -->
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Grupo</th>
+                                        <th>Materia</th>
+                                        <th>Día</th>
+                                        <th>Horario</th>
+                                        <th>Bloque</th>
+                                        <th>Observaciones</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var leccion in Model.OrderBy(l => l.DiaSemana).ThenBy(l => l.HoraInicio))
+                                    {
+                                        <tr class="@(leccion.Activa ? "" : "table-secondary")">
+                                            <td>@leccion.Grupo?.Nombre</td>
+                                            <td>@leccion.Materia?.Nombre</td>
+                                            <td>
+                                                @switch (leccion.DiaSemana)
+                                                {
+                                                    case DayOfWeek.Monday: <span>Lunes</span> break;
+                                                    case DayOfWeek.Tuesday: <span>Martes</span> break;
+                                                    case DayOfWeek.Wednesday: <span>Miércoles</span> break;
+                                                    case DayOfWeek.Thursday: <span>Jueves</span> break;
+                                                    case DayOfWeek.Friday: <span>Viernes</span> break;
+                                                    case DayOfWeek.Saturday: <span>Sábado</span> break;
+                                                    case DayOfWeek.Sunday: <span>Domingo</span> break;
+                                                }
+                                            </td>
+                                            <td>@leccion.HorarioFormateado</td>
+                                            <td>
+                                                <span class="badge bg-info">Bloque @leccion.NumeroBloque</span>
+                                            </td>
+                                            <td>@(leccion.Observaciones ?? "-")</td>
+                                            <td>
+                                                @if (leccion.Activa)
+                                                {
+                                                    <span class="badge bg-success">Activo</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">Inactivo</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a asp-action="Details" asp-route-id="@leccion.IdLeccion" 
+                                                       class="btn btn-sm btn-info" title="Ver detalles">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a asp-action="Edit" asp-route-id="@leccion.IdLeccion" 
+                                                       class="btn btn-sm btn-warning" title="Editar">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    @if (leccion.Activa)
+                                                    {
+                                                        <button type="button" class="btn btn-sm btn-secondary" 
+                                                                onclick="toggleActivo(@leccion.IdLeccion, false)" 
+                                                                title="Desactivar">
+                                                            <i class="fas fa-toggle-on"></i>
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button type="button" class="btn btn-sm btn-success" 
+                                                                onclick="toggleActivo(@leccion.IdLeccion, true)" 
+                                                                title="Activar">
+                                                            <i class="fas fa-toggle-off"></i>
+                                                        </button>
+                                                    }
+                                                    <button type="button" class="btn btn-sm btn-danger" 
+                                                            onclick="eliminarLeccion(@leccion.IdLeccion)" 
+                                                            title="Eliminar">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No se encontraron horarios con los filtros seleccionados.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación para eliminar -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro que desea eliminar este horario? Esta acción no se puede deshacer.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="deleteForm" method="post" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleActivo(id, activo) {
+            if (confirm(`¿Desea ${activo ? 'activar' : 'desactivar'} este horario?`)) {
+                fetch(`/Horarios/ToggleActivo/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error al cambiar el estado: ' + (data.message || 'Error desconocido'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al cambiar el estado');
+                });
+            }
+        }
+
+        function eliminarLeccion(id) {
+            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            document.getElementById('deleteForm').action = `/Horarios/Delete/${id}`;
+            modal.show();
+        }
+    </script>
+}

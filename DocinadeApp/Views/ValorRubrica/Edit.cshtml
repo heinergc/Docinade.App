@@ -1,0 +1,212 @@
+﻿@model RubricasApp.Web.Models.ValorRubrica
+
+@{
+    ViewData["Title"] = "Editar Valor de Rúbrica";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-edit"></i> @ViewData["Title"]
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        
+                        <input type="hidden" asp-for="IdValor" />
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="IdRubrica" class="form-label">Rúbrica *</label>
+                                    @Html.DropDownListFor(m => m.IdRubrica, ViewBag.Rubricas as SelectList, "-- Seleccionar rúbrica --", new { @class = "form-select", required = "required", id = "rubricaSelect" })
+                                    <span asp-validation-for="IdRubrica" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="IdItem" class="form-label">Item de Evaluación *</label>
+                                    @Html.DropDownListFor(m => m.IdItem, ViewBag.Items as SelectList, "-- Seleccionar item --", new { @class = "form-select", required = "required", id = "itemSelect" })
+                                    <span asp-validation-for="IdItem" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="IdNivel" class="form-label">Nivel de Calificación *</label>
+                                    @Html.DropDownListFor(m => m.IdNivel, ViewBag.Niveles as SelectList, "-- Seleccionar nivel --", new { @class = "form-select", required = "required", id = "nivelSelect" })
+                                    <span asp-validation-for="IdNivel" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="ValorPuntos" class="form-label">Valor en Puntos *</label>
+                                    <div class="input-group">
+                                        <input asp-for="ValorPuntos" class="form-control" type="number" step="0.1" min="0" max="100" required />
+                                        <span class="input-group-text">pts</span>
+                                    </div>
+                                    <span asp-validation-for="ValorPuntos" class="text-danger"></span>
+                                    <div class="form-text">Valor entre 0 y 100 puntos</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información actual -->
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle"></i> Configuración Actual</h6>
+                            <div><strong>Rúbrica:</strong> @Model.Rubrica?.NombreRubrica</div>
+                            <div><strong>Item:</strong> @Model.ItemEvaluacion?.NombreItem</div>
+                            <div><strong>Nivel:</strong> @Model.NivelCalificacion?.NombreNivel</div>
+                            <div><strong>Valor Actual:</strong> <span class="badge bg-success">@Model.ValorPuntos pts</span></div>
+                        </div>
+
+                        <!-- Validación de duplicados (solo si se cambian los valores clave) -->
+                        <div id="duplicadoAlert" class="alert alert-warning d-none">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>¡Atención!</strong> Ya existe un valor configurado para esta combinación de Rúbrica, Item y Nivel.
+                        </div>
+
+                        <hr>
+                        
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Volver a la Lista
+                                </a>
+                                <a asp-action="Details" asp-route-id="@Model.IdValor" class="btn btn-outline-info">
+                                    <i class="fas fa-eye"></i> Ver Detalles
+                                </a>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-save"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Card de información adicional -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-lightbulb"></i> Información Importante
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Cambios Permitidos</h6>
+                            <ul class="small">
+                                <li>Modificar el valor en puntos</li>
+                                <li>Cambiar la rúbrica, item o nivel</li>
+                                <li>Actualizar cualquier combinación</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Consideraciones</h6>
+                            <ul class="small">
+                                <li>No puede haber duplicados</li>
+                                <li>El valor debe estar entre 0 y 100</li>
+                                <li>Los cambios afectan evaluaciones futuras</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            var rubricaSelect = $('#rubricaSelect');
+            var itemSelect = $('#itemSelect');
+            var nivelSelect = $('#nivelSelect');
+            var duplicadoAlert = $('#duplicadoAlert');
+            var submitBtn = $('#submitBtn');
+            var originalRubrica = @Model.IdRubrica;
+            var originalItem = @Model.IdItem;
+            var originalNivel = @Model.IdNivel;
+
+            // Cargar items cuando cambia la rúbrica
+            rubricaSelect.change(function() {
+                var rubricaId = $(this).val();
+                
+                if (rubricaId && rubricaId != originalRubrica) {
+                    // Cargar items via AJAX
+                    $.get('@Url.Action("GetItemsByRubrica", "ItemsEvaluacion")', { rubricaId: rubricaId })
+                        .done(function(data) {
+                            var currentItemId = itemSelect.val();
+                            itemSelect.empty();
+                            itemSelect.append('<option value="">-- Seleccionar item --</option>');
+                            
+                            var itemFound = false;
+                            $.each(data, function(index, item) {
+                                itemSelect.append('<option value="' + item.value + '">' + item.text + '</option>');
+                                if (item.value == currentItemId) {
+                                    itemFound = true;
+                                }
+                            });
+                            
+                            // Si el item actual no está en la nueva rúbrica, limpiar selección
+                            if (!itemFound) {
+                                itemSelect.val('');
+                            }
+                        })
+                        .fail(function() {
+                            // Fallback: recargar página
+                            window.location.href = '@Url.Action("Edit", new { id = Model.IdValor })?rubricaId=' + rubricaId;
+                        });
+                }
+                
+                checkDuplicado();
+            });
+
+            // Verificar duplicados cuando cambian los valores clave
+            itemSelect.change(checkDuplicado);
+            nivelSelect.change(checkDuplicado);
+
+            function checkDuplicado() {
+                var rubricaId = rubricaSelect.val();
+                var itemId = itemSelect.val();
+                var nivelId = nivelSelect.val();
+                
+                // Solo verificar si algún valor cambió respecto al original
+                if (rubricaId && itemId && nivelId && 
+                    (rubricaId != originalRubrica || itemId != originalItem || nivelId != originalNivel)) {
+                    
+                    $.get('@Url.Action("CheckDuplicado")', {
+                        idRubrica: rubricaId,
+                        idItem: itemId,
+                        idNivel: nivelId,
+                        excludeId: @Model.IdValor
+                    })
+                    .done(function(exists) {
+                        if (exists) {
+                            duplicadoAlert.removeClass('d-none');
+                            submitBtn.prop('disabled', true);
+                        } else {
+                            duplicadoAlert.addClass('d-none');
+                            submitBtn.prop('disabled', false);
+                        }
+                    });
+                } else {
+                    duplicadoAlert.addClass('d-none');
+                    submitBtn.prop('disabled', false);
+                }
+            }
+
+            // Verificar al cargar la página
+            checkDuplicado();
+        });
+    </script>
+}

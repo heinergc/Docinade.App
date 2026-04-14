@@ -1,0 +1,75 @@
+﻿# Creando las vistas restantes para Instrumentos
+
+# Vista Edit
+@"
+@model RubricasApp.Web.Models.InstrumentoEvaluacion
+
+@{
+    ViewData[`"Title`"] = `"Editar Instrumento de Evaluación`";
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Editar Instrumento de Evaluación</h5>
+                    <a asp-action="Index" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-arrow-left me-2"></i>Volver
+                    </a>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <input type="hidden" asp-for="InstrumentoId" />
+                        <input type="hidden" asp-for="FechaCreacion" />
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label asp-for="Nombre" class="form-label">Nombre del Instrumento</label>
+                                    <input asp-for="Nombre" class="form-control" />
+                                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="Activo" class="form-label">Estado</label>
+                                    <div class="form-check form-switch">
+                                        <input asp-for="Activo" class="form-check-input" type="checkbox" />
+                                        <label class="form-check-label" asp-for="Activo">
+                                            Activo
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Descripcion" class="form-label">Descripción</label>
+                            <textarea asp-for="Descripcion" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Descripcion" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync(`"_ValidationScriptsPartial`");}
+}
+"@ | Out-File -FilePath "Views\Instrumentos\Edit.cshtml" -Encoding UTF8
+
+Write-Host "Vista Edit creada"

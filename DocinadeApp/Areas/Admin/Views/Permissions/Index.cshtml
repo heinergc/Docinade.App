@@ -1,0 +1,266 @@
+@model RubricasApp.Web.ViewModels.Admin.PermissionListViewModel
+
+@{
+    ViewData["Title"] = "Gestión de Permisos";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <i class="fas fa-shield-alt"></i>
+                        Gestión de Permisos del Sistema
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Filtros -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="moduleFilter" class="form-label">Filtrar por Módulo:</label>
+                            <select id="moduleFilter" class="form-select">
+                                <option value="">Todos los módulos</option>
+                                @foreach (var module in Model.Modules)
+                                {
+                                    <option value="@module">@module</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="searchInput" class="form-label">Buscar Permiso:</label>
+                            <input type="text" id="searchInput" class="form-control" placeholder="Buscar por nombre o descripción...">
+                        </div>
+                    </div>
+
+                    <!-- Estadísticas -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <h5>@Model.TotalPermissions</h5>
+                                    <small>Total Permisos</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h5>@Model.Permissions.Count(p => p.IsAssigned)</h5>
+                                    <small>Asignados</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body text-center">
+                                    <h5>@Model.Permissions.Count(p => !p.IsAssigned)</h5>
+                                    <small>No Asignados</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <h5>@Model.Modules.Count()</h5>
+                                    <small>Módulos</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="btn-group" role="group">
+                                <a href="@Url.Action("SelectRoleForAssignment", "Permissions", new { area = "Admin" })" 
+                                   class="btn btn-primary">
+                                    <i class="fas fa-user-shield"></i>
+                                    Asignar Permisos a Rol
+                                </a>
+                                <a href="@Url.Action("Sync", "Permissions", new { area = "Admin" })" 
+                                   class="btn btn-warning">
+                                    <i class="fas fa-sync"></i>
+                                    Sincronizar Permisos
+                                </a>
+                                <a href="@Url.Action("ExportMatrix", "Permissions", new { area = "Admin" })" 
+                                   class="btn btn-success">
+                                    <i class="fas fa-download"></i>
+                                    Exportar Matriz
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de permisos -->
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover" id="permissionsTable">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Módulo</th>
+                                    <th>Permiso</th>
+                                    <th>Descripción</th>
+                                    <th>Estado</th>
+                                    <th>Roles Asignados</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var permission in Model.Permissions)
+                                {
+                                    <tr data-module="@permission.Module" data-permission="@permission.Name.ToLower() @permission.Description.ToLower()">
+                                        <td>
+                                            <span class="badge bg-secondary">@permission.Module</span>
+                                        </td>
+                                        <td>
+                                            <strong>@permission.Name</strong>
+                                        </td>
+                                        <td>
+                                            @permission.Description
+                                        </td>
+                                        <td>
+                                            @if (permission.AssignedRoles.Count > 0)
+                                            {
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check"></i>
+                                                    Asignado
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning">
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                    Sin Asignar
+                                                </span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (permission.AssignedRoles?.Any() == true)
+                                            {
+                                                @foreach (var role in permission.AssignedRoles)
+                                                {
+                                                    <span class="badge bg-primary me-1">@role</span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Ninguno</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="@Url.Action("Details", "Permissions", new { area = "Admin", id = permission.Id })" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                @if (permission.AssignedRoles.Count > 0)
+                                                {
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-outline-danger" 
+                                                            onclick="removeFromRoles('@permission.Id', '@permission.Name')">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                 @*    <button type="button" 
+                                                            class="btn btn-sm btn-outline-success" 
+                                                            onclick="assignToRoles('@permission.Id', '@permission.Name')">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button> *@
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if (!Model.Permissions.Any())
+                    {
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle"></i>
+                            No se encontraron permisos en el sistema. 
+                            <a href="@Url.Action("Sync", "Permissions", new { area = "Admin" })" class="alert-link">
+                                Haga clic aquí para sincronizar los permisos.
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Filtro por módulo
+            $('#moduleFilter').on('change', function() {
+                const selectedModule = $(this).val().toLowerCase();
+                filterTable();
+            });
+
+            // Búsqueda
+            $('#searchInput').on('keyup', function() {
+                filterTable();
+            });
+
+            function filterTable() {
+                const moduleFilter = $('#moduleFilter').val().toLowerCase();
+                const searchText = $('#searchInput').val().toLowerCase();
+
+                $('#permissionsTable tbody tr').each(function() {
+                    const row = $(this);
+                    const module = row.data('module').toLowerCase();
+                    const permission = row.data('permission');
+
+                    const moduleMatch = !moduleFilter || module === moduleFilter;
+                    const textMatch = !searchText || permission.includes(searchText);
+
+                    if (moduleMatch && textMatch) {
+                        row.show();
+                    } else {
+                        row.hide();
+                    }
+                });
+            }
+        });
+
+        function assignToRoles(permissionId, permissionName) {
+            Swal.fire({
+                title: '¿Asignar permiso?',
+                text: `¿Está seguro de que desea asignar el permiso "${permissionName}" a los roles seleccionados?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, asignar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `@Url.Action("AssignToRole", "Permissions", new { area = "Admin" })/${permissionId}`;
+                }
+            });
+        }
+
+        function removeFromRoles(permissionId, permissionName) {
+            Swal.fire({
+                title: '¿Remover permiso?',
+                text: `¿Está seguro de que desea remover el permiso "${permissionName}" de todos los roles?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, remover',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `@Url.Action("RemoveFromRole", "Permissions", new { area = "Admin" })/${permissionId}`;
+                }
+            });
+        }
+    </script>
+}

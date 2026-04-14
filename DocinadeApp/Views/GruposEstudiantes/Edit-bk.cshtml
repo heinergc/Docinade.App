@@ -1,0 +1,496 @@
+@model RubricasApp.Web.ViewModels.Grupos.EditarGrupoViewModel
+
+@{
+    ViewData["Title"] = $"Editar Grupo: {Model.Codigo}";
+}
+
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="page-title">
+                <i class="fas fa-edit text-warning me-2"></i>
+                Editar Grupo
+            </h1>
+            <h6 class="text-muted">
+                <span class="badge bg-primary">@Model.Codigo</span> @Model.Nombre
+            </h6>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index")">
+                            <i class="fas fa-users-cog"></i> Grupos
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Details", new { id = Model.GrupoId })">
+                            @Model.Codigo
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">Editar</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="modern-card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Modificar Informaci�n del Grupo
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post" id="editGroupForm">
+                    <input type="hidden" asp-for="GrupoId" />
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                    
+                    <!-- Informaci�n b�sica -->
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label asp-for="Codigo" class="form-label required">C�digo del Grupo</label>
+                                <input asp-for="Codigo" class="form-control" maxlength="20" />
+                                <span asp-validation-for="Codigo" class="text-danger"></span>
+                                <div class="form-text">C�digo �nico identificador del grupo</div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="form-group mb-3">
+                                <label asp-for="Nombre" class="form-label required">Nombre del Grupo</label>
+                                <input asp-for="Nombre" class="form-control" maxlength="100" />
+                                <span asp-validation-for="Nombre" class="text-danger"></span>
+                                <div class="form-text">Nombre descriptivo del grupo</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="TipoGrupo" class="form-label required">Tipo de Grupo</label>
+                                <select asp-for="TipoGrupo" class="form-select" id="tipoGrupoSelect">
+                                    <option value="">Seleccione un tipo</option>
+                                    <option value="Seccion" selected="@(Model.TipoGrupo == RubricasApp.Web.Models.TipoGrupo.Seccion)">Secci�n</option>
+                                    <option value="Nivel" selected="@(Model.TipoGrupo == RubricasApp.Web.Models.TipoGrupo.Nivel)">Nivel</option>
+                                    <option value="Modalidad" selected="@(Model.TipoGrupo == RubricasApp.Web.Models.TipoGrupo.Modalidad)">Modalidad</option>
+                                    <option value="Custom" selected="@(Model.TipoGrupo == RubricasApp.Web.Models.TipoGrupo.Custom)">Personalizado</option>
+                                </select>
+                                <span asp-validation-for="TipoGrupo" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Nivel" class="form-label">Nivel Acad�mico</label>
+                                <input asp-for="Nivel" class="form-control" maxlength="50" />
+                                <span asp-validation-for="Nivel" class="text-danger"></span>
+                                <div class="form-text">Opcional: Especifica el nivel acad�mico</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="PeriodoAcademicoId" class="form-label required">Per�odo Acad�mico</label>
+                                <select asp-for="PeriodoAcademicoId" class="form-select" id="periodoSelect">
+                                    <option value="">Seleccione un per�odo</option>
+                                    @if (ViewBag.PeriodosAcademicos != null)
+                                    {
+                                        @foreach (var periodo in ViewBag.PeriodosAcademicos)
+                                        {
+                                            <option value="@periodo.Id" selected="@(periodo.Id == Model.PeriodoAcademicoId)">
+                                                @periodo.Nombre
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="PeriodoAcademicoId" class="text-danger"></span>
+                                <div class="form-text text-warning">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    Cambiar el per�odo puede afectar las asignaciones de estudiantes
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="CapacidadMaxima" class="form-label">Capacidad M�xima</label>
+                                <input asp-for="CapacidadMaxima" type="number" class="form-control" 
+                                       min="1" max="200" />
+                                <span asp-validation-for="CapacidadMaxima" class="text-danger"></span>
+                                <div class="form-text">
+                                    Dejar vac�o para capacidad ilimitada.
+                                    @if (Model.CantidadEstudiantesActuales > 0)
+                                    {
+                                        <br><strong>Actualmente hay @Model.CantidadEstudiantesActuales estudiante(s) asignado(s).</strong>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Estado" class="form-label required">Estado</label>
+                                <select asp-for="Estado" class="form-select" id="estadoSelect">
+                                    <option value="Activo" selected="@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Activo)">Activo</option>
+                                    <option value="Inactivo" selected="@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Inactivo)">Inactivo</option>
+                                    <option value="Cerrado" selected="@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Cerrado)">Cerrado</option>
+                                    <option value="Suspendido" selected="@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Suspendido)">Suspendido</option>
+                                </select>
+                                <span asp-validation-for="Estado" class="text-danger"></span>
+                                <div class="form-text" id="estadoHelp">
+                                    <!-- Se actualiza din�micamente con JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Informaci�n del Grupo</label>
+                                <div class="card bg-light border-0">
+                                    <div class="card-body py-2">
+                                        <small class="text-muted">
+                                            <strong>Creado:</strong> @Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")
+                                            @if (!string.IsNullOrEmpty(Model.CreadoPor))
+                                            {
+                                                <br><strong>por:</strong> @Model.CreadoPor
+                                            }
+                                            @if (Model.FechaModificacion.HasValue)
+                                            {
+                                                <br><strong>Modificado:</strong> @Model.FechaModificacion.Value.ToString("dd/MM/yyyy HH:mm")
+                                            }
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Descripcion" class="form-label">Descripci�n</label>
+                        <textarea asp-for="Descripcion" class="form-control" rows="3" maxlength="500"></textarea>
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                        <div class="form-text">
+                            <span id="descripcionCounter">0</span>/500 caracteres
+                        </div>
+                    </div>
+
+                    <!-- Materias asociadas -->
+                    <div class="form-group mb-4">
+                        <label class="form-label">Materias Asociadas</label>
+                        <div class="card border-light bg-light">
+                            <div class="card-header bg-transparent border-0">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Seleccione las materias que estar�n asociadas a este grupo
+                                </small>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    @if (ViewBag.MateriasDisponibles != null)
+                                    {
+                                        @foreach (var materia in ViewBag.MateriasDisponibles)
+                                        {
+                                            <div class="col-md-6 mb-2">
+                                                <div class="form-check">
+                                                    <input type="checkbox" name="MateriasSeleccionadas" 
+                                                           value="@materia.MateriaId" class="form-check-input" 
+                                                           id="materia_@materia.MateriaId" 
+                                                           checked="@(Model.MateriasSeleccionadas != null && Model.MateriasSeleccionadas.Contains(materia.MateriaId))" />
+                                                    <label class="form-check-label" for="materia_@materia.MateriaId">
+                                                        @materia.Nombre
+                                                        <br><small class="text-muted">@materia.Codigo</small>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="col-12">
+                                            <p class="text-muted mb-0">No hay materias disponibles</p>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Observaciones" class="form-label">Observaciones</label>
+                        <textarea asp-for="Observaciones" class="form-control" rows="2" maxlength="1000"></textarea>
+                        <span asp-validation-for="Observaciones" class="text-danger"></span>
+                        <div class="form-text">
+                            <span id="observacionesCounter">0</span>/1000 caracteres
+                        </div>
+                    </div>
+
+                    <!-- Alertas de validaci�n -->
+                    <div id="validationAlerts">
+                        <!-- Se llenan din�micamente con JavaScript -->
+                    </div>
+
+                    <!-- Botones de acci�n -->
+                    <div class="row">
+                        <div class="col-12">
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <a href="@Url.Action("Details", new { id = Model.GrupoId })" class="btn btn-modern secondary">
+                                        <i class="fas fa-arrow-left"></i> Cancelar
+                                    </a>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-modern info me-2" id="resetFormBtn">
+                                        <i class="fas fa-undo"></i> Restablecer
+                                    </button>
+                                    <button type="submit" class="btn btn-modern primary">
+                                        <i class="fas fa-save"></i> Guardar Cambios
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            const originalFormData = $('#editGroupForm').serialize();
+            const cantidadEstudiantesActuales = @Model.CantidadEstudiantesActuales;
+            
+            // Contador de caracteres para descripci�n
+            $('#Descripcion').on('input', function() {
+                const length = $(this).val().length;
+                $('#descripcionCounter').text(length);
+                
+                if (length > 450) {
+                    $('#descripcionCounter').addClass('text-warning');
+                } else {
+                    $('#descripcionCounter').removeClass('text-warning');
+                }
+            });
+
+            // Contador de caracteres para observaciones
+            $('#Observaciones').on('input', function() {
+                const length = $(this).val().length;
+                $('#observacionesCounter').text(length);
+                
+                if (length > 900) {
+                    $('#observacionesCounter').addClass('text-warning');
+                } else {
+                    $('#observacionesCounter').removeClass('text-warning');
+                }
+            });
+
+            // Actualizar ayuda del estado
+            function updateEstadoHelp() {
+                const estado = $('#Estado').val();
+                const help = $('#estadoHelp');
+                
+                switch(estado) {
+                    case 'Activo':
+                        help.html('<span class="text-success">El grupo está activo y acepta nuevos estudiantes.</span>');
+                        break;
+                    case 'Inactivo':
+                        help.html('<span class="text-secondary">El grupo está inactivo temporalmente.</span>');
+                        break;
+                    case 'Cerrado':
+                        help.html('<span class="text-danger">El grupo está cerrado permanentemente.</span>');
+                        break;
+                    case 'Suspendido':
+                        help.html('<span class="text-warning">El grupo está suspendido temporalmente.</span>');
+                        break;
+                    default:
+                        help.html('');
+                }
+            }
+
+            $('#Estado').change(updateEstadoHelp);
+
+            // Validación de capacidad
+            $('#CapacidadMaxima').on('input', function() {
+                const capacidad = parseInt($(this).val()) || 0;
+                const alerts = $('#validationAlerts');
+                
+                alerts.empty();
+                
+                if (capacidad > 0 && capacidad < cantidadEstudiantesActuales) {
+                    alerts.append(`
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Error:</strong> La capacidad no puede ser menor al n�mero actual de estudiantes asignados (${cantidadEstudiantesActuales}).
+                        </div>
+                    `);
+                } else if (capacidad > 0 && capacidad < cantidadEstudiantesActuales + 10) {
+                    alerts.append(`
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Atenci�n:</strong> La nueva capacidad deja poco margen para nuevos estudiantes.
+                        </div>
+                    `);
+                }
+            });
+
+            // Restablecer formulario
+            $('#resetFormBtn').click(function() {
+                Swal.fire({
+                    title: 'Restablecer cambios?',
+                    text: 'Se perderán todos los cambios no guardados.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#6c757d',
+                    cancelButtonColor: '#007bff',
+                    confirmButtonText: 'Sí, restablecer',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }
+                });
+            });
+
+            // Detectar cambios en el formulario
+            function hasFormChanged() {
+                return $('#editGroupForm').serialize() !== originalFormData;
+            }
+
+            // Validación del formulario antes de envío
+            $('#editGroupForm').on('submit', function(e) {
+                const codigo = $('#Codigo').val().trim();
+                const nombre = $('#Nombre').val().trim();
+                const tipo = $('#TipoGrupo').val();
+                const periodo = $('#PeriodoAcademicoId').val();
+                const capacidad = parseInt($('#CapacidadMaxima').val()) || 0;
+                
+                if (!codigo || !nombre || !tipo || !periodo) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Campos requeridos',
+                        text: 'Por favor, complete todos los campos obligatorios marcados con *',
+                        icon: 'error'
+                    });
+                    return false;
+                }
+                
+                if (capacidad > 0 && capacidad < cantidadEstudiantesActuales) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Capacidad insuficiente',
+                        text: `La capacidad no puede ser menor al n�mero actual de estudiantes asignados (${cantidadEstudiantesActuales}).`,
+                        icon: 'error'
+                    });
+                    return false;
+                }
+
+                if (!hasFormChanged()) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Sin cambios',
+                        text: 'No se han detectado cambios en el formulario.',
+                        icon: 'info'
+                    });
+                    return false;
+                }
+                
+                // Mostrar loading
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Guardando cambios...',
+                    text: 'Por favor espere',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                // Enviar formulario despu�s de un breve delay
+                setTimeout(() => {
+                    this.submit();
+                }, 500);
+                
+                return false;
+            });
+
+            // Advertencia antes de salir si hay cambios sin guardar
+            $(window).on('beforeunload', function(e) {
+                if (hasFormChanged()) {
+                    return 'Tiene cambios sin guardar. ¿Está seguro de que desea salir?';
+                }
+            });
+
+            // Inicializar
+            updateEstadoHelp();
+            $('#Descripcion').trigger('input');
+            $('#Observaciones').trigger('input');
+            $('#CapacidadMaxima').trigger('input');
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .required::after {
+            content: ' *';
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .form-check {
+            padding: 0.25rem 0;
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .text-warning {
+            font-weight: bold;
+        }
+        
+        .modern-card {
+            border: none;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        
+        .modern-card .card-header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .btn-modern.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+        }
+        
+        .btn-modern.secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            color: white;
+        }
+        
+        .btn-modern.info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border: none;
+            color: white;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #f5576c;
+            box-shadow: 0 0 0 0.2rem rgba(245, 87, 108, 0.25);
+        }
+    </style>
+}

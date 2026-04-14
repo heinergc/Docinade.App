@@ -1,0 +1,183 @@
+﻿@model RubricasApp.Web.Models.InstrumentoEvaluacion
+
+@{
+    ViewData["Title"] = "Detalles del Instrumento";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-clipboard-list me-2"></i>
+                        Detalles del Instrumento de Evaluación
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td class="fw-bold text-muted" style="width: 200px;">
+                                        <i class="fas fa-hashtag me-2"></i>
+                                        ID:
+                                    </td>
+                                    <td>@Html.DisplayFor(model => model.InstrumentoId)</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-muted">
+                                        <i class="fas fa-tag me-2"></i>
+                                        @Html.DisplayNameFor(model => model.Nombre):
+                                    </td>
+                                    <td>
+                                        <strong class="fs-5">@Html.DisplayFor(model => model.Nombre)</strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-muted">
+                                        <i class="fas fa-align-left me-2"></i>
+                                        @Html.DisplayNameFor(model => model.Descripcion):
+                                    </td>
+                                    <td>
+                                        @if (string.IsNullOrEmpty(Model.Descripcion))
+                                        {
+                                            <em class="text-muted">Sin descripción</em>
+                                        }
+                                        else
+                                        {
+                                            @Html.DisplayFor(model => model.Descripcion)
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-muted">
+                                        <i class="fas fa-toggle-on me-2"></i>
+                                        @Html.DisplayNameFor(model => model.Activo):
+                                    </td>
+                                    <td>
+                                        @if (Model.Activo)
+                                        {
+                                            <span class="badge bg-success fs-6">
+                                                <i class="fas fa-check me-1"></i>Activo
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary fs-6">
+                                                <i class="fas fa-times me-1"></i>Inactivo
+                                            </span>
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-muted">
+                                        <i class="fas fa-calendar-alt me-2"></i>
+                                        @Html.DisplayNameFor(model => model.FechaCreacion):
+                                    </td>
+                                    <td>
+                                        @Model.FechaCreacion.ToString("dddd, dd 'de' MMMM 'de' yyyy 'a las' HH:mm", new System.Globalization.CultureInfo("es-ES"))
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card bg-light">
+                                <div class="card-header">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-chart-bar me-2"></i>
+                                        Estadísticas
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row text-center">
+                                        <div class="col-6">
+                                            <div class="border-end">
+                                                <h4 class="text-primary mb-0">@Model.InstrumentoRubricas.Count</h4>
+                                                <small class="text-muted">Rúbricas</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <h4 class="text-info mb-0">@Model.InstrumentoMaterias.Count</h4>
+                                            <small class="text-muted">Materias</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.InstrumentoRubricas.Any() || Model.InstrumentoMaterias.Any())
+                    {
+                        <hr class="my-4">
+                        
+                        <div class="row">
+                            @if (Model.InstrumentoRubricas.Any())
+                            {
+                                <div class="col-lg-6">
+                                    <h5>
+                                        <i class="fas fa-list me-2"></i>
+                                        Rúbricas Asociadas
+                                    </h5>
+                                    <div class="list-group">
+                                        @foreach (var rubrica in Model.InstrumentoRubricas)
+                                        {
+                                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span>
+                                                    <i class="fas fa-file-alt me-2"></i>
+                                                    Rúbrica ID: @rubrica.RubricaId
+                                                </span>
+                                                <span class="badge bg-primary rounded-pill">Ver</span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+
+                            @if (Model.InstrumentoMaterias.Any())
+                            {
+                                <div class="col-lg-6">
+                                    <h5>
+                                        <i class="fas fa-book me-2"></i>
+                                        Materias Asociadas
+                                    </h5>
+                                    <div class="list-group">
+                                        @foreach (var materia in Model.InstrumentoMaterias)
+                                        {
+                                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span>
+                                                    <i class="fas fa-graduation-cap me-2"></i>
+                                                    Materia ID: @materia.MateriaId
+                                                </span>
+                                                <span class="badge bg-info rounded-pill">Ver</span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between flex-wrap gap-2">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Volver a la Lista
+                        </a>
+                        <div class="btn-group" role="group">
+                            <a asp-action="Edit" asp-route-id="@Model?.InstrumentoId" class="btn btn-warning">
+                                <i class="fas fa-edit me-1"></i>
+                                Editar
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@Model?.InstrumentoId" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i>
+                                Eliminar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

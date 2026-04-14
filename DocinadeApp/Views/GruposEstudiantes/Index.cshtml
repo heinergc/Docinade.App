@@ -1,0 +1,1497 @@
+﻿@model RubricasApp.Web.ViewModels.Grupos.GrupoEstudianteIndexViewModel
+@using RubricasApp.Web.Models
+@using Microsoft.AspNetCore.Routing
+@{
+    ViewData["Title"] = "Grupos de Estudiantes";
+}
+
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="page-title">
+                <i class="fas fa-users text-white me-2"></i>
+                Grupos de Estudiantes
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-white">
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index", "Home")" class="text-white">
+                            <i class="fas fa-home"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active text-white">Grupos de Estudiantes</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-auto">
+            <div class="btn-group">
+                <a href="@Url.Action("Create")" class="btn btn-light">
+                    <i class="fas fa-plus" style="color: black;"></i> <span style="color: black;">Nuevo Grupo</span>
+                </a>
+                <a href="@Url.Action("Estadisticas")" class="btn btn-info">
+                    <i class="fas fa-chart-bar"></i> Estadísticas
+                </a>
+                <a href="@Url.Action("ExportarExcel", Model.Filtros)" class="btn btn-light">
+                    <i class="fas fa-download" style="color: black;"></i> <span style="color: black;">Exportar</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas -->
+<div class="stats-container-generic">
+    @{
+        var tiposArray = Model.EstadisticasPorTipo.ToArray();
+        for (int i = 0; i < Math.Min(4, tiposArray.Length); i++)
+        {
+            var estadistica = tiposArray[i];
+            string iconClass = estadistica.Key switch
+            {
+                TipoGrupo.Seccion => "fas fa-layer-group",
+                TipoGrupo.Nivel => "fas fa-users",
+                TipoGrupo.Modalidad => "fas fa-laptop",
+                TipoGrupo.Custom => "fas fa-cog",
+                _ => "fas fa-users"
+            };
+            
+            string colorClass = i switch
+            {
+                0 => "text-primary",
+                1 => "text-success", 
+                2 => "text-info",
+                3 => "text-warning",
+                _ => "text-secondary"
+            };
+
+            <div class="stat-card-generic">
+                <div class="stat-icon-generic @colorClass">
+                    <i class="@iconClass"></i>
+                </div>
+                <div class="stat-number-generic">@estadistica.Value</div>
+                <div class="stat-label-generic">@estadistica.Key.ToString().ToUpper()</div>
+            </div>
+        }
+        
+        // Si hay menos de 4 tipos, completar con estadística total
+        if (tiposArray.Length < 4)
+        {
+            <div class="stat-card-generic">
+                <div class="stat-icon-generic text-info">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="stat-number-generic">@Model.Paginacion.TotalElementos</div>
+                <div class="stat-label-generic">TOTAL GRUPOS</div>
+            </div>
+        }
+    }
+</div>
+
+<!-- Filtros -->
+<div class="card-generic grupos-filter-section">
+    <div class="card-header-generic">
+        <h5 class="card-title-generic">
+            <i class="fas fa-filter"></i>
+            Filtros de Búsqueda
+        </h5>
+    </div>
+    <div class="card-body-generic">
+        <form method="get" action="@Url.Action("Index")" id="filtrosForm">
+            <div class="row">
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="form-group-generic">
+                        <label class="form-label-generic">
+                            <i class="fas fa-calendar-alt"></i>
+                            Período Académico
+                        </label>
+                        <select name="Filtros.PeriodoAcademicoId" class="form-control-generic" asp-for="Filtros.PeriodoAcademicoId">
+                            <option value="">Todos los períodos</option>
+                            @if (ViewBag.PeriodosAcademicos != null)
+                            {
+                                @foreach (var periodo in (List<RubricasApp.Web.ViewModels.Shared.PeriodoAcademicoDropdownViewModel>)ViewBag.PeriodosAcademicos)
+                                {
+                                    <option value="@periodo.Id" selected="@(periodo.Id == Model.Filtros.PeriodoAcademicoId)">
+                                        @periodo.Nombre
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="col-xl-2 col-lg-3 col-md-6">
+                    <div class="form-group-generic">
+                        <label class="form-label-generic">
+                            <i class="fas fa-layer-group"></i>
+                            Tipo de Grupo
+                        </label>
+                        <select name="Filtros.TipoGrupo" class="form-control-generic" asp-for="Filtros.TipoGrupo">
+                            <option value="">Todos los tipos</option>
+                            @{
+                                var tiposGrupoDisponibles = ViewBag.TiposGrupoDisponibles as List<SelectListItem> ?? new List<SelectListItem>();
+                            }
+                            @foreach (var tipo in tiposGrupoDisponibles)
+                            {
+                                <option value="@tipo.Value" selected="@(tipo.Value == Model.Filtros.TipoGrupo?.ToString())">
+                                    @tipo.Text
+                                </option>
+                            }
+                            @if (!tiposGrupoDisponibles.Any())
+                            {
+                                <option value="Seccion" selected="@(Model.Filtros.TipoGrupo == TipoGrupo.Seccion)">Sección</option>
+                                <option value="Nivel" selected="@(Model.Filtros.TipoGrupo == TipoGrupo.Nivel)">Nivel</option>
+                                <option value="Modalidad" selected="@(Model.Filtros.TipoGrupo == TipoGrupo.Modalidad)">Modalidad</option>
+                                <option value="Custom" selected="@(Model.Filtros.TipoGrupo == TipoGrupo.Custom)">Personalizado</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="col-xl-2 col-lg-3 col-md-6">
+                    <div class="form-group-generic">
+                        <label class="form-label-generic">
+                            <i class="fas fa-toggle-on"></i>
+                            Estado
+                        </label>
+                        <select name="Filtros.Estado" class="form-control-generic" asp-for="Filtros.Estado">
+                            <option value="">Todos los estados</option>
+                            <option value="Activo" selected="@(Model.Filtros.Estado == EstadoGrupo.Activo)">Activo</option>
+                            <option value="Inactivo" selected="@(Model.Filtros.Estado == EstadoGrupo.Inactivo)">Inactivo</option>
+                            <option value="Cerrado" selected="@(Model.Filtros.Estado == EstadoGrupo.Cerrado)">Cerrado</option>
+                            <option value="Suspendido" selected="@(Model.Filtros.Estado == EstadoGrupo.Suspendido)">Suspendido</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="form-group-generic">
+                        <label class="form-label-generic">
+                            <i class="fas fa-school"></i>
+                            Institución
+                        </label>
+                        <select name="Filtros.InstitucionId" class="form-control-generic" asp-for="Filtros.InstitucionId">
+                            <option value="">Todas las instituciones</option>
+                            @if (ViewBag.Instituciones != null)
+                            {
+                                @foreach (var institucion in ViewBag.Instituciones)
+                                {
+                                    <option value="@institucion.Value" selected="@(institucion.Value == Model.Filtros.InstitucionId?.ToString())">
+                                        @institucion.Text
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="col-xl-2 col-lg-3 col-md-6">
+                    <div class="form-group-generic">
+                        <label class="form-label-generic">
+                            <i class="fas fa-hashtag"></i>
+                            Código
+                        </label>
+                        <input type="text" name="Filtros.Codigo" class="form-control-generic" 
+                               placeholder="Buscar código..." value="@Model.Filtros.Codigo" asp-for="Filtros.Codigo">
+                    </div>
+                </div>
+                
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="form-group-generic">
+                        <label class="form-label-generic">
+                            <i class="fas fa-signature"></i>
+                            Nombre
+                        </label>
+                        <input type="text" name="Filtros.Nombre" class="form-control-generic" 
+                               placeholder="Buscar nombre..." value="@Model.Filtros.Nombre" asp-for="Filtros.Nombre">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <div class="form-check-generic">
+                    <input type="checkbox" name="Filtros.SoloConEspacio" class="form-check-input-generic"
+                           asp-for="Filtros.SoloConEspacio" checked="@Model.Filtros.SoloConEspacio" id="soloConEspacio">
+                    <label class="form-check-label-generic" for="soloConEspacio">
+                        <i class="fas fa-users-slash"></i>
+                        Solo grupos con capacidad disponible
+                    </label>
+                </div>
+                <div class="btn-group-generic">
+                    <button type="submit" class="btn-generic btn-primary-generic">
+                        <i class="fas fa-search"></i> 
+                        Buscar
+                    </button>
+                    <a href="@Url.Action("Index")" class="btn-generic btn-secondary-generic">
+                        <i class="fas fa-times"></i> 
+                        Limpiar
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Lista de Grupos -->
+<div class="table-container-generic">
+    <div class="card-header-generic">
+        <div class="row align-items-center">
+            <div class="col">
+                <h5 class="card-title-generic">
+                    <i class="fas fa-list"></i>
+                    Lista de Grupos (@Model.Paginacion.TotalElementos total)
+                </h5>
+            </div>
+            <div class="col-auto">
+                <div class="btn-group-generic">
+                    <button class="btn-generic btn-small-generic btn-secondary-generic" onclick="toggleView('card')" title="Vista de tarjetas">
+                        <i class="fas fa-th-large"></i>
+                    </button>
+                    <button class="btn-generic btn-small-generic btn-primary-generic active" onclick="toggleView('table')" title="Vista de tabla">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-body-generic p-0">
+        @if (Model.Grupos.Any())
+        {
+            <div class="table-responsive-generic">
+                <table class="table-generic">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Información del Grupo</th>
+                            <th>Institución</th>
+                            <th>Tipo</th>
+                            <th>Estudiantes</th>
+                            <th>Materias</th>
+                            <th>Estado</th>
+                            <th>Creado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var grupo in Model.Grupos)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="badge-generic badge-primary-generic">@grupo.Codigo</span>
+                                </td>
+                                
+                                <td>
+                                    <div>
+                                        <strong>@grupo.Nombre</strong>
+                                        @if (!string.IsNullOrEmpty(grupo.Nivel))
+                                        {
+                                            <br>
+                                            <small class="text-muted-black">
+                                                <i class="fas fa-level-up-alt"></i>
+                                                Nivel: @grupo.Nivel
+                                            </small>
+                                        }
+                                    </div>
+                                </td>
+                                
+                                <td>
+                                    @if (!string.IsNullOrEmpty(grupo.InstitucionNombre))
+                                    {
+                                        <span class="badge bg-info text-dark">
+                                            <i class="fas fa-school me-1"></i>@grupo.InstitucionNombre
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <small class="text-muted">Sin institución</small>
+                                    }
+                                </td>
+                                
+                                <td>
+                                    @{
+                                        string tipoBadgeClass = grupo.TipoGrupoDisplay switch
+                                        {
+                                            "Sección" => "badge-tipo-seccion",
+                                            "Nivel" => "badge-tipo-nivel",
+                                            "Modalidad" => "badge-tipo-modalidad",
+                                            "Custom" => "badge-tipo-custom",
+                                            _ => "badge-secondary-generic"
+                                        };
+                                    }
+                                    <span class="badge-generic grupos-badge-tipo @tipoBadgeClass">
+                                        @grupo.TipoGrupoDisplay
+                                    </span>
+                                </td>
+                                
+                                <td class="text-center-generic">
+                                    <div>
+                                        <span class="fw-bold">@grupo.CantidadEstudiantes</span>
+                                        @if (grupo.CapacidadMaxima.HasValue)
+                                        {
+                                            <span class="text-muted-black">/@grupo.CapacidadMaxima</span>
+                                        }
+                                    </div>
+                                    @if (grupo.EstaCompleto)
+                                    {
+                                        <small class="badge-generic badge-warning-generic status-badge-generic">Completo</small>
+                                    }
+                                    else
+                                    {
+                                        <small class="text-muted-black">Disponible</small>
+                                    }
+                                </td>
+                                
+                                <td class="text-center-generic">
+                                    @if (grupo.Materias.Any())
+                                    {
+                                        <span class="badge-generic badge-success-generic">@grupo.Materias.Count</span>
+                                        <br>
+                                        <small class="text-muted-white">
+                                            @string.Join(", ", grupo.Materias.Take(2))
+                                            @if (grupo.Materias.Count > 2)
+                                            {
+                                                <span>...</span>
+                                            }
+                                        </small>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted-black">Sin materias</span>
+                                    }
+                                </td>
+                                
+                                <td>
+                                    @{
+                                        string estadoBadgeClass = grupo.Estado switch
+                                        {
+                                            EstadoGrupo.Activo => "badge-success-generic",
+                                            EstadoGrupo.Inactivo => "badge-secondary-generic",
+                                            EstadoGrupo.Cerrado => "badge-danger-generic",
+                                            EstadoGrupo.Suspendido => "badge-warning-generic",
+                                            _ => "badge-secondary-generic"
+                                        };
+                                    }
+                                    <span class="badge-generic @estadoBadgeClass status-badge-generic">
+                                        @grupo.EstadoDisplay
+                                    </span>
+                                </td>
+                                
+                                <td class="text-center-generic">
+                                    <small>
+                                        @grupo.FechaCreacion.ToString("dd/MM/yyyy")
+                                        @if (!string.IsNullOrEmpty(grupo.CreadoPor))
+                                        {
+                                            <br>
+                                            <span class="text-muted-black">@grupo.CreadoPor</span>
+                                        }
+                                    </small>
+                                </td>
+                                
+                                <td>
+                                    <div class="grupos-table-actions">
+                                        <a href="@Url.Action("Details", new { id = grupo.GrupoId })"
+                                           class="btn-generic btn-small-generic btn-outline-info-generic"
+                                           title="Ver detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="@Url.Action("AsignarEstudiantes", new { id = grupo.GrupoId })"
+                                           class="btn-generic btn-small-generic badge-success-generic"
+                                           title="Asignar estudiantes">
+                                            <i class="fas fa-user-plus"></i>
+                                        </a>
+                                        <a href="@Url.Action("Edit", new { id = grupo.GrupoId })"
+                                           class="btn-generic btn-small-generic badge-warning-generic"
+                                           title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="@Url.Action("ExportarEstudiantesExcel", new { id = grupo.GrupoId })"
+                                           class="btn-generic btn-small-generic btn-primary-generic"
+                                           title="Exportar estudiantes">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                        <a href="@Url.Action("HistorialGrupo", "Auditoria", new { grupoId = grupo.GrupoId })"
+                                           class="btn-generic btn-small-generic btn-outline-secondary-generic"
+                                           title="Ver historial de auditoría">
+                                            <i class="fas fa-history"></i>
+                                        </a>
+                                        <a href="@Url.Action("Delete", new { id = grupo.GrupoId })"
+                                           class="btn-generic btn-small-generic badge-danger-generic"
+                                           title="Eliminar grupo"
+                                           onclick="return confirm('¿Está seguro de eliminar este grupo?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No se encontraron grupos</h5>
+                @if (Model.Filtros.PeriodoAcademicoId.HasValue || !string.IsNullOrEmpty(Model.Filtros.Codigo) || !string.IsNullOrEmpty(Model.Filtros.Nombre))
+                {
+                    <p class="text-muted">No hay grupos que coincidan con los filtros aplicados.</p>
+                    <a href="@Url.Action("Index")" class="btn btn-outline-primary">
+                        <i class="fas fa-times"></i> Limpiar filtros
+                    </a>
+                }
+                else
+                {
+                    <p class="text-muted">Comience creando su primer grupo de estudiantes.</p>
+                    <a href="@Url.Action("Create")" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Crear primer grupo
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Paginación con clases genéricas -->
+@if (Model.Paginacion.TotalPaginas > 1)
+{
+    <div class="pagination-container">
+        <div class="pagination-info">
+            <span class="info-text">
+                Mostrando @((Model.Paginacion.PaginaActual - 1) * Model.Paginacion.ElementosPorPagina + 1) - 
+                @(Math.Min(Model.Paginacion.PaginaActual * Model.Paginacion.ElementosPorPagina, Model.Paginacion.TotalElementos)) 
+                de @Model.Paginacion.TotalElementos grupos
+            </span>
+        </div>
+        
+        <nav aria-label="Paginación de grupos">
+            <ul class="pagination pagination-modern">
+                <li class="page-item @(!Model.Paginacion.TienePaginaAnterior ? "disabled" : "")">
+                    <a class="page-link" 
+                       href="@Url.Action("Index", new { pagina = Model.Paginacion.PaginaActual - 1, Filtros = Model.Filtros })"
+                       aria-label="Página anterior">
+                        <i class="fas fa-chevron-left"></i>
+                        <span>Anterior</span>
+                    </a>
+                </li>
+
+                @for (int i = Math.Max(1, Model.Paginacion.PaginaActual - 2); i <= Math.Min(Model.Paginacion.TotalPaginas, Model.Paginacion.PaginaActual + 2); i++)
+                {
+                    <li class="page-item @(i == Model.Paginacion.PaginaActual ? "active" : "")">
+                        <a class="page-link" 
+                           href="@Url.Action("Index", new { pagina = i, Filtros = Model.Filtros })"
+                           aria-label="Página @i">@i</a>
+                    </li>
+                }
+
+                <li class="page-item @(!Model.Paginacion.TienePaginaSiguiente ? "disabled" : "")">
+                    <a class="page-link" 
+                       href="@Url.Action("Index", new { pagina = Model.Paginacion.PaginaActual + 1, Filtros = Model.Filtros })"
+                       aria-label="Página siguiente">
+                        <span>Siguiente</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        // ===== VARIABLES GLOBALES =====
+        let currentView = 'table';
+        let tooltipsInitialized = false;
+
+        // ===== INICIALIZACIÓN =====
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTooltips();
+            initializeFilters();
+            initializeViewControls();
+            initializeTableAnimations();
+            initializeDropdowns();
+            
+            console.log('GruposEstudiantes - Página inicializada correctamente');
+        });
+
+        // ===== INICIALIZACIÓN DE DROPDOWNS =====
+        function initializeDropdowns() {
+            // Asegurar que todos los dropdowns en la tabla funcionen correctamente
+            const dropdownToggleList = [].slice.call(document.querySelectorAll('.table-actions .dropdown-toggle'));
+            dropdownToggleList.map(function(dropdownToggleEl) {
+                // Crear instancia de Bootstrap dropdown si no existe
+                if (!bootstrap.Dropdown.getInstance(dropdownToggleEl)) {
+                    return new bootstrap.Dropdown(dropdownToggleEl, {
+                        autoClose: true,
+                        boundary: 'viewport'
+                    });
+                }
+            });
+
+            // Manejar eventos de apertura/cierre para z-index
+            document.querySelectorAll('.table-actions .dropdown').forEach(function(dropdown) {
+                dropdown.addEventListener('show.bs.dropdown', function() {
+                    // Asegurar que el dropdown tenga el z-index más alto
+                    this.style.zIndex = '9999';
+                    const menu = this.querySelector('.dropdown-menu');
+                    if (menu) {
+                        menu.style.zIndex = '9999';
+                    }
+                });
+
+                dropdown.addEventListener('hide.bs.dropdown', function() {
+                    // Resetear z-index cuando se cierre
+                    this.style.zIndex = '';
+                });
+            });
+        }
+
+        // ===== FUNCIONES DE VISTA =====
+        function toggleView(view) {
+            const buttons = document.querySelectorAll('.view-controls .btn-group button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            const clickedButton = event.target.closest('button');
+            if (clickedButton) {
+                clickedButton.classList.add('active');
+            }
+            
+            currentView = view;
+            
+            // Aquí se puede implementar la lógica para cambiar entre tabla y cards
+            if (view === 'card') {
+                // TODO: Implementar vista de tarjetas
+                console.log('Vista de tarjetas seleccionada');
+            } else {
+                // Vista de tabla (actual)
+                console.log('Vista de tabla seleccionada');
+            }
+        }
+
+        // ===== FILTROS =====
+        function initializeFilters() {
+            const form = document.getElementById('filtrosForm');
+            const selects = form.querySelectorAll('select.form-control-modern');
+            const inputs = form.querySelectorAll('input.form-control-modern');
+            
+            // Auto-submit en selects (excepto si es valor vacío)
+            selects.forEach(select => {
+                select.addEventListener('change', function() {
+                    if (this.value !== '') {
+                        showLoadingState();
+                        form.submit();
+                    }
+                });
+            });
+            
+            // Enter en inputs para submit
+            inputs.forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        showLoadingState();
+                        form.submit();
+                    }
+                });
+            });
+            
+            // Toggle de filtros
+            const filterToggle = document.querySelector('[data-bs-target="#filtrosCollapse"]');
+            if (filterToggle) {
+                filterToggle.addEventListener('click', function() {
+                    const icon = this.querySelector('.filters-toggle i');
+                    setTimeout(() => {
+                        const isExpanded = this.getAttribute('aria-expanded') === 'true';
+                        icon.className = isExpanded ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+                    }, 150);
+                });
+            }
+        }
+
+        function clearFilters() {
+            const form = document.getElementById('filtrosForm');
+            const inputs = form.querySelectorAll('input, select');
+            
+            inputs.forEach(input => {
+                if (input.type === 'checkbox') {
+                    input.checked = false;
+                } else {
+                    input.value = '';
+                }
+            });
+            
+            showLoadingState();
+            window.location.href = '@Url.Action("Index")';
+        }
+
+        // ===== ANIMACIONES Y EFECTOS =====
+        function initializeTableAnimations() {
+            const rows = document.querySelectorAll('.table-row');
+            
+            rows.forEach((row, index) => {
+                // Animación de entrada escalonada
+                row.style.animationDelay = `${index * 0.05}s`;
+                row.classList.add('table-row-animate');
+                
+                // Hover effects mejorados
+                row.addEventListener('mouseenter', function() {
+                    this.classList.add('row-hover');
+                });
+                
+                row.addEventListener('mouseleave', function() {
+                    this.classList.remove('row-hover');
+                });
+            });
+        }
+
+        function initializeTooltips() {
+            if (typeof bootstrap !== 'undefined' && !tooltipsInitialized) {
+                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                tooltipTriggerList.map(function(tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl, {
+                        trigger: 'hover',
+                        delay: { show: 500, hide: 100 }
+                    });
+                });
+                tooltipsInitialized = true;
+            }
+        }
+
+        function initializeViewControls() {
+            const viewButtons = document.querySelectorAll('.view-controls button');
+            
+            viewButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Efecto de pulsación
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+        }
+
+        // ===== ESTADOS DE CARGA =====
+        function showLoadingState() {
+            const submitBtn = document.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                const originalContent = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> <span class="btn-text">Buscando...</span>';
+                
+                // Restore button after a reasonable time
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalContent;
+                }, 5000);
+            }
+        }
+
+        // ===== UTILIDADES =====
+        function confirmDelete(grupoNombre, deleteUrl) {
+            if (confirm(`¿Está seguro de eliminar el grupo "${grupoNombre}"?\n\nEsta acción no se puede deshacer.`)) {
+                window.location.href = deleteUrl;
+            }
+        }
+
+        function exportarEstudiantes(grupoId, grupoNombre) {
+            const loadingToast = showToast('info', 'Preparando exportación...', false);
+            
+            fetch(`@Url.Action("ExportarEstudiantesExcel")?id=${grupoId}`)
+                .then(response => {
+                    if (response.ok) {
+                        return response.blob();
+                    }
+                    throw new Error('Error en la exportación');
+                })
+                .then(blob => {
+                    // Crear enlace de descarga
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `estudiantes_${grupoNombre}_${new Date().toISOString().slice(0,10)}.xlsx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    
+                    hideToast(loadingToast);
+                    showToast('success', 'Archivo exportado correctamente');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    hideToast(loadingToast);
+                    showToast('error', 'Error al exportar el archivo');
+                });
+        }
+
+        function showToast(type, message, autoHide = true) {
+            // Implementación básica de toast - se puede mejorar con Bootstrap Toast
+            const toastContainer = document.getElementById('toast-container') || createToastContainer();
+            
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
+            toast.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            if (autoHide) {
+                setTimeout(() => hideToast(toast), 5000);
+            }
+            
+            return toast;
+        }
+
+        function hideToast(toast) {
+            if (toast && toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }
+
+        function createToastContainer() {
+            const container = document.createElement('div');
+            container.id = 'toast-container';
+            container.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 350px;';
+            document.body.appendChild(container);
+            return container;
+        }
+
+        // ===== EVENTOS GLOBALES =====
+        window.toggleView = toggleView;
+        window.clearFilters = clearFilters;
+        window.confirmDelete = confirmDelete;
+        window.exportarEstudiantes = exportarEstudiantes;
+    </script>
+}
+
+@section Styles {
+    <style>
+        /* ===== IMPORTACIÓN DE FUENTES ===== */
+        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        /* ===== VARIABLES CSS GLOBALES ===== */
+        :root {
+            /* Paleta de colores */
+            --color-primary: #3b82f6;
+            --color-primary-hover: #2563eb;
+            --color-secondary: #6b7280;
+            --color-text-primary: #1f2937;
+            --color-background-page: #f3f4f6;
+            --color-background-card: #ffffff;
+            --color-footer-bg: #2a599b;
+            --color-border: #e5e7eb;
+            
+            /* Colores de estado */
+            --color-success: #22c55e;
+            --color-warning: #f59e0b;
+            --color-danger: #ef4444;
+            --color-info: #3b82f6;
+            
+            /* Espaciado */
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            
+            /* Bordes redondeados */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            
+            /* Sombras */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            /* Transiciones */
+            --transition-fast: 0.15s ease-in-out;
+            --transition-normal: 0.3s ease-in-out;
+            --transition-slow: 0.5s ease-in-out;
+        }
+
+        /* ===== ESTRUCTURA BASE ===== */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-background-page);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+        }
+
+        /* ===== COMPONENTES DE TARJETAS ===== */
+        .card-generic {
+            background-color: var(--color-background-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--color-border);
+            transition: var(--transition-normal);
+        }
+
+        .card-generic:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .card-header-generic {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--color-border);
+            background-color: #f8f9fa;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+
+        .card-body-generic {
+            padding: var(--spacing-lg);
+        }
+
+        .card-title-generic {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        /* ===== COMPONENTES DE BOTONES ===== */
+        .btn-generic {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: 0.625rem 1.25rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            border-radius: var(--radius-md);
+            border: 1px solid transparent;
+            text-decoration: none;
+            transition: var(--transition-normal);
+            cursor: pointer;
+            line-height: 1.5;
+        }
+
+        .btn-primary-generic {
+            background-color: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        .btn-primary-generic:hover {
+            background-color: var(--color-primary-hover);
+            border-color: var(--color-primary-hover);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary-generic {
+            background-color: transparent;
+            color: var(--color-secondary);
+            border-color: var(--color-border);
+        }
+
+        .btn-secondary-generic:hover {
+            background-color: var(--color-background-page);
+            color: var(--color-text-primary);
+            border-color: var(--color-secondary);
+        }
+
+        .btn-outline-info-generic {
+            background-color: transparent;
+            color: var(--color-info);
+            border-color: var(--color-info);
+        }
+
+        .btn-outline-info-generic:hover {
+            background-color: var(--color-info);
+            color: white;
+        }
+
+        .btn-small-generic {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+            border-radius: var(--radius-sm);
+        }
+
+        .btn-group-generic {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        /* ===== COMPONENTES DE TABLAS ===== */
+        .table-container-generic {
+            background-color: var(--color-background-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            border: 1px solid var(--color-border);
+        }
+
+        .table-generic {
+            width: 100%;
+            margin-bottom: 0;
+            border-collapse: collapse;
+        }
+
+        .table-generic thead th {
+            background-color: #f8f9fa;
+            color: var(--color-text-primary);
+            font-weight: 600;
+            font-size: 0.875rem;
+            padding: var(--spacing-md);
+            border-bottom: 2px solid var(--color-border);
+            text-align: left;
+        }
+
+        .table-generic tbody td {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--color-border);
+            vertical-align: middle;
+        }
+
+        .table-generic tbody tr {
+            transition: var(--transition-fast);
+        }
+
+        .table-generic tbody tr:hover {
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+
+        .table-responsive-generic {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* ===== COMPONENTES DE FORMULARIOS ===== */
+        .form-group-generic {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-label-generic {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-weight: 500;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-sm);
+            font-size: 0.875rem;
+        }
+
+        .form-control-generic {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            font-size: 0.875rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background-color: var(--color-background-card);
+            color: var(--color-text-primary);
+            transition: var(--transition-normal);
+        }
+
+        .form-control-generic:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-check-generic {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .form-check-input-generic {
+            width: 1.125rem;
+            height: 1.125rem;
+            border-radius: var(--radius-sm);
+        }
+
+        .form-check-label-generic {
+            font-weight: 500;
+            color: var(--color-text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        /* ===== COMPONENTES DE BADGES ===== */
+        .badge-generic {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .badge-primary-generic {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--color-primary);
+        }
+
+        .badge-success-generic {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: var(--color-success);
+        }
+
+        .badge-warning-generic {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--color-warning);
+        }
+
+        .badge-danger-generic {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--color-danger);
+        }
+
+        .badge-secondary-generic {
+            background-color: rgba(107, 114, 128, 0.1);
+            color: var(--color-secondary);
+        }
+
+        .status-badge-generic {
+            border-radius: var(--radius-lg);
+            font-weight: 500;
+        }
+
+        /* ===== COMPONENTES DE ESTADÍSTICAS ===== */
+        .stats-container-generic {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .stat-card-generic {
+            background-color: var(--color-background-card);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--color-border);
+            transition: var(--transition-normal);
+            text-align: center;
+        }
+
+        .stat-card-generic:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .stat-icon-generic {
+            font-size: 2.5rem;
+            margin-bottom: var(--spacing-md);
+            opacity: 0.9;
+        }
+
+        .stat-number-generic {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .stat-label-generic {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--color-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ===== COMPONENTES DE NAVEGACIÓN ===== */
+        .breadcrumb-white {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .breadcrumb-white .breadcrumb-item + .breadcrumb-item::before {
+            color: rgba(255, 255, 255, 0.7);
+            content: ">";
+        }
+
+        .breadcrumb-white .breadcrumb-item a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: var(--transition-fast);
+        }
+
+        .breadcrumb-white .breadcrumb-item a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        .breadcrumb-white .breadcrumb-item.active {
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        /* ===== ESTADO VACÍO ===== */
+        .empty-state-generic {
+            text-align: center;
+            padding: var(--spacing-2xl);
+        }
+
+        .empty-state-icon-generic {
+            font-size: 4rem;
+            color: var(--color-secondary);
+            margin-bottom: var(--spacing-lg);
+            opacity: 0.6;
+        }
+
+        .empty-state-title-generic {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .empty-state-text-generic {
+            color: var(--color-secondary);
+            margin-bottom: var(--spacing-lg);
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ===== PAGINACIÓN ===== */
+        .pagination-container-generic {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: var(--spacing-xl);
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+
+        .pagination-info-generic {
+            color: var(--color-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* ===== UTILIDADES ===== */
+        .text-muted-white {
+            color: white !important;
+        }
+
+        .text-center-generic {
+            text-align: center;
+        }
+
+        .mb-generic {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .mt-generic {
+            margin-top: var(--spacing-lg);
+        }
+
+        .p-generic {
+            padding: var(--spacing-md);
+        }
+
+        .rounded-generic {
+            border-radius: var(--radius-md);
+        }
+
+        .shadow-generic {
+            box-shadow: var(--shadow-md);
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @@media (max-width: 768px) {
+            .stats-container-generic {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-group-generic {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .btn-generic {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .table-responsive-generic {
+                font-size: 0.875rem;
+            }
+            
+            .pagination-container-generic {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .card-body-generic {
+                padding: var(--spacing-md);
+            }
+            
+            .stat-card-generic {
+                padding: var(--spacing-md);
+            }
+            
+            .stat-number-generic {
+                font-size: 1.5rem;
+            }
+            
+            .stat-icon-generic {
+                font-size: 2rem;
+            }
+        }
+
+        /* ===== INTEGRACIÓN CON BOOTSTRAP (COMPATIBILIDAD) ===== */
+        .modern-card {
+            background-color: var(--color-background-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--color-border);
+            transition: var(--transition-normal);
+        }
+
+        .modern-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .stat-card {
+            background-color: var(--color-background-card);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--color-border);
+            transition: var(--transition-normal);
+            text-align: center;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .table {
+            width: 100%;
+            margin-bottom: 0;
+            border-collapse: collapse;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: 0.625rem 1.25rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            border-radius: var(--radius-md);
+            background-color: var(--color-primary);
+            color: white;
+            border: 1px solid var(--color-primary);
+            text-decoration: none;
+            transition: var(--transition-normal);
+            cursor: pointer;
+            line-height: 1.5;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-primary-hover);
+            border-color: var(--color-primary-hover);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .text-muted {
+            color: white !important;
+        }
+
+        /* ===== MEJORAS ESPECÍFICAS PARA GRUPOS ESTUDIANTES ===== */
+        .grupos-header-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            align-items: center;
+        }
+
+        .grupos-filter-section {
+            background: var(--color-background-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .grupos-table-actions {
+            display: flex;
+            gap: 2px;
+            justify-content: center;
+        }
+
+        .grupos-table-actions .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            border-radius: var(--radius-sm);
+        }
+
+        .grupos-badge-tipo {
+            font-weight: 600;
+            padding: 0.375rem 0.75rem;
+            border-radius: var(--radius-md);
+        }
+
+        /* Colores específicos para tipos de grupo */
+        .badge-tipo-seccion {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--color-primary);
+        }
+
+        .badge-tipo-nivel {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: var(--color-success);
+        }
+
+        .badge-tipo-modalidad {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--color-warning);
+        }
+
+        .badge-tipo-custom {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--color-danger);
+        }
+
+        /* Additional specific component styles */
+        .grupos-badge-tipo {
+            font-weight: 600;
+            letter-spacing: 0.025em;
+        }
+
+        .badge-tipo-seccion {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        .badge-tipo-nivel {
+            background-color: var(--color-info);
+            color: white;
+        }
+
+        .badge-tipo-modalidad {
+            background-color: var(--color-success);
+            color: white;
+        }
+
+        .badge-tipo-custom {
+            background-color: var(--color-warning);
+            color: var(--color-dark);
+        }
+
+        .status-badge-generic {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .grupos-table-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-xs);
+            justify-content: center;
+        }
+
+        .grupos-table-actions .btn-generic {
+            min-width: 2rem;
+            min-height: 2rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .text-muted-white {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+
+        .text-center-generic {
+            text-align: center;
+        }
+
+        /* Responsive adjustments for groups table */
+        @@media (max-width: 768px) {
+            .grupos-table-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .grupos-table-actions .btn-generic {
+                justify-content: flex-start;
+                padding-left: var(--spacing-sm);
+            }
+
+            .table-generic th,
+            .table-generic td {
+                font-size: 0.8rem;
+                padding: var(--spacing-xs);
+            }
+
+            .stats-container-generic {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .filters-generic .form-group-generic {
+                margin-bottom: var(--spacing-sm);
+            }
+
+            .badge-generic {
+                font-size: 0.65rem;
+            }
+        }
+    </style>
+}
+
+@functions {
+    private string GenerarUrlPaginacion(int pagina)
+    {
+        var routeValues = new RouteValueDictionary
+        {
+            ["pagina"] = pagina
+        };
+
+        // Agregar filtros a la URL
+        if (Model.Filtros.PeriodoAcademicoId.HasValue)
+            routeValues["Filtros.PeriodoAcademicoId"] = Model.Filtros.PeriodoAcademicoId;
+        
+        if (!string.IsNullOrEmpty(Model.Filtros.Codigo))
+            routeValues["Filtros.Codigo"] = Model.Filtros.Codigo;
+        
+        if (!string.IsNullOrEmpty(Model.Filtros.Nombre))
+            routeValues["Filtros.Nombre"] = Model.Filtros.Nombre;
+        
+        if (Model.Filtros.TipoGrupo.HasValue)
+            routeValues["Filtros.TipoGrupo"] = Model.Filtros.TipoGrupo;
+        
+        if (Model.Filtros.Estado.HasValue)
+            routeValues["Filtros.Estado"] = Model.Filtros.Estado;
+
+        return Url.Action("Index", routeValues) ?? "#";
+    }
+}
+   
+    

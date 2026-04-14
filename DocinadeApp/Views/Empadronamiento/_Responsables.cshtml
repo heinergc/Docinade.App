@@ -1,0 +1,121 @@
+@model RubricasApp.Web.ViewModels.EstudianteEmpadronamientoViewModel
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.NombrePadre" class="form-label">
+                <i class="mdi mdi-account me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.NombrePadre)
+            </label>
+            <input asp-for="DatosEmpadronamiento.NombrePadre" class="form-control" 
+                   placeholder="Nombre completo del padre" />
+            <span asp-validation-for="DatosEmpadronamiento.NombrePadre" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.NombreMadre" class="form-label">
+                <i class="mdi mdi-account me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.NombreMadre)
+            </label>
+            <input asp-for="DatosEmpadronamiento.NombreMadre" class="form-control" 
+                   placeholder="Nombre completo de la madre" />
+            <span asp-validation-for="DatosEmpadronamiento.NombreMadre" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.NombreTutor" class="form-label">
+                <i class="mdi mdi-account-supervisor me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.NombreTutor)
+            </label>
+            <input asp-for="DatosEmpadronamiento.NombreTutor" class="form-control" 
+                   placeholder="Nombre completo del tutor legal (si aplica)" />
+            <div class="form-text">
+                <i class="mdi mdi-information-outline me-1"></i>
+                Solo llenar si el estudiante está bajo tutela legal
+            </div>
+            <span asp-validation-for="DatosEmpadronamiento.NombreTutor" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+<hr class="my-4">
+
+<h6 class="mb-3">
+    <i class="mdi mdi-alert-circle-outline me-2 text-danger"></i>
+    Contacto de Emergencia
+</h6>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.ContactoEmergencia" class="form-label">
+                <i class="mdi mdi-account-heart me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.ContactoEmergencia)
+                <span class="text-danger">*</span>
+            </label>
+            <input asp-for="DatosEmpadronamiento.ContactoEmergencia" class="form-control" 
+                   placeholder="Nombre de la persona de emergencia" required />
+            <span asp-validation-for="DatosEmpadronamiento.ContactoEmergencia" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.TelefonoEmergencia" class="form-label">
+                <i class="mdi mdi-phone-alert me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.TelefonoEmergencia)
+                <span class="text-danger">*</span>
+            </label>
+            <input asp-for="DatosEmpadronamiento.TelefonoEmergencia" class="form-control" 
+                   placeholder="Ej: +506 8888-8888" required />
+            <span asp-validation-for="DatosEmpadronamiento.TelefonoEmergencia" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label asp-for="DatosEmpadronamiento.RelacionEmergencia" class="form-label">
+                <i class="mdi mdi-heart me-1"></i>
+                @Html.DisplayNameFor(m => m.DatosEmpadronamiento.RelacionEmergencia)
+                <span class="text-danger">*</span>
+            </label>
+            <select asp-for="DatosEmpadronamiento.RelacionEmergencia" class="form-select" required>
+                <option value="">Seleccione...</option>
+                <option value="Padre">Padre</option>
+                <option value="Madre">Madre</option>
+                <option value="Hermano/a">Hermano/a</option>
+                <option value="Abuelo/a">Abuelo/a</option>
+                <option value="Tío/a">Tío/a</option>
+                <option value="Primo/a">Primo/a</option>
+                <option value="Esposo/a">Esposo/a</option>
+                <option value="Compañero/a">Compañero/a</option>
+                <option value="Amigo/a">Amigo/a</option>
+                <option value="Tutor legal">Tutor legal</option>
+                <option value="Otro familiar">Otro familiar</option>
+                <option value="Otro">Otro</option>
+            </select>
+            <span asp-validation-for="DatosEmpadronamiento.RelacionEmergencia" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-warning mt-3">
+    <h6><i class="mdi mdi-alert-triangle-outline me-2"></i>Importante - Contacto de Emergencia</h6>
+    <ul class="mb-0">
+        <li>Debe ser una persona mayor de edad y disponible las 24 horas</li>
+        <li>Preferiblemente que resida en Costa Rica o tenga fácil acceso al país</li>
+        <li>Esta persona será contactada en caso de emergencias médicas o académicas</li>
+        <li>Asegúrese de que los datos de contacto estén actualizados</li>
+    </ul>
+</div>
+
+<div class="alert alert-info mt-3">
+    <h6><i class="mdi mdi-information-outline me-2"></i>Nota sobre Responsables</h6>
+    <p class="mb-0">
+        La información de los responsables es importante para trámites académicos, becas y comunicaciones oficiales.
+        Para estudiantes menores de edad, al menos uno de los padres o el tutor legal debe estar registrado.
+    </p>
+</div>

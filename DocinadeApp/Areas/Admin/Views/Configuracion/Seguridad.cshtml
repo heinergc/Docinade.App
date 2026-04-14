@@ -1,0 +1,563 @@
+@model RubricasApp.Web.ViewModels.Admin.SecurityViewModel
+
+@{
+    ViewData["Title"] = "Configuración de Seguridad";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Home", new { area = "" })">
+                    <i class="fas fa-home"></i> Inicio
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index")">
+                    <i class="fas fa-cogs"></i> Configuración
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-shield-alt"></i> Seguridad
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="mb-0">
+                <i class="fas fa-shield-alt text-danger"></i>
+                Configuración de Seguridad
+            </h2>
+            <p class="text-muted mt-2">Configurar políticas de seguridad y autenticación del sistema</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    <form asp-action="Seguridad" method="post">
+        @Html.AntiForgeryToken()
+        
+        <div class="row">
+            <!-- Políticas de Contraseñas -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-key"></i>
+                            Políticas de Contraseñas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group mb-3">
+                            <label asp-for="LongitudMinimaPassword" class="form-label required">
+                                Longitud Mínima de Contraseña
+                            </label>
+                            <input asp-for="LongitudMinimaPassword" type="number" class="form-control" 
+                                min="6" max="32" />
+                            <span asp-validation-for="LongitudMinimaPassword" class="text-danger"></span>
+                            <small class="form-text text-muted">Entre 6 y 32 caracteres</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input asp-for="RequiereLetrasMayusculas" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label" asp-for="RequiereLetrasMayusculas">
+                                    Requiere letras mayúsculas (A-Z)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input asp-for="RequiereLetrasMinusculas" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label" asp-for="RequiereLetrasMinusculas">
+                                    Requiere letras minúsculas (a-z)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input asp-for="RequiereNumeros" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label" asp-for="RequiereNumeros">
+                                    Requiere números (0-9)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input asp-for="RequiereCaracteresEspeciales" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label" asp-for="RequiereCaracteresEspeciales">
+                                    Requiere caracteres especiales 
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="DiasExpiracionPassword" class="form-label">
+                                Días para Expiración de Contraseña
+                            </label>
+                            <input asp-for="DiasExpiracionPassword" type="number" class="form-control" 
+                                min="0" max="365" placeholder="90" />
+                            <span asp-validation-for="DiasExpiracionPassword" class="text-danger"></span>
+                            <small class="form-text text-muted">0 = Sin expiración, máximo 365 días</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="HistorialPasswords" class="form-label">
+                                Recordar Últimas Contraseñas
+                            </label>
+                            <input asp-for="HistorialPasswords" type="number" class="form-control" 
+                                min="0" max="12" placeholder="5" />
+                            <span asp-validation-for="HistorialPasswords" class="text-danger"></span>
+                            <small class="form-text text-muted">Evita reutilizar las últimas N contraseñas</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuración de Bloqueos -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">
+                            <i class="fas fa-lock"></i>
+                            Bloqueo de Cuentas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input asp-for="BloqueoAutomatico" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label" asp-for="BloqueoAutomatico">
+                                    Habilitar bloqueo automático de cuentas
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="MaximosIntentos" class="form-label">
+                                Máximo Intentos Fallidos
+                            </label>
+                            <input asp-for="MaximosIntentos" type="number" class="form-control" 
+                                min="3" max="10" />
+                            <span asp-validation-for="MaximosIntentos" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="TiempoBloqueo" class="form-label">
+                                Tiempo de Bloqueo (minutos)
+                            </label>
+                            <input asp-for="TiempoBloqueo" type="number" class="form-control" 
+                                min="5" max="1440" />
+                            <span asp-validation-for="TiempoBloqueo" class="text-danger"></span>
+                            <small class="form-text text-muted">Entre 5 minutos y 24 horas</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input asp-for="NotificarBloqueos" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label" asp-for="NotificarBloqueos">
+                                    Notificar por email cuando se bloquee una cuenta
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input asp-for="BloqueoTemporal" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label" asp-for="BloqueoTemporal">
+                                    Bloqueo temporal (se desbloquea automáticamente)
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">Si está deshabilitado, requiere intervención manual del administrador</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Autenticación de Dos Factores -->
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-mobile-alt"></i>
+                            Autenticación de Dos Factores (2FA)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input asp-for="Habilitar2FA" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label" asp-for="Habilitar2FA">
+                                    Habilitar autenticación de dos factores
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input asp-for="Requerir2FAAdmins" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label" asp-for="Requerir2FAAdmins">
+                                    Requerir 2FA para administradores
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="TiempoValidezCodigo" class="form-label">
+                                Tiempo de Validez del Código (minutos)
+                            </label>
+                            <input asp-for="TiempoValidezCodigo" type="number" class="form-control" 
+                                min="1" max="15" />
+                            <span asp-validation-for="TiempoValidezCodigo" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuración de Sesiones -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-clock"></i>
+                            Configuración de Sesiones
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group mb-3">
+                            <label asp-for="TiempoInactividadSesion" class="form-label">
+                                Tiempo de Inactividad de Sesión (minutos)
+                            </label>
+                            <input asp-for="TiempoInactividadSesion" type="number" class="form-control" 
+                                min="5" max="480" />
+                            <span asp-validation-for="TiempoInactividadSesion" class="text-danger"></span>
+                            <small class="form-text text-muted">Tiempo antes de cerrar sesión por inactividad</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="MaximoSesionesSimultaneas" class="form-label">
+                                Máximo Sesiones Simultáneas por Usuario
+                            </label>
+                            <input asp-for="MaximoSesionesSimultaneas" type="number" class="form-control" 
+                                min="1" max="10" />
+                            <span asp-validation-for="MaximoSesionesSimultaneas" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input asp-for="CerrarSesionesInactivas" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label" asp-for="CerrarSesionesInactivas">
+                                    Cerrar automáticamente sesiones inactivas
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input asp-for="LoguearCambiosSesion" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label" asp-for="LoguearCambiosSesion">
+                                    Registrar cambios de sesión en auditoría
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuración de Auditoría y Logs -->
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-search"></i>
+                            Auditoría y Logs
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input asp-for="AuditoriaHabilitada" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label" asp-for="AuditoriaHabilitada">
+                                    Habilitar auditoría del sistema
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input asp-for="LoguearAccesos" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label" asp-for="LoguearAccesos">
+                                    Registrar todos los accesos al sistema
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input asp-for="LoguearCambiosDatos" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label" asp-for="LoguearCambiosDatos">
+                                    Registrar cambios en datos críticos
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="RetencionLogs" class="form-label">
+                                Retención de Logs (días)
+                            </label>
+                            <input asp-for="RetencionLogs" type="number" class="form-control" 
+                                min="30" max="3650" />
+                            <span asp-validation-for="RetencionLogs" class="text-danger"></span>
+                            <small class="form-text text-muted">Entre 30 días y 10 años</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input asp-for="NotificarEventosSeguridad" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label" asp-for="NotificarEventosSeguridad">
+                                    Notificar eventos de seguridad críticos
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuración de Validaciones Adicionales -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-cogs"></i>
+                            Configuraciones Adicionales de Seguridad
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <div class="form-check">
+                                        <input asp-for="ValidarIPAcceso" class="form-check-input" type="checkbox" />
+                                        <label class="form-check-label" asp-for="ValidarIPAcceso">
+                                            Validar dirección IP de acceso
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted">Detecta accesos desde ubicaciones inusuales</small>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <div class="form-check">
+                                        <input asp-for="ForzarHTTPS" class="form-check-input" type="checkbox" />
+                                        <label class="form-check-label" asp-for="ForzarHTTPS">
+                                            Forzar conexiones HTTPS
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <div class="form-check">
+                                        <input asp-for="ValidarDispositivo" class="form-check-input" type="checkbox" />
+                                        <label class="form-check-label" asp-for="ValidarDispositivo">
+                                            Validar dispositivos conocidos
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted">Solicita verificación en dispositivos nuevos</small>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <div class="form-check">
+                                        <input asp-for="CaptchaLogin" class="form-check-input" type="checkbox" />
+                                        <label class="form-check-label" asp-for="CaptchaLogin">
+                                            Requerir CAPTCHA en login
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label asp-for="NivelSeguridadMinimo" class="form-label">
+                                        Nivel de Seguridad Mínimo
+                                    </label>
+                                    <select asp-for="NivelSeguridadMinimo" class="form-select">
+                                        <option value="Bajo">Bajo</option>
+                                        <option value="Medio">Medio</option>
+                                        <option value="Alto">Alto</option>
+                                        <option value="Crítico">Crítico</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-footer bg-light">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <button type="button" class="btn btn-outline-warning me-2" onclick="resetSecurityDefaults()">
+                                    <i class="fas fa-undo"></i> Restaurar Predeterminados
+                                </button>
+                                <button type="button" class="btn btn-outline-info" onclick="testSecuritySettings()">
+                                    <i class="fas fa-vial"></i> Probar Configuración
+                                </button>
+                            </div>
+                            <div>
+                                <a href="@Url.Action("Index")" class="btn btn-secondary me-2">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-shield-alt"></i> Guardar Configuración
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        function resetSecurityDefaults() {
+            Swal.fire({
+                title: '¿Restaurar configuración de seguridad?',
+                text: 'Esta acción restablecerá todas las políticas de seguridad a sus valores predeterminados.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Restaurar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Restaurar valores de seguridad por defecto
+                    $('#LongitudMinimaPassword').val(8);
+                    $('#RequiereLetrasMayusculas').prop('checked', true);
+                    $('#RequiereLetrasMinusculas').prop('checked', true);
+                    $('#RequiereNumeros').prop('checked', true);
+                    $('#RequiereCaracteresEspeciales').prop('checked', false);
+                    $('#DiasExpiracionPassword').val(90);
+                    $('#HistorialPasswords').val(5);
+                    $('#BloqueoAutomatico').prop('checked', true);
+                    $('#MaximosIntentos').val(5);
+                    $('#TiempoBloqueo').val(30);
+                    $('#NotificarBloqueos').prop('checked', true);
+                    $('#BloqueoTemporal').prop('checked', true);
+                    $('#Habilitar2FA').prop('checked', false);
+                    $('#Requerir2FAAdmins').prop('checked', true);
+                    $('#TiempoValidezCodigo').val(5);
+                    $('#TiempoInactividadSesion').val(30);
+                    $('#MaximoSesionesSimultaneas').val(3);
+                    $('#CerrarSesionesInactivas').prop('checked', true);
+                    $('#LoguearCambiosSesion').prop('checked', true);
+                    $('#AuditoriaHabilitada').prop('checked', true);
+                    $('#LoguearAccesos').prop('checked', true);
+                    $('#LoguearCambiosDatos').prop('checked', true);
+                    $('#RetencionLogs').val(365);
+                    $('#NotificarEventosSeguridad').prop('checked', true);
+                    $('#ValidarIPAcceso').prop('checked', false);
+                    $('#ForzarHTTPS').prop('checked', true);
+                    $('#ValidarDispositivo').prop('checked', false);
+                    $('#CaptchaLogin').prop('checked', false);
+                    $('#NivelSeguridadMinimo').val('Medio');
+                    
+                    toastr.success('Configuración de seguridad restaurada a valores predeterminados');
+                }
+            });
+        }
+
+        function testSecuritySettings() {
+            const settings = {
+                longitudMinima: $('#LongitudMinimaPassword').val(),
+                requiereMayusculas: $('#RequiereLetrasMayusculas').is(':checked'),
+                requiereMinusculas: $('#RequiereLetrasMinusculas').is(':checked'),
+                requiereNumeros: $('#RequiereNumeros').is(':checked'),
+                requiereEspeciales: $('#RequiereCaracteresEspeciales').is(':checked')
+            };
+
+            let testPassword = 'Test123';
+            if (settings.requiereEspeciales) testPassword += '!';
+
+            Swal.fire({
+                title: 'Prueba de Configuración de Contraseña',
+                html: `
+                    <div class="text-start">
+                        <p><strong>Contraseña de prueba:</strong> <code>${testPassword}</code></p>
+                        <hr>
+                        <ul class="list-unstyled">
+                            <li><i class="fas ${testPassword.length >= settings.longitudMinima ? 'fa-check text-success' : 'fa-times text-danger'}"></i> 
+                                Longitud mínima (${settings.longitudMinima}): ${testPassword.length} caracteres</li>
+                            <li><i class="fas ${!settings.requiereMayusculas || /[A-Z]/.test(testPassword) ? 'fa-check text-success' : 'fa-times text-danger'}"></i> 
+                                Letras mayúsculas: ${settings.requiereMayusculas ? 'Requeridas' : 'Opcionales'}</li>
+                            <li><i class="fas ${!settings.requiereMinusculas || /[a-z]/.test(testPassword) ? 'fa-check text-success' : 'fa-times text-danger'}"></i> 
+                                Letras minúsculas: ${settings.requiereMinusculas ? 'Requeridas' : 'Opcionales'}</li>
+                            <li><i class="fas ${!settings.requiereNumeros || /[0-9]/.test(testPassword) ? 'fa-check text-success' : 'fa-times text-danger'}"></i> 
+                                Números: ${settings.requiereNumeros ? 'Requeridos' : 'Opcionales'}</li>
+                            <li><i class="fas ${!settings.requiereEspeciales || /[!^&*]/.test(testPassword) ? 'fa-check text-success' : 'fa-times text-danger'}"></i> 
+                                Caracteres especiales: ${settings.requiereEspeciales ? 'Requeridos' : 'Opcionales'}</li>
+                        </ul>
+                    </div>
+                `,
+                icon: 'info',
+                width: '600px'
+            });
+        }
+
+        // Mostrar/ocultar configuraciones dependientes
+        $(document).ready(function() {
+            function toggleDependentFields() {
+                const bloqueoAutomatico = $('#BloqueoAutomatico').is(':checked');
+                $('#MaximosIntentos, #TiempoBloqueo').closest('.form-group').toggle(bloqueoAutomatico);
+                
+                const habilitar2FA = $('#Habilitar2FA').is(':checked');
+                $('#Requerir2FAAdmins, #TiempoValidezCodigo').closest('.form-group').toggle(habilitar2FA);
+            }
+
+            $('#BloqueoAutomatico, #Habilitar2FA').on('change', toggleDependentFields);
+            toggleDependentFields();
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .required::after {
+            content: ' *';
+            color: red;
+        }
+        
+        .card {
+            border: none;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-check-input:checked {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+    </style>
+}

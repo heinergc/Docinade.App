@@ -1,0 +1,136 @@
+﻿@model RubricasApp.Web.ViewModels.Admin.PermissionMatrixViewModel
+
+@{
+    ViewData["Title"] = "Matriz de Permisos - Impresión";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Matriz de Permisos - Sistema de Rúbricas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            font-size: 11px;
+        }
+
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+
+        .info {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #333;
+            padding: 4px;
+            text-align: left;
+            font-size: 9px;
+        }
+
+        th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .category {
+            font-weight: bold;
+            color: #0066cc;
+        }
+
+        .yes {
+            background-color: #d4edda;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .no {
+            background-color: #f8d7da;
+            text-align: center;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 9px;
+            color: #666;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+
+        @@page {
+            margin: 1cm;
+        }
+    </style>
+</head>
+<body>
+    <h1>Matriz de Permisos del Sistema</h1>
+
+    <div class="info">
+        <p><strong>Generado:</strong> @Model.GeneratedDate.ToString("dd/MM/yyyy HH:mm:ss")</p>
+        <p><strong>Total Permisos:</strong> @Model.Matrix.Count | <strong>Total Roles:</strong> @Model.Roles.Count</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 15%;">Categoría</th>
+                <th style="width: 25%;">Permiso</th>
+                <th style="width: 35%;">Descripción</th>
+                @foreach (var role in Model.Roles.OrderBy(r => r))
+                {
+                    <th style="width: 5%;">@role</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var permission in Model.Matrix.OrderBy(m => m.Category).ThenBy(m => m.Permission))
+            {
+                <tr>
+                    <td class="category">@permission.Category</td>
+                    <td>@permission.Permission</td>
+                    <td>@permission.Description</td>
+                    @foreach (var role in Model.Roles.OrderBy(r => r))
+                    {
+                        @if (permission.RoleAssignments.ContainsKey(role) && permission.RoleAssignments[role])
+                        {
+                            <td class="yes">SÍ</td>
+                        }
+                        else
+                        {
+                            <td class="no">NO</td>
+                        }
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p><strong>Leyenda:</strong></p>
+        <p>• SÍ = Permiso asignado al rol | • NO = Permiso NO asignado al rol</p>
+        <p>Sistema de Rúbricas - Matriz generada automáticamente</p>
+    </div>
+
+    <script>
+        // Auto-imprimir cuando se carga la página
+        window.onload = function() {
+            window.print();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+﻿@model RubricasApp.Web.ViewModels.SeleccionarPeriodoViewModel
+
+@{
+    ViewData["Title"] = "Seleccionar Período Académico";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            
+            @if (Model.MostrarMensajeBienvenida)
+            {
+                <div class="card border-primary mb-4">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-calendar-alt"></i> ¡Bienvenido!
+                        </h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <p class="card-text">
+                            Para comenzar a trabajar en el sistema, necesita seleccionar 
+                            el período académico con el que desea trabajar.
+                        </p>
+                        <p class="text-muted mb-0">
+                            Este período se aplicará a todos los datos que vea en el sistema.
+                        </p>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">
+                            <i class="fas fa-calendar-check"></i> Cambiar Período Académico
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">
+                            Seleccione el período académico con el que desea trabajar. 
+                            Todos los datos del sistema se filtrarán según su selección.
+                        </p>
+                    </div>
+                </div>
+            }
+
+            @if (!Model.TienePeriodosDisponibles)
+            {
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>No hay períodos académicos disponibles.</strong>
+                    <br>
+                    Contacte al administrador del sistema para que configure los períodos académicos.
+                </div>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list"></i> Períodos Académicos Disponibles
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="Establecer" method="post">
+                            <input type="hidden" name="returnUrl" value="@Model.UrlRetorno" />
+                            @Html.AntiForgeryToken()
+                            
+                            <div class="row">
+                                @foreach (var periodo in Model.PeriodosDisponibles)
+                                {
+                                    <div class="col-12 mb-3">
+                                        <div class="card periodo-card @(periodo.Id == Model.PeriodoActivoId ? "border-success" : "border-light")" 
+                                             style="cursor: pointer;"
+                                             onclick="seleccionarPeriodo(@periodo.Id)">
+                                            <div class="card-body">
+                                                <div class="row align-items-center">
+                                                    <div class="col-1">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" 
+                                                                   type="radio" 
+                                                                   name="periodoId" 
+                                                                   value="@periodo.Id" 
+                                                                   id="periodo_@periodo.Id"
+                                                                   @(periodo.Id == Model.PeriodoActivoId ? "checked" : "")>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col">
+                                                        <h6 class="mb-1">
+                                                            @periodo.NombreCompleto
+                                                            @if (periodo.Id == Model.PeriodoActivoId)
+                                                            {
+                                                                <span class="badge bg-success ms-2">Actual</span>
+                                                            }
+                                                        </h6>
+                                                        <p class="text-muted mb-0">
+                                                            <i class="fas fa-calendar"></i>
+                                                            @periodo.FechaInicio.ToString("dd/MM/yyyy") - 
+                                                            @periodo.FechaFin.ToString("dd/MM/yyyy")
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <span class="badge bg-@(periodo.Estado == "ACTIVO" ? "success" : "secondary")">
+                                                            @periodo.Estado
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                @if (!Model.MostrarMensajeBienvenida)
+                                {
+                                    <a href="@(Model.UrlRetorno ?? Url.Action("Index", "Home"))" 
+                                       class="btn btn-outline-secondary me-md-2">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </a>
+                                }
+                                <button type="submit" class="btn btn-primary" id="btnEstablecer" disabled>
+                                    <i class="fas fa-check"></i> 
+                                    @(Model.MostrarMensajeBienvenida ? "Comenzar" : "Cambiar Período")
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+
+            @if (Model.PeriodoActivoId.HasValue)
+            {
+                <div class="card mt-3">
+                    <div class="card-body text-center">
+                        <p class="mb-2">
+                            <strong>Período Actual:</strong> 
+                            @Model.PeriodosDisponibles.FirstOrDefault(p => p.Id == Model.PeriodoActivoId)?.NombreCompleto
+                        </p>
+                        <form asp-action="Limpiar" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-warning btn-sm" 
+                                    onclick="return confirm('¿Está seguro de que desea limpiar el período de la sesión?')">
+                                <i class="fas fa-eraser"></i> Limpiar Sesión
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function seleccionarPeriodo(periodoId) {
+            // Marcar el radio button
+            document.getElementById('periodo_' + periodoId).checked = true;
+            
+            // Habilitar el botón de establecer
+            document.getElementById('btnEstablecer').disabled = false;
+            
+            // Actualizar estilos de las cards
+            document.querySelectorAll('.periodo-card').forEach(card => {
+                card.classList.remove('border-primary');
+                card.classList.add('border-light');
+            });
+            
+            event.currentTarget.classList.remove('border-light');
+            event.currentTarget.classList.add('border-primary');
+        }
+
+        // Verificar si hay un período seleccionado al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            const radioSeleccionado = document.querySelector('input[name="periodoId"]:checked');
+            if (radioSeleccionado) {
+                document.getElementById('btnEstablecer').disabled = false;
+            }
+        });
+
+        // Hacer que las cards respondan al hover
+        document.querySelectorAll('.periodo-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('border-primary')) {
+                    this.classList.add('border-info');
+                }
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('border-primary')) {
+                    this.classList.remove('border-info');
+                    this.classList.add('border-light');
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .periodo-card {
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .periodo-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--bs-success);
+        border-color: var(--bs-success);
+    }
+</style>

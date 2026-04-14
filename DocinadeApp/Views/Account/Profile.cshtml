@@ -1,0 +1,222 @@
+﻿@using RubricasApp.Web.ViewModels.Account
+@model ProfileViewModel
+@{
+    ViewData["Title"] = "Mi Perfil";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <!-- Información básica del usuario -->
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-user me-2"></i>
+                    Información Personal
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" 
+                         style="width: 80px; height: 80px; font-size: 2rem;">
+                        @Model.Iniciales
+                    </div>
+                </div>
+                <h5>@Model.NombreCompleto</h5>
+                <p class="text-muted">@Model.Email</p>
+                
+                @if (!string.IsNullOrEmpty(Model.Roles))
+                {
+                    <div class="mb-2">
+                        @foreach (var role in Model.Roles.Split(','))
+                        {
+                            <span class="badge bg-secondary me-1">@role.Trim()</span>
+                        }
+                    </div>
+                }
+
+                <div class="text-muted small">
+                    <div><i class="fas fa-university me-1"></i> @Model.Institucion</div>
+                    @if (!string.IsNullOrEmpty(Model.Departamento))
+                    {
+                        <div><i class="fas fa-building me-1"></i> @Model.Departamento</div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Telefono))
+                    {
+                        <div><i class="fas fa-phone me-1"></i> @Model.Telefono</div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas rápidas -->
+        <div class="card shadow mt-4">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0">
+                    <i class="fas fa-chart-bar me-1"></i>
+                    Estadísticas
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="border-end">
+                            <h4 class="text-primary mb-0">@ViewBag.RubricasCreadas</h4>
+                            <small class="text-muted">Rúbricas</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-success mb-0">@ViewBag.EvaluacionesRealizadas</h4>
+                        <small class="text-muted">Evaluaciones</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <!-- Formulario de edición de perfil -->
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-edit me-2"></i>
+                    Editar Perfil
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Profile" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Nombre" class="form-label">
+                                <i class="fas fa-user me-1"></i>
+                                @Html.DisplayNameFor(m => m.Nombre)
+                            </label>
+                            <input asp-for="Nombre" class="form-control" />
+                            <span asp-validation-for="Nombre" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Apellidos" class="form-label">
+                                <i class="fas fa-user me-1"></i>
+                                @Html.DisplayNameFor(m => m.Apellidos)
+                            </label>
+                            <input asp-for="Apellidos" class="form-control" />
+                            <span asp-validation-for="Apellidos" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label">
+                            <i class="fas fa-envelope me-1"></i>
+                            @Html.DisplayNameFor(m => m.Email)
+                        </label>
+                        <input asp-for="Email" class="form-control" readonly />
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            El email no se puede cambiar. Contacta al administrador si necesitas modificarlo.
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Institucion" class="form-label">
+                                <i class="fas fa-university me-1"></i>
+                                @Html.DisplayNameFor(m => m.Institucion)
+                            </label>
+                            <input asp-for="Institucion" class="form-control" />
+                            <span asp-validation-for="Institucion" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Departamento" class="form-label">
+                                <i class="fas fa-building me-1"></i>
+                                @Html.DisplayNameFor(m => m.Departamento)
+                            </label>
+                            <input asp-for="Departamento" class="form-control" />
+                            <span asp-validation-for="Departamento" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Telefono" class="form-label">
+                            <i class="fas fa-phone me-1"></i>
+                            @Html.DisplayNameFor(m => m.Telefono)
+                        </label>
+                        <input asp-for="Telefono" class="form-control" />
+                        <span asp-validation-for="Telefono" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-1"></i>
+                            Guardar Cambios
+                        </button>
+                        <a asp-action="ChangePassword" class="btn btn-warning">
+                            <i class="fas fa-key me-1"></i>
+                            Cambiar Contraseña
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Información de roles y permisos -->
+        <div class="card shadow mt-4">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0">
+                    <i class="fas fa-shield-alt me-1"></i>
+                    Roles y Permisos
+                </h6>
+            </div>
+            <div class="card-body">
+                @if (!string.IsNullOrEmpty(Model.Roles))
+                {
+                    <div class="row">
+                        @foreach (var role in Model.Roles.Split(','))
+                        {
+                            var roleInfo = GetRoleDescription(role.Trim());
+                            <div class="col-md-6 mb-3">
+                                <div class="border rounded p-3">
+                                    <h6 class="text-primary">
+                                        <i class="fas fa-user-tag me-1"></i>
+                                        @role.Trim()
+                                    </h6>
+                                    <small class="text-muted">@roleInfo</small>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        No tienes roles asignados. Contacta al administrador.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetRoleDescription(string role)
+    {
+        return role switch
+        {
+            "SuperAdministrador" => "Acceso completo al sistema y gestión de todos los aspectos",
+            "Administrador" => "Gestión de usuarios, rúbricas y evaluaciones institucionales",
+            "Coordinador" => "Coordinación de evaluaciones y gestión de equipos docentes",
+            "Docente" => "Creación y aplicación de rúbricas para evaluación de estudiantes",
+            "Evaluador" => "Realización de evaluaciones usando rúbricas existentes",
+            "Observador" => "Visualización de rúbricas y evaluaciones sin capacidad de edición",
+            _ => "Rol personalizado con permisos específicos"
+        };
+    }
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

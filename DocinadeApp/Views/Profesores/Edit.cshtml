@@ -1,0 +1,698 @@
+@model RubricasApp.Web.ViewModels.ProfesorViewModel
+
+@{
+    ViewData["Title"] = "Editar Profesor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="h4 mb-0 text-gray-800">
+                                <i class="fas fa-user-edit"></i> Editar Profesor: @Model.NombreCompleto
+                            </h1>
+                            <p class="mb-0 text-muted">Modificar información del profesor - ID: @Model.Id</p>
+                        </div>
+                        <div>
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-info">
+                                <i class="fas fa-eye"></i> Ver Detalles
+                            </a>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver a Lista
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensajes de TempData -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="fas fa-exclamation-triangle"></i> Error:</strong> @TempData["Error"]
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+        </div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong><i class="fas fa-check-circle"></i> Éxito:</strong> @TempData["Success"]
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+        </div>
+    }
+
+    <!-- Acordeón de secciones editables -->
+    <div class="accordion" id="accordionProfesor">
+        
+        <!-- PASO 1: Información Personal -->
+        <div class="card shadow mb-3">
+            <div class="card-header" id="headingPersonal">
+                <h2 class="mb-0">
+                    <button class="btn btn-link btn-block text-left d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePersonal" aria-expanded="true" aria-controls="collapsePersonal">
+                        <span><i class="fas fa-user text-primary"></i> <strong>Paso 1:</strong> Información Personal</span>
+                        <i class="fas fa-chevron-down text-dark"></i>
+                    </button>
+                </h2>
+            </div>
+            <div id="collapsePersonal" class="collapse show" aria-labelledby="headingPersonal" data-parent="#accordionProfesor">
+                <div class="card-body">
+                    <form asp-action="UpdatePersonal" method="post" id="formPersonal">
+                        @Html.HiddenFor(m => m.Id)
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Nombres">Nombres *</label>
+                                    <input asp-for="Nombres" class="form-control" required />
+                                    <span asp-validation-for="Nombres" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="PrimerApellido">Primer Apellido *</label>
+                                    <input asp-for="PrimerApellido" class="form-control" required />
+                                    <span asp-validation-for="PrimerApellido" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="SegundoApellido">Segundo Apellido</label>
+                                    <input asp-for="SegundoApellido" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Cedula">Cédula *</label>
+                                    <input asp-for="Cedula" class="form-control" required />
+                                    <span asp-validation-for="Cedula" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="TipoCedula">Tipo de Cédula</label>
+                                    <select asp-for="TipoCedula" class="form-control">
+                                        <option value="Nacional">Nacional</option>
+                                        <option value="Residente">Residente</option>
+                                        <option value="Pasaporte">Pasaporte</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="FechaNacimiento">Fecha de Nacimiento *</label>
+                                    <input asp-for="FechaNacimiento" type="date" class="form-control" required />
+                                    <span asp-validation-for="FechaNacimiento" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Sexo">Sexo *</label>
+                                    <select asp-for="Sexo" class="form-control" required>
+                                        <option value="">-- Seleccione --</option>
+                                        <option value="M">Masculino</option>
+                                        <option value="F">Femenino</option>
+                                    </select>
+                                    <span asp-validation-for="Sexo" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="EstadoCivil">Estado Civil</label>
+                                    <select asp-for="EstadoCivil" class="form-control">
+                                        <option value="">-- Seleccione --</option>
+                                        <option value="Soltero">Soltero</option>
+                                        <option value="Casado">Casado</option>
+                                        <option value="Divorciado">Divorciado</option>
+                                        <option value="Viudo">Viudo</option>
+                                        <option value="Union Libre">Unión Libre</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Nacionalidad">Nacionalidad</label>
+                                    <input asp-for="Nacionalidad" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input asp-for="Estado" type="checkbox" class="form-check-input" />
+                                <label asp-for="Estado" class="form-check-label">Profesor activo</label>
+                            </div>
+                        </div>
+
+                        <div class="text-right">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Actualizar Información Personal
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASO 2: Información de Contacto -->
+        <div class="card shadow mb-3">
+            <div class="card-header" id="headingContacto">
+                <h2 class="mb-0">
+                    <button class="btn btn-link btn-block text-left collapsed d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapseContacto" aria-expanded="false" aria-controls="collapseContacto">
+                        <span><i class="fas fa-phone text-info"></i> <strong>Paso 2:</strong> Información de Contacto</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </h2>
+            </div>
+            <div id="collapseContacto" class="collapse" aria-labelledby="headingContacto" data-parent="#accordionProfesor">
+                <div class="card-body">
+                    <form asp-action="UpdateContacto" method="post" id="formContacto">
+                        @Html.HiddenFor(m => m.Id)
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="EmailPersonal">Email Personal *</label>
+                                    <input asp-for="EmailPersonal" type="email" class="form-control" required />
+                                    <span asp-validation-for="EmailPersonal" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="EmailInstitucional">Email Institucional</label>
+                                    <input asp-for="EmailInstitucional" type="email" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="TelefonoFijo">Teléfono Fijo</label>
+                                    <input asp-for="TelefonoFijo" class="form-control" placeholder="2222-2222" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="TelefonoCelular">Teléfono Celular *</label>
+                                    <input asp-for="TelefonoCelular" class="form-control" placeholder="8888-8888" required />
+                                    <span asp-validation-for="TelefonoCelular" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="TelefonoOficina">Teléfono Oficina</label>
+                                    <input asp-for="TelefonoOficina" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-right">
+                            <button type="submit" class="btn btn-info">
+                                <i class="fas fa-save"></i> Actualizar Información de Contacto
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASO 3: Dirección -->
+        <div class="card shadow mb-3">
+            <div class="card-header" id="headingDireccion">
+                <h2 class="mb-0">
+                    <button class="btn btn-link btn-block text-left collapsed d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDireccion" aria-expanded="false" aria-controls="collapseDireccion">
+                        <span><i class="fas fa-map-marker-alt text-success"></i> <strong>Paso 3:</strong> Dirección</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </h2>
+            </div>
+            <div id="collapseDireccion" class="collapse" aria-labelledby="headingDireccion" data-parent="#accordionProfesor">
+                <div class="card-body">
+                    <form asp-action="UpdateDireccion" method="post" id="formDireccion">
+                        @Html.HiddenFor(m => m.Id)
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="ProvinciaId">Provincia *</label>
+                                    <select asp-for="ProvinciaId" class="form-control provincia-select" asp-items="Model.Provincias" required>
+                                        <option value="">-- Seleccione --</option>
+                                    </select>
+                                    <span asp-validation-for="ProvinciaId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="CantonId">Cantón *</label>
+                                    <select asp-for="CantonId" class="form-control canton-select" required>
+                                        <option value="">-- Seleccione --</option>
+                                    </select>
+                                    <span asp-validation-for="CantonId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="DistritoId">Distrito *</label>
+                                    <select asp-for="DistritoId" class="form-control distrito-select" required>
+                                        <option value="">-- Seleccione --</option>
+                                    </select>
+                                    <span asp-validation-for="DistritoId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="DireccionExacta">Dirección Exacta</label>
+                            <textarea asp-for="DireccionExacta" class="form-control" rows="3" placeholder="Señas, referencias, etc."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="CodigoPostal">Código Postal</label>
+                            <input asp-for="CodigoPostal" class="form-control" />
+                        </div>
+
+                        <div class="text-right">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Actualizar Dirección
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASO 4: Formación Académica y Capacitaciones -->
+        <div class="card shadow mb-3">
+            <div class="card-header" id="headingAcademica">
+                <h2 class="mb-0">
+                    <button class="btn btn-link btn-block text-left collapsed d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAcademica" aria-expanded="false" aria-controls="collapseAcademica">
+                        <span><i class="fas fa-graduation-cap text-primary"></i> <strong>Paso 4:</strong> Formación Académica y Capacitaciones</span>
+                        <i class="fas fa-chevron-down text-dark"></i>
+                    </button>
+                </h2>
+            </div>
+            <div id="collapseAcademica" class="collapse" aria-labelledby="headingAcademica" data-parent="#accordionProfesor">
+                <div class="card-body">
+                    <!-- Formación Académica -->
+                    <div class="mb-4">
+                        <h5 class="text-primary border-bottom pb-2">
+                            <i class="fas fa-university"></i> Formación Académica
+                        </h5>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Gestiona títulos universitarios, maestrías, doctorados y otros estudios formales.
+                        </div>
+                        
+                        @if (Model.FormacionAcademica != null && Model.FormacionAcademica.Any())
+                        {
+                            <div class="table-responsive mb-3">
+                                <table class="table table-sm table-hover">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>Título Obtenido</th>
+                                            <th>Institución</th>
+                                            <th>Año</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var formacion in Model.FormacionAcademica)
+                                        {
+                                            <tr>
+                                                <td><strong>@formacion.TituloObtenido</strong></td>
+                                                <td>@formacion.InstitucionEducativa</td>
+                                                <td>@formacion.AnioFinalizacion</td>
+                                                <td><span class="badge badge-info">@formacion.TipoFormacion</span></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="text-muted"><small><strong>Total registradas:</strong> @Model.FormacionAcademica.Count</small></p>
+                        }
+                        else
+                        {
+                            <p class="text-muted"><i class="fas fa-exclamation-triangle"></i> No hay formaciones académicas registradas.</p>
+                        }
+                        
+                        <div class="text-right">
+                            <a asp-action="CreateStep4" asp-route-profesorId="@Model.Id" class="btn btn-primary">
+                                <i class="fas fa-edit"></i> Gestionar Formación Académica
+                            </a>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <!-- Capacitaciones -->
+                    <div class="mt-4">
+                        <h5 class="text-success border-bottom pb-2">
+                            <i class="fas fa-certificate"></i> Capacitaciones y Cursos
+                        </h5>
+                        <div class="alert alert-success">
+                            <i class="fas fa-info-circle"></i> Gestiona cursos, talleres, seminarios, certificaciones y otras capacitaciones recibidas.
+                        </div>
+                        
+                        @if (Model.Capacitaciones != null && Model.Capacitaciones.Any())
+                        {
+                            <div class="table-responsive mb-3">
+                                <table class="table table-sm table-hover">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>Nombre de Capacitación</th>
+                                            <th>Institución</th>
+                                            <th>Tipo</th>
+                                            <th>Horas</th>
+                                            <th>Periodo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var capacitacion in Model.Capacitaciones)
+                                        {
+                                            <tr>
+                                                <td><strong>@capacitacion.NombreCapacitacion</strong></td>
+                                                <td>@capacitacion.InstitucionOrganizadora</td>
+                                                <td><span class="badge badge-success">@capacitacion.TipoCapacitacion</span></td>
+                                                <td>@(capacitacion.HorasCapacitacion ?? 0)h</td>
+                                                <td>
+                                                    @if (capacitacion.FechaInicio.HasValue && capacitacion.FechaFin.HasValue)
+                                                    {
+                                                        <small>@capacitacion.FechaInicio.Value.ToString("MM/yyyy") - @capacitacion.FechaFin.Value.ToString("MM/yyyy")</small>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="text-muted"><small><strong>Total registradas:</strong> @Model.Capacitaciones.Count</small></p>
+                        }
+                        else
+                        {
+                            <p class="text-muted"><i class="fas fa-exclamation-triangle"></i> No hay capacitaciones registradas.</p>
+                        }
+                        
+                        <div class="text-right">
+                            <a asp-action="CreateStep6" asp-route-profesorId="@Model.Id" class="btn btn-success">
+                                <i class="fas fa-edit"></i> Gestionar Capacitaciones
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASO 5: Experiencia Laboral -->
+        <div class="card shadow mb-3">
+            <div class="card-header" id="headingLaboral">
+                <h2 class="mb-0">
+                    <button class="btn btn-link btn-block text-left collapsed d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLaboral" aria-expanded="false" aria-controls="collapseLaboral">
+                        <span><i class="fas fa-briefcase text-warning"></i> <strong>Paso 5:</strong> Experiencia Laboral</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </h2>
+            </div>
+            <div id="collapseLaboral" class="collapse" aria-labelledby="headingLaboral" data-parent="#accordionProfesor">
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Gestiona la experiencia laboral completa desde el formulario especializado.
+                    </div>
+                    <p><strong>Experiencias registradas:</strong> @(Model.ExperienciaLaboral?.Count ?? 0)</p>
+                    
+                    <div class="text-right">
+                        <a asp-action="CreateStep5" asp-route-profesorId="@Model.Id" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Gestionar Experiencia Laboral
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASO 6: Información Adicional -->
+        <div class="card shadow mb-3">
+            <div class="card-header" id="headingAdicional">
+                <h2 class="mb-0">
+                    <button class="btn btn-link btn-block text-left collapsed d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdicional" aria-expanded="false" aria-controls="collapseAdicional">
+                        <span><i class="fas fa-clipboard-list text-secondary"></i> <strong>Paso 6:</strong> Información Adicional y Contacto de Emergencia</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </h2>
+            </div>
+            <div id="collapseAdicional" class="collapse" aria-labelledby="headingAdicional" data-parent="#accordionProfesor">
+                <div class="card-body">
+                    <form asp-action="UpdateAdicional" method="post" id="formAdicional">
+                        @Html.HiddenFor(m => m.Id)
+                        
+                        <h6 class="text-primary mb-3"><i class="fas fa-star"></i> Especialidades e Idiomas</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="AreasEspecializacion">Áreas de Especialización</label>
+                                    <textarea asp-for="AreasEspecializacion" class="form-control" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="IdiomasHabla">Idiomas que Habla</label>
+                                    <textarea asp-for="IdiomasHabla" class="form-control" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="NivelIngles">Nivel de Inglés</label>
+                                    <select asp-for="NivelIngles" class="form-control">
+                                        <option value="">-- Seleccione --</option>
+                                        <option value="Básico">Básico</option>
+                                        <option value="Intermedio">Intermedio</option>
+                                        <option value="Avanzado">Avanzado</option>
+                                        <option value="Nativo">Nativo</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="ExperienciaDocente">Años de Experiencia Docente</label>
+                                    <input asp-for="ExperienciaDocente" type="number" class="form-control" min="0" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h6 class="text-danger mb-3"><i class="fas fa-exclamation-triangle"></i> Contacto de Emergencia</h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="ContactoEmergenciaNombre">Nombre Completo</label>
+                                    <input asp-for="ContactoEmergenciaNombre" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="ContactoEmergenciaTelefono">Teléfono</label>
+                                    <input asp-for="ContactoEmergenciaTelefono" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="ContactoEmergenciaParentesco">Relación/Parentesco</label>
+                                    <select asp-for="ContactoEmergenciaParentesco" class="form-control">
+                                        <option value="">-- Seleccione --</option>
+                                        <option value="Esposo/a">Esposo/a</option>
+                                        <option value="Padre">Padre</option>
+                                        <option value="Madre">Madre</option>
+                                        <option value="Hijo/a">Hijo/a</option>
+                                        <option value="Hermano/a">Hermano/a</option>
+                                        <option value="Amigo/a">Amigo/a</option>
+                                        <option value="Otro">Otro</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h6 class="text-info mb-3"><i class="fas fa-bell"></i> Preferencias de Notificación</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input asp-for="NotificacionesEmail" type="checkbox" class="form-check-input" />
+                                    <label asp-for="NotificacionesEmail" class="form-check-label">
+                                        Recibir notificaciones por Email
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input asp-for="NotificacionesSMS" type="checkbox" class="form-check-input" />
+                                    <label asp-for="NotificacionesSMS" class="form-check-label">
+                                        Recibir notificaciones por SMS
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-right mt-3">
+                            <button type="submit" class="btn btn-secondary">
+                                <i class="fas fa-save"></i> Actualizar Información Adicional
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Abrir la sección actualizada según el parámetro de la URL
+            var urlParams = new URLSearchParams(window.location.search);
+            var section = urlParams.get('section');
+            
+            if (section) {
+                // Cerrar todas las secciones
+                $('.accordion .collapse').removeClass('show');
+                $('.accordion .btn-link').addClass('collapsed');
+                $('.accordion .btn-link').attr('aria-expanded', 'false');
+                
+                // Abrir la sección específica
+                var collapseId = '#collapse' + section;
+                $(collapseId).addClass('show');
+                $(collapseId).prev('.card-header').find('.btn-link').removeClass('collapsed');
+                $(collapseId).prev('.card-header').find('.btn-link').attr('aria-expanded', 'true');
+                
+                // Scroll hacia la sección actualizada
+                setTimeout(function() {
+                    $('html, body').animate({
+                        scrollTop: $(collapseId).offset().top - 100
+                    }, 500);
+                }, 100);
+            }
+            
+            // Manejar el evento de toggle del acordeón para rotar el icono
+            $('.accordion').on('show.bs.collapse', function(e) {
+                $(e.target).prev('.card-header').find('.fa-chevron-down').addClass('fa-rotate-180');
+            });
+            
+            $('.accordion').on('hide.bs.collapse', function(e) {
+                $(e.target).prev('.card-header').find('.fa-chevron-down').removeClass('fa-rotate-180');
+            });
+            
+            // Funcionalidad de cascada para provincia, cantón y distrito
+            function initCascadingDropdowns() {
+                $('.provincia-select').off('change').on('change', function() {
+                    var $form = $(this).closest('form');
+                    var provinciaId = $(this).val();
+                    var $cantonSelect = $form.find('.canton-select');
+                    var $distritoSelect = $form.find('.distrito-select');
+                    
+                    $cantonSelect.empty().append('<option value="">-- Seleccione --</option>');
+                    $distritoSelect.empty().append('<option value="">-- Seleccione --</option>');
+                    
+                    if (provinciaId) {
+                        $.get('@Url.Action("GetCantonesByProvincia")', { provinciaId: provinciaId })
+                            .done(function(data) {
+                                $.each(data, function(index, item) {
+                                    $cantonSelect.append('<option value="' + item.value + '">' + item.text + '</option>');
+                                });
+                                
+                                var selectedCanton = '@Model.CantonId';
+                                if (selectedCanton) {
+                                    $cantonSelect.val(selectedCanton).trigger('change');
+                                }
+                            });
+                    }
+                });
+
+                $('.canton-select').off('change').on('change', function() {
+                    var $form = $(this).closest('form');
+                    var cantonId = $(this).val();
+                    var $distritoSelect = $form.find('.distrito-select');
+                    
+                    $distritoSelect.empty().append('<option value="">-- Seleccione --</option>');
+                    
+                    if (cantonId) {
+                        $.get('@Url.Action("GetDistritosByCanton")', { cantonId: cantonId })
+                            .done(function(data) {
+                                $.each(data, function(index, item) {
+                                    $distritoSelect.append('<option value="' + item.value + '">' + item.text + '</option>');
+                                });
+                                
+                                var selectedDistrito = '@Model.DistritoId';
+                                if (selectedDistrito) {
+                                    $distritoSelect.val(selectedDistrito);
+                                }
+                            });
+                    }
+                });
+
+                // Trigger inicial
+                if ($('.provincia-select').val()) {
+                    $('.provincia-select').trigger('change');
+                }
+            }
+
+            // Inicializar al cargar
+            initCascadingDropdowns();
+
+            // Reinicializar cuando se expande el acordeón de dirección
+            $('#collapseDireccion').on('shown.bs.collapse', function () {
+                initCascadingDropdowns();
+            });
+        });
+    </script>
+
+    <style>
+        .accordion .card-header .btn-link {
+            text-decoration: none;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .accordion .card-header .btn-link:hover {
+            background-color: #f8f9fa;
+        }
+
+        .accordion .card-header .btn-link i.fa-chevron-down {
+            transition: transform 0.3s ease;
+        }
+
+        .accordion .card-header .btn-link .fa-rotate-180 {
+            transform: rotate(180deg);
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .card-header {
+            background-color: #f8f9fc;
+            border-bottom: 2px solid #e3e6f0;
+        }
+    </style>
+}

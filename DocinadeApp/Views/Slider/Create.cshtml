@@ -1,0 +1,243 @@
+@model RubricasApp.Web.Models.SliderItem
+
+@{
+    ViewData["Title"] = "Crear Nuevo Slider";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2>
+                <i class="fas fa-plus-circle"></i> Crear Nuevo Slider
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index">Sliders</a></li>
+                    <li class="breadcrumb-item active">Crear</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <form asp-action="Create" method="post" enctype="multipart/form-data" id="sliderForm">
+                <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label asp-for="Titulo" class="form-label">
+                                <i class="fas fa-heading"></i> Título *
+                            </label>
+                            <input asp-for="Titulo" class="form-control" placeholder="Ingrese el título del slider" maxlength="200" required />
+                            <span asp-validation-for="Titulo" class="text-danger"></span>
+                            <small class="form-text text-muted">Máximo 200 caracteres</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Subtitulo" class="form-label">
+                                <i class="fas fa-align-left"></i> Subtítulo
+                            </label>
+                            <textarea asp-for="Subtitulo" class="form-control" rows="3" placeholder="Ingrese un subtítulo opcional" maxlength="500"></textarea>
+                            <span asp-validation-for="Subtitulo" class="text-danger"></span>
+                            <small class="form-text text-muted">Opcional. Máximo 500 caracteres</small>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label asp-for="EnlaceUrl" class="form-label">
+                                        <i class="fas fa-link"></i> URL del Enlace
+                                    </label>
+                                    <input asp-for="EnlaceUrl" type="url" class="form-control" placeholder="https://ejemplo.com" maxlength="500" />
+                                    <span asp-validation-for="EnlaceUrl" class="text-danger"></span>
+                                    <small class="form-text text-muted">URL válida (ej: https://ejemplo.com). Opcional</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="TextoBoton" class="form-label">
+                                        <i class="fas fa-tag"></i> Texto del Botón
+                                    </label>
+                                    <input asp-for="TextoBoton" class="form-control" placeholder="Ver más" maxlength="100" />
+                                    <span asp-validation-for="TextoBoton" class="text-danger"></span>
+                                    <small class="form-text text-muted">Si hay enlace. Máx 100 caracteres</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="imageFile" class="form-label">
+                                <i class="fas fa-image"></i> Imagen del Slider *
+                            </label>
+                            <input type="file" id="imageFile" name="imageFile" class="form-control" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" required />
+                            <span class="text-danger" data-valmsg-for="imageFile"></span>
+                            <small class="form-text text-muted">
+                                Formatos: JPG, PNG, GIF, WebP. Tamaño máximo: 5 MB
+                            </small>
+                            <div id="imagePreview" class="mt-3" style="display:none;">
+                                <p class="text-muted">Vista previa:</p>
+                                <img id="previewImg" src="#" alt="Vista previa" class="img-thumbnail" style="max-width: 400px; max-height: 300px;" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-cog"></i> Configuración
+                                </h5>
+
+                                <div class="mb-3">
+                                    <label asp-for="Orden" class="form-label">
+                                        <i class="fas fa-sort-numeric-up"></i> Orden de Visualización
+                                    </label>
+                                    <input asp-for="Orden" type="number" class="form-control" min="1" max="999" value="1" />
+                                    <span asp-validation-for="Orden" class="text-danger"></span>
+                                    <small class="form-text text-muted">Entre 1 y 999. Menor número = primero</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input asp-for="Activo" class="form-check-input" type="checkbox" checked />
+                                        <label asp-for="Activo" class="form-check-label">
+                                            <i class="fas fa-toggle-on"></i> ¿Activar inmediatamente?
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted">Puede cambiarlo después desde la lista</small>
+                                </div>
+
+                                <hr />
+
+                                <div class="alert alert-info" role="alert">
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>Tip:</strong> Los sliders se mostrarán en orden ascendente en el carrusel principal.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-save"></i> Guardar Slider
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Suprimir warnings de TinyMCE cuando no se usa en esta vista
+        if (typeof tinymce !== 'undefined') {
+            tinymce.on('AddEditor', function(e) {
+                e.editor.on('init', function() {
+                    console.log('[INFO] TinyMCE cargado pero no se usa en esta vista');
+                });
+            });
+        }
+
+        $(document).ready(function() {
+            // Vista previa de imagen
+            $('#imageFile').on('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Validar tamaño (5MB máximo)
+                    if (file.size > 5242880) {
+                        alert('El archivo es demasiado grande. Tamaño máximo: 5 MB');
+                        $(this).val('');
+                        $('#imagePreview').hide();
+                        return;
+                    }
+
+                    // Validar tipo
+                    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                    if (!validTypes.includes(file.type)) {
+                        alert('Formato de imagen no válido. Use JPG, PNG, GIF o WebP');
+                        $(this).val('');
+                        $('#imagePreview').hide();
+                        return;
+                    }
+
+                    // Mostrar vista previa
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#previewImg').attr('src', e.target.result);
+                        $('#imagePreview').fadeIn();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Validación antes de enviar
+            $('#sliderForm').on('submit', function(e) {
+                console.log('[DEBUG] Formulario intentando enviarse...');
+                
+                const imageFile = $('#imageFile')[0].files[0];
+                if (!imageFile) {
+                    e.preventDefault();
+                    console.log('[ERROR] No se seleccionó imagen');
+                    alert('Debe seleccionar una imagen para el slider');
+                    return false;
+                }
+
+                console.log('[INFO] Formulario válido, enviando...');
+                console.log('[INFO] Imagen:', imageFile.name, imageFile.size, 'bytes');
+                
+                // Deshabilitar botón para evitar doble envío
+                $('#submitBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+                
+                // Permitir el envío
+                return true;
+            });
+
+            // Sincronizar texto del botón si hay enlace
+            $('#EnlaceUrl').on('blur', function() {
+                const url = $(this).val();
+                const textoBoton = $('#TextoBoton').val();
+                
+                if (url && !textoBoton) {
+                    $('#TextoBoton').val('Ver más');
+                }
+            });
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .card {
+            border-radius: 12px;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .form-control:focus, .form-check-input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        #imagePreview {
+            border: 2px dashed #dee2e6;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+        .alert-info {
+            font-size: 0.9rem;
+        }
+    </style>
+}

@@ -1,0 +1,351 @@
+@{
+    ViewData["Title"] = "Sistema de Asistencia";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="display-6">
+                    <i class="fas fa-clipboard-check text-primary"></i> 
+                    Sistema de Asistencia
+                </h1>
+            </div>
+
+            <!-- Tarjeta de bienvenida -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-info-circle text-info"></i> 
+                        Bienvenido al Sistema de Asistencia
+                    </h5>
+                    <p class="card-text">
+                        Desde aquí puede gestionar el pase de lista para los diferentes grupos de estudiantes. 
+                        Seleccione un grupo para comenzar a registrar la asistencia.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" id="filtros-form">
+                        <div class="row align-items-end">
+                            <div class="col-md-3 mb-3">
+                                <label for="periodoId" class="form-label">
+                                    <i class="fas fa-calendar-alt text-primary"></i>
+                                    Período Académico
+                                </label>
+                                <select class="form-select" id="periodoId" name="periodoId">
+                                    <option value="">Todos los períodos</option>
+                                    @if (ViewBag.Periodos != null)
+                                    {
+                                        @foreach (var periodo in (IEnumerable<SelectListItem>)ViewBag.Periodos)
+                                        {
+                                            <option value="@periodo.Value" selected="@periodo.Selected">
+                                                @periodo.Text
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="grupoId" class="form-label">
+                                    <i class="fas fa-users text-success"></i>
+                                    Seleccionar Grupo
+                                </label>
+                                <select class="form-select" id="grupoId" name="grupoId">
+                                    <option value="">Todos los grupos</option>
+                                    @if (ViewBag.Grupos != null)
+                                    {
+                                        @foreach (var grupo in (List<RubricasApp.Web.Models.GrupoEstudiante>)ViewBag.Grupos)
+                                        {
+                                            <option value="@grupo.GrupoId" 
+                                                    data-estudiantes="@grupo.EstudianteGrupos.Count"
+                                                    data-periodo="@(grupo.PeriodoAcademico?.Nombre ?? "")"
+                                                    selected="@(ViewBag.GrupoSeleccionado != null && ViewBag.GrupoSeleccionado.ToString() == grupo.GrupoId.ToString())">
+                                                @grupo.Nombre @(!string.IsNullOrEmpty(grupo.Codigo) ? $" ({grupo.Codigo})" : "")
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="buscar" class="form-label">
+                                    <i class="fas fa-search text-info"></i>
+                                    Buscar Grupo
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="buscar" 
+                                       name="buscar"
+                                       placeholder="Nombre del grupo o código..."
+                                       value="@ViewBag.TerminoBusqueda">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-filter"></i> Filtrar
+                                </button>
+                                <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i> Limpiar
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Información del grupo seleccionado -->
+                        <div id="grupo-info" class="mt-3" style="display: none;">
+                            <div class="alert alert-info">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h6 class="alert-heading mb-1">
+                                            <i class="fas fa-info-circle"></i> 
+                                            Información del Grupo Seleccionado
+                                        </h6>
+                                        <div id="grupo-detalles"></div>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <button type="button" class="btn btn-success btn-sm" id="btn-pase-lista">
+                                            <i class="fas fa-clipboard-check"></i> 
+                                            Ir a Pase de Lista
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Grupos disponibles -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-users"></i> 
+                        Grupos Disponibles
+                        @if (ViewBag.Grupos != null && ((List<RubricasApp.Web.Models.GrupoEstudiante>)ViewBag.Grupos).Any())
+                        {
+                            <span class="badge bg-primary ms-2">@(((List<RubricasApp.Web.Models.GrupoEstudiante>)ViewBag.Grupos).Count)</span>
+                        }
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Grupos != null && ((List<RubricasApp.Web.Models.GrupoEstudiante>)ViewBag.Grupos).Any())
+                    {
+                        <div class="row">
+                            @foreach (var grupo in (List<RubricasApp.Web.Models.GrupoEstudiante>)ViewBag.Grupos)
+                            {
+                                <div class="col-md-6 col-lg-4 mb-3">
+                                    <div class="card border-primary h-100">
+                                        <div class="card-body d-flex flex-column">
+                                            <h6 class="card-title">
+                                                <i class="fas fa-graduation-cap text-primary"></i>
+                                                @grupo.Nombre
+                                            </h6>
+                                            <p class="card-text flex-grow-1">
+                                                @if (!string.IsNullOrEmpty(grupo.Codigo))
+                                                {
+                                                    <small class="text-muted">Código: @grupo.Codigo</small><br>
+                                                }
+                                                <strong>@grupo.EstudianteGrupos.Count estudiantes</strong><br>
+                                                @if (grupo.PeriodoAcademico != null)
+                                                {
+                                                    @grupo.PeriodoAcademico.Nombre
+                                                }
+                                                @if (!string.IsNullOrEmpty(grupo.Descripcion))
+                                                {
+                                                    <br><small class="text-muted">@grupo.Descripcion</small>
+                                                }
+                                            </p>
+                                            <div class="mt-auto">
+                                                <a href="@Url.Action("PaseLista", new { grupoId = grupo.GrupoId })" 
+                                                   class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-clipboard-check"></i> 
+                                                    Pase de Lista
+                                                </a>
+                                                <a href="@Url.Action("Resumen", new { grupoId = grupo.GrupoId, fecha = DateTime.Now.ToString("yyyy-MM-dd") })" 
+                                                   class="btn btn-outline-secondary btn-sm">
+                                                    <i class="fas fa-chart-bar"></i> 
+                                                    Ver Historial
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No se encontraron grupos</h5>
+                            <p class="text-muted">
+                                @if (!string.IsNullOrEmpty(ViewBag.TerminoBusqueda?.ToString()) || ViewBag.PeriodoSeleccionado != null)
+                                {
+                                    <span>No hay grupos que coincidan con los filtros aplicados.</span><br>
+                                    <small>Filtros activos: 
+                                        @if (ViewBag.PeriodoSeleccionado != null) { <span>Período: @ViewBag.PeriodoSeleccionado</span> }
+                                        @if (!string.IsNullOrEmpty(ViewBag.TerminoBusqueda?.ToString())) { <span>Búsqueda: "@ViewBag.TerminoBusqueda"</span> }
+                                    </small>
+                                }
+                                else
+                                {
+                                    <span>No hay grupos con estudiantes en el sistema.</span><br>
+                                    <small class="text-info">Solo se muestran grupos que tengan estudiantes asignados.</small>
+                                }
+                            </p>
+                            @if (!string.IsNullOrEmpty(ViewBag.TerminoBusqueda?.ToString()) || ViewBag.PeriodoSeleccionado != null)
+                            {
+                                <a href="@Url.Action("Index")" class="btn btn-primary">
+                                    <i class="fas fa-arrow-left"></i> Ver todos los grupos
+                                </a>
+                            }
+                            
+                            <!-- Información de diagnóstico para desarrollo -->
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <div class="mt-4 p-3 bg-light rounded">
+                                    <small class="text-muted">
+                                        <strong>Información de diagnóstico:</strong><br>
+                                        ViewBag.Grupos: @(ViewBag.Grupos != null ? "✓ Definido" : "✗ Null")<br>
+                                        Tipo: @(ViewBag.Grupos?.GetType().Name ?? "N/A")<br>
+                                        Período seleccionado: @(ViewBag.PeriodoSeleccionado?.ToString() ?? "Ninguno")<br>
+                                        Término búsqueda: @(ViewBag.TerminoBusqueda ?? "Ninguno")
+                                    </small>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Acciones adicionales -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-cogs"></i> 
+                        Acciones Adicionales
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                            <button class="btn btn-outline-info btn-block w-100" onclick="alert('Funcionalidad próximamente disponible');">
+                                <i class="fas fa-chart-bar"></i> 
+                                Reportes de Asistencia
+                            </button>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <button class="btn btn-outline-warning btn-block w-100" onclick="alert('Funcionalidad próximamente disponible');">
+                                <i class="fas fa-file-excel"></i> 
+                                Exportar Datos
+                            </button>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <button class="btn btn-outline-secondary btn-block w-100" onclick="alert('Funcionalidad próximamente disponible');">
+                                <i class="fas fa-cog"></i> 
+                                Configuración
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Auto-submit form when periodo changes
+            $('#periodoId').on('change', function() {
+                $('#filtros-form').submit();
+            });
+            
+            // Manejar cambio del combobox de grupos
+            $('#grupoId').on('change', function() {
+                var grupoId = $(this).val();
+                var grupoInfo = $('#grupo-info');
+                var grupoDetalles = $('#grupo-detalles');
+                var btnPaseLista = $('#btn-pase-lista');
+                
+                if (grupoId) {
+                    var selectedOption = $(this).find('option:selected');
+                    var nombreGrupo = selectedOption.text();
+                    var estudiantes = selectedOption.data('estudiantes');
+                    var periodo = selectedOption.data('periodo');
+                    
+                    // Mostrar información del grupo
+                    var infoHtml = '<strong>' + nombreGrupo + '</strong><br>';
+                    infoHtml += '<small class="text-muted">';
+                    infoHtml += '<i class="fas fa-users"></i> ' + estudiantes + ' estudiantes';
+                    if (periodo) {
+                        infoHtml += ' • <i class="fas fa-calendar"></i> ' + periodo;
+                    }
+                    infoHtml += '</small>';
+                    
+                    grupoDetalles.html(infoHtml);
+                    grupoInfo.slideDown();
+                    
+                    // Configurar botón de pase de lista
+                    btnPaseLista.off('click').on('click', function() {
+                        window.location.href = '@Url.Action("PaseLista")' + '?grupoId=' + grupoId;
+                    });
+                    
+                } else {
+                    grupoInfo.slideUp();
+                }
+            });
+            
+            // Trigger change if there's a preselected group
+            if ($('#grupoId').val()) {
+                $('#grupoId').trigger('change');
+            }
+            
+            // Add some hover effects
+            $('.card.border-primary').hover(
+                function() {
+                    $(this).addClass('shadow-sm');
+                },
+                function() {
+                    $(this).removeClass('shadow-sm');
+                }
+            );
+            
+            // Mostrar mensaje de bienvenida si es necesario
+            @if (TempData["Success"] != null)
+            {
+                <text>
+                toastr.success('@TempData["Success"]');
+                </text>
+            }
+            
+            @if (TempData["Error"] != null)
+            {
+                <text>
+                toastr.error('@TempData["Error"]');
+                </text>
+            }
+            
+            @if (TempData["Info"] != null)
+            {
+                <text>
+                toastr.info('@TempData["Info"]');
+                </text>
+            }
+        });
+    </script>
+}
+
+<style>
+    .card.border-primary:hover {
+        transform: translateY(-2px);
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    .btn:hover {
+        transform: scale(1.02);
+        transition: transform 0.1s ease-in-out;
+    }
+</style>

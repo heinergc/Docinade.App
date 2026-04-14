@@ -1,0 +1,286 @@
+@model IEnumerable<RubricasApp.Web.Models.Asistencia>
+
+@{
+    ViewData["Title"] = "Gestión de Asistencias";
+    Layout = "_Layout";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">@ViewData["Title"]</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Inicio</a></li>
+                        <li class="breadcrumb-item active">Asistencias</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <!-- Filtros y Acciones -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-filter mr-2"></i>Filtros y Acciones
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="get" id="filtrosForm">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="grupoId">Grupo:</label>
+                                    @Html.DropDownList("grupoId", ViewBag.Grupos as SelectList, "Todos los grupos", new { @class = "form-control select2", id = "grupoId" })
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="fecha">Fecha:</label>
+                                    <input type="date" name="fecha" id="fecha" value="@ViewBag.FechaFiltro?.ToString("yyyy-MM-dd")" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="estado">Estado:</label>
+                                    @Html.DropDownList("estado", ViewBag.Estados as SelectList, "Todos los estados", new { @class = "form-control", id = "estado" })
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>&nbsp;</label>
+                                    <div class="btn-group d-block">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-search mr-1"></i>Filtrar
+                                        </button>
+                                        <a href="@Url.Action("Index")" class="btn btn-secondary">
+                                            <i class="fas fa-times mr-1"></i>Limpiar
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <div class="btn-group">
+                                <a href="@Url.Action("Create")" class="btn btn-success">
+                                    <i class="fas fa-plus mr-1"></i>Nuevo Registro
+                                </a>
+                                <a href="@Url.Action("Reportes")" class="btn btn-info">
+                                    <i class="fas fa-chart-bar mr-1"></i>Reportes
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen de Resultados -->
+            @if (ViewBag.TotalRecords != null)
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Se encontraron <strong>@ViewBag.TotalRecords</strong> registros.
+                    @if (ViewBag.TotalPages > 1)
+                    {
+                        <span>Página @ViewBag.CurrentPage de @ViewBag.TotalPages</span>
+                    }
+                </div>
+            }
+
+            <!-- Lista de Asistencias -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-list mr-2"></i>Registros de Asistencia
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-hover">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Estudiante</th>
+                                        <th>Grupo</th>
+                                        <th>Estado</th>
+                                        <th>Hora Llegada</th>
+                                        <th>Observaciones</th>
+                                        <th>Registrado Por</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Fecha)
+                                            </td>
+                                            <td>
+                                                <strong>@Html.DisplayFor(modelItem => item.Estudiante.NombreCompleto)</strong><br />
+                                                <small class="text-muted">@Html.DisplayFor(modelItem => item.Estudiante.NumeroId)</small>
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Grupo.Nombre)<br />
+                                                <small class="text-muted">@Html.DisplayFor(modelItem => item.Grupo.PeriodoAcademico.Nombre)</small>
+                                            </td>
+                                            <td>
+                                                @switch (item.Estado)
+                                                {
+                                                    case "P":
+                                                        <span class="badge badge-success"><i class="fas fa-check mr-1"></i>Presente</span>
+                                                        break;
+                                                    case "A":
+                                                        <span class="badge badge-danger"><i class="fas fa-times mr-1"></i>Ausente</span>
+                                                        break;
+                                                    case "T":
+                                                        <span class="badge badge-warning"><i class="fas fa-clock mr-1"></i>Tardanza</span>
+                                                        break;
+                                                    case "AJ":
+                                                        <span class="badge badge-info"><i class="fas fa-file-medical mr-1"></i>Ausencia Justificada</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (item.HoraLlegada.HasValue)
+                                                {
+                                                    @item.HoraLlegada.Value.ToString("HH:mm")
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(item.Observaciones))
+                                                {
+                                                    if (item.Observaciones.Length > 50)
+                                                    {
+                                                        <span title="@item.Observaciones">@item.Observaciones.Substring(0, 50)...</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        @item.Observaciones
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.RegistradoPor.UserName)<br />
+                                                <small class="text-muted">@item.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</small>
+                                                @if (item.EsModificacion)
+                                                {
+                                                    <br /><small class="text-warning"><i class="fas fa-edit"></i> Modificado</small>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group-vertical btn-group-sm">
+                                                    <a href="@Url.Action("Details", new { id = item.AsistenciaId })" 
+                                                       class="btn btn-info btn-sm" title="Ver Detalles">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="@Url.Action("Edit", new { id = item.AsistenciaId })" 
+                                                       class="btn btn-warning btn-sm" title="Editar">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="@Url.Action("Delete", new { id = item.AsistenciaId })" 
+                                                       class="btn btn-danger btn-sm" title="Eliminar">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Paginación -->
+                        @if (ViewBag.TotalPages > 1)
+                        {
+                            <nav aria-label="Navegación de páginas">
+                                <ul class="pagination justify-content-center">
+                                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                    {
+                                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                            <a class="page-link" href="@Url.Action("Index", new { 
+                                                pageNumber = i, 
+                                                grupoId = ViewBag.Request?.Query["grupoId"], 
+                                                fecha = ViewBag.Request?.Query["fecha"], 
+                                                estado = ViewBag.Request?.Query["estado"] 
+                                            })">@i</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </nav>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning text-center">
+                            <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                            <h4>No se encontraron registros</h4>
+                            <p>No hay registros de asistencia que coincidan con los filtros aplicados.</p>
+                            <a href="@Url.Action("Create")" class="btn btn-success">
+                                <i class="fas fa-plus mr-1"></i>Crear Primer Registro
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Inicializar Select2
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                placeholder: 'Seleccione...'
+            });
+
+            // Auto-submit del formulario cuando cambian los filtros
+            $('#grupoId, #estado, #fecha').change(function() {
+                $('#filtrosForm').submit();
+            });
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .badge {
+            font-size: 0.875em;
+        }
+        
+        .btn-group-vertical .btn {
+            margin-bottom: 2px;
+        }
+        
+        .table th {
+            background-color: #343a40;
+            color: white;
+            border-color: #454d55;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(0,0,0,.05);
+        }
+    </style>
+}

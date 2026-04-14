@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-labelledby="title desc" role="img">
+  <title>AcademiaPro Symbol — CSS variable</title>
+  <desc>Open book with growth bars, upward arrow, and graduation cap. Color controlled by --brand CSS variable.</desc>
+  <style>
+    :root { --brand: #2563eb; }
+    .brand { fill: var(--brand); }
+  </style>
+  <g class="brand">
+    <!-- Graduation cap -->
+    <path d="M256 88 L128 136 L256 184 L384 136 Z"/>
+    <path d="M184 172 q72 28 144 0 v28 q-72 28-144 0z"/>
+    <circle cx="392" cy="162" r="10"/>
+    <path d="M392 172 v44 q0 10-10 10 h-6 q10 0 10-10z"/>
+    <!-- Upward arrow -->
+    <path d="M180 258 q40-36 92-20 q30 8 54-18 q10-12 26-30 l22 18 q-18 20-30 34 q-32 34-74 24 q-40-12-76 16z"/>
+    <path d="M372 192 l40 10 l-24 32z"/>
+    <!-- Bars -->
+    <rect x="188" y="260" width="28" height="92" rx="6"/>
+    <rect x="230" y="240" width="28" height="112" rx="6"/>
+    <rect x="272" y="222" width="28" height="130" rx="6"/>
+    <rect x="314" y="206" width="28" height="146" rx="6"/>
+    <!-- Book base (left & right pages) -->
+    <path d="M64 332 q96-30 160 18 q64-48 160-18 v70 q-98-36-160 10 q-62-46-160-10z"/>
+    <path d="M224 374 q32-22 64 0 v32 q-32-20-64 0z"/>
+  </g>
+</svg>

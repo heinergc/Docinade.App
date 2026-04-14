@@ -1,0 +1,308 @@
+@model RubricasApp.Web.ViewModels.Conducta.VerificarProgramaViewModel
+
+@{
+    ViewData["Title"] = "Verificar Programa de Acciones";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller="NotaConducta" asp-action="Dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Index">Programas</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@Model.IdPrograma">Programa #@Model.IdPrograma</a></li>
+                    <li class="breadcrumb-item active">Verificar</li>
+                </ol>
+            </nav>
+            <h2><i class="fas fa-certificate text-success"></i> Verificación del Programa de Acciones</h2>
+            <p class="text-muted">Comité de Apoyo Educativo - Evaluación Final</p>
+        </div>
+    </div>
+
+    <!-- Información normativa -->
+    <div class="alert alert-info border-info">
+        <h5 class="alert-heading"><i class="fas fa-info-circle"></i> Instrucciones</h5>
+        <p>
+            La verificación del Programa de Acciones Institucional debe realizarse por el Comité de Apoyo Educativo 
+            una vez que el estudiante ha completado las actividades programadas.
+        </p>
+        <ul class="mb-0">
+            <li>Evalúe si el estudiante cumplió satisfactoriamente con los objetivos del programa</li>
+            <li>Verifique el cumplimiento de las actividades propuestas</li>
+            <li>Considere los compromisos asumidos por el estudiante y su familia</li>
+            <li>Aplique los criterios de evaluación establecidos en el programa</li>
+        </ul>
+    </div>
+
+    <!-- Resumen del programa -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-clipboard-list"></i> Resumen del Programa</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Estudiante:</strong> @Model.NombreEstudiante</p>
+                    <p><strong>Identificación:</strong> @Model.NumeroIdentificacion</p>
+                    <p><strong>Grupo:</strong> @Model.NombreGrupo</p>
+                    <p><strong>Período:</strong> @Model.NombrePeriodo</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Fecha Inicio:</strong> @Model.FechaInicio.ToString("dd/MM/yyyy")</p>
+                    <p><strong>Fecha Fin Prevista:</strong> @Model.FechaFinPrevista.ToString("dd/MM/yyyy")</p>
+                    <p><strong>Supervisor:</strong> @Model.NombreSupervisor</p>
+                    <p><strong>Estado Actual:</strong> <span class="badge bg-primary">En Proceso</span></p>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-12">
+                    <h6 class="text-primary">Objetivos del Programa:</h6>
+                    <p class="text-justify">@Model.Objetivos</p>
+                    
+                    <h6 class="text-primary mt-3">Criterios de Evaluación:</h6>
+                    <p class="text-justify mb-0">@Model.CriteriosEvaluacion</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de verificación -->
+    <form asp-action="Verificar" method="post">
+        <input type="hidden" asp-for="IdPrograma" />
+
+        <!-- Resultado de la verificación -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-check-circle"></i> Resultado de la Verificación</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <label class="form-label required">Resultado del Programa</label>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card h-100 resultado-option" data-resultado="Exitoso">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                                    <h5>Exitoso</h5>
+                                    <p class="text-muted">El estudiante cumplió satisfactoriamente con el programa</p>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="Resultado" id="resultadoExitoso" 
+                                               value="Exitoso" required onchange="actualizarEstado('Exitoso')">
+                                        <label class="form-check-label" for="resultadoExitoso">
+                                            Seleccionar
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100 resultado-option" data-resultado="No Exitoso">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-times-circle fa-4x text-danger mb-3"></i>
+                                    <h5>No Exitoso</h5>
+                                    <p class="text-muted">El estudiante no cumplió satisfactoriamente con el programa</p>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="Resultado" id="resultadoNoExitoso" 
+                                               value="No Exitoso" required onchange="actualizarEstado('No Exitoso')">
+                                        <label class="form-check-label" for="resultadoNoExitoso">
+                                            Seleccionar
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-light border" id="infoResultado" style="display:none;">
+                    <h6 class="alert-heading" id="tituloInfo"></h6>
+                    <p class="mb-0" id="textoInfo"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Observaciones -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0"><i class="fas fa-comments"></i> Observaciones de la Verificación</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label asp-for="ObservacionesVerificacion" class="form-label required">
+                        Observaciones y Justificación
+                    </label>
+                    <textarea asp-for="ObservacionesVerificacion" class="form-control" rows="6" required 
+                              placeholder="Describa detalladamente la evaluación del programa, el cumplimiento de actividades, el desempeño del estudiante y la justificación del resultado..."></textarea>
+                    <span asp-validation-for="ObservacionesVerificacion" class="text-danger"></span>
+                    <div class="form-text">
+                        <strong>Incluya:</strong>
+                        <ul class="mb-0">
+                            <li>Cumplimiento de actividades propuestas</li>
+                            <li>Cambios observados en el comportamiento</li>
+                            <li>Participación de la familia</li>
+                            <li>Recomendaciones para el estudiante</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Datos del comité -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-users"></i> Datos de la Verificación</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="FechaVerificacion" class="form-label required">Fecha de Verificación</label>
+                        <input asp-for="FechaVerificacion" type="date" class="form-control" required />
+                        <span asp-validation-for="FechaVerificacion" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Verificado Por</label>
+                        <input type="text" class="form-control" value="@User.Identity.Name" disabled />
+                        <div class="form-text">Usuario actual del sistema</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirmación -->
+        <div class="card mb-4">
+            <div class="card-body bg-light">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="confirmarVerificacion" required>
+                    <label class="form-check-label" for="confirmarVerificacion">
+                        <strong>
+                            Confirmo que he evaluado exhaustivamente el cumplimiento del programa y que esta 
+                            verificación se realiza en nombre del Comité de Apoyo Educativo.
+                        </strong>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Details" asp-route-id="@Model.IdPrograma" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-success btn-lg" id="btnVerificar">
+                        <i class="fas fa-certificate"></i> Verificar Programa
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        function actualizarEstado(resultado) {
+            // Resaltar opción seleccionada
+            $('.resultado-option').removeClass('border-success border-danger border-3');
+            $('[data-resultado="' + resultado + '"]').addClass(
+                resultado === 'Exitoso' ? 'border-success border-3' : 'border-danger border-3'
+            );
+
+            // Mostrar información
+            $('#infoResultado').show();
+            if (resultado === 'Exitoso') {
+                $('#tituloInfo').html('<i class="fas fa-check-circle text-success"></i> Programa Completado Exitosamente');
+                $('#textoInfo').html(
+                    'El estudiante completó satisfactoriamente el programa. Su estado cambiará a <strong>Completado</strong>.'
+                );
+                $('#infoResultado').removeClass('alert-danger').addClass('alert-success');
+            } else {
+                $('#tituloInfo').html('<i class="fas fa-times-circle text-danger"></i> Programa No Completado');
+                $('#textoInfo').html(
+                    'El estudiante no completó satisfactoriamente el programa. Su estado cambiará a <strong>No Completado</strong>. ' +
+                    'Se requerirá considerar otras opciones para el estudiante.'
+                );
+                $('#infoResultado').removeClass('alert-success').addClass('alert-danger');
+            }
+        }
+
+        $(document).ready(function() {
+            // Validar fecha no sea futura
+            $('#@Html.IdFor(m => m.FechaVerificacion)').on('change', function() {
+                const fechaVerif = new Date($(this).val());
+                const hoy = new Date();
+                const fechaInicio = new Date('@Model.FechaInicio.ToString("yyyy-MM-dd")');
+                
+                if (fechaVerif > hoy) {
+                    toastr.error('La fecha de verificación no puede ser futura');
+                    $(this).val('');
+                } else if (fechaVerif < fechaInicio) {
+                    toastr.error('La fecha de verificación no puede ser anterior al inicio del programa');
+                    $(this).val('');
+                }
+            });
+
+            // Validar longitud de observaciones
+            $('#@Html.IdFor(m => m.ObservacionesVerificacion)').on('blur', function() {
+                const minLength = 50;
+                if ($(this).val().trim().length < minLength) {
+                    toastr.warning('Las observaciones deben tener al menos ' + minLength + ' caracteres');
+                }
+            });
+
+            // Confirmación antes de enviar
+            $('form').on('submit', function(e) {
+                if (!$('input[name="Resultado"]:checked').val()) {
+                    e.preventDefault();
+                    toastr.error('Debe seleccionar un resultado');
+                    return false;
+                }
+
+                if (!$('#confirmarVerificacion').is(':checked')) {
+                    e.preventDefault();
+                    toastr.error('Debe confirmar la verificación');
+                    return false;
+                }
+
+                const resultado = $('input[name="Resultado"]:checked').val();
+                const mensaje = '¿Está seguro de verificar este programa como ' + resultado + '?\n\n' +
+                                'Esta acción quedará registrada permanentemente.';
+
+                if (!confirm(mensaje)) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                $('#btnVerificar')
+                    .prop('disabled', true)
+                    .html('<i class="fas fa-spinner fa-spin"></i> Verificando...');
+            });
+
+            // Establecer fecha de hoy por defecto
+            const hoy = new Date().toISOString().split('T')[0];
+            $('#@Html.IdFor(m => m.FechaVerificacion)').val(hoy);
+        });
+    </script>
+}
+
+<style>
+    .resultado-option {
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .resultado-option:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+    
+    .required::after {
+        content: " *";
+        color: red;
+    }
+</style>

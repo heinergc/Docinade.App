@@ -1,0 +1,476 @@
+﻿@using RubricasApp.Web.ViewModels.Account
+@model UserManagementViewModel
+@{
+    ViewData["Title"] = "Gestión de Usuarios";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        <i class="fas fa-users me-2"></i>
+        Gestión de Usuarios
+    </h2>
+    <div>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">
+            <i class="fas fa-user-plus me-1"></i>
+            Crear Usuario
+        </button>
+        <button type="button" class="btn btn-success" id="exportUsers">
+            <i class="fas fa-download me-1"></i>
+            Exportar
+        </button>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" id="filterForm">
+            <div class="row align-items-end">
+                <div class="col-md-3">
+                    <label for="searchTerm" class="form-label">Buscar</label>
+                    <input type="text" class="form-control" id="searchTerm" name="searchTerm" 
+                           value="@Model.SearchTerm" placeholder="Nombre, email o institución...">
+                </div>
+                <div class="col-md-2">
+                    <label for="roleFilter" class="form-label">Rol</label>
+                    <select class="form-select" id="roleFilter" name="roleFilter">
+                        <option value="">Todos los roles</option>
+                        <option value="SuperAdministrador" selected="@(Model.RoleFilter == "SuperAdministrador")">Super Administrador</option>
+                        <option value="Administrador" selected="@(Model.RoleFilter == "Administrador")">Administrador</option>
+                        <option value="Coordinador" selected="@(Model.RoleFilter == "Coordinador")">Coordinador</option>
+                        <option value="Docente" selected="@(Model.RoleFilter == "Docente")">Docente</option>
+                        <option value="Evaluador" selected="@(Model.RoleFilter == "Evaluador")">Evaluador</option>
+                        <option value="Observador" selected="@(Model.RoleFilter == "Observador")">Observador</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="statusFilter" class="form-label">Estado</label>
+                    <select class="form-select" id="statusFilter" name="statusFilter">
+                        <option value="">Todos</option>
+                        <option value="Active" selected="@(Model.StatusFilter == "Active")">Activos</option>
+                        <option value="Inactive" selected="@(Model.StatusFilter == "Inactive")">Inactivos</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="institutionFilter" class="form-label">Institución</label>
+                    <input type="text" class="form-control" id="institutionFilter" name="institutionFilter" 
+                           value="@Model.InstitutionFilter" placeholder="Filtrar por institución...">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-search me-1"></i>
+                        Filtrar
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabla de usuarios -->
+<div class="card shadow">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">
+            <i class="fas fa-list me-1"></i>
+            Lista de Usuarios (@Model.Users.Count() usuarios)
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.Users.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Email</th>
+                            <th>Institución</th>
+                            <th>Roles</th>
+                            <th>Estado</th>
+                            <th>Último Acceso</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model.Users)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center me-2" 
+                                             style="width: 35px; height: 35px; font-size: 0.8rem;">
+                                            @(user.NombreCompleto.Length >= 2 ? user.NombreCompleto.Substring(0, 2).ToUpper() : user.NombreCompleto.ToUpper())
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">@user.NombreCompleto</div>
+                                            @if (!string.IsNullOrEmpty(user.Departamento))
+                                            {
+                                                <small class="text-muted">@user.Departamento</small>
+                                            }
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="text-break">@user.Email</span>
+                                    @if (user.EmailConfirmed)
+                                    {
+                                        <i class="fas fa-check-circle text-success ms-1" title="Email verificado"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-exclamation-circle text-warning ms-1" title="Email no verificado"></i>
+                                    }
+                                </td>
+                                <td>
+                                    <small>@user.Institucion</small>
+                                </td>
+                                <td>
+                                    @if (user.Roles != null && user.Roles.Any())
+                                    {
+                                        @foreach (var role in user.Roles)
+                                        {
+                                            <span class="badge bg-secondary me-1 small">@role</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Sin roles</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.Now)
+                                    {
+                                        <span class="badge bg-danger">Bloqueado</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">Activo</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (user.LastLoginDate.HasValue)
+                                    {
+                                        <small>@user.LastLoginDate.Value.ToString("dd/MM/yyyy")</small>
+                                    }
+                                    else
+                                    {
+                                        <small class="text-muted">Nunca</small>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button type="button" class="btn btn-outline-primary" 
+                                                onclick="editUser('@user.Id')" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-warning" 
+                                                onclick="manageRoles('@user.Id')" title="Gestionar Roles">
+                                            <i class="fas fa-user-tag"></i>
+                                        </button>
+                                        @if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.Now)
+                                        {
+                                            <button type="button" class="btn btn-outline-success" 
+                                                    onclick="unlockUser('@user.Id')" title="Desbloquear">
+                                                <i class="fas fa-unlock"></i>
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn btn-outline-danger" 
+                                                    onclick="lockUser('@user.Id')" title="Bloquear">
+                                                <i class="fas fa-lock"></i>
+                                            </button>
+                                        }
+                                        <button type="button" class="btn btn-outline-danger" 
+                                                onclick="deleteUser('@user.Id', '@user.NombreCompleto')" title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center p-5">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No se encontraron usuarios con los criterios especificados.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Modal para crear usuario -->
+<div class="modal fade" id="createUserModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-user-plus me-2"></i>
+                    Crear Nuevo Usuario
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="createUserForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="createNombre" class="form-label">Nombre *</label>
+                            <input type="text" class="form-control" id="createNombre" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="createApellidos" class="form-label">Apellidos *</label>
+                            <input type="text" class="form-control" id="createApellidos" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="createEmail" class="form-label">Email *</label>
+                        <input type="email" class="form-control" id="createEmail" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="createInstitucion" class="form-label">Institución *</label>
+                            <input type="text" class="form-control" id="createInstitucion" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="createDepartamento" class="form-label">Departamento</label>
+                            <input type="text" class="form-control" id="createDepartamento">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="createTelefono" class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="createTelefono">
+                    </div>
+                    <div class="mb-3">
+                        <label for="createRoles" class="form-label">Roles *</label>
+                        <select class="form-select" id="createRoles" multiple required>
+                            <option value="SuperAdministrador">Super Administrador</option>
+                            <option value="Administrador">Administrador</option>
+                            <option value="Coordinador">Coordinador</option>
+                            <option value="Docente">Docente</option>
+                            <option value="Evaluador">Evaluador</option>
+                            <option value="Observador" selected>Observador</option>
+                        </select>
+                        <div class="form-text">Mantén Ctrl presionado para seleccionar múltiples roles.</div>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Se enviará un email al usuario con instrucciones para establecer su contraseña.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus me-1"></i>
+                        Crear Usuario
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-submit form on filter change
+        $('#roleFilter, #statusFilter').change(function() {
+            $('#filterForm').submit();
+        });
+
+        // Debounced search
+        let searchTimeout;
+        $('#searchTerm, #institutionFilter').on('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(function() {
+                $('#filterForm').submit();
+            }, 500);
+        });
+
+        // Create user form submission
+        $('#createUserForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            const submitButton = $(this).find('button[type="submit"]');
+            const originalText = submitButton.html();
+            
+            // Deshabilitar botón y mostrar loading
+            submitButton.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Creando...');
+            
+            const formData = {
+                nombre: $('#createNombre').val(),
+                apellidos: $('#createApellidos').val(),
+                email: $('#createEmail').val(),
+                institucion: $('#createInstitucion').val(),
+                departamento: $('#createDepartamento').val(),
+                telefono: $('#createTelefono').val(),
+                roles: $('#createRoles').val() || []
+            };
+
+            // Validación básica del lado cliente
+            if (!formData.nombre || !formData.apellidos || !formData.email || !formData.institucion) {
+                showAlert('Por favor complete todos los campos requeridos.', 'danger');
+                submitButton.prop('disabled', false).html(originalText);
+                return;
+            }
+
+            if (!formData.roles.length) {
+                showAlert('Debe seleccionar al menos un rol para el usuario.', 'danger');
+                submitButton.prop('disabled', false).html(originalText);
+                return;
+            }
+
+            // Llamada AJAX
+            $.ajax({
+                url: '@Url.Action("CreateUser", "Account")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(result) {
+                    if (result.success) {
+                        showAlert(result.message, 'success');
+                        $('#createUserModal').modal('hide');
+                        $('#createUserForm')[0].reset();
+                        
+                        // Recargar la página para mostrar el nuevo usuario
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        showAlert(result.message, 'danger');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error creating user:', error);
+                    showAlert('Error al crear el usuario. Por favor intente nuevamente.', 'danger');
+                },
+                complete: function() {
+                    submitButton.prop('disabled', false).html(originalText);
+                }
+            });
+        });
+
+        // Función para mostrar alertas
+        function showAlert(message, type) {
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            // Insertar alerta al principio del contenido
+            $('.container-fluid').prepend(alertHtml);
+            
+            // Auto-remover después de 5 segundos
+            setTimeout(function() {
+                $('.alert').fadeOut(500, function() {
+                    $(this).remove();
+                });
+            }, 5000);
+        }
+
+        // User management functions
+        function editUser(userId) {
+            // Obtener detalles del usuario
+            $.get('@Url.Action("GetUserDetails", "Account")', { userId: userId }, function(result) {
+                if (result.success) {
+                    // Aquí se puede implementar un modal de edición
+                    console.log('User details:', result.user);
+                    showAlert('Funcionalidad de edición en desarrollo.', 'info');
+                } else {
+                    showAlert(result.message, 'danger');
+                }
+            }).fail(function() {
+                showAlert('Error al obtener detalles del usuario.', 'danger');
+            });
+        }
+
+        function manageRoles(userId) {
+            // Implementar gestión de roles
+            showAlert('Funcionalidad de gestión de roles en desarrollo.', 'info');
+        }
+
+        function lockUser(userId) {
+            if (confirm('¿Estás seguro de que quieres bloquear este usuario?')) {
+                $.post('@Url.Action("LockUser", "Account")', 
+                    { 
+                        userId: userId,
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                    }, 
+                    function(result) {
+                        if (result.success) {
+                            showAlert(result.message, 'success');
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            showAlert(result.message, 'danger');
+                        }
+                    }
+                ).fail(function() {
+                    showAlert('Error al bloquear el usuario.', 'danger');
+                });
+            }
+        }
+
+        function unlockUser(userId) {
+            if (confirm('¿Estás seguro de que quieres desbloquear este usuario?')) {
+                $.post('@Url.Action("UnlockUser", "Account")', 
+                    { 
+                        userId: userId,
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                    }, 
+                    function(result) {
+                        if (result.success) {
+                            showAlert(result.message, 'success');
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            showAlert(result.message, 'danger');
+                        }
+                    }
+                ).fail(function() {
+                    showAlert('Error al desbloquear el usuario.', 'danger');
+                });
+            }
+        }
+
+        function deleteUser(userId, userName) {
+            if (confirm(`¿Estás seguro de que quieres eliminar al usuario "${userName}"? Esta acción no se puede deshacer.`)) {
+                $.post('@Url.Action("DeleteUser", "Account")', 
+                    { 
+                        userId: userId,
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                    }, 
+                    function(result) {
+                        if (result.success) {
+                            showAlert(result.message, 'success');
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            showAlert(result.message, 'danger');
+                        }
+                    }
+                ).fail(function() {
+                    showAlert('Error al eliminar el usuario.', 'danger');
+                });
+            }
+        }
+
+        // Export users
+        $('#exportUsers').click(function() {
+            // Implementar exportación
+            console.log('Export users');
+        });
+    </script>
+}

@@ -1,0 +1,673 @@
+@model dynamic
+
+@{
+    ViewData["Title"] = $"Historial de Auditoría - {ViewBag.EntidadNombre ?? ViewBag.TipoEntidad ?? "Entidad"}";
+}
+<link rel="stylesheet" href="~/css/estilos_genericos.css" />
+
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="page-title">
+                <i class="fas fa-history text-warning me-2"></i>
+                Historial de Auditoría
+            </h1>
+            <h6 class="text-muted-white">
+                <span class="badge bg-info">@(ViewBag.TipoEntidad ?? "Entidad")</span> @(ViewBag.EntidadNombre ?? "Sin nombre")
+            </h6>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-white">
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index", "Home")" style="color: white !important;">
+                            <i class="fas fa-home"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index", "Auditoria")" style="color: white !important;">
+                            <i class="fas fa-clipboard-list"></i> Auditoría
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" style="color: white !important;">Historial</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="content-wrapper">
+        <!-- Información del Registro -->
+        <div class="header-section">
+            <div>
+                <h2>Historial de Cambios</h2>
+                <p class="subtitle">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Entidad: @(ViewBag.TipoEntidad ?? "Sin especificar") | 
+                    Total de registros: @(ViewBag.TotalRegistros?.ToString() ?? "0")
+                </p>
+            </div>
+            <div class="header-actions">
+                <button type="button" class="btn btn-info" id="btnFiltros">
+                    <i class="fas fa-filter"></i> Filtros
+                </button>
+                <button type="button" class="btn btn-success" id="btnExportar">
+                    <i class="fas fa-download"></i> Exportar
+                </button>
+                <a href="@Url.Action("Index")" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+            </div>
+        </div>
+
+        <!-- Panel de Filtros (Colapsible) -->
+        <div class="row mb-4" id="panelFiltros" style="display: none;">
+            <div class="col-12">
+                <div class="card card-subtle">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-search me-2"></i>
+                            Filtros de Búsqueda
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="form-label">Acción</label>
+                                    <select id="filtroAccion" class="form-select">
+                                        <option value="">Todas las acciones</option>
+                                        <option value="INSERT">Creación</option>
+                                        <option value="UPDATE">Modificación</option>
+                                        <option value="DELETE">Eliminación</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="form-label">Usuario</label>
+                                    <input type="text" id="filtroUsuario" class="form-control" placeholder="Filtrar por usuario...">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="form-label">Fecha Desde</label>
+                                    <input type="date" id="filtroFechaDesde" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="form-label">Fecha Hasta</label>
+                                    <input type="date" id="filtroFechaHasta" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-primary me-2" id="btnAplicarFiltros">
+                                    <i class="fas fa-search"></i> Aplicar Filtros
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="btnLimpiarFiltros">
+                                    <i class="fas fa-eraser"></i> Limpiar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Historial -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-modern">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            Registros de Auditoría
+                            <span class="badge badge-primary ms-2" id="totalRegistros">@(ViewBag.TotalRegistros?.ToString() ?? "0")</span>
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-container">
+                            <div class="table-responsive">
+                                <table class="table table-striped" id="tablaHistorial">
+                                    <thead>
+                                        <tr>
+                                            <th width="60">
+                                                <i class="fas fa-clock"></i>
+                                            </th>
+                                            <th>Fecha y Hora</th>
+                                            <th>Acción</th>
+                                            <th>Usuario</th>
+                                            <th>Campo</th>
+                                            <th>Valor Anterior</th>
+                                            <th>Valor Nuevo</th>
+                                            <th width="80">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model != null)
+                                        {
+                                            @foreach (var registro in Model)
+                                            {
+                                                <tr data-accion="@registro.Accion" 
+                                                    data-usuario="@registro.Usuario" 
+                                                    data-fecha="@registro.FechaHora.ToString("yyyy-MM-dd")">
+                                                    <td>
+                                                        @switch (registro.Accion)
+                                                        {
+                                                            case "INSERT":
+                                                                <span class="badge badge-success" title="Creación">
+                                                                    <i class="fas fa-plus"></i>
+                                                                </span>
+                                                                break;
+                                                            case "UPDATE":
+                                                                <span class="badge badge-warning" title="Modificación">
+                                                                    <i class="fas fa-edit"></i>
+                                                                </span>
+                                                                break;
+                                                            case "DELETE":
+                                                                <span class="badge badge-danger" title="Eliminación">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </span>
+                                                                break;
+                                                            default:
+                                                                <span class="badge badge-secondary" title="Otra acción">
+                                                                    <i class="fas fa-question"></i>
+                                                                </span>
+                                                                break;
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        <div>
+                                                            <strong>@registro.FechaHora.ToString("dd/MM/yyyy")</strong>
+                                                            <br><small class="text-muted">@registro.FechaHora.ToString("HH:mm:ss")</small>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        @switch (registro.Accion)
+                                                        {
+                                                            case "INSERT":
+                                                                <span class="text-success">Creación</span>
+                                                                break;
+                                                            case "UPDATE":
+                                                                <span class="text-warning">Modificación</span>
+                                                                break;
+                                                            case "DELETE":
+                                                                <span class="text-danger">Eliminación</span>
+                                                                break;
+                                                            default:
+                                                                <span class="text-muted">@registro.Accion</span>
+                                                                break;
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        <div>
+                                                            <strong>@(registro.Usuario ?? "Sistema")</strong>
+                                                            @if (!string.IsNullOrEmpty(registro.UsuarioNombre))
+                                                            {
+                                                                <br><small class="text-muted">@registro.UsuarioNombre</small>
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        @if (!string.IsNullOrEmpty(registro.Campo))
+                                                        {
+                                                            <code class="text-info">@registro.Campo</code>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted">-</span>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (!string.IsNullOrEmpty(registro.ValorAnterior))
+                                                        {
+                                                            <div class="valor-anterior">
+                                                                <small>@registro.ValorAnterior</small>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted">-</span>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (!string.IsNullOrEmpty(registro.ValorNuevo))
+                                                        {
+                                                            <div class="valor-nuevo">
+                                                                <small>@registro.ValorNuevo</small>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted">-</span>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-small btn-info btn-detalles" 
+                                                                data-registro-id="@registro.Id" 
+                                                                title="Ver detalles">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                                @if (ViewBag.SinRegistros == true)
+                                {
+                                    <div class="p-4 text-center text-muted">
+                                        <i class="fas fa-history fa-2x mb-2"></i>
+                                        <p class="mb-0">No hay registros de auditoría para esta entidad</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de Estadísticas -->
+        @if (ViewBag.MostrarEstadisticas != false)
+        {
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card card-subtle">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-chart-pie me-2"></i>
+                                Estadísticas del Historial
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-md-3">
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-plus-circle fa-2x text-success me-3"></i>
+                                        <div>
+                                            <h4 class="mb-0" id="conteoCreaciones">0</h4>
+                                            <small class="text-muted">Creaciones</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-edit fa-2x text-warning me-3"></i>
+                                        <div>
+                                            <h4 class="mb-0" id="conteoModificaciones">0</h4>
+                                            <small class="text-muted">Modificaciones</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-trash fa-2x text-danger me-3"></i>
+                                        <div>
+                                            <h4 class="mb-0" id="conteoEliminaciones">0</h4>
+                                            <small class="text-muted">Eliminaciones</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-users fa-2x text-info me-3"></i>
+                                        <div>
+                                            <h4 class="mb-0" id="usuariosUnicos">0</h4>
+                                            <small class="text-muted">Usuarios Únicos</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Calcular estadísticas al cargar la página
+            calcularEstadisticas();
+            
+            // Toggle panel de filtros
+            $('#btnFiltros').click(function() {
+                $('#panelFiltros').toggle();
+                $(this).toggleClass('active');
+            });
+
+            // Aplicar filtros
+            $('#btnAplicarFiltros').click(function() {
+                aplicarFiltros();
+            });
+
+            // Limpiar filtros
+            $('#btnLimpiarFiltros').click(function() {
+                limpiarFiltros();
+            });
+
+            // Ver detalles del registro
+            $('.btn-detalles').click(function() {
+                const registroId = $(this).data('registro-id');
+                mostrarDetallesRegistro(registroId);
+            });
+
+            // Exportar historial
+            $('#btnExportar').click(function() {
+                exportarHistorial();
+            });
+
+            // Función para calcular estadísticas
+            function calcularEstadisticas() {
+                let creaciones = 0;
+                let modificaciones = 0;
+                let eliminaciones = 0;
+                let usuariosSet = new Set();
+
+                $('#tablaHistorial tbody tr').each(function() {
+                    const accion = $(this).data('accion');
+                    const usuario = $(this).data('usuario');
+                    
+                    if (accion === 'INSERT') creaciones++;
+                    else if (accion === 'UPDATE') modificaciones++;
+                    else if (accion === 'DELETE') eliminaciones++;
+                    
+                    if (usuario) usuariosSet.add(usuario);
+                });
+
+                $('#conteoCreaciones').text(creaciones);
+                $('#conteoModificaciones').text(modificaciones);
+                $('#conteoEliminaciones').text(eliminaciones);
+                $('#usuariosUnicos').text(usuariosSet.size);
+            }
+
+            // Función para aplicar filtros
+            function aplicarFiltros() {
+                const filtroAccion = $('#filtroAccion').val();
+                const filtroUsuario = $('#filtroUsuario').val().toLowerCase();
+                const filtroFechaDesde = $('#filtroFechaDesde').val();
+                const filtroFechaHasta = $('#filtroFechaHasta').val();
+
+                let registrosVisibles = 0;
+
+                $('#tablaHistorial tbody tr').each(function() {
+                    const fila = $(this);
+                    const accion = fila.data('accion');
+                    const usuario = fila.data('usuario').toLowerCase();
+                    const fecha = fila.data('fecha');
+
+                    let mostrar = true;
+
+                    // Filtro por acción
+                    if (filtroAccion && accion !== filtroAccion) {
+                        mostrar = false;
+                    }
+
+                    // Filtro por usuario
+                    if (filtroUsuario && !usuario.includes(filtroUsuario)) {
+                        mostrar = false;
+                    }
+
+                    // Filtro por fecha desde
+                    if (filtroFechaDesde && fecha < filtroFechaDesde) {
+                        mostrar = false;
+                    }
+
+                    // Filtro por fecha hasta
+                    if (filtroFechaHasta && fecha > filtroFechaHasta) {
+                        mostrar = false;
+                    }
+
+                    fila.toggle(mostrar);
+                    if (mostrar) registrosVisibles++;
+                });
+
+                $('#totalRegistros').text(registrosVisibles);
+
+                // Mostrar mensaje si no hay resultados
+                if (registrosVisibles === 0) {
+                    if ($('#noResultados').length === 0) {
+                        $('#tablaHistorial tbody').append(`
+                            <tr id="noResultados">
+                                <td colspan="8" class="text-center p-4 text-muted">
+                                    <i class="fas fa-search fa-2x mb-2"></i>
+                                    <p class="mb-0">No se encontraron registros con los filtros aplicados</p>
+                                </td>
+                            </tr>
+                        `);
+                    }
+                } else {
+                    $('#noResultados').remove();
+                }
+            }
+
+            // Función para limpiar filtros
+            function limpiarFiltros() {
+                $('#filtroAccion').val('');
+                $('#filtroUsuario').val('');
+                $('#filtroFechaDesde').val('');
+                $('#filtroFechaHasta').val('');
+                
+                $('#tablaHistorial tbody tr').show();
+                $('#noResultados').remove();
+                $('#totalRegistros').text('@(ViewBag.TotalRegistros?.ToString() ?? "0")');
+            }
+
+            // Función para mostrar detalles del registro
+            function mostrarDetallesRegistro(registroId) {
+                Swal.fire({
+                    title: 'Detalles del Registro',
+                    html: '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Cargando detalles...</div>',
+                    showConfirmButton: false,
+                    allowOutsideClick: true
+                });
+
+                $.get('@Url.Action("DetalleRegistro")', { id: registroId })
+                    .done(function(data) {
+                        let html = '<div class="text-left">';
+                        
+                        if (data.campos && data.campos.length > 0) {
+                            html += '<table class="table table-sm">';
+                            html += '<thead><tr><th>Campo</th><th>Valor Anterior</th><th>Valor Nuevo</th></tr></thead>';
+                            html += '<tbody>';
+                            
+                            data.campos.forEach(function(campo) {
+                                html += `<tr>
+                                    <td><code>${campo.nombre}</code></td>
+                                    <td><small>${campo.valorAnterior || '-'}</small></td>
+                                    <td><small>${campo.valorNuevo || '-'}</small></td>
+                                </tr>`;
+                            });
+                            
+                            html += '</tbody></table>';
+                        } else {
+                            html += '<p class="text-muted">No hay detalles adicionales disponibles.</p>';
+                        }
+                        
+                        html += '</div>';
+
+                        Swal.fire({
+                            title: 'Detalles del Registro',
+                            html: html,
+                            confirmButtonText: 'Cerrar',
+                            width: '600px'
+                        });
+                    })
+                    .fail(function() {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'No se pudieron cargar los detalles del registro',
+                            icon: 'error'
+                        });
+                    });
+            }
+
+            // Función para exportar historial
+            function exportarHistorial() {
+                const grupoId = '@ViewBag.GrupoId';
+                
+                Swal.fire({
+                    title: 'Exportar Historial',
+                    text: '¿En qué formato desea exportar el historial?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="fas fa-file-excel"></i> Excel',
+                    cancelButtonText: '<i class="fas fa-file-pdf"></i> PDF',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Exportar a Excel
+                        window.location.href = '@Url.Action("ExportarHistorial")?grupoId=' + grupoId + '&formato=excel';
+                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                        // Exportar a PDF
+                        window.location.href = '@Url.Action("ExportarHistorial")?grupoId=' + grupoId + '&formato=pdf';
+                    }
+                });
+            }
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        /* Estilos específicos para la vista de historial */
+        
+        /* Estilos para breadcrumb blanco */
+        .breadcrumb-white {
+            background: transparent;
+        }
+
+        .breadcrumb-white .breadcrumb-item {
+            color: white !important;
+        }
+
+        .breadcrumb-white .breadcrumb-item a {
+            color: white !important;
+            text-decoration: none;
+        }
+
+        .breadcrumb-white .breadcrumb-item a:hover {
+            color: #f8f9fa !important;
+            text-decoration: underline;
+        }
+
+        .breadcrumb-white .breadcrumb-item.active {
+            color: white !important;
+        }
+
+        .breadcrumb-white .breadcrumb-item + .breadcrumb-item::before {
+            color: white !important;
+            content: var(--bs-breadcrumb-divider, "/");
+        }
+
+        /* Estilos adicionales para header */
+        .page-header .breadcrumb-item,
+        .page-header .breadcrumb-item a,
+        .page-header .breadcrumb-item.active {
+            color: white !important;
+        }
+
+        .page-header .breadcrumb-item + .breadcrumb-item::before {
+            color: white !important;
+        }
+
+        .page-header .breadcrumb a {
+            color: white !important;
+            text-decoration: none;
+            opacity: 0.9;
+        }
+
+        .page-header .breadcrumb a:hover {
+            color: white !important;
+            text-decoration: underline;
+            opacity: 1;
+        }
+
+        /* Estilos específicos para la tabla de historial */
+        .valor-anterior {
+            max-width: 150px;
+            word-wrap: break-word;
+            background-color: rgba(220, 53, 69, 0.1);
+            border-left: 3px solid #dc3545;
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+        }
+
+        .valor-nuevo {
+            max-width: 150px;
+            word-wrap: break-word;
+            background-color: rgba(40, 167, 69, 0.1);
+            border-left: 3px solid #28a745;
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+        }
+
+        /* Botón activo para filtros */
+        .btn.active {
+            transform: scale(0.98);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Animaciones para las filas */
+        #tablaHistorial tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        #tablaHistorial tbody tr:hover {
+            background-color: var(--bg-light);
+            transform: translateX(2px);
+        }
+
+        /* Responsive adjustments */
+        @@media (max-width: 768px) {
+            .header-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .header-actions {
+                margin-top: 1rem;
+                flex-wrap: wrap;
+            }
+            
+            .btn {
+                margin-bottom: 0.5rem;
+            }
+
+            .col-md-3 {
+                margin-bottom: 1rem;
+            }
+
+            .table-responsive {
+                font-size: 0.875rem;
+            }
+
+            .valor-anterior,
+            .valor-nuevo {
+                max-width: 100px;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Estados de los badges */
+        .badge {
+            font-size: 0.7rem;
+        }
+
+        /* Código en los campos */
+        code {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--info-color);
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+        }
+    </style>
+}

@@ -1,0 +1,270 @@
+@model RubricasApp.Web.ViewModels.TomarAsistenciaViewModel
+
+@{
+    ViewData["Title"] = "Tomar Asistencia por Lección";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-check-square me-2"></i>@ViewData["Title"]
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Información de la lección -->
+                    <div class="alert alert-info mb-4">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <strong><i class="fas fa-users me-1"></i>Grupo:</strong>
+                                <br />@Model.Leccion?.Grupo?.Nombre
+                            </div>
+                            <div class="col-md-3">
+                                <strong><i class="fas fa-book me-1"></i>Materia:</strong>
+                                <br />@Model.Leccion?.Materia?.Nombre
+                            </div>
+                            <div class="col-md-3">
+                                <strong><i class="fas fa-calendar me-1"></i>Día:</strong>
+                                <br />
+                                @switch (Model.Leccion?.DiaSemana)
+                                {
+                                    case DayOfWeek.Monday: <text>Lunes</text> break;
+                                    case DayOfWeek.Tuesday: <text>Martes</text> break;
+                                    case DayOfWeek.Wednesday: <text>Miércoles</text> break;
+                                    case DayOfWeek.Thursday: <text>Jueves</text> break;
+                                    case DayOfWeek.Friday: <text>Viernes</text> break;
+                                    case DayOfWeek.Saturday: <text>Sábado</text> break;
+                                    case DayOfWeek.Sunday: <text>Domingo</text> break;
+                                }
+                            </div>
+                            <div class="col-md-3">
+                                <strong><i class="fas fa-clock me-1"></i>Horario:</strong>
+                                <br />@Model.Leccion?.HorarioFormateado
+                            </div>
+                        </div>
+                    </div>
+
+                    <form asp-action="GuardarAsistencia" method="post" id="formAsistencia">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="IdLeccion" />
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label asp-for="FechaAsistencia" class="form-label">Fecha *</label>
+                                <input asp-for="FechaAsistencia" type="date" class="form-control" />
+                                <span asp-validation-for="FechaAsistencia" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-8 d-flex align-items-end">
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-success" onclick="marcarTodos('P')">
+                                        <i class="fas fa-check-circle me-1"></i>Todos Presentes
+                                    </button>
+                                    <button type="button" class="btn btn-danger" onclick="marcarTodos('A')">
+                                        <i class="fas fa-times-circle me-1"></i>Todos Ausentes
+                                    </button>
+                                    <button type="button" class="btn btn-warning" onclick="marcarTodos('T')">
+                                        <i class="fas fa-clock me-1"></i>Todos Tarde
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" onclick="marcarTodos('N')">
+                                        <i class="fas fa-undo me-1"></i>Limpiar Todo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tabla de estudiantes -->
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width: 40px;">#</th>
+                                        <th>Estudiante</th>
+                                        <th style="width: 120px;">Identificación</th>
+                                        <th style="width: 150px;">Estado *</th>
+                                        <th>Observaciones</th>
+                                        <th style="width: 150px;">Justificación</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.RegistrosAsistencia.Count; i++)
+                                    {
+                                        <tr id="row-@i">
+                                            <td class="align-middle">@(i + 1)</td>
+                                            <td class="align-middle">
+                                                <strong>@Model.RegistrosAsistencia[i].NombreCompleto</strong>
+                                                <input type="hidden" asp-for="RegistrosAsistencia[i].EstudianteId" />
+                                                <input type="hidden" asp-for="RegistrosAsistencia[i].AsistenciaId" />
+                                            </td>
+                                            <td class="align-middle">
+                                                @Model.RegistrosAsistencia[i].Identificacion
+                                            </td>
+                                            <td>
+                                                <select asp-for="RegistrosAsistencia[i].Estado" 
+                                                        class="form-select form-select-sm estado-select" 
+                                                        data-row="@i"
+                                                        onchange="cambiarEstado(this)">
+                                                    <option value="N">No marcado</option>
+                                                    <option value="P" class="bg-success text-white">Presente</option>
+                                                    <option value="A" class="bg-danger text-white">Ausente</option>
+                                                    <option value="T" class="bg-warning">Tardanza</option>
+                                                    <option value="AJ" class="bg-info text-white">Aus. Justificada</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input asp-for="RegistrosAsistencia[i].Observaciones" 
+                                                       class="form-control form-control-sm" 
+                                                       placeholder="Observaciones" />
+                                            </td>
+                                            <td>
+                                                <input asp-for="RegistrosAsistencia[i].Justificacion" 
+                                                       class="form-control form-control-sm justificacion-input" 
+                                                       placeholder="Justificación"
+                                                       data-row="@i" />
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Resumen estadístico -->
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Resumen</h5>
+                                        <div class="row text-center">
+                                            <div class="col">
+                                                <div class="badge bg-secondary fs-5" id="total-estudiantes">0</div>
+                                                <div class="small">Total</div>
+                                            </div>
+                                            <div class="col">
+                                                <div class="badge bg-success fs-5" id="total-presentes">0</div>
+                                                <div class="small">Presentes</div>
+                                            </div>
+                                            <div class="col">
+                                                <div class="badge bg-danger fs-5" id="total-ausentes">0</div>
+                                                <div class="small">Ausentes</div>
+                                            </div>
+                                            <div class="col">
+                                                <div class="badge bg-warning fs-5" id="total-tardanzas">0</div>
+                                                <div class="small">Tardanzas</div>
+                                            </div>
+                                            <div class="col">
+                                                <div class="badge bg-info fs-5" id="total-justificadas">0</div>
+                                                <div class="small">Justificadas</div>
+                                            </div>
+                                            <div class="col">
+                                                <div class="badge bg-primary fs-5" id="porcentaje-asistencia">0%</div>
+                                                <div class="small">% Asistencia</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Index" asp-route-grupoId="@Model.Leccion?.IdGrupo" asp-route-fecha="@Model.FechaAsistencia" 
+                               class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Volver
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-1"></i>Guardar Asistencia
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            actualizarResumen();
+            
+            // Actualizar resumen cuando cambie cualquier estado
+            $('.estado-select').on('change', function() {
+                actualizarResumen();
+            });
+        });
+
+        function marcarTodos(estado) {
+            $('.estado-select').val(estado).trigger('change');
+            cambiarEstadoVisual();
+        }
+
+        function cambiarEstado(select) {
+            const row = $(select).data('row');
+            const estado = $(select).val();
+            const rowElement = $(`#row-${row}`);
+            
+            // Cambiar color de fondo según estado
+            rowElement.removeClass('table-success table-danger table-warning table-info');
+            
+            switch(estado) {
+                case 'P':
+                    rowElement.addClass('table-success');
+                    break;
+                case 'A':
+                    rowElement.addClass('table-danger');
+                    break;
+                case 'T':
+                    rowElement.addClass('table-warning');
+                    break;
+                case 'AJ':
+                    rowElement.addClass('table-info');
+                    break;
+            }
+
+            // Habilitar/deshabilitar campo de justificación
+            const justificacionInput = $(`.justificacion-input[data-row="${row}"]`);
+            if (estado === 'AJ' || estado === 'A') {
+                justificacionInput.prop('disabled', false);
+            } else {
+                justificacionInput.prop('disabled', true);
+                justificacionInput.val('');
+            }
+            
+            actualizarResumen();
+        }
+
+        function cambiarEstadoVisual() {
+            $('.estado-select').each(function() {
+                cambiarEstado(this);
+            });
+        }
+
+        function actualizarResumen() {
+            const total = $('.estado-select').length;
+            let presentes = 0, ausentes = 0, tardanzas = 0, justificadas = 0;
+
+            $('.estado-select').each(function() {
+                const estado = $(this).val();
+                switch(estado) {
+                    case 'P': presentes++; break;
+                    case 'A': ausentes++; break;
+                    case 'T': tardanzas++; break;
+                    case 'AJ': justificadas++; break;
+                }
+            });
+
+            const porcentaje = total > 0 ? ((presentes + tardanzas) / total * 100).toFixed(1) : 0;
+
+            $('#total-estudiantes').text(total);
+            $('#total-presentes').text(presentes);
+            $('#total-ausentes').text(ausentes);
+            $('#total-tardanzas').text(tardanzas);
+            $('#total-justificadas').text(justificadas);
+            $('#porcentaje-asistencia').text(porcentaje + '%');
+        }
+
+        // Inicializar estados visuales
+        cambiarEstadoVisual();
+    </script>
+}

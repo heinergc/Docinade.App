@@ -1,0 +1,274 @@
+@*
+    Partial para cargar assets de SearchableSelect de forma idempotente.
+    Versión 2.0 - Con lógica de carga remota y API de control.
+*@
+
+@if (ViewContext.HttpContext.Items.ContainsKey("SearchableSelectAssetsNeeded") &&
+     !ViewContext.HttpContext.Items.ContainsKey("SearchableSelectAssetsLoaded"))
+{
+    ViewContext.HttpContext.Items["SearchableSelectAssetsLoaded"] = true;
+
+    @* CSS Libraries *@
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+
+    @* CSS personalizado *@
+    <style>
+        .ts-wrapper.form-select {
+            padding: 0;
+            border: none;
+            background: transparent;
+        }
+        .ts-control {
+            min-height: calc(1.5em + .75rem + 2px); /* Altura de form-control de Bootstrap */
+        }
+        .ts-wrapper.is-disabled .ts-control {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+        .select2-container--bootstrap-5 .select2-selection {
+            min-height: calc(1.5em + .75rem + 2px);
+        }
+        .searchable-select-loading .ts-control::after,
+        .searchable-select-loading.select2-container--bootstrap-5 .select2-selection::after {
+            content: "";
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: searchable-select-spin 1s linear infinite;
+        }
+        @@keyframes searchable-select-spin {
+            0% { transform: translateY(-50%) rotate(0deg); }
+            100% { transform: translateY(-50%) rotate(360deg); }
+        }
+    </style>
+
+    @* JavaScript Libraries *@
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    @* SearchableSelect Library v2.0 *@
+    <script>
+        window.SearchableSelect = (function() {
+            'use strict';
+
+            const instances = {};
+
+            function init(selector) {
+                const element = typeof selector === 'string' ? document.querySelector(selector) : selector;
+                if (!element || element.dataset.searchableInitialized === 'true') return;
+
+                const id = element.id;
+                if (!id) {
+                    console.error('SearchableSelect requiere un ID único.', element);
+                    return;
+                }
+
+                const library = element.dataset.searchableLibrary || 'tomselect';
+                let instance = null;
+
+                try {
+                    if (library === 'tomselect' && typeof TomSelect !== 'undefined') {
+                        instance = initTomSelect(element);
+                    } else if (library === 'select2' && typeof $ !== 'undefined' && $.fn.select2) {
+                        instance = initSelect2(element);
+                    }
+
+                    if (instance) {
+                        element.dataset.searchableInitialized = 'true';
+                        instances[id] = { instance, library };
+                        console.log(`✅ SearchableSelect '${id}' inicializado con ${library}.`);
+                    }
+                } catch (error) {
+                    console.error(`Error inicializando SearchableSelect '${id}':`, error);
+                }
+            }
+
+            function initTomSelect(element) {
+                const endpoint = element.dataset.searchableEndpoint;
+                const config = {
+                    create: false,
+                    placeholder: element.dataset.searchablePlaceholder || 'Seleccionar...',
+                    allowEmptyOption: true,
+                    maxOptions: element.dataset.searchableMaxOptions ? parseInt(element.dataset.searchableMaxOptions) : 100,
+                    onFocus: () => {
+                        // Abre el dropdown al enfocar si no hay endpoint o si la longitud mínima es 0
+                        const minInput = parseInt(element.dataset.searchableMinimumInput || '0');
+                        if (!endpoint || minInput === 0) {
+                            const tomselect = instances[element.id]?.instance;
+                            if (tomselect && !tomselect.isOpen) {
+                                tomselect.open();
+                                tomselect.load(''); // Cargar opciones iniciales si es necesario
+                            }
+                        }
+                    }
+                };
+
+                if (endpoint) {
+                    config.load = function(query, callback) {
+                        const tomselect = this;
+                        const minInput = parseInt(element.dataset.searchableMinimumInput || '2');
+                        if (query.length < minInput) return callback();
+
+                        tomselect.wrapper.classList.add('searchable-select-loading');
+
+                        let extraData = {};
+                        try {
+                            if (element.dataset.searchableExtra) {
+                                extraData = JSON.parse(element.dataset.searchableExtra);
+                            }
+                        } catch (e) { console.error('Error parsing data-searchable-extra:', e); }
+
+                        const params = new URLSearchParams({
+                            query: query,
+                            ...extraData
+                        });
+
+                        fetch(`${endpoint}?${params.toString()}`)
+                            .then(response => response.json())
+                            .then(json => {
+                                tomselect.wrapper.classList.remove('searchable-select-loading');
+                                callback(json);
+                            }).catch(() => {
+                                tomselect.wrapper.classList.remove('searchable-select-loading');
+                                callback();
+                            });
+                    };
+                    config.shouldLoad = function(query) {
+                        const minInput = parseInt(element.dataset.searchableMinimumInput || '2');
+                        return query.length >= minInput;
+                    };
+                }
+
+                return new TomSelect(element, config);
+            }
+
+            function initSelect2(element) {
+                const endpoint = element.dataset.searchableEndpoint;
+                const config = {
+                    theme: 'bootstrap-5',
+                    width: '100%',
+                    placeholder: element.dataset.searchablePlaceholder || 'Seleccionar...',
+                    allowClear: element.dataset.searchableAllowClear === 'true',
+                };
+
+                if (endpoint) {
+                    config.minimumInputLength = parseInt(element.dataset.searchableMinimumInput || '2');
+                    config.ajax = {
+                        url: endpoint,
+                        dataType: 'json',
+                        delay: parseInt(element.dataset.searchableDebounce || '250'),
+                        data: function(params) {
+                            let extraData = {};
+                            try {
+                                if (element.dataset.searchableExtra) {
+                                    extraData = JSON.parse(element.dataset.searchableExtra);
+                                }
+                            } catch (e) { console.error('Error parsing data-searchable-extra:', e); }
+
+                            return {
+                                query: params.term, // search term
+                                page: params.page,
+                                ...extraData
+                            };
+                        },
+                        processResults: function(data, params) {
+                            params.page = params.page || 1;
+                            return {
+                                results: data,
+                                pagination: {
+                                    more: (params.page * 30) < data.total_count
+                                }
+                            };
+                        },
+                        cache: true
+                    };
+                }
+
+                return $(element).select2(config).data('select2');
+            }
+
+            function getInstance(selector) {
+                const id = typeof selector === 'string' ? selector.replace('#', '') : selector.id;
+                return instances[id];
+            }
+
+            function setValue(selector, value, silent = false) {
+                const control = getInstance(selector);
+                if (!control) return;
+
+                if (control.library === 'tomselect') {
+                    control.instance.setValue(value, silent);
+                } else if (control.library === 'select2') {
+                    $(control.instance.$element).val(value).trigger('change');
+                }
+            }
+
+            function clear(selector, silent = false) {
+                const control = getInstance(selector);
+                if (!control) return;
+
+                if (control.library === 'tomselect') {
+                    control.instance.clear(silent);
+                } else if (control.library === 'select2') {
+                    $(control.instance.$element).val(null).trigger('change');
+                }
+            }
+            
+            function enable(selector) {
+                const control = getInstance(selector);
+                if (!control) return;
+
+                if (control.library === 'tomselect') {
+                    control.instance.enable();
+                } else if (control.library === 'select2') {
+                    $(control.instance.$element).prop("disabled", false).trigger('change');
+                }
+            }
+
+            function disable(selector) {
+                const control = getInstance(selector);
+                if (!control) return;
+
+                if (control.library === 'tomselect') {
+                    control.instance.disable();
+                } else if (control.library === 'select2') {
+                    $(control.instance.$element).prop("disabled", true).trigger('change');
+                }
+            }
+
+            function initAll() {
+                const elements = document.querySelectorAll('.searchable-select:not([data-searchable-initialized="true"])');
+                elements.forEach(init);
+            }
+
+            // Auto-inicialización
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initAll);
+            } else {
+                initAll();
+            }
+
+            return {
+                init: init,
+                initAll: initAll,
+                setValue: setValue,
+                clear: clear,
+                enable: enable,
+                disable: disable,
+                getInstance: getInstance,
+                version: '2.0.0'
+            };
+        })();
+
+        console.log('✅ SearchableSelect library v2.0 loaded');
+    </script>
+}
+

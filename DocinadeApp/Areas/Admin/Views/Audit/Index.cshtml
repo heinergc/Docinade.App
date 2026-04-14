@@ -1,0 +1,972 @@
+@model RubricasApp.Web.ViewModels.Admin.AuditListViewModel
+
+@{
+    ViewData["Title"] = "Auditoría del Sistema";
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Home", new { area = "" })">
+                    <i class="fas fa-home"></i> Inicio
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-shield-alt"></i> Auditoría
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2 class="mb-0">
+                <i class="fas fa-shield-alt text-info"></i>
+                Auditoría del Sistema
+            </h2>
+            <p class="text-muted mt-2">Registro detallado de actividades del sistema</p>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="@Url.Action("Statistics")" class="btn btn-info me-2">
+                <i class="fas fa-chart-bar"></i> Estadísticas
+            </a>
+            <a href="@Url.Action("Dashboard")" class="btn btn-primary">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-filter"></i> Filtros
+            </h5>
+            <div class="text-muted small">
+                @if (Model.Filter.HasActiveFilters())
+                {
+                    <span class="badge bg-info me-2">Filtros activos</span>
+                }
+                Mostrando @Model.AuditLogs.Count de @Model.TotalRecords registros
+            </div>
+        </div>
+        <div class="card-body">
+            <form method="get" id="filterForm">
+                <!-- Fila 1: Filtros principales -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-2">
+                        <label for="fromDate" class="form-label">Fecha Desde</label>
+                        <input type="date" class="form-control filter-input" id="fromDate" name="fromDate" 
+                               value="@Model.Filter.FromDate?.ToString("yyyy-MM-dd")"
+                               title="Filtrar desde esta fecha">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="toDate" class="form-label">Fecha Hasta</label>
+                        <input type="date" class="form-control filter-input" id="toDate" name="toDate" 
+                               value="@Model.Filter.ToDate?.ToString("yyyy-MM-dd")"
+                               title="Filtrar hasta esta fecha">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="action" class="form-label">Acción</label>
+                        <select class="form-select filter-select" id="action" name="action" title="Filtrar por acción específica">
+                            <option value="">Todas las acciones</option>
+                            @if (Model.Filter.AvailableActions != null)
+                            {
+                                @foreach (var action in Model.Filter.AvailableActions.OrderBy(a => a))
+                                {
+                                    <option value="@action" selected="@(Model.Filter.Action == action)">
+                                        @action
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="entityType" class="form-label">Tipo Entidad</label>
+                        <select class="form-select filter-select" id="entityType" name="entityType" title="Filtrar por tipo de entidad">
+                            <option value="">Todos los tipos</option>
+                            @if (Model.Filter.AvailableEntityTypes != null)
+                            {
+                                @foreach (var type in Model.Filter.AvailableEntityTypes.OrderBy(t => t))
+                                {
+                                    <option value="@type" selected="@(Model.Filter.EntityType == type)">
+                                        @type
+                                    </option>
+                                }
+
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="logLevel" class="form-label">Nivel</label>
+                        <select class="form-select filter-select" id="logLevel" name="logLevel" title="Filtrar por nivel de log">
+                            <option value="">Todos los niveles</option>
+                            @if (Model.Filter.AvailableLogLevels != null)
+                            {
+                                @foreach (var level in Model.Filter.AvailableLogLevels)
+                                {
+                                    <option value="@level" selected="@(Model.Filter.LogLevel == level)">
+                                        @level
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Fila 2: Filtros adicionales -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label for="searchTerm" class="form-label">Búsqueda en detalles</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control filter-input" id="searchTerm" name="searchTerm" 
+                                   value="@Model.Filter.SearchTerm" 
+                                   placeholder="Buscar en acciones, entidades, usuarios..."
+                                   title="Buscar texto en los detalles de los logs">
+                            @if (!string.IsNullOrEmpty(Model.Filter.SearchTerm))
+                            {
+                                <button type="button" class="btn btn-outline-secondary" onclick="clearSearch()" title="Limpiar búsqueda">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="success" class="form-label">Resultado</label>
+                        <select class="form-select filter-select" id="success" name="success" title="Filtrar por resultado">
+                            <option value="">Todos</option>
+                            <option value="true" selected="@(Model.Filter.Success == true)">Exitosos</option>
+                            <option value="false" selected="@(Model.Filter.Success == false)">Con errores</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="pageSize" class="form-label">Por página</label>
+                        <select class="form-select filter-select" id="pageSize" name="pageSize" title="Número de registros por página">
+                            <option value="25" selected="@(Model.Filter.PageSize == 25)">25</option>
+                            <option value="50" selected="@(Model.Filter.PageSize == 50)">50</option>
+                            <option value="100" selected="@(Model.Filter.PageSize == 100)">100</option>
+                            <option value="200" selected="@(Model.Filter.PageSize == 200)">200</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <div class="btn-group w-100">
+                            <button type="submit" class="btn btn-primary" title="Aplicar filtros">
+                                <i class="fas fa-search"></i> Filtrar
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="clearAllFilters()" title="Limpiar todos los filtros">
+                                <i class="fas fa-eraser"></i> Limpiar
+                            </button>
+                            <button type="button" class="btn btn-outline-info" onclick="toggleAdvancedFilters()" title="Mostrar/ocultar filtros avanzados">
+                                <i class="fas fa-cog"></i> Avanzado
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Filtros avanzados (ocultos por defecto) -->
+                <div id="advancedFilters" class="row g-3 mb-3" style="display: none;">
+                    <div class="col-12">
+                        <div class="alert alert-info alert-sm">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Filtros Avanzados:</strong> Use estos filtros para búsquedas más específicas.
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="userId" class="form-label">Usuario específico</label>
+                        <input type="text" class="form-control filter-input" id="userId" name="userId" 
+                               value="@Model.Filter.UserId" placeholder="ID de usuario"
+                               title="Filtrar por ID de usuario específico">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="ipAddress" class="form-label">Dirección IP</label>
+                        <input type="text" class="form-control filter-input" id="ipAddress" name="ipAddress" 
+                               placeholder="192.168.1.1" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
+                               title="Filtrar por dirección IP">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="entityId" class="form-label">ID de Entidad</label>
+                        <input type="text" class="form-control filter-input" id="entityId" name="entityId" 
+                               placeholder="ID específico" title="Filtrar por ID de entidad específica">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="orderBy" class="form-label">Ordenar por</label>
+                        <select class="form-select filter-select" id="orderBy" name="orderBy">
+                            <option value="timestamp_desc">Fecha (más reciente)</option>
+                            <option value="timestamp_asc">Fecha (más antigua)</option>
+                            <option value="action_asc">Acción (A-Z)</option>
+                            <option value="user_asc">Usuario (A-Z)</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Estadísticas rápidas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center bg-primary text-white">
+                <div class="card-body">
+                    <i class="fas fa-list fa-2x mb-2"></i>
+                    <h4>@Model.TotalRecords</h4>
+                    <p class="mb-0">Total de Registros</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-success text-white">
+                <div class="card-body">
+                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                    <h4>@Model.AuditLogs.Count(l => l.Success)</h4>
+                    <p class="mb-0">Exitosos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-danger text-white">
+                <div class="card-body">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                    <h4>@Model.AuditLogs.Count(l => !l.Success)</h4>
+                    <p class="mb-0">Con Errores</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-info text-white">
+                <div class="card-body">
+                    <i class="fas fa-users fa-2x mb-2"></i>
+                    <h4>@Model.AuditLogs.Select(l => l.UserId).Distinct().Count()</h4>
+                    <p class="mb-0">Usuarios Únicos</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de logs -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-list"></i>
+                Logs de Auditoría 
+                (@Model.AuditLogs.Count de @Model.TotalRecords registros)
+            </h5>
+            @if (Model.AuditLogs.Any())
+            {
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-success btn-sm" onclick="exportLogs()">
+                        <i class="fas fa-download"></i> Exportar CSV
+                    </button>
+                    <button type="button" class="btn btn-outline-warning btn-sm" onclick="showCleanupModal()">
+                        <i class="fas fa-broom"></i> Limpiar Antiguos
+                    </button>
+                </div>
+            }
+        </div>
+        <div class="card-body p-0">
+            @if (Model.AuditLogs.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Fecha/Hora</th>
+                                <th>Usuario</th>
+                                <th>Acción</th>
+                                <th>Entidad</th>
+                                <th>IP</th>
+                                <th>Estado</th>
+                                <th>Detalles</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var log in Model.AuditLogs)
+                            {
+                                <tr class="@(log.Success ? "" : "table-danger")">
+                                    <td>
+                                        <small>
+                                            @log.Timestamp.ToString("dd/MM/yyyy")<br>
+                                            @log.Timestamp.ToString("HH:mm:ss")
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>@log.UserName</strong>
+                                            @if (!string.IsNullOrEmpty(log.IpAddress))
+                                            {
+                                                <br><small class="text-muted">@log.IpAddress</small>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">@log.Action</span>
+                                        @if (!string.IsNullOrEmpty(log.LogLevel) && log.LogLevel != "Information")
+                                        {
+                                            <br><span class="badge bg-warning">@log.LogLevel</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>@log.EntityType</strong>
+                                            @if (!string.IsNullOrEmpty(log.EntityName))
+                                            {
+                                                <br><small class="text-muted">@log.EntityName</small>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(log.IpAddress))
+                                        {
+                                            <code>@log.IpAddress</code>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        @if (log.Success)
+                                        {
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check"></i> Éxito
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times"></i> Error
+                                            </span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="@Url.Action("Details", new { id = log.Id })" 
+                                           class="btn btn-outline-info btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h5>No se encontraron registros</h5>
+                    <p class="text-muted">Intenta ajustar los filtros de búsqueda</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Paginación -->
+    @if (Model.TotalPages > 1)
+    {
+        <nav aria-label="Paginación de auditoría" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <!-- Primera página -->
+                @if (Model.CurrentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@GetPageUrl(1)">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                }
+
+                <!-- Página anterior -->
+                @if (Model.CurrentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@GetPageUrl(Model.CurrentPage - 1)">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                }
+
+                <!-- Páginas numéricas -->
+                @{
+                    var startPage = Math.Max(1, Model.CurrentPage - 2);
+                    var endPage = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
+                }
+
+                @for (int i = startPage; i <= endPage; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="@GetPageUrl(i)">@i</a>
+                    </li>
+                }
+
+                <!-- Página siguiente -->
+                @if (Model.CurrentPage < Model.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@GetPageUrl(Model.CurrentPage + 1)">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                }
+
+                <!-- Última página -->
+                @if (Model.CurrentPage < Model.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@GetPageUrl(Model.TotalPages)">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+
+        <div class="text-center text-muted">
+            Página @Model.CurrentPage de @Model.TotalPages 
+            (@Model.TotalRecords registros en total)
+        </div>
+    }
+</div>
+
+<!-- Modal para limpieza de logs -->
+<div class="modal fade" id="cleanupModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-broom"></i>
+                    Limpiar Logs Antiguos
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Esta acción eliminará permanentemente los logs de auditoría antiguos.</p>
+                <div class="mb-3">
+                    <label for="daysToKeep" class="form-label">Días a conservar (mínimo 30):</label>
+                    <input type="number" class="form-control" id="daysToKeep" value="90" min="30" max="365">
+                    <div class="form-text">
+                        Los logs más antiguos que esta cantidad de días serán eliminados permanentemente.
+                    </div>
+                </div>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Advertencia:</strong> Esta acción no se puede deshacer.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-warning" onclick="executeCleanup()">
+                    <i class="fas fa-broom"></i> Limpiar Logs
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <style>
+        /* Estilos para los filtros de auditoría */
+        .filter-input:focus,
+        .filter-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+
+        .filter-input.has-value,
+        .filter-select.has-value {
+            background-color: #f8f9fa;
+            border-color: #198754;
+        }
+
+        .alert-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+        }
+
+        .table-responsive {
+            border-radius: 0.375rem;
+        }
+
+        .btn-group .btn {
+            border-radius: 0;
+        }
+
+        .btn-group .btn:first-child {
+            border-top-left-radius: 0.375rem;
+            border-bottom-left-radius: 0.375rem;
+        }
+
+        .btn-group .btn:last-child {
+            border-top-right-radius: 0.375rem;
+            border-bottom-right-radius: 0.375rem;
+        }
+
+        .pagination .page-link {
+            color: #0d6efd;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+        /* Indicador de filtros activos */
+        .filter-active::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 8px;
+            height: 8px;
+            background-color: #dc3545;
+            border-radius: 50%;
+            margin: 4px;
+        }
+
+        .position-relative {
+            position: relative;
+        }
+
+        /* Animación para carga */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .fa-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Estilos para tooltips */
+        .tooltip {
+            font-size: 0.875rem;
+        }
+
+        /* Estilos responsivos */
+        @@media (max-width: 768px) {
+            .btn-group {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .btn-group .btn {
+                border-radius: 0.375rem !important;
+                margin-bottom: 0.25rem;
+            }
+            
+            .table-responsive {
+                font-size: 0.875rem;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+            
+            .card-header .text-muted {
+                margin-top: 0.5rem;
+            }
+        }
+
+        /* Mejorar visibilidad de errores */
+        .table-danger {
+            background-color: rgba(220, 53, 69, 0.1) !important;
+        }
+
+        .table-danger:hover {
+            background-color: rgba(220, 53, 69, 0.2) !important;
+        }
+
+        /* Estilos para los estados de los logs */
+        .badge.bg-success {
+            background-color: #198754 !important;
+        }
+
+        .badge.bg-danger {
+            background-color: #dc3545 !important;
+        }
+
+        .badge.bg-secondary {
+            background-color: #6c757d !important;
+        }
+
+        .badge.bg-warning {
+            background-color: #ffc107 !important;
+            color: #000 !important;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            // Auto-submit del formulario cuando cambian los filtros select
+            $('.filter-select').change(function() {
+                $('#filterForm').submit();
+            });
+
+            // Auto-submit con delay para campos de texto
+            let searchTimeout;
+            $('.filter-input').on('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(function() {
+                    // Solo auto-submit si hay al menos 3 caracteres o está vacío
+                    var value = $(this).val();
+                    if (value.length === 0 || value.length >= 3) {
+                        $('#filterForm').submit();
+                    }
+                }.bind(this), 1000); // 1 segundo de delay
+            });
+
+            // Validar fechas
+            $('#fromDate, #toDate').change(function() {
+                var fromDate = $('#fromDate').val();
+                var toDate = $('#toDate').val();
+                
+                if (fromDate && toDate) {
+                    if (new Date(fromDate) > new Date(toDate)) {
+                        alert('La fecha de inicio no puede ser mayor que la fecha de fin.');
+                        $(this).val('');
+                        return false;
+                    }
+                }
+                
+                // Auto-submit para fechas
+                $('#filterForm').submit();
+            });
+
+            // Actualizar automáticamente cada 30 segundos si estamos en la primera página
+            @if (Model.CurrentPage == 1)
+            {
+                <text>
+                var autoRefreshEnabled = true;
+                var refreshInterval = setInterval(function() {
+                    if (!document.hidden && autoRefreshEnabled) {
+                        // Solo refrescar si no hay filtros activos
+                        if (!hasActiveFilters()) {
+                            window.location.reload();
+                        }
+                    }
+                }, 30000);
+                
+                // Pausar auto-refresh cuando el usuario está interactuando
+                $('.filter-input, .filter-select').on('focus', function() {
+                    autoRefreshEnabled = false;
+                }).on('blur', function() {
+                    setTimeout(function() {
+                        autoRefreshEnabled = true;
+                    }, 5000); // Reactivar después de 5 segundos
+                });
+                </text>
+            }
+
+            // Mostrar indicador de carga al aplicar filtros
+            $('#filterForm').submit(function() {
+                showLoadingIndicator();
+            });
+
+            // Inicializar tooltips
+            $('[title]').tooltip();
+        });
+
+        // Función para verificar si hay filtros activos
+        function hasActiveFilters() {
+            var formData = $('#filterForm').serializeArray();
+            return formData.some(function(item) {
+                return item.value && item.value.trim() !== '' && item.name !== 'pageSize';
+            });
+        }
+
+        // Función para limpiar búsqueda específica
+        function clearSearch() {
+            $('#searchTerm').val('');
+            $('#filterForm').submit();
+        }
+
+        // Función para limpiar todos los filtros
+        function clearAllFilters() {
+            if (confirm('¿Está seguro de que desea limpiar todos los filtros?')) {
+                // Limpiar todos los campos del formulario
+                $('#filterForm')[0].reset();
+                // Mantener el pageSize por defecto
+                $('#pageSize').val('50');
+                // Enviar el formulario
+                $('#filterForm').submit();
+            }
+        }
+
+        // Función para mostrar/ocultar filtros avanzados
+        function toggleAdvancedFilters() {
+            var $advancedFilters = $('#advancedFilters');
+            var $toggleBtn = $('button[onclick="toggleAdvancedFilters()"]');
+            
+            if ($advancedFilters.is(':visible')) {
+                $advancedFilters.slideUp();
+                $toggleBtn.html('<i class="fas fa-cog"></i> Avanzado');
+                localStorage.setItem('audit_advanced_filters', 'hidden');
+            } else {
+                $advancedFilters.slideDown();
+                $toggleBtn.html('<i class="fas fa-cog"></i> Básico');
+                localStorage.setItem('audit_advanced_filters', 'visible');
+            }
+        }
+
+        // Restaurar estado de filtros avanzados
+        $(document).ready(function() {
+            if (localStorage.getItem('audit_advanced_filters') === 'visible') {
+                $('#advancedFilters').show();
+                $('button[onclick="toggleAdvancedFilters()"]').html('<i class="fas fa-cog"></i> Básico');
+            }
+        });
+
+        // Función para mostrar indicador de carga
+        function showLoadingIndicator() {
+            var $submitBtn = $('#filterForm button[type="submit"]');
+            var originalHtml = $submitBtn.html();
+            $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Filtrando...');
+            
+            // Restaurar botón después de un tiempo máximo
+            setTimeout(function() {
+                $submitBtn.prop('disabled', false).html(originalHtml);
+            }, 10000);
+        }
+
+        function exportLogs() {
+            // Mostrar indicador de carga
+            var $exportBtn = $('button[onclick="exportLogs()"]');
+            var originalHtml = $exportBtn.html();
+            $exportBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Exportando...');
+
+            // Crear formulario para exportar con los filtros actuales
+            var form = $('<form>', {
+                'method': 'POST',
+                'action': '@Url.Action("Export")'
+            });
+
+            // Agregar token CSRF
+            form.append($('<input>', {
+                'type': 'hidden',
+                'name': '__RequestVerificationToken',
+                'value': $('input[name="__RequestVerificationToken"]').val()
+            }));
+
+            // Agregar filtros actuales
+            var formData = $('#filterForm').serializeArray();
+            $.each(formData, function(i, field) {
+                if (field.value && field.value.trim() !== '') {
+                    form.append($('<input>', {
+                        'type': 'hidden',
+                        'name': field.name,
+                        'value': field.value
+                    }));
+                }
+            });
+
+            // Enviar formulario
+            form.appendTo('body').submit().remove();
+            
+            // Restaurar botón después de un tiempo
+            setTimeout(function() {
+                $exportBtn.prop('disabled', false).html(originalHtml);
+            }, 5000);
+        }
+
+        function showCleanupModal() {
+            $('#cleanupModal').modal('show');
+        }
+
+        function executeCleanup() {
+            var daysToKeep = $('#daysToKeep').val();
+            
+            if (daysToKeep < 30) {
+                alert('Debe conservar al menos 30 días de logs.');
+                return;
+            }
+
+            $('#cleanupModal').modal('hide');
+
+            Swal.fire({
+                title: '¿Confirmar limpieza?',
+                text: `Se eliminarán los logs más antiguos que ${daysToKeep} días. Esta acción no se puede deshacer.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ffc107',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, limpiar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("Cleanup")', {
+                        daysToKeep: daysToKeep,
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                    })
+                    .done(function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '¡Limpieza completada!',
+                                text: response.message,
+                                timer: 3000
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message
+                            });
+                        }
+                    })
+                    .fail(function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error al procesar la solicitud'
+                        });
+                    });
+                }
+            });
+        }
+
+        // Funciones de utilidad para URLs
+        function updateUrlWithFilters() {
+            var formData = $('#filterForm').serializeArray();
+            var params = new URLSearchParams();
+            
+            formData.forEach(function(item) {
+                if (item.value && item.value.trim() !== '') {
+                    params.append(item.name, item.value);
+                }
+            });
+            
+            var newUrl = window.location.pathname + '?' + params.toString();
+            window.history.replaceState({}, '', newUrl);
+        }
+
+        // Validación de formulario antes del envío
+        $('#filterForm').on('submit', function(e) {
+            var fromDate = $('#fromDate').val();
+            var toDate = $('#toDate').val();
+            
+            // Validar rango de fechas
+            if (fromDate && toDate) {
+                if (new Date(fromDate) > new Date(toDate)) {
+                    e.preventDefault();
+                    alert('La fecha de inicio no puede ser mayor que la fecha de fin.');
+                    $('#fromDate').focus();
+                    return false;
+                }
+            }
+            
+            // Validar IP si se proporcionó
+            var ipAddress = $('#ipAddress').val();
+            if (ipAddress && ipAddress.trim() !== '') {
+                var ipPattern = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
+                if (!ipPattern.test(ipAddress)) {
+                    e.preventDefault();
+                    alert('Por favor ingrese una dirección IP válida (ej: 192.168.1.1)');
+                    $('#ipAddress').focus();
+                    return false;
+                }
+            }
+            
+            return true;
+        });
+    </script>
+
+    <!-- Token CSRF -->
+    @Html.AntiForgeryToken()
+}
+
+@functions {
+    string GetPageUrl(int page)
+    {
+        var routeValues = new RouteValueDictionary();
+        
+        // Mantener filtros actuales con codificación adecuada
+        if (!string.IsNullOrWhiteSpace(Model.Filter.Action))
+            routeValues.Add("action", Model.Filter.Action);
+        if (!string.IsNullOrWhiteSpace(Model.Filter.EntityType))
+            routeValues.Add("entityType", Model.Filter.EntityType);
+        if (Model.Filter.FromDate.HasValue)
+            routeValues.Add("fromDate", Model.Filter.FromDate.Value.ToString("yyyy-MM-dd"));
+        if (Model.Filter.ToDate.HasValue)
+            routeValues.Add("toDate", Model.Filter.ToDate.Value.ToString("yyyy-MM-dd"));
+        if (!string.IsNullOrWhiteSpace(Model.Filter.LogLevel))
+            routeValues.Add("logLevel", Model.Filter.LogLevel);
+        if (Model.Filter.Success.HasValue)
+            routeValues.Add("success", Model.Filter.Success.Value.ToString().ToLower());
+        if (!string.IsNullOrWhiteSpace(Model.Filter.SearchTerm))
+            routeValues.Add("searchTerm", Model.Filter.SearchTerm);
+        if (!string.IsNullOrWhiteSpace(Model.Filter.UserId))
+            routeValues.Add("userId", Model.Filter.UserId);
+        
+        routeValues.Add("page", page);
+        routeValues.Add("pageSize", Model.Filter.PageSize);
+        
+        return Url.Action("Index", routeValues) ?? "#";
+    }
+
+    /// <summary>
+    /// Trunca un texto para mostrar solo los primeros caracteres
+    /// </summary>
+    string TruncateText(string? text, int maxLength = 50)
+    {
+        if (string.IsNullOrEmpty(text))
+            return string.Empty;
+            
+        if (text.Length <= maxLength)
+            return text;
+            
+        return text.Substring(0, maxLength) + "...";
+    }
+
+    /// <summary>
+    /// Obtiene la clase CSS para el nivel de log
+    /// </summary>
+    string GetLogLevelClass(string? logLevel)
+    {
+        return logLevel?.ToLower() switch
+        {
+            "error" => "bg-danger",
+            "warning" => "bg-warning",
+            "critical" => "bg-danger",
+            "information" => "bg-info",
+            _ => "bg-secondary"
+        };
+    }
+
+    /// <summary>
+    /// Formatea la fecha para mostrar en la tabla
+    /// </summary>
+    string FormatTimestamp(DateTime timestamp)
+    {
+        var now = DateTime.Now;
+        var diff = now - timestamp;
+
+        if (diff.TotalDays < 1)
+        {
+            if (diff.TotalHours < 1)
+            {
+                return diff.TotalMinutes < 1 ? "Hace un momento" : $"Hace {(int)diff.TotalMinutes} min";
+            }
+            return $"Hace {(int)diff.TotalHours}h";
+        }
+        
+        if (diff.TotalDays < 7)
+        {
+            return $"Hace {(int)diff.TotalDays} días";
+        }
+
+        return timestamp.ToString("dd/MM/yyyy HH:mm");
+    }
+}

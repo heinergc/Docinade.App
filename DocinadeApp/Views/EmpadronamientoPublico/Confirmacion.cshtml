@@ -1,0 +1,138 @@
+@model string
+
+@{
+    ViewData["Title"] = "Empadronamiento Exitoso";
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-success">
+                <div class="card-header bg-success text-white text-center py-4">
+                    <h2><i class="fas fa-check-circle fa-3x mb-3"></i></h2>
+                    <h3 class="mb-0">¡Empadronamiento Exitoso!</h3>
+                </div>
+                <div class="card-body p-5 text-center">
+                    
+                    <div class="alert alert-success border-success">
+                        <h4 class="alert-heading">
+                            <i class="fas fa-clipboard-check"></i> Su Código de Confirmación
+                        </h4>
+                        <hr>
+                        <h2 class="display-4 fw-bold text-success mb-0">@Model</h2>
+                    </div>
+                    
+                    <p class="lead mt-4">
+                        Su proceso de empadronamiento ha sido registrado exitosamente. 
+                        Guarde este código de confirmación para futuras referencias.
+                    </p>
+                    
+                    <div class="alert alert-info text-start mt-4">
+                        <h5><i class="fas fa-info-circle"></i> Próximos Pasos:</h5>
+                        <ol class="mb-0">
+                            <li class="mb-2">
+                                <strong>Revise su correo electrónico</strong> - 
+                                Hemos enviado una confirmación con todos los detalles a la dirección proporcionada.
+                            </li>
+                            <li class="mb-2">
+                                <strong>Espere la aprobación</strong> - 
+                                El personal administrativo revisará su solicitud en las próximas 24-48 horas.
+                            </li>
+                            <li class="mb-2">
+                                <strong>Guarde su código</strong> - 
+                                Necesitará este código (@Model) para consultar el estado de su solicitud.
+                            </li>
+                            <li>
+                                <strong>Esté atento a notificaciones</strong> - 
+                                Le contactaremos por correo o teléfono si necesitamos información adicional.
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="alert alert-warning text-start">
+                        <strong><i class="fas fa-exclamation-triangle"></i> Importante:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Si no recibe el correo de confirmación en los próximos minutos, revise su carpeta de spam</li>
+                            <li>Su solicitud está en estado "Pre-Registro" y requiere aprobación administrativa</li>
+                            <li>Una vez aprobado, recibirá las instrucciones para completar su matrícula</li>
+                        </ul>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <h5 class="mb-3">¿Necesita Ayuda?</h5>
+                    <p class="text-muted">
+                        Si tiene alguna pregunta o necesita asistencia, puede contactarnos:
+                    </p>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6 mb-3">
+                            <div class="card border-primary">
+                                <div class="card-body">
+                                    <i class="fas fa-phone fa-2x text-primary mb-2"></i>
+                                    <h6>Teléfono</h6>
+                                    <p class="text-muted mb-0">
+                                        <small>Oficina de Registro</small><br>
+                                        <strong>Próximamente</strong>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card border-primary">
+                                <div class="card-body">
+                                    <i class="fas fa-envelope fa-2x text-primary mb-2"></i>
+                                    <h6>Correo Electrónico</h6>
+                                    <p class="text-muted mb-0">
+                                        <small>Escribanos a</small><br>
+                                        <strong>registro@institucion.edu</strong>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button class="btn btn-outline-success btn-lg" onclick="window.print()">
+                            <i class="fas fa-print"></i> Imprimir Confirmación
+                        </button>
+                        
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-primary btn-lg">
+                            <i class="fas fa-home"></i> Volver al Inicio
+                        </a>
+                    </div>
+                    
+                    <p class="text-muted mt-4 small">
+                        <i class="fas fa-calendar-alt"></i> 
+                        Fecha y hora de registro: @DateTime.Now.ToString("dd/MM/yyyy hh:mm tt")
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Mostrar animación de éxito
+            Swal.fire({
+                icon: 'success',
+                title: '¡Empadronamiento Exitoso!',
+                html: '<p>Su código de confirmación es:</p><h3 class="text-success">@Model</h3>',
+                showConfirmButton: true,
+                confirmButtonText: 'Entendido',
+                timer: 5000,
+                timerProgressBar: true
+            });
+        });
+    </script>
+}
+
+<style>
+    @@media print {
+        .btn, nav, footer {
+            display: none !important;
+        }
+    }
+</style>

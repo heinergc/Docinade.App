@@ -1,0 +1,185 @@
+@model RubricasApp.Web.ViewModels.AsignarInstrumentosVm
+
+@{
+    ViewData["Title"] = "Asignar Instrumentos";
+}
+
+<div class="row">
+    <div class="col-md-10 offset-md-1">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-tools"></i> Gestionar Instrumentos de Evaluación
+                </h3>
+                <div class="card-subtitle mt-1">
+                    <span class="text-muted">@Model.MateriaNombre</span>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <!-- Sección para asignar nuevo instrumento -->
+                <div class="mb-4">
+                    <h5 class="mb-3">
+                        <i class="fas fa-plus-circle"></i> Asignar Nuevo Instrumento
+                    </h5>
+                    
+                    @if (Model.InstrumentosDisponibles.Any())
+                    {
+                        <form asp-action="AsignarInstrumento" method="post" class="row g-3">
+                            <input type="hidden" name="materiaId" value="@Model.MateriaId" />
+                            
+                            <div class="col-md-4">
+                                <label class="form-label">Instrumento de Evaluación</label>
+                                <select name="instrumentoId" class="form-select" required>
+                                    <option value="">-- Seleccione un instrumento --</option>
+                                    @foreach (var instrumento in Model.InstrumentosDisponibles)
+                                    {
+                                        <option value="@instrumento.Value">@instrumento.Text</option>
+                                    }
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label class="form-label">Período Académico</label>
+                                <select name="periodoAcademicoId" class="form-select" asp-items="ViewBag.PeriodosAcademicos">
+                                    <option value="">-- Seleccione un período --</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="esObligatorio" value="true" id="esObligatorio">
+                                    <label class="form-check-label" for="esObligatorio">
+                                        Es Obligatorio
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="fas fa-plus"></i> Asignar
+                                </button>
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Sin instrumentos disponibles:</strong> Todos los instrumentos activos ya están asignados a esta materia.
+                        </div>
+                    }
+                </div>
+                
+                <hr class="my-4" />
+                
+                <!-- Sección de instrumentos asignados -->
+                <div class="mb-4">
+                    <h5 class="mb-3">
+                        <i class="fas fa-list"></i> Instrumentos Asignados
+                        <span class="badge bg-primary ms-2">@Model.InstrumentosAsignados.Count</span>
+                    </h5>
+                    
+                    @if (Model.InstrumentosAsignados.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th><i class="fas fa-tools"></i> Instrumento</th>
+                                        <th><i class="fas fa-calendar"></i> Período</th>
+                                        <th><i class="fas fa-clock"></i> Fecha Asignación</th>
+                                        <th><i class="fas fa-star"></i> Obligatorio</th>
+                                        <th><i class="fas fa-sort-numeric-up"></i> Orden</th>
+                                        <th class="text-center"><i class="fas fa-cogs"></i> Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var instrumento in Model.InstrumentosAsignados.OrderBy(i => i.OrdenPresentacion ?? int.MaxValue))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@instrumento.InstrumentoNombre</strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">@instrumento.PeriodoAcademicoNombre</span>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">@instrumento.FechaAsignacion.ToString("dd/MM/yyyy HH:mm")</small>
+                                            </td>
+                                            <td>
+                                                @if (instrumento.EsObligatorio)
+                                                {
+                                                    <span class="badge bg-warning">
+                                                        <i class="fas fa-star"></i> Obligatorio
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">Opcional</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (instrumento.OrdenPresentacion.HasValue)
+                                                {
+                                                    <span class="badge bg-primary">@instrumento.OrdenPresentacion</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                <form asp-action="QuitarInstrumento" method="post" class="d-inline" 
+                                                      onsubmit="return confirm('¿Está seguro que desea quitar este instrumento de la materia?')">
+                                                    <input type="hidden" name="materiaId" value="@Model.MateriaId" />
+                                                    <input type="hidden" name="instrumentoId" value="@instrumento.InstrumentoId" />
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm" 
+                                                            data-bs-toggle="tooltip" title="Quitar instrumento">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Sin instrumentos asignados:</strong> Esta materia no tiene instrumentos de evaluación asignados.
+                        </div>
+                    }
+                </div>
+            </div>
+            
+            <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Details" asp-route-id="@Model.MateriaId" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver a Detalles
+                    </a>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-list"></i> Lista de Materias
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Inicializar tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+}

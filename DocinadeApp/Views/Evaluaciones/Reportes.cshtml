@@ -1,0 +1,748 @@
+﻿@model RubricasApp.Web.ViewModels.ReporteEvaluacionesViewModel
+
+@{
+    ViewData["Title"] = "Reportes de Evaluaciones";
+}
+
+@functions {
+    public static string LimpiarHtml(string html)
+    {
+        if (string.IsNullOrEmpty(html))
+            return string.Empty;
+
+        // Reemplazar entidades HTML
+        html = html.Replace("&nbsp;", " ")
+                   .Replace("&amp;", "&")
+                   .Replace("&lt;", "<")
+                   .Replace("&gt;", ">")
+                   .Replace("&quot;", "\"")
+                   .Replace("&#39;", "'")
+                   .Replace("&aacute;", "á")
+                   .Replace("&eacute;", "é")
+                   .Replace("&iacute;", "í")
+                   .Replace("&oacute;", "ó")
+                   .Replace("&uacute;", "ú")
+                   .Replace("&ntilde;", "ñ")
+                   .Replace("&Aacute;", "Á")
+                   .Replace("&Eacute;", "É")
+                   .Replace("&Iacute;", "Í")
+                   .Replace("&Oacute;", "Ó")
+                   .Replace("&Uacute;", "Ú")
+                   .Replace("&Ntilde;", "Ñ");
+
+        // Remover todas las etiquetas HTML
+        html = System.Text.RegularExpressions.Regex.Replace(html, "<.*?>", "");
+
+        // Limpiar espacios múltiples y saltos de línea
+        html = System.Text.RegularExpressions.Regex.Replace(html, @"\s+", " ");
+
+        return html.Trim();
+    }
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-chart-bar text-success"></i> Reportes de Evaluaciones</h1>
+    <a asp-action="Index" class="btn btn-primary">
+        <i class="fas fa-arrow-left"></i> Volver a Evaluaciones
+    </a>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0"><i class="fas fa-filter"></i> Filtros para Reportes</h5>
+    </div>
+    <div class="card-body">
+        <form method="get" asp-action="Reportes">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="periodoId">Período Académico:</label>
+                        <select name="periodoId" id="periodoId" class="form-select">
+                            <option value="">-- Todos los períodos --</option>
+                            @if (ViewBag.Periodos != null)
+                            {
+                                @foreach (var periodo in ViewBag.Periodos as List<SelectListItem>)
+                                {
+                                    <option value="@periodo.Value" selected="@(periodo.Value == ViewBag.PeriodoSeleccionado?.ToString())">
+                                        @periodo.Text
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="rubricaId">Rúbrica:</label>
+                        <select name="rubricaId" id="rubricaId" class="form-select">
+                            <option value="">-- Todas las rúbricas --</option>
+                            @if (ViewBag.Rubricas != null)
+                            {
+                                @foreach (var rubrica in ViewBag.Rubricas as List<SelectListItem>)
+                                {
+                                    <option value="@rubrica.Value" selected="@(rubrica.Value == ViewBag.RubricaSeleccionada?.ToString())">
+                                        @rubrica.Text
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-chart-line"></i> Generar Reporte
+                    </button>
+                    <a asp-action="Reportes" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Limpiar Filtros
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (Model.Evaluaciones.Any())
+{
+    <!-- Estadísticas generales -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-clipboard-check fa-2x mb-2"></i>
+                    <h4>@Model.TotalEvaluaciones</h4>
+                    <p class="mb-0">Total Evaluaciones</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-2x mb-2"></i>
+                    <h4>@Model.PromedioGeneral.ToString("F2")</h4>
+                    <p class="mb-0">Promedio General</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-arrow-up fa-2x mb-2"></i>
+                    <h4>@Model.PuntajeMaximo.ToString("F2")</h4>
+                    <p class="mb-0">Puntaje Máximo</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-arrow-down fa-2x mb-2"></i>
+                    <h4>@Model.PuntajeMinimo.ToString("F2")</h4>
+                    <p class="mb-0">Puntaje Mínimo</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico de distribución de puntajes -->
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Distribución de Puntajes</h5>
+        </div>
+        <div class="card-body">
+            <canvas id="graficoPuntajes" width="400" height="300"></canvas>
+        </div>
+    </div>
+
+    <!-- Tabla detallada -->
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-table"></i> Detalle de Evaluaciones</h5>
+            <button id="btnExportar" class="btn btn-sm btn-light" onclick="exportarAExcel()">
+                <i class="fas fa-file-excel"></i> Exportar a Excel
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover" id="tablaEvaluaciones">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Estudiante</th>
+                            <th>ID</th>
+                            <th>Rúbrica</th>
+                            <th>Período</th>
+                            <th>Fecha</th>
+                            <th>Puntaje</th>
+                            <th>Items</th>
+                            <th>Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var evaluacion in Model.Evaluaciones.OrderByDescending(e => e.TotalPuntos))
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@evaluacion.IdEvaluacion" class="text-decoration-none">
+                                        @evaluacion.Estudiante.Apellidos, @evaluacion.Estudiante.Nombre
+                                    </a>
+                                </td>
+                                <td>@evaluacion.Estudiante.NumeroId</td>
+                                <td>
+                                    <span class="badge bg-info">@evaluacion.Rubrica.NombreRubrica</span>
+                                </td>
+                                <td>
+                                    <small>@if (evaluacion.Estudiante.PeriodoAcademico != null) {
+                                    @evaluacion.Estudiante.PeriodoAcademico.Nombre
+                                }
+    </small>
+                            </td>
+                            <td>@evaluacion.FechaEvaluacion.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                @if (evaluacion.TotalPuntos.HasValue)
+                                {
+                                    var puntaje = evaluacion.TotalPuntos.Value;
+                                    var porcentaje = Model.PuntajeMaximo > 0 ? (puntaje / Model.PuntajeMaximo) * 100 : 0;
+                                    var clase = "";
+
+                                    if (porcentaje >= 90) { clase = "bg-success"; }
+                                    else if (porcentaje >= 80) { clase = "bg-info"; }
+                                    else if (porcentaje >= 70) { clase = "bg-warning"; }
+                                    else { clase = "bg-danger"; }
+
+                                    <span class="badge @clase fs-6">
+                                        @puntaje.ToString("F2")
+                                        <small>(@porcentaje.ToString("F0")%)</small>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Sin calcular</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">@evaluacion.DetallesEvaluacion.Count</span>
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(evaluacion.Observaciones))
+                                {
+                                    var observacionesLimpias = LimpiarHtml(evaluacion.Observaciones);
+                                    var observacionesCortas = observacionesLimpias.Length > 100
+                                    ? observacionesLimpias.Substring(0, 100) + "..."
+                                    : observacionesLimpias;
+
+                                    <span class="observaciones-container"
+                                          data-bs-toggle="tooltip"
+                                          data-bs-placement="top"
+                                          title="@observacionesLimpias">
+                                        <i class="fas fa-comment text-info me-1"></i>
+                                        <small class="text-muted">@observacionesCortas</small>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        <i class="fas fa-comment-slash me-1"></i>
+                                        <small>Sin observaciones</small>
+                                    </span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+}
+else
+{
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No hay datos para mostrar</h5>
+            <p class="text-muted">
+                @if (ViewBag.PeriodoSeleccionado != null || ViewBag.RubricaSeleccionada != null)
+                {
+                    <span>No se encontraron evaluaciones que coincidan con los filtros aplicados.</span>
+                }
+                else
+                {
+                    <span>No hay evaluaciones registradas en el sistema.</span>
+                }
+            </p>
+            <a asp-action="Create" class="btn btn-success">
+                <i class="fas fa-plus"></i> Crear Nueva Evaluación
+            </a>
+        </div>
+    </div>
+}
+
+<!-- Estilos CSS -->
+<style>
+    /* Estilos para las observaciones */
+    .observaciones-container {
+        cursor: pointer;
+        max-width: 250px;
+        display: inline-block;
+    }
+
+        .observaciones-container:hover {
+            background-color: rgba(0,123,255,0.1);
+            border-radius: 4px;
+            padding: 2px 4px;
+        }
+
+    /* Mejorar el gráfico */
+    #graficoPuntajes {
+        height: 300px !important;
+    }
+
+    /* Estilos para tooltips */
+    .tooltip {
+        font-size: 0.875rem;
+    }
+
+    .tooltip-inner {
+        max-width: 400px;
+        text-align: left;
+        background-color: rgba(0,0,0,0.9);
+        border-radius: 6px;
+        padding: 8px 12px;
+    }
+</style>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            console.log('🚀 Inicializando página de reportes...');
+
+            // ======== INICIALIZAR TOOLTIPS ========
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl, {
+                    html: false,
+                    sanitize: true,
+                    trigger: 'hover focus'
+                });
+            });
+            console.log('✅ Tooltips inicializados:', tooltipList.length);
+
+            // ======== AUTO-SUBMIT FILTROS ========
+            $('#periodoId, #rubricaId').change(function() {
+                console.log('🔄 Filtro cambiado, enviando formulario...');
+                $(this).closest('form').submit();
+            });
+
+            @if (Model.Evaluaciones.Any())
+            {
+                    @: // ======== GENERAR GRÁFICO DE DISTRIBUCIÓN ========
+                    @: try {
+                    @:     console.log('📊 Iniciando generación de gráfico...');
+                    @:
+                    @:     // Obtener datos del modelo directamente
+                    @:     var puntajes = [@Html.Raw(string.Join(",", Model.Evaluaciones.Where(e => e.TotalPuntos.HasValue).Select(e => e.TotalPuntos.Value.ToString("F2", System.Globalization.CultureInfo.InvariantCulture))))];
+                    @:     var puntajeMaximo = @Model.PuntajeMaximo.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+                    @:     var totalEvaluaciones = @Model.TotalEvaluaciones;
+                    @:     var promedioGeneral = @Model.PromedioGeneral.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+                    @:
+                    @:     console.log('📊 Datos del gráfico:', {
+                    @:         puntajes: puntajes.length,
+                    @:         puntajeMaximo: puntajeMaximo,
+                    @:         totalEvaluaciones: totalEvaluaciones,
+                    @:         promedioGeneral: promedioGeneral
+                    @:     });
+                    @:
+                    @:     if (puntajes.length === 0) {
+                    @:         console.warn('⚠️ No hay puntajes para graficar');
+                    @:         mostrarMensajeNoData();
+                    @:         return;
+                    @:     }
+                    @:
+                    @:     // Crear rangos de puntajes
+                    @:     var rangos = ['0-20%', '21-40%', '41-60%', '61-80%', '81-100%'];
+                    @:     var conteos = [0, 0, 0, 0, 0];
+                    @:
+                    @:     // Calcular distribución
+                    @:     puntajes.forEach(function(puntaje) {
+                    @:         var porcentaje = puntajeMaximo > 0 ? (puntaje / puntajeMaximo) * 100 : 0;
+                    @:         if (porcentaje <= 20) {
+                    @:             conteos[0]++;
+                    @:         } else if (porcentaje <= 40) {
+                    @:             conteos[1]++;
+                    @:         } else if (porcentaje <= 60) {
+                    @:             conteos[2]++;
+                    @:         } else if (porcentaje <= 80) {
+                    @:             conteos[3]++;
+                    @:         } else {
+                    @:             conteos[4]++;
+                    @:         }
+                    @:     });
+                    @:
+                    @:     console.log('📊 Distribución calculada:', conteos);
+                    @:
+                    @:     // Verificar que Chart.js esté disponible
+                    @:     if (typeof Chart === 'undefined') {
+                    @:         console.error('❌ Chart.js no está disponible');
+                    @:         mostrarErrorGrafico('Chart.js no está cargado');
+                    @:         return;
+                    @:     }
+                    @:
+                    @:     var canvas = document.getElementById('graficoPuntajes');
+                    @:     if (!canvas) {
+                    @:         console.error('❌ Canvas no encontrado');
+                    @:         return;
+                    @:     }
+                    @:
+                    @:     var ctx = canvas.getContext('2d');
+                    @:
+                    @:     // Destruir gráfico anterior si existe
+                    @:     if (window.distribucionChart) {
+                    @:         window.distribucionChart.destroy();
+                    @:     }
+                    @:
+                    @:     // Crear gráfico
+                    @:     window.distribucionChart = new Chart(ctx, {
+                    @:         type: 'bar',
+                    @:         data: {
+                    @:             labels: rangos,
+                    @:             datasets: [{
+                    @:                 label: 'Cantidad de Evaluaciones',
+                    @:                 data: conteos,
+                    @:                 backgroundColor: [
+                    @:                     '#dc3545',   // Rojo - 0-20%
+                    @:                     '#fd7e14',   // Naranja - 21-40%
+                    @:                     '#ffc107',   // Amarillo - 41-60%
+                    @:                     '#20c997',   // Teal - 61-80%
+                    @:                     '#198754'    // Verde - 81-100%
+                    @:                 ],
+                    @:                 borderColor: [
+                    @:                     '#dc3545',
+                    @:                     '#fd7e14',
+                    @:                     '#ffc107',
+                    @:                     '#20c997',
+                    @:                     '#198754'
+                    @:                 ],
+                    @:                 borderWidth: 2,
+                    @:                 borderRadius: 8,
+                    @:                 borderSkipped: false,
+                    @:             }]
+                    @:         },
+                    @:         options: {
+                    @:             responsive: true,
+                    @:             maintainAspectRatio: false,
+                    @:             plugins: {
+                    @:                 legend: {
+                    @:                     display: false
+                    @:                 },
+                    @:                 title: {
+                    @:                     display: true,
+                    @:                     text: 'Distribución de Puntajes por Rangos de Rendimiento',
+                    @:                     font: {
+                    @:                         size: 16,
+                    @:                         weight: 'bold'
+                    @:                     },
+                    @:                     padding: {
+                    @:                         top: 10,
+                    @:                         bottom: 20
+                    @:                     }
+                    @:                 },
+                    @:                 tooltip: {
+                    @:                     backgroundColor: 'rgba(0,0,0,0.8)',
+                    @:                     titleColor: 'white',
+                    @:                     bodyColor: 'white',
+                    @:                     borderColor: 'rgba(255,255,255,0.2)',
+                    @:                     borderWidth: 1,
+                    @:                     cornerRadius: 6,
+                    @:                     callbacks: {
+                    @:                         label: function(context) {
+                    @:                             var valor = context.raw;
+                    @:                             var total = puntajes.length;
+                    @:                             var percentage = total > 0 ? ((valor / total) * 100).toFixed(1) : 0;
+                    @:                             return [
+                    @:                                 'Evaluaciones: ' + valor,
+                    @:                                 'Porcentaje: ' + percentage + '%'
+                    @:                             ];
+                    @:                         },
+                    @:                         title: function(context) {
+                    @:                             return 'Rango: ' + context[0].label;
+                    @:                         }
+                    @:                     }
+                    @:                 }
+                    @:             },
+                    @:             scales: {
+                    @:                 y: {
+                    @:                     beginAtZero: true,
+                    @:                     stepSize: 1,
+                    @:                     ticks: {
+                    @:                         precision: 0,
+                    @:                         font: { size: 12 }
+                    @:                     },
+                    @:                     grid: {
+                    @:                         color: 'rgba(0,0,0,0.1)',
+                    @:                         drawBorder: false
+                    @:                     },
+                    @:                     title: {
+                    @:                         display: true,
+                    @:                         text: 'Cantidad de Evaluaciones',
+                    @:                         font: {
+                    @:                             size: 13,
+                    @:                             weight: 'bold'
+                    @:                         }
+                    @:                     }
+                    @:                 },
+                    @:                 x: {
+                    @:                     ticks: {
+                    @:                         font: {
+                    @:                             size: 12,
+                    @:                             weight: 'bold'
+                    @:                         }
+                    @:                     },
+                    @:                     grid: {
+                    @:                         display: false
+                    @:                     },
+                    @:                     title: {
+                    @:                         display: true,
+                    @:                         text: 'Rangos de Rendimiento',
+                    @:                         font: {
+                    @:                             size: 13,
+                    @:                             weight: 'bold'
+                    @:                         }
+                    @:                     }
+                    @:                 }
+                    @:             },
+                    @:             animation: {
+                    @:                 duration: 1000,
+                    @:                 easing: 'easeInOutQuart'
+                    @:             }
+                    @:         }
+                    @:     });
+                    @:
+                    @:     console.log('✅ Gráfico creado exitosamente');
+                    @:
+                    @:     // Agregar información estadística debajo del gráfico
+                    @:     var infoDiv = document.createElement('div');
+                    @:     infoDiv.className = 'mt-3 text-center grafico-info';
+                    @:     infoDiv.innerHTML =
+                    @:         '<div class="row text-center">' +
+                    @:             '<div class="col-md-4"><small class="text-muted"><i class="fas fa-calculator"></i> Total: <strong>' + totalEvaluaciones + '</strong></small></div>' +
+                    @:             '<div class="col-md-4"><small class="text-muted"><i class="fas fa-chart-line"></i> Promedio: <strong>' + promedioGeneral + '</strong></small></div>' +
+                    @:             '<div class="col-md-4"><small class="text-muted"><i class="fas fa-arrow-up"></i> Máximo: <strong>' + puntajeMaximo + '</strong></small></div>' +
+                    @:         '</div>';
+                    @:
+                    @:     // Remover info anterior si existe
+                    @:     var infoAnterior = canvas.parentNode.querySelector('.grafico-info');
+                    @:     if (infoAnterior) {
+                    @:         infoAnterior.remove();
+                    @:     }
+                    @:
+                    @:     canvas.parentNode.appendChild(infoDiv);
+                    @:
+                    @: } catch (error) {
+                    @:     console.error('❌ Error al crear el gráfico:', error);
+                    @:     mostrarErrorGrafico(error.message);
+                    @: }
+            }
+
+            console.log('🎉 Inicialización completada exitosamente');
+        });
+
+        // ======== FUNCIONES AUXILIARES PARA EL GRÁFICO ========
+        function mostrarMensajeNoData() {
+            var canvas = document.getElementById('graficoPuntajes');
+            if (canvas && canvas.parentNode) {
+                var noDataDiv = document.createElement('div');
+                noDataDiv.className = 'alert alert-info text-center';
+                noDataDiv.innerHTML = '<i class="fas fa-info-circle"></i> No hay datos suficientes para mostrar el gráfico de distribución';
+                canvas.parentNode.replaceChild(noDataDiv, canvas);
+            }
+        }
+
+        function mostrarErrorGrafico(mensaje) {
+            var canvas = document.getElementById('graficoPuntajes');
+            if (canvas && canvas.parentNode) {
+                var errorDiv = document.createElement('div');
+                errorDiv.className = 'alert alert-danger text-center';
+                errorDiv.innerHTML =
+                    '<i class="fas fa-exclamation-triangle"></i> ' +
+                    '<strong>Error al generar el gráfico</strong><br>' +
+                    '<small>' + mensaje + '</small>';
+                canvas.parentNode.replaceChild(errorDiv, canvas);
+            }
+        }
+
+        // ======== FUNCIÓN DE EXPORTACIÓN A EXCEL (GLOBAL) ========
+        function exportarAExcel() {
+            try {
+                console.log('📊 Iniciando exportación a Excel...');
+
+                // Verificar que XLSX esté disponible
+                if (typeof XLSX === 'undefined') {
+                    console.error('❌ XLSX no está disponible');
+                    alert('Error: La librería XLSX no está cargada. Verifique la conexión a internet.');
+                    return;
+                }
+
+                // Obtener la tabla
+                var tabla = document.getElementById('tablaEvaluaciones');
+                if (!tabla) {
+                    console.error('❌ No se encontró la tabla');
+                    alert('Error: No se encontró la tabla de evaluaciones.');
+                    return;
+                }
+
+                console.log('✅ Tabla encontrada, procesando datos...');
+
+                // Cambiar botón a estado de carga
+                var btnExportar = document.getElementById('btnExportar');
+                if (btnExportar) {
+                    btnExportar.disabled = true;
+                    btnExportar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exportando...';
+                }
+
+                // Crear datos manualmente para mayor control
+                var datosExcel = [];
+
+                // Agregar encabezados
+                var encabezados = ['Estudiante', 'ID', 'Rúbrica', 'Período', 'Fecha', 'Puntaje', 'Porcentaje', 'Items', 'Observaciones'];
+                datosExcel.push(encabezados);
+
+                // Procesar filas de datos
+                var filas = tabla.querySelectorAll('tbody tr');
+                console.log('📋 Procesando', filas.length, 'filas');
+
+                filas.forEach(function(fila, filaIndex) {
+                    var celdas = fila.querySelectorAll('td');
+                    var filaData = [];
+
+                    celdas.forEach(function(celda, celdaIndex) {
+                        var valor = '';
+
+                        switch(celdaIndex) {
+                            case 0: // Estudiante - extraer texto del enlace
+                                var enlace = celda.querySelector('a');
+                                valor = enlace ? enlace.textContent.trim() : celda.textContent.trim();
+                                break;
+
+                            case 1: // ID
+                                valor = celda.textContent.trim();
+                                break;
+
+                            case 2: // Rúbrica - extraer texto del badge
+                                var badge = celda.querySelector('.badge');
+                                valor = badge ? badge.textContent.trim() : celda.textContent.trim();
+                                break;
+
+                            case 3: // Período
+                                valor = celda.textContent.trim();
+                                break;
+
+                            case 4: // Fecha
+                                valor = celda.textContent.trim();
+                                break;
+
+                            case 5: // Puntaje - extraer valor numérico
+                                var puntajeBadge = celda.querySelector('.badge');
+                                if (puntajeBadge) {
+                                    var textoCompleto = puntajeBadge.textContent.trim();
+                                    // Extraer solo el número antes del paréntesis
+                                    var puntaje = textoCompleto.split('(')[0].trim();
+                                    valor = puntaje;
+
+                                    // Agregar porcentaje en columna separada
+                                    var match = textoCompleto.match(/\((\d+)%\)/);
+                                    var porcentaje = match ? match[1] + '%' : '';
+                                    filaData.push(valor); // Puntaje
+                                    filaData.push(porcentaje); // Porcentaje
+                                    return; // Skip el resto del switch para esta celda
+                                } else {
+                                    valor = celda.textContent.trim();
+                                    filaData.push(valor);
+                                    filaData.push(''); // Porcentaje vacío
+                                    return;
+                                }
+                                break;
+
+                            case 6: // Items - extraer número del badge
+                                var itemsBadge = celda.querySelector('.badge');
+                                valor = itemsBadge ? itemsBadge.textContent.trim() : celda.textContent.trim();
+                                break;
+
+                            case 7: // Observaciones - obtener texto completo
+                                var observacionesContainer = celda.querySelector('.observaciones-container');
+                                if (observacionesContainer) {
+                                    valor = observacionesContainer.getAttribute('title') || 'Sin observaciones';
+                                } else {
+                                    valor = celda.textContent.trim().replace('Sin observaciones', '') || 'Sin observaciones';
+                                }
+                                break;
+
+                            default:
+                                valor = celda.textContent.trim();
+                        }
+
+                        if (celdaIndex !== 5) { // Ya manejamos puntaje arriba
+                            filaData.push(valor);
+                        }
+                    });
+
+                    datosExcel.push(filaData);
+                });
+
+                console.log('🔄 Generando libro de Excel...');
+
+                // Crear worksheet
+                var ws = XLSX.utils.aoa_to_sheet(datosExcel);
+
+                // Configurar ancho de columnas
+                var anchos = [
+                    {wch: 25}, // Estudiante
+                    {wch: 15}, // ID
+                    {wch: 20}, // Rúbrica
+                    {wch: 15}, // Período
+                    {wch: 12}, // Fecha
+                    {wch: 10}, // Puntaje
+                    {wch: 12}, // Porcentaje
+                    {wch: 8},  // Items
+                    {wch: 40}  // Observaciones
+                ];
+                ws['!cols'] = anchos;
+
+                // Crear workbook
+                var wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Evaluaciones");
+
+                // Generar nombre del archivo
+                var fechaHoy = new Date();
+                var fechaFormateada = fechaHoy.getFullYear() + '-' +
+                                     String(fechaHoy.getMonth() + 1).padStart(2, '0') + '-' +
+                                     String(fechaHoy.getDate()).padStart(2, '0');
+
+                var nombreArchivo = 'Reporte_Evaluaciones_' + fechaFormateada + '.xlsx';
+
+                console.log('💾 Descargando archivo:', nombreArchivo);
+
+                // Escribir archivo
+                XLSX.writeFile(wb, nombreArchivo);
+
+                console.log('✅ Exportación completada exitosamente');
+                alert('Archivo exportado exitosamente: ' + nombreArchivo);
+
+            } catch (error) {
+                console.error('❌ Error en exportarAExcel:', error);
+                alert('Error al exportar: ' + error.message);
+            } finally {
+                // Restaurar botón
+                var btnExportar = document.getElementById('btnExportar');
+                if (btnExportar) {
+                    btnExportar.disabled = false;
+                    btnExportar.innerHTML = '<i class="fas fa-file-excel"></i> Exportar a Excel';
+                }
+            }
+        }
+    </script>
+}

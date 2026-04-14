@@ -1,0 +1,256 @@
+@* Modal para crear grupo de calificación rápidamente *@
+<div class="modal fade" id="modalCrearGrupoRapido" tabindex="-1" aria-labelledby="modalCrearGrupoRapidoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalCrearGrupoRapidoLabel">
+                    <i class="fas fa-layer-group"></i> Crear Nuevo Grupo de Niveles
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formCrearGrupoRapido">
+                    <div class="mb-3">
+                        <label for="nombreGrupoRapido" class="form-label">
+                            <i class="fas fa-tag"></i> Nombre del Grupo <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="nombreGrupoRapido" placeholder="Ej: Grupo Estándar 4 Niveles" required maxlength="100">
+                        <div class="form-text">Ingrese un nombre descriptivo para el grupo</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="descripcionGrupoRapido" class="form-label">
+                            <i class="fas fa-align-left"></i> Descripción (Opcional)
+                        </label>
+                        <textarea class="form-control" id="descripcionGrupoRapido" rows="2" placeholder="Descripción del grupo..." maxlength="200"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-list-ol"></i> Seleccionar Niveles de Calificación <span class="text-danger">*</span>
+                        </label>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted"><span id="contadorNivelesModal">0</span> niveles seleccionados</small>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-outline-primary" onclick="seleccionarTodosNivelesModal()">
+                                    <i class="fas fa-check-double"></i> Todos
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="limpiarNivelesModal()">
+                                    <i class="fas fa-times"></i> Ninguno
+                                </button>
+                            </div>
+                        </div>
+                        <div id="nivelesListaModal" class="border rounded p-3" style="max-height: 300px; overflow-y: auto; background-color: #f8f9fa;">
+                            <!-- Los niveles se cargarán aquí dinámicamente -->
+                            <p class="text-muted text-center mb-0">Cargando niveles...</p>
+                        </div>
+                        <div class="invalid-feedback" id="errorNivelesModal">
+                            Debe seleccionar al menos un nivel
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info d-flex align-items-center" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <div>
+                            El grupo se creará y estará disponible inmediatamente para asignarlo a esta rúbrica.
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" onclick="guardarGrupoRapido()">
+                    <i class="fas fa-save"></i> Crear y Seleccionar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let nivelesDisponiblesModal = [];
+
+    // Cargar niveles disponibles al abrir el modal
+    function cargarNivelesModal(niveles) {
+        nivelesDisponiblesModal = niveles;
+        const container = document.getElementById('nivelesListaModal');
+        
+        if (!niveles || niveles.length === 0) {
+            container.innerHTML = '<p class="text-muted text-center mb-0">No hay niveles disponibles</p>';
+            return;
+        }
+
+        let html = '<div class="row g-2">';
+        niveles.forEach((nivel, index) => {
+            const nivelId = `nivelModal_${nivel.idNivel}`;
+            html += `
+                <div class="col-md-6">
+                    <div class="form-check">
+                        <input class="form-check-input nivel-checkbox-modal" type="checkbox" value="${nivel.idNivel}" id="${nivelId}" onchange="actualizarContadorNivelesModal()">
+                        <label class="form-check-label" for="${nivelId}">
+                            <strong>${nivel.nombreNivel}</strong>
+                            ${nivel.descripcion ? `<br><small class="text-muted">${nivel.descripcion}</small>` : ''}
+                        </label>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        
+        container.innerHTML = html;
+        actualizarContadorNivelesModal();
+    }
+
+    // Seleccionar todos los niveles
+    function seleccionarTodosNivelesModal() {
+        document.querySelectorAll('.nivel-checkbox-modal').forEach(cb => cb.checked = true);
+        actualizarContadorNivelesModal();
+    }
+
+    // Limpiar selección de niveles
+    function limpiarNivelesModal() {
+        document.querySelectorAll('.nivel-checkbox-modal').forEach(cb => cb.checked = false);
+        actualizarContadorNivelesModal();
+    }
+
+    // Actualizar contador de niveles seleccionados
+    function actualizarContadorNivelesModal() {
+        const checkboxes = document.querySelectorAll('.nivel-checkbox-modal:checked');
+        document.getElementById('contadorNivelesModal').textContent = checkboxes.length;
+    }
+
+    // Guardar grupo rápido
+    async function guardarGrupoRapido() {
+        const nombreGrupo = document.getElementById('nombreGrupoRapido').value.trim();
+        const descripcionGrupo = document.getElementById('descripcionGrupoRapido').value.trim();
+        const nivelesSeleccionados = Array.from(document.querySelectorAll('.nivel-checkbox-modal:checked')).map(cb => parseInt(cb.value));
+
+        // Validaciones
+        if (!nombreGrupo) {
+            alert('Por favor ingrese un nombre para el grupo.');
+            document.getElementById('nombreGrupoRapido').focus();
+            return;
+        }
+
+        if (nivelesSeleccionados.length === 0) {
+            alert('Por favor seleccione al menos un nivel.');
+            document.getElementById('errorNivelesModal').style.display = 'block';
+            return;
+        }
+
+        // Mostrar loading
+        const btnGuardar = event.target;
+        const textoOriginal = btnGuardar.innerHTML;
+        btnGuardar.disabled = true;
+        btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
+
+        try {
+            const response = await fetch('/GruposCalificacion/CrearGrupoRapido', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify({
+                    nombreGrupo: nombreGrupo,
+                    descripcion: descripcionGrupo,
+                    nivelesIds: nivelesSeleccionados
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Cerrar modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('modalCrearGrupoRapido'));
+                modal.hide();
+
+                // Agregar el nuevo grupo al select de grupos existentes
+                const selectGrupo = document.getElementById('grupoExistente');
+                const option = document.createElement('option');
+                option.value = result.grupoId;
+                option.text = `${result.nombreGrupo} (${result.cantidadNiveles} niveles)`;
+                option.setAttribute('data-niveles', result.cantidadNiveles);
+                selectGrupo.appendChild(option);
+                selectGrupo.value = result.grupoId;
+
+                // Seleccionar automáticamente el grupo recién creado
+                seleccionarGrupoExistente();
+
+                // Mostrar mensaje de éxito
+                mostrarNotificacion('success', result.message);
+
+                // Limpiar formulario
+                document.getElementById('formCrearGrupoRapido').reset();
+            } else {
+                alert(result.message || 'Error al crear el grupo. Por favor intente nuevamente.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al crear el grupo. Por favor intente nuevamente.');
+        } finally {
+            btnGuardar.disabled = false;
+            btnGuardar.innerHTML = textoOriginal;
+        }
+    }
+
+    // Función auxiliar para mostrar notificaciones
+    function mostrarNotificacion(tipo, mensaje) {
+        const alertClass = tipo === 'success' ? 'alert-success' : 'alert-danger';
+        const icono = tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        
+        const alertHtml = `
+            <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                <i class="fas ${icono} me-2"></i>${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        
+        // Insertar al inicio del formulario principal
+        const form = document.getElementById('rubricaForm');
+        form.insertAdjacentHTML('afterbegin', alertHtml);
+        
+        // Auto-ocultar después de 5 segundos
+        setTimeout(() => {
+            const alert = form.querySelector('.alert');
+            if (alert) {
+                alert.classList.remove('show');
+                setTimeout(() => alert.remove(), 150);
+            }
+        }, 5000);
+    }
+
+    // Evento cuando se abre el modal
+    document.getElementById('modalCrearGrupoRapido').addEventListener('show.bs.modal', function() {
+        // Limpiar formulario
+        document.getElementById('formCrearGrupoRapido').reset();
+        document.getElementById('errorNivelesModal').style.display = 'none';
+        
+        // Cargar niveles desde el ViewBag (ya disponibles en la página)
+        if (typeof nivelesDisponiblesGlobal !== 'undefined') {
+            cargarNivelesModal(nivelesDisponiblesGlobal);
+        }
+    });
+</script>
+
+<style>
+    .nivel-checkbox-modal {
+        cursor: pointer;
+    }
+    
+    .form-check-label {
+        cursor: pointer;
+    }
+    
+    #nivelesListaModal .form-check {
+        padding: 8px;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
+    
+    #nivelesListaModal .form-check:hover {
+        background-color: #e9ecef;
+    }
+</style>

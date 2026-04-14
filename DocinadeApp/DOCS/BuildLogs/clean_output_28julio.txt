@@ -1,0 +1,32 @@
+Comando: dotnet clean
+Fecha: 2025-07-28 12:42:47.450242
+==================================================
+STDOUT:
+CompilaciÃ³n iniciada a las 28/07/2025 12:42:44.
+     1>Proyecto "C:\Users\hguido\Desktop\RubricasApp\src\RubricasApp.Web\RubricasApp.Web.sln" en el nodo 1 (Clean destinos).
+     1>ValidateSolutionConfiguration:
+         Compilando la configuraciÃ³n de soluciones "Debug|Any CPU".
+     1>El proyecto "C:\Users\hguido\Desktop\RubricasApp\src\RubricasApp.Web\RubricasApp.Web.sln" (1) estÃ¡ compilando "C:\Users\hguido\Desktop\RubricasApp\src\RubricasApp.Web\RubricasApp.Web.csproj" (2) en el nodo 1 (Clean destinos).
+     2>CoreClean:
+         Se eliminarÃ¡ el archivo "C:\Users\hguido\Desktop\RubricasApp\src\RubricasApp.Web\obj\Debug\net8.0\RubricasApp.Web.csproj.AssemblyReference.cache".
+         Se eliminarÃ¡ el archivo "C:\Users\hguido\Desktop\RubricasApp\src\RubricasApp.Web\obj\Debug\net8.0\rpswa.dswa.cache.json".
+         Se eliminarÃ¡ el archivo "C:\Users\hguido\Desktop\RubricasApp\src\RubricasApp.Web\obj\Debug\net8.0\RubricasApp.Web.GeneratedMSBuildEditorConfig.editorconfig".
+         Se eliminarÃ¡ el archivo "C:\Users\hguido\Desktop\RubricasApp\src\RubricasApp.Web\obj\Debug\net8.0\RubricasApp.Web.AssemblyInfoInputs.cache".
+         Se eliminarÃ¡ el archivo "C:\Users\hguido\Desktop\RubricasApp\src\RubricasApp.Web\obj\Debug\net8.0\RubricasApp.Web.AssemblyInfo.cs".
+         Se eliminarÃ¡ el archivo "C:\Users\hguido\Desktop\RubricasApp\src\RubricasApp.Web\obj\Debug\net8.0\RubricasApp.Web.csproj.CoreCompileInputs.cache".
+         Se eliminarÃ¡ el archivo "C:\Users\hguido\Desktop\RubricasApp\src\RubricasApp.Web\obj\Debug\net8.0\RubricasApp.Web.MvcApplicationPartsAssemblyInfo.cs".
+         Se eliminarÃ¡ el archivo "C:\Users\hguido\Desktop\RubricasApp\src\RubricasApp.Web\obj\Debug\net8.0\RubricasApp.Web.MvcApplicationPartsAssemblyInfo.cache".
+         Se eliminarÃ¡ el archivo "C:\Users\hguido\Desktop\RubricasApp\src\RubricasApp.Web\obj\Debug\net8.0\RubricasApp.Web.RazorAssemblyInfo.cache".
+         Se eliminarÃ¡ el archivo "C:\Users\hguido\Desktop\RubricasApp\src\RubricasApp.Web\obj\Debug\net8.0\RubricasApp.Web.RazorAssemblyInfo.cs".
+         Se eliminarÃ¡ el archivo "C:\Users\hguido\Desktop\RubricasApp\src\RubricasApp.Web\obj\Debug\net8.0\RubricasApp.Web.sourcelink.json".
+     2>CompilaciÃ³n del proyecto terminada "C:\Users\hguido\Desktop\RubricasApp\src\RubricasApp.Web\RubricasApp.Web.csproj" (Clean destinos).
+     1>CompilaciÃ³n del proyecto terminada "C:\Users\hguido\Desktop\RubricasApp\src\RubricasApp.Web\RubricasApp.Web.sln" (Clean destinos).
+
+CompilaciÃ³n correcta.
+    0 Advertencia(s)
+    0 Errores
+
+Tiempo transcurrido 00:00:02.56
+
+
+STDERR:

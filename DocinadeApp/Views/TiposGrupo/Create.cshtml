@@ -1,0 +1,189 @@
+﻿@model RubricasApp.Web.ViewModels.Grupos.CreateTipoGrupoViewModel
+
+@{
+    ViewData["Title"] = "Crear Tipo de Grupo";
+}
+
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="page-title">
+                <i class="fas fa-plus-circle text-primary me-2"></i>
+                Crear Nuevo Tipo de Grupo
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-white">
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index", "Home")" class="text-white">
+                            <i class="fas fa-home"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index")" class="text-white">
+                            <i class="fas fa-tags"></i> Tipos de Grupo
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active text-white">Crear</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="modern-card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Información del Tipo de Grupo
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post" id="createTipoForm">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Nombre" class="form-label required">Nombre</label>
+                        <input asp-for="Nombre" class="form-control" placeholder="Ej: Sección, Nivel, Modalidad" maxlength="100" />
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                        <div class="form-text">Nombre descriptivo del tipo de grupo</div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Estado" class="form-label required">Estado</label>
+                        <select asp-for="Estado" class="form-select">
+                            @foreach (var estado in ViewBag.EstadosDisponibles as List<RubricasApp.Web.Controllers.EstadoOption>)
+                            {
+                                <option value="@estado.Valor"
+                                        selected="@(Model.Estado == estado.Valor)">
+                                    @estado.Nombre
+                                </option>
+                            }
+                        </select>
+                        <span asp-validation-for="Estado" class="text-danger"></span>
+                        <div class="form-text">Estado inicial del tipo de grupo</div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="row">
+                        <div class="col-12">
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <a href="@Url.Action("Index")" class="btn btn-modern secondary">
+                                    <i class="fas fa-arrow-left"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-modern primary">
+                                    <i class="fas fa-save"></i> Crear Tipo de Grupo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            // Validación del formulario
+            $('#createTipoForm').on('submit', function(e) {
+                const nombre = $('#Nombre').val().trim();
+
+                if (!nombre) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Campo requerido',
+                        text: 'Por favor, ingrese el nombre del tipo de grupo',
+                        icon: 'error'
+                    });
+                    return false;
+                }
+
+                // Mostrar loading
+                Swal.fire({
+                    title: 'Creando tipo de grupo...',
+                    text: 'Por favor espere',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                return true;
+            });
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .breadcrumb-white {
+            background-color: rgba(0,0,0,0.1);
+            border-radius: 6px;
+            padding: 8px 15px;
+        }
+
+        .breadcrumb-white .breadcrumb-item + .breadcrumb-item::before {
+            color: rgba(255,255,255,0.7);
+            content: ">";
+        }
+
+        .breadcrumb-white .breadcrumb-item a {
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb-white .breadcrumb-item a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        .breadcrumb-white .breadcrumb-item.active {
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .required::after {
+            content: ' *';
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .modern-card {
+            border: none;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+
+            .modern-card .card-header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border-radius: 10px 10px 0 0;
+            }
+
+        .btn-modern.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+        }
+
+        .btn-modern.secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            color: white;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+    </style>
+}

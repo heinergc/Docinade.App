@@ -1,0 +1,242 @@
+using RubricasApp.Web.Models.Permissions;
+using System.ComponentModel.DataAnnotations;
+
+namespace RubricasApp.Web.ViewModels.Admin
+{
+    /// <summary>
+    /// ViewModel para mostrar información de un rol
+    /// </summary>
+    public class RoleViewModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string NormalizedName { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public int PermissionCount { get; set; }
+        public int UserCount { get; set; }
+        public List<string> Permissions { get; set; } = new List<string>();
+        public bool IsSystemRole { get; set; }
+        public DateTime CreatedDate { get; set; }
+    }
+
+    /// <summary>
+    /// ViewModel para crear un nuevo rol
+    /// </summary>
+    public class CreateRoleViewModel
+    {
+        [Required(ErrorMessage = "El nombre del rol es requerido")]
+        [StringLength(50, ErrorMessage = "El nombre no puede exceder 50 caracteres")]
+        [Display(Name = "Nombre del Rol")]
+        public string Name { get; set; } = string.Empty;
+
+        [StringLength(200, ErrorMessage = "La descripción no puede exceder 200 caracteres")]
+        [Display(Name = "Descripción")]
+        public string? Description { get; set; }
+
+        [Display(Name = "Permisos")]
+        public List<string>? SelectedPermissions { get; set; }
+
+        public Dictionary<string, List<PermissionInfo>> PermissionsByCategory { get; set; } = new();
+    }
+
+    /// <summary>
+    /// ViewModel para editar un rol existente
+    /// </summary>
+    public class EditRoleViewModel
+    {
+        public string Id { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El nombre del rol es requerido")]
+        [StringLength(50, ErrorMessage = "El nombre no puede exceder 50 caracteres")]
+        [Display(Name = "Nombre del Rol")]
+        public string Name { get; set; } = string.Empty;
+
+        [StringLength(200, ErrorMessage = "La descripción no puede exceder 200 caracteres")]
+        [Display(Name = "Descripción")]
+        public string? Description { get; set; }
+
+        [Display(Name = "Permisos")]
+        public List<string>? SelectedPermissions { get; set; }
+
+        public Dictionary<string, List<PermissionInfo>> PermissionsByCategory { get; set; } = new();
+        public bool IsSystemRole { get; set; }
+    }
+
+    /// <summary>
+    /// ViewModel para usuario en rol
+    /// </summary>
+    public class UserInRoleViewModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string NombreCompleto { get; set; } = string.Empty;
+        public string? Institucion { get; set; }
+        public bool Activo { get; set; }
+        public DateTime FechaRegistro { get; set; }
+        public DateTime? UltimoAcceso { get; set; }
+    }
+
+    /// <summary>
+    /// ViewModel para gestión de permisos de usuario
+    /// </summary>
+    public class UserPermissionsViewModel
+    {
+        public string UserId { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string NombreCompleto { get; set; } = string.Empty;
+        public List<string> UserRoles { get; set; } = new List<string>();
+        public List<string> DirectPermissions { get; set; } = new List<string>();
+        public List<string> RolePermissions { get; set; } = new List<string>();
+        public List<string> AllPermissions { get; set; } = new List<string>();
+        public Dictionary<string, List<PermissionInfo>> PermissionsByCategory { get; set; } = new();
+        public List<string>? SelectedPermissions { get; set; }
+    }
+
+    /// <summary>
+    /// ViewModel para asignar roles a usuario
+    /// </summary>
+    public class UserRolesViewModel
+    {
+        public string UserId { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string NombreCompleto { get; set; } = string.Empty;
+        public List<string> CurrentRoles { get; set; } = new List<string>();
+        public List<RoleSelectionItem> AvailableRoles { get; set; } = new List<RoleSelectionItem>();
+        public List<string>? SelectedRoles { get; set; }
+    }
+
+    /// <summary>
+    /// Item para selección de roles
+    /// </summary>
+    public class RoleSelectionItem
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public bool IsSelected { get; set; }
+        public bool IsSystemRole { get; set; }
+        public int PermissionCount { get; set; }
+    }
+
+    /// <summary>
+    /// ViewModel para auditoría de acciones
+    /// </summary>
+    public class AuditLogViewModel
+    {
+        public int Id { get; set; }
+        public string UserId { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
+        public string Action { get; set; } = string.Empty;
+        public string EntityType { get; set; } = string.Empty;
+        public string? EntityId { get; set; }
+        public string EntityName { get; set; } = string.Empty;
+        public string? OldValues { get; set; }
+        public string? NewValues { get; set; }
+        public string IpAddress { get; set; } = string.Empty;
+        public string UserAgent { get; set; } = string.Empty;
+        public DateTime Timestamp { get; set; }
+        public string LogLevel { get; set; } = string.Empty;
+        public string? AdditionalInfo { get; set; }
+        public bool Success { get; set; }
+        public string? ErrorMessage { get; set; }
+    }
+
+    /// <summary>
+    /// ViewModel para filtros de auditoría
+    /// </summary>
+    public class AuditFilterViewModel
+    {
+        public string? UserId { get; set; }
+        public string? Action { get; set; }
+        public string? EntityType { get; set; }
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
+        public string? LogLevel { get; set; }
+        public bool? Success { get; set; }
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 50;
+        public string? SearchTerm { get; set; }
+
+        // Para poblar filtros
+        public List<string> AvailableActions { get; set; } = new List<string>();
+        public List<string> AvailableEntityTypes { get; set; } = new List<string>();
+        public List<string> AvailableLogLevels { get; set; } = new List<string>();
+    }
+
+    /// <summary>
+    /// ViewModel para lista de auditoría con paginación
+    /// </summary>
+    public class AuditListViewModel
+    {
+        public List<AuditLogViewModel> AuditLogs { get; set; } = new List<AuditLogViewModel>();
+        public AuditFilterViewModel Filter { get; set; } = new AuditFilterViewModel();
+        public int TotalRecords { get; set; }
+        public int TotalPages { get; set; }
+        public int CurrentPage { get; set; }
+        public bool HasPreviousPage => CurrentPage > 1;
+        public bool HasNextPage => CurrentPage < TotalPages;
+    }
+
+    /// <summary>
+    /// ViewModel para estadísticas de auditoría
+    /// </summary>
+    public class AuditStatisticsViewModel
+    {
+        public Dictionary<string, int> ActionStatistics { get; set; } = new Dictionary<string, int>();
+        public Dictionary<string, int> EntityStatistics { get; set; } = new Dictionary<string, int>();
+        public Dictionary<string, int> UserActivityStatistics { get; set; } = new Dictionary<string, int>();
+        public Dictionary<string, int> DailyActivityStatistics { get; set; } = new Dictionary<string, int>();
+        public int TotalLogsToday { get; set; }
+        public int TotalLogsThisWeek { get; set; }
+        public int TotalLogsThisMonth { get; set; }
+        public int ErrorCount { get; set; }
+        public List<string> MostActiveUsers { get; set; } = new List<string>();
+        public List<string> MostCommonActions { get; set; } = new List<string>();
+    }
+
+    /// <summary>
+    /// ViewModel para dashboard de administración
+    /// </summary>
+    public class AdminDashboardViewModel
+    {
+        public int TotalUsers { get; set; }
+        public int ActiveUsers { get; set; }
+        public int TotalRoles { get; set; }
+        public int TotalPermissions { get; set; }
+        public int TotalAuditLogs { get; set; }
+        public int LoginsToday { get; set; }
+        public int LoginsThisWeek { get; set; }
+        public int ErrorsToday { get; set; }
+        
+        public List<UserActivitySummary> RecentUserActivity { get; set; } = new List<UserActivitySummary>();
+        public List<SystemAlert> SystemAlerts { get; set; } = new List<SystemAlert>();
+        public Dictionary<string, int> RoleDistribution { get; set; } = new Dictionary<string, int>();
+        public Dictionary<string, int> WeeklyLoginTrend { get; set; } = new Dictionary<string, int>();
+    }
+
+    /// <summary>
+    /// Resumen de actividad de usuario
+    /// </summary>
+    public class UserActivitySummary
+    {
+        public string UserId { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string NombreCompleto { get; set; } = string.Empty;
+        public DateTime LastActivity { get; set; }
+        public string LastAction { get; set; } = string.Empty;
+        public int ActivityCount { get; set; }
+    }
+
+    /// <summary>
+    /// Alerta del sistema
+    /// </summary>
+    public class SystemAlert
+    {
+        public string Type { get; set; } = string.Empty; // Info, Warning, Error, Critical
+        public string Title { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
+        public DateTime Timestamp { get; set; }
+        public string? ActionUrl { get; set; }
+        public bool IsRead { get; set; }
+    }
+}

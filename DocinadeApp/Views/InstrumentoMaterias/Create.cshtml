@@ -1,0 +1,138 @@
+﻿@model RubricasApp.Web.ViewModels.InstrumentoMateriaViewModel
+
+@{
+    ViewData["Title"] = "Crear Relación Instrumento-Materia";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-plus"></i> @ViewData["Title"]
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="InstrumentoId" class="form-label">
+                                        <i class="fas fa-clipboard-list"></i> Instrumento de Evaluación
+                                    </label>
+                                    <select asp-for="InstrumentoId" class="form-select" asp-items="ViewBag.InstrumentoId">
+                                        <option value="">-- Seleccione un instrumento --</option>
+                                    </select>
+                                    <span asp-validation-for="InstrumentoId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="MateriaId" class="form-label">
+                                        <i class="fas fa-book"></i> Materia
+                                    </label>
+                                    <select asp-for="MateriaId" class="form-select" asp-items="ViewBag.MateriaId">
+                                        <option value="">-- Seleccione una materia --</option>
+                                    </select>
+                                    <span asp-validation-for="MateriaId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label asp-for="PeriodoAcademicoId" class="form-label">
+                                <i class="fas fa-calendar-alt"></i> Período Académico
+                            </label>
+                            <select asp-for="PeriodoAcademicoId" class="form-select" asp-items="ViewBag.PeriodoAcademicoId">
+                                <option value="">-- Seleccione un período académico --</option>
+                            </select>
+                            <div class="form-text">
+                                Seleccione el período académico correspondiente
+                            </div>
+                            <span asp-validation-for="PeriodoAcademicoId" class="text-danger"></span>
+                        </div>
+
+                        <!-- Información adicional -->
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Información:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Esta relación vincula un instrumento de evaluación con una materia específica.</li>
+                                <li>El período académico ayuda a organizar las evaluaciones por semestre o período.</li>
+                                <li>No se pueden crear relaciones duplicadas para el mismo instrumento y materia.</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver a la Lista
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Crear Relación
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Verificar que Select2 esté disponible
+            if (typeof $.fn.select2 === 'undefined') {
+                console.warn('Select2 no está cargado. Los selects funcionarán sin mejoras.');
+                return;
+            }
+
+            try {
+                // Mejorar la experiencia del usuario con los selects
+                $('#InstrumentoId, #MateriaId, #PeriodoAcademicoId').select2({
+                    placeholder: function() {
+                        return $(this).find('option:first').text();
+                    },
+                    allowClear: true,
+                    width: '100%'
+                });
+            } catch (error) {
+                console.error('Error al inicializar Select2:', error);
+            }
+
+            // Validación en tiempo real
+            $('form').on('submit', function(e) {
+                var instrumentoId = $('#InstrumentoId').val();
+                var materiaId = $('#MateriaId').val();
+                var periodoAcademicoId = $('#PeriodoAcademicoId').val();
+
+                if (!instrumentoId) {
+                    e.preventDefault();
+                    $('#InstrumentoId').focus();
+                    return false;
+                }
+
+                if (!materiaId) {
+                    e.preventDefault();
+                    $('#MateriaId').focus();
+                    return false;
+                }
+
+                if (!periodoAcademicoId) {
+                    e.preventDefault();
+                    $('#PeriodoAcademicoId').focus();
+                    return false;
+                }
+
+                // Confirmar la creación
+                return confirm('¿Está seguro de que desea crear esta relación instrumento-materia?');
+            });
+        });
+    </script>
+}

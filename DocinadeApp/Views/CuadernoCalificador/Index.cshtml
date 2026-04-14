@@ -1,0 +1,637 @@
+﻿@model RubricasApp.Web.ViewModels.CuadernoCalificadorDinamicoViewModel
+
+@{
+    ViewData["Title"] = "Cuaderno Calificador";
+}
+
+<div class="container-fluid">
+    <!-- Encabezado y filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-table me-2"></i>
+                            Cuaderno Calificador
+                        </h4>
+                        <div class="d-flex gap-2">
+                            @if (Model.TieneDatos)
+                            {
+                                <a asp-action="ExportarExcelDinamico" 
+                                   asp-route-materiaId="@Model.MateriaId" 
+                                   asp-route-periodoAcademicoId="@Model.PeriodoAcademicoId"
+                                   class="btn btn-success btn-sm">
+                                    <i class="fas fa-file-excel me-1"></i>
+                                    Exportar Excel
+                                </a>
+                            }
+                            <a asp-action="Tradicional" class="btn btn-outline-light btn-sm">
+                                <i class="fas fa-cog me-1"></i>
+                                Cuadernos Tradicionales
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Filtros -->
+                    <form method="get" class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label for="materiaId" class="form-label">Materia</label>
+                            <select name="materiaId" id="materiaId" class="form-select" onchange="this.form.submit()">
+                                @foreach (var item in Model.MateriasDisponibles)
+                                {
+                                    <option value="@item.Value" selected="@(item.Value == Model.MateriaId?.ToString())">@item.Text</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="periodoAcademicoId" class="form-label">Período Académico</label>
+                            <select name="periodoAcademicoId" id="periodoAcademicoId" class="form-select" onchange="this.form.submit()">
+                                @foreach (var item in Model.PeriodosDisponibles)
+                                {
+                                    <option value="@item.Value" selected="@(item.Value == Model.PeriodoAcademicoId?.ToString())">@item.Text</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-1"></i>
+                                Filtrar
+                            </button>
+                            <a href="@Url.Action("Index")" class="btn btn-outline-secondary ms-2">
+                                <i class="fas fa-times me-1"></i>
+                                Limpiar
+                            </a>
+                        </div>
+                    </form>
+
+                    @if (!string.IsNullOrEmpty(Model.NombreMateria) && !string.IsNullOrEmpty(Model.NombrePeriodoAcademico))
+                    {
+                        <hr>
+                        <div class="alert alert-info mb-0">
+                            <strong>Filtros aplicados:</strong>
+                            <span class="badge bg-primary me-2">@Model.NombreMateria</span>
+                            <span class="badge bg-secondary">@Model.NombrePeriodoAcademico</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.TieneDatos)
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-warning text-center">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                    <h5>No hay datos para mostrar</h5>
+                    <p class="mb-0">
+                        @if (!Model.MateriaId.HasValue || !Model.PeriodoAcademicoId.HasValue)
+                        {
+                            <span>Seleccione una materia y un período académico para generar el cuaderno calificador.</span>
+                        }
+                        else
+                        {
+                            <span>No se encontraron evaluaciones para los filtros seleccionados.</span>
+                        }
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        @* Advertencia de instrumentos sin rúbricas asignadas *@
+        @if (Model.TieneInstrumentosSinRubricas)
+        {
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Instrumentos sin configuración
+                        </h5>
+                        <p>
+                            Los siguientes instrumentos de evaluación están asignados a esta materia pero <strong>no tienen rúbricas configuradas</strong>, 
+                            por lo que no se mostrarán en el cuaderno calificador:
+                        </p>
+                        <ul class="mb-2">
+                            @foreach (var instrumento in Model.InstrumentosSinRubricas)
+                            {
+                                <li><strong>@instrumento</strong></li>
+                            }
+                        </ul>
+                        <hr>
+                        <p class="mb-0">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Para que estos instrumentos aparezcan en el cuaderno calificador, debe asignarles rúbricas y sus ponderaciones desde el menú 
+                            <a asp-controller="InstrumentoRubrica" asp-action="Index" class="alert-link">
+                                <strong>Asignación de Rúbricas a Instrumentos</strong>
+                            </a>.
+                        </p>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+        }
+        <!-- Tarjetas de estadísticas -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title">Total Estudiantes</h6>
+                                <h3 class="mb-0">@Model.TotalEstudiantes</h3>
+                            </div>
+                            <i class="fas fa-users fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title">Promedio General</h6>
+                                <h3 class="mb-0">@Model.Estadisticas.PromedioGeneral.ToString("F1")</h3>
+                            </div>
+                            <i class="fas fa-chart-line fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title">% Aprobación</h6>
+                                <h3 class="mb-0">@Model.Estadisticas.PorcentajeAprobacion.ToString("F1")%</h3>
+                            </div>
+                            <i class="fas fa-graduation-cap fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title">Instrumentos</h6>
+                                <h3 class="mb-0">@Model.Instrumentos.Count</h3>
+                            </div>
+                            <i class="fas fa-clipboard-list fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información de instrumentos y ponderaciones -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-weight-hanging me-2"></i>
+                            Instrumentos de Evaluación y Ponderaciones
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        @if (!Model.PonderacionesValidas)
+                        {
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>Advertencia de Ponderaciones:</strong>
+                                Las ponderaciones actuales suman @Model.PonderacionTotal.ToString("F1")% en lugar de 100%.
+                                <br>
+                                <small class="text-muted">
+                                    Esto puede indicar que faltan instrumentos por configurar o que las ponderaciones necesitan ajuste.
+                                    Las notas se calcularán proporcionalmente.
+                                </small>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Las ponderaciones están correctamente configuradas (Total: @Model.PonderacionTotal.ToString("F1")%)
+                            </div>
+                        }
+                        
+                        <div class="row">
+                            @foreach (var instrumento in Model.Instrumentos)
+                            {
+                                <div class="col-md-6 col-lg-4 mb-3">
+                                    <div class="card h-100 border-start border-primary border-3">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-primary">@instrumento.NombreInstrumento</h6>
+                                            <p class="card-text small text-muted mb-2">@instrumento.DescripcionInstrumento</p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="badge bg-primary fs-6">@instrumento.PorcentajePonderacion.ToString("F1")%</span>
+                                                <small class="text-muted">@instrumento.TotalRubricas rúbrica(s)</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla principal de calificaciones -->
+        <div class="row">
+            <div class="col-12">
+                <!-- TABLA: Estudiantes Regulares -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-users me-2"></i>
+                            Estudiantes - Evaluación Regular
+                            <span class="badge bg-light text-dark ms-2">@((Model.EstudiantesRegulares ?? Model.EstudiantesCalificaciones.Where(e => !e.RequiereACS).ToList()).Count) estudiantes</span>
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped mb-0" id="tablaCuadernoRegular">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Correo</th>
+                                        @foreach (var instrumento in Model.Instrumentos.OrderBy(i => i.InstrumentoId))
+                                        {
+                                            <th class="text-center">
+                                                @instrumento.NombreInstrumento
+                                                <br>
+                                                <small class="text-muted">(@instrumento.PorcentajePonderacion.ToString("F1")%)</small>
+                                            </th>
+                                        }
+                                        <th class="text-center bg-primary">
+                                            <strong>Total (ponderado)</strong>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        var estudiantesRegulares = Model.EstudiantesRegulares ?? Model.EstudiantesCalificaciones.Where(e => !e.RequiereACS).ToList();
+                                    }
+                                    @foreach (var estudiante in estudiantesRegulares.OrderBy(e => e.NombreCompleto))
+                                    {
+                                        <tr class="@(estudiante.EstadoGeneral == "COMPLETO" ? "" : "table-warning")">
+                                            <td>
+                                                <code>@estudiante.NumeroIdentificacion</code>
+                                            </td>
+                                            <td>
+                                                <strong>@estudiante.NombreCompleto</strong>
+                                                <br>
+                                                <small class="text-muted">
+                                                    <span class="badge badge-sm @(estudiante.EstadoGeneral == "COMPLETO" ? "bg-success" : estudiante.EstadoGeneral == "PARCIAL" ? "bg-warning" : "bg-secondary")">
+                                                        @estudiante.EstadoGeneral
+                                                    </span>
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">@estudiante.CorreoElectronico</small>
+                                            </td>
+                                            @foreach (var instrumento in Model.Instrumentos.OrderBy(i => i.InstrumentoId))
+                                            {
+                                                <td class="text-center">
+                                                    @if (estudiante.NotasPorInstrumento.ContainsKey(instrumento.InstrumentoId) && 
+                                                         estudiante.NotasPorInstrumento[instrumento.InstrumentoId].NotaInstrumento.HasValue)
+                                                    {
+                                                        var nota = estudiante.NotasPorInstrumento[instrumento.InstrumentoId].NotaInstrumento.Value;
+                                                        <span class="badge @(nota >= 70 ? "bg-success" : "bg-danger") fs-6">
+                                                            @nota.ToString("F1")
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">-</span>
+                                                    }
+                                                </td>
+                                            }
+                                            <td class="text-center bg-light">
+                                                @if (estudiante.NotaFinalPonderada.HasValue)
+                                                {
+                                                    <strong class="fs-5 @(estudiante.Aprobado ? "text-success" : "text-danger")">
+                                                        @estudiante.NotaFinalPonderada.Value.ToString("F1")
+                                                    </strong>
+                                                    <br>
+                                                    <small class="@(estudiante.Aprobado ? "text-success" : "text-danger")">
+                                                        @(estudiante.Aprobado ? "APROBADO" : "REPROBADO")
+                                                    </small>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Pendiente</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABLA: Estudiantes con ACS (Adecuación Curricular Significativa) -->
+                @{
+                    var estudiantesACS = Model.EstudiantesACS ?? Model.EstudiantesCalificaciones.Where(e => e.RequiereACS).ToList();
+                }
+                @if (estudiantesACS.Any())
+                {
+                    <div class="card mt-4 border-warning">
+                        <div class="card-header bg-warning text-dark">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-user-graduate me-2"></i>
+                                    Estudiantes con Adecuación Curricular Significativa (ACS)
+                                    <span class="badge bg-dark ms-2">@estudiantesACS.Count estudiantes</span>
+                                </h5>
+                                <span class="badge bg-info">
+                                    <i class="fas fa-info-circle"></i> Evaluación Diferenciada
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Evaluación Adaptada según MEP:</strong>
+                                Estos estudiantes tienen criterios de evaluación personalizados según sus necesidades educativas.
+                                Las rúbricas, ponderaciones y criterios pueden diferir del grupo regular.
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0 border-warning" id="tablaCuadernoACS">
+                                    <thead class="table-warning">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Nombre</th>
+                                            <th>Tipo Adec.</th>
+                                            <th>Detalles</th>
+                                            @foreach (var instrumento in Model.Instrumentos.OrderBy(i => i.InstrumentoId))
+                                            {
+                                                <th class="text-center">
+                                                    @instrumento.NombreInstrumento
+                                                    <br>
+                                                    <small class="text-muted">(@instrumento.PorcentajePonderacion.ToString("F1")%)</small>
+                                                </th>
+                                            }
+                                            <th class="text-center bg-warning">
+                                                <strong>Total</strong>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var estudiante in estudiantesACS.OrderBy(e => e.NombreCompleto))
+                                        {
+                                            <tr class="@(estudiante.EstadoGeneral == "COMPLETO" ? "" : "table-warning")">
+                                                <td>
+                                                    <code>@estudiante.NumeroIdentificacion</code>
+                                                </td>
+                                                <td>
+                                                    <strong>@estudiante.NombreCompleto</strong>
+                                                    <i class="fas fa-user-graduate text-warning ms-1" title="Estudiante con ACS"></i>
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        <span class="badge badge-sm @(estudiante.EstadoGeneral == "COMPLETO" ? "bg-success" : estudiante.EstadoGeneral == "PARCIAL" ? "bg-warning" : "bg-secondary")">
+                                                            @estudiante.EstadoGeneral
+                                                        </span>
+                                                    </small>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-warning text-dark">
+                                                        @estudiante.TipoAdecuacion
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    @if (!string.IsNullOrEmpty(estudiante.DetallesACS))
+                                                    {
+                                                        <small class="text-muted" title="@estudiante.DetallesACS">
+                                                            <i class="fas fa-notes-medical"></i>
+                                                            @(estudiante.DetallesACS.Length > 30 ? estudiante.DetallesACS.Substring(0, 30) + "..." : estudiante.DetallesACS)
+                                                        </small>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">-</span>
+                                                    }
+                                                </td>
+                                                @foreach (var instrumento in Model.Instrumentos.OrderBy(i => i.InstrumentoId))
+                                                {
+                                                    <td class="text-center">
+                                                        @{
+                                                            var tieneConfigACS = estudiante.ConfigACSPorInstrumento != null && 
+                                                                                 estudiante.ConfigACSPorInstrumento.ContainsKey(instrumento.InstrumentoId);
+                                                            var configACS = tieneConfigACS ? estudiante.ConfigACSPorInstrumento[instrumento.InstrumentoId] : null;
+                                                        }
+                                                        
+                                                        @if (configACS?.Exento == true)
+                                                        {
+                                                            <span class="badge bg-secondary" title="Estudiante exento de este instrumento">
+                                                                <i class="fas fa-ban"></i> EXENTO
+                                                            </span>
+                                                        }
+                                                        else
+                                                        {
+                                                            @if (estudiante.NotasPorInstrumento.ContainsKey(instrumento.InstrumentoId) && 
+                                                                 estudiante.NotasPorInstrumento[instrumento.InstrumentoId].NotaInstrumento.HasValue)
+                                                            {
+                                                                var nota = estudiante.NotasPorInstrumento[instrumento.InstrumentoId].NotaInstrumento.Value;
+                                                                <div>
+                                                                    <span class="badge @(nota >= 70 ? "bg-success" : "bg-danger") fs-6">
+                                                                        @nota.ToString("F1")
+                                                                    </span>
+                                                                    @if (configACS != null)
+                                                                    {
+                                                                        <br>
+                                                                        @if (configACS.RubricaModificadaId.HasValue)
+                                                                        {
+                                                                            <small class="badge bg-info mt-1" title="Usa rúbrica adaptada: @configACS.NombreRubricaModificada">
+                                                                                <i class="fas fa-edit"></i> Modificado
+                                                                            </small>
+                                                                        }
+                                                                        @if (configACS.PonderacionPersonalizada.HasValue)
+                                                                        {
+                                                                            <small class="badge bg-warning mt-1" title="Ponderación personalizada">
+                                                                                @configACS.PonderacionPersonalizada.Value.ToString("F1")%
+                                                                            </small>
+                                                                        }
+                                                                    }
+                                                                </div>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="text-muted">-</span>
+                                                            }
+                                                        }
+                                                    </td>
+                                                }
+                                                <td class="text-center bg-light">
+                                                    @if (estudiante.NotaFinalPonderada.HasValue)
+                                                    {
+                                                        <strong class="fs-5 @(estudiante.Aprobado ? "text-success" : "text-danger")">
+                                                            @estudiante.NotaFinalPonderada.Value.ToString("F1")
+                                                        </strong>
+                                                        <br>
+                                                        <small class="@(estudiante.Aprobado ? "text-success" : "text-danger")">
+                                                            @(estudiante.Aprobado ? "APROBADO" : "REPROBADO")
+                                                        </small>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">Pendiente</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="alert alert-light mt-3 mb-0">
+                                <small class="text-muted">
+                                    <i class="fas fa-lightbulb me-1"></i>
+                                    <strong>Leyenda:</strong>
+                                    <span class="badge bg-secondary ms-2"><i class="fas fa-ban"></i> EXENTO</span> = No aplica este instrumento |
+                                    <span class="badge bg-info ms-2"><i class="fas fa-edit"></i> Modificado</span> = Usa rúbrica adaptada |
+                                    <span class="badge bg-warning text-dark ms-2">%</span> = Ponderación personalizada
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Estadísticas adicionales -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">Distribución de Notas</h6>
+                    </div>
+                    <div class="card-body">
+                        @foreach (var distribucion in Model.Estadisticas.DistribucionNotas)
+                        {
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span>@distribucion.Key</span>
+                                <span class="badge bg-secondary">@distribucion.Value estudiantes</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">Resumen General</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="text-center">
+                                    <div class="text-success h4 mb-1">@Model.Estadisticas.EstudiantesAprobados</div>
+                                    <div class="text-muted small">Aprobados</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center">
+                                    <div class="text-danger h4 mb-1">@Model.Estadisticas.EstudiantesReprobados</div>
+                                    <div class="text-muted small">Reprobados</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center">
+                                    <div class="text-primary h4 mb-1">@Model.Estadisticas.NotaMaxima.ToString("F1")</div>
+                                    <div class="text-muted small">Nota Máxima</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center">
+                                    <div class="text-warning h4 mb-1">@Model.Estadisticas.NotaMinima.ToString("F1")</div>
+                                    <div class="text-muted small">Nota Mínima</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.bootstrap5.min.css">
+    
+    <style>
+        .badge-sm {
+            font-size: 0.7em;
+        }
+        
+        .table th {
+            white-space: nowrap;
+        }
+        
+        .opacity-75 {
+            opacity: 0.75;
+        }
+        
+        .border-3 {
+            border-width: 3px !important;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Inicializar DataTable si hay datos
+            @if (Model.TieneDatos)
+            {
+                <text>
+                $('#tablaCuaderno').DataTable({
+                    "language": {
+                        "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json"
+                    },
+                    "pageLength": 25,
+                    "order": [[1, "asc"]], // Ordenar por nombre
+                    "columnDefs": [
+                        { "orderable": false, "targets": [2] }, // Correo no ordenable
+                        { "className": "text-center", "targets": [-1, -2, -3, -4, -5] } // Centrar columnas de notas
+                    ],
+                    "responsive": true,
+                    "dom": 'Bfrtip',
+                    "buttons": [
+                        {
+                            extend: 'copy',
+                            text: 'Copiar',
+                            className: 'btn btn-secondary btn-sm'
+                        },
+                        {
+                            extend: 'print',
+                            text: 'Imprimir',
+                            className: 'btn btn-info btn-sm'
+                        }
+                    ]
+                });
+                </text>
+            }
+        });
+    </script>
+}

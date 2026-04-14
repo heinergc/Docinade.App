@@ -1,0 +1,348 @@
+﻿@model RubricasApp.Web.Models.ConfigurarInstrumentosViewModel
+
+@{
+    ViewData["Title"] = "Configurar Instrumentos - " + Model.NombreCuaderno;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header Section -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-primary text-white">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h4 class="mb-0">
+                                <i class="fas fa-cogs me-2"></i>
+                                Configurar Instrumentos de Evaluación
+                            </h4>
+                            <small class="opacity-75">@Model.NombreCuaderno - @Model.Materia</small>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge bg-info fs-6">
+                                Período: @Model.PeriodoAcademico
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form method="post" action="@Url.Action("ConfigurarInstrumentos", new { id = Model.CuadernoId })">
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.CuadernoId)
+
+                <!-- Current Configuration Summary -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body text-center">
+                                <div class="text-primary mb-2">
+                                    <i class="fas fa-list-check fa-2x"></i>
+                                </div>
+                                <h5 class="card-title text-primary" id="totalInstrumentos">
+                                    @(Model.InstrumentosSeleccionados?.Count ?? 0)
+                                </h5>
+                                <p class="card-text text-muted">Instrumentos Configurados</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body text-center">
+                                <div class="text-success mb-2">
+                                    <i class="fas fa-percentage fa-2x"></i>
+                                </div>
+                                <h5 class="card-title" id="ponderacionTotal">
+                                    <span class="text-success">0%</span>
+                                </h5>
+                                <p class="card-text text-muted">Ponderación Total</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body text-center">
+                                <div class="text-warning mb-2">
+                                    <i class="fas fa-exclamation-triangle fa-2x"></i>
+                                </div>
+                                <h5 class="card-title text-warning" id="instrumentosObligatorios">0</h5>
+                                <p class="card-text text-muted">Instrumentos Obligatorios</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available Rubrics -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="fas fa-plus-circle me-2"></i>
+                            Rúbricas Disponibles
+                        </h5>
+                        <small class="text-muted">Selecciona las rúbricas que deseas incluir en este cuaderno</small>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.RubricasDisponibles?.Any() == true)
+                        {
+                            <div class="row">
+                                @foreach (var rubrica in Model.RubricasDisponibles)
+                                {
+                                    <div class="col-md-6 col-lg-4 mb-3">
+                                        <div class="card border h-100 rubrica-card" data-rubrica-id="@rubrica.Value">
+                                            <div class="card-body">
+                                                <div class="form-check mb-2">
+                                                    <input class="form-check-input rubrica-checkbox" 
+                                                           type="checkbox" 
+                                                           value="@rubrica.Value" 
+                                                           id="rubrica_@rubrica.Value"
+                                                           @(Model.InstrumentosSeleccionados?.Any(i => i.RubricaId == int.Parse(rubrica.Value)) == true ? "checked" : "")>
+                                                    <label class="form-check-label fw-semibold" for="rubrica_@rubrica.Value">
+                                                        @rubrica.Text
+                                                    </label>
+                                                </div>
+                                                
+                                                <!-- Configuration fields (initially hidden) -->
+                                                <div class="rubrica-config" style="display: none;">
+                                                    <div class="border-top pt-3">
+                                                        <div class="row g-2">
+                                                            <div class="col-6">
+                                                                <label class="form-label small">Ponderación (%)</label>
+                                                                <input type="number" 
+                                                                       class="form-control form-control-sm ponderacion-input" 
+                                                                       name="InstrumentosSeleccionados[@rubrica.Value].PonderacionPorcentaje"
+                                                                       value="@(Model.InstrumentosSeleccionados?.FirstOrDefault(i => i.RubricaId == int.Parse(rubrica.Value))?.PonderacionPorcentaje ?? 0)"
+                                                                       min="0" 
+                                                                       max="100" 
+                                                                       step="0.01">
+                                                            </div>
+                                                            <div class="col-6">
+                                                                <label class="form-label small">Orden</label>
+                                                                <input type="number" 
+                                                                       class="form-control form-control-sm orden-input" 
+                                                                       name="InstrumentosSeleccionados[@rubrica.Value].Orden"
+                                                                       value="@(Model.InstrumentosSeleccionados?.FirstOrDefault(i => i.RubricaId == int.Parse(rubrica.Value))?.Orden ?? 1)"
+                                                                       min="1">
+                                                            </div>
+                                                        </div>
+                                                        <div class="row g-2 mt-1">
+                                                            <div class="col-12">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input obligatorio-checkbox" 
+                                                                           type="checkbox" 
+                                                                           name="InstrumentosSeleccionados[@rubrica.Value].EsObligatorio"
+                                                                           value="true"
+                                                                           @(Model.InstrumentosSeleccionados?.FirstOrDefault(i => i.RubricaId == int.Parse(rubrica.Value))?.EsObligatorio == true ? "checked" : "")
+                                                                           id="obligatorio_@rubrica.Value">
+                                                                    <label class="form-check-label small" for="obligatorio_@rubrica.Value">
+                                                                        Instrumento obligatorio
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Hidden fields -->
+                                                        <input type="hidden" name="InstrumentosSeleccionados[@rubrica.Value].RubricaId" value="@rubrica.Value">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-4">
+                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No hay rúbricas disponibles</h5>
+                                <p class="text-muted">Crea rúbricas primero para poder configurar los instrumentos.</p>
+                                <a href="@Url.Action("Create", "Rubricas")" class="btn btn-primary">
+                                    <i class="fas fa-plus me-1"></i>
+                                    Crear Rúbrica
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Validation Summary -->
+                <div class="alert alert-warning" id="validationAlert" style="display: none;">
+                    <h6><i class="fas fa-exclamation-triangle me-2"></i>Revisa la configuración:</h6>
+                    <ul id="validationList"></ul>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <div class="d-grid">
+                                    <a href="@Url.Action("Ver", new { id = Model.CuadernoId })" 
+                                       class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i>
+                                        Cancelar
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary" id="guardarBtn">
+                                        <i class="fas fa-save me-2"></i>
+                                        Guardar Configuración
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Referencias a elementos
+            const checkboxes = document.querySelectorAll('.rubrica-checkbox');
+            const ponderacionInputs = document.querySelectorAll('.ponderacion-input');
+            const obligatorioCheckboxes = document.querySelectorAll('.obligatorio-checkbox');
+            const ordenInputs = document.querySelectorAll('.orden-input');
+            
+            // Inicializar vista
+            checkboxes.forEach(checkbox => {
+                toggleRubricaConfig(checkbox);
+            });
+            
+            // Event listeners
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    toggleRubricaConfig(this);
+                    updateSummary();
+                    validateConfiguration();
+                });
+            });
+            
+            ponderacionInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    updateSummary();
+                    validateConfiguration();
+                });
+            });
+            
+            obligatorioCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    updateSummary();
+                });
+            });
+            
+            // Funciones
+            function toggleRubricaConfig(checkbox) {
+                const card = checkbox.closest('.rubrica-card');
+                const config = card.querySelector('.rubrica-config');
+                
+                if (checkbox.checked) {
+                    config.style.display = 'block';
+                    card.classList.add('border-primary');
+                    
+                    // Asignar orden automático si está vacío
+                    const ordenInput = config.querySelector('.orden-input');
+                    if (!ordenInput.value || ordenInput.value == '0') {
+                        const checkedCount = document.querySelectorAll('.rubrica-checkbox:checked').length;
+                        ordenInput.value = checkedCount;
+                    }
+                } else {
+                    config.style.display = 'none';
+                    card.classList.remove('border-primary');
+                    
+                    // Limpiar campos
+                    config.querySelector('.ponderacion-input').value = 0;
+                    config.querySelector('.obligatorio-checkbox').checked = false;
+                }
+            }
+            
+            function updateSummary() {
+                const checkedCheckboxes = document.querySelectorAll('.rubrica-checkbox:checked');
+                const totalInstrumentos = checkedCheckboxes.length;
+                
+                let ponderacionTotal = 0;
+                let instrumentosObligatorios = 0;
+                
+                checkedCheckboxes.forEach(checkbox => {
+                    const card = checkbox.closest('.rubrica-card');
+                    const ponderacion = parseFloat(card.querySelector('.ponderacion-input').value) || 0;
+                    const esObligatorio = card.querySelector('.obligatorio-checkbox').checked;
+                    
+                    ponderacionTotal += ponderacion;
+                    if (esObligatorio) instrumentosObligatorios++;
+                });
+                
+                // Actualizar UI
+                document.getElementById('totalInstrumentos').textContent = totalInstrumentos;
+                document.getElementById('instrumentosObligatorios').textContent = instrumentosObligatorios;
+                
+                const ponderacionElement = document.getElementById('ponderacionTotal').querySelector('span');
+                ponderacionElement.textContent = ponderacionTotal.toFixed(1) + '%';
+                
+                // Cambiar color según la ponderación
+                ponderacionElement.className = '';
+                if (ponderacionTotal == 100) {
+                    ponderacionElement.classList.add('text-success');
+                } else if (ponderacionTotal > 100) {
+                    ponderacionElement.classList.add('text-danger');
+                } else {
+                    ponderacionElement.classList.add('text-warning');
+                }
+            }
+            
+            function validateConfiguration() {
+                const validationAlert = document.getElementById('validationAlert');
+                const validationList = document.getElementById('validationList');
+                const guardarBtn = document.getElementById('guardarBtn');
+                
+                const errors = [];
+                
+                const checkedCheckboxes = document.querySelectorAll('.rubrica-checkbox:checked');
+                let ponderacionTotal = 0;
+                
+                if (checkedCheckboxes.length === 0) {
+                    errors.push('Debe seleccionar al menos un instrumento de evaluación.');
+                }
+                
+                checkedCheckboxes.forEach(checkbox => {
+                    const card = checkbox.closest('.rubrica-card');
+                    const ponderacion = parseFloat(card.querySelector('.ponderacion-input').value) || 0;
+                    
+                    if (ponderacion <= 0) {
+                        errors.push(`La ponderación debe ser mayor a 0 para el instrumento seleccionado.`);
+                    }
+                    
+                    ponderacionTotal += ponderacion;
+                });
+                
+                if (ponderacionTotal != 100 && checkedCheckboxes.length > 0) {
+                    errors.push(`La ponderación total debe ser 100%. Actualmente es ${ponderacionTotal.toFixed(1)}%.`);
+                }
+                
+                // Mostrar errores
+                if (errors.length > 0) {
+                    validationList.innerHTML = '';
+                    errors.forEach(error => {
+                        const li = document.createElement('li');
+                        li.textContent = error;
+                        validationList.appendChild(li);
+                    });
+                    validationAlert.style.display = 'block';
+                    guardarBtn.disabled = true;
+                } else {
+                    validationAlert.style.display = 'none';
+                    guardarBtn.disabled = false;
+                }
+            }
+            
+            // Inicializar
+            updateSummary();
+            validateConfiguration();
+        });
+    </script>
+}

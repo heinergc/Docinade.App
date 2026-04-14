@@ -1,0 +1,497 @@
+@model RubricasApp.Web.ViewModels.Shared.DiagnosticoSistemaViewModel
+
+@{
+    ViewData["Title"] = "Diagnóstico de Grupos y Estudiantes";
+    var diagnostico = ViewBag.Diagnostico as dynamic;
+    var error = ViewBag.Error as string;
+    var gruposDetalle = ViewBag.GruposDetalle as dynamic;
+    var estudiantesDetalle = ViewBag.EstudiantesDetalle as dynamic;
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-stethoscope text-primary"></i> Diagnóstico de Grupos y Estudiantes</h1>
+                <div>
+                    <button type="button" class="btn btn-info" onclick="cargarEstadoRapido()">
+                        <i class="fas fa-tachometer-alt"></i> Estado Rápido
+                    </button>
+                    <button type="button" class="btn btn-info" onclick="verificarEstado()">
+                        <i class="fas fa-search"></i> Verificar Estado Completo
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="crearDatosPrueba()">
+                        <i class="fas fa-database"></i> Crear Datos de Prueba
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Mostrar errores si los hay *@
+    @if (!string.IsNullOrEmpty(error))
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <strong>Error:</strong> @error
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Resumen estadístico -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Resumen Estadístico</h5>
+                    @if (diagnostico?.FechaCarga != null)
+                    {
+                        <small>Actualizado: @diagnostico.FechaCarga.ToString("dd/MM/yyyy HH:mm:ss")</small>
+                    }
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="text-center">
+                                <h3 class="text-primary" id="totalGrupos">@(diagnostico?.TotalGrupos ?? 0)</h3>
+                                <p class="mb-0">Total Grupos</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-center">
+                                <h3 class="text-success" id="gruposActivos">@(diagnostico?.GruposActivos ?? 0)</h3>
+                                <p class="mb-0">Grupos Activos</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-center">
+                                <h3 class="text-info" id="totalEstudiantes">@(diagnostico?.TotalEstudiantes ?? 0)</h3>
+                                <p class="mb-0">Total Estudiantes</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-warning" id="totalRelaciones">@(diagnostico?.TotalRelacionesGrupoEstudiante ?? 0)</h3>
+                                <p class="mb-0">Total Relaciones Grupo-Estudiante</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-success" id="relacionesActivas">@(diagnostico?.RelacionesActivas ?? 0)</h3>
+                                <p class="mb-0">Relaciones Activas</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Indicador de estado *@
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            @if (diagnostico != null && diagnostico.RelacionesActivas > 0)
+                            {
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle"></i>
+                                    <strong>Sistema Funcionando:</strong> Se encontraron @diagnostico.RelacionesActivas relaciones activas entre grupos y estudiantes.
+                                </div>
+                            }
+                            else if (diagnostico != null && diagnostico.RelacionesActivas == 0)
+                            {
+                                <div class="alert alert-danger">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <strong>Problema Identificado:</strong> No hay relaciones activas entre grupos y estudiantes. 
+                                    Esto explica por qué no se cargan los estudiantes al seleccionar un grupo.
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Mostrar algunos datos de ejemplo si están disponibles *@
+    @if (gruposDetalle != null)
+    {
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0"><i class="fas fa-users"></i> Grupos Encontrados (Muestra)</h6>
+                    </div>
+                    <div class="card-body">
+                        @if (((IEnumerable<dynamic>)gruposDetalle).Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Código</th>
+                                            <th>Nombre</th>
+                                            <th>Estudiantes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var grupo in gruposDetalle)
+                                        {
+                                            <tr>
+                                                <td>@grupo.GrupoId</td>
+                                                <td><span class="badge bg-primary">@grupo.Codigo</span></td>
+                                                <td>@grupo.Nombre</td>
+                                                <td>
+                                                    @if (grupo.CantidadEstudiantes > 0)
+                                                    {
+                                                        <span class="badge bg-success">@grupo.CantidadEstudiantes</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-warning">0</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted">No hay grupos para mostrar</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <h6 class="mb-0"><i class="fas fa-user-graduate"></i> Estudiantes Encontrados (Muestra)</h6>
+                    </div>
+                    <div class="card-body">
+                        @if (estudiantesDetalle != null && ((IEnumerable<dynamic>)estudiantesDetalle).Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Número ID</th>
+                                            <th>Nombre</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var estudiante in estudiantesDetalle)
+                                        {
+                                            <tr>
+                                                <td>@estudiante.IdEstudiante</td>
+                                                <td><code>@estudiante.NumeroId</code></td>
+                                                <td>@estudiante.NombreCompleto</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted">No hay estudiantes para mostrar</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Resultados del diagnóstico dinámico -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-list-alt"></i> Detalles del Sistema</h5>
+                    <div>
+                        <span class="badge bg-info" id="estadoIndicador">Listo para diagnóstico</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="resultadosDiagnostico">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Información:</strong> Use los botones de arriba para verificar el estado actual del sistema o crear datos de prueba.
+                            
+                            @if (diagnostico != null && diagnostico.RelacionesActivas == 0)
+                            {
+                                <hr>
+                                <div class="alert alert-warning mt-2">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <strong>Recomendación:</strong> Haga clic en "Crear Datos de Prueba" para generar datos de ejemplo y resolver el problema.
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de acciones rápidas -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-tools"></i> Acciones Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-bug"></i> Depuración</h6>
+                            <p>Herramientas para diagnosticar problemas con la carga de estudiantes por grupo.</p>
+                            <a href="/Evaluaciones" class="btn btn-primary btn-sm">
+                                <i class="fas fa-arrow-right"></i> Probar en Evaluaciones
+                            </a>
+                            <button type="button" class="btn btn-info btn-sm" onclick="abrirConsola()">
+                                <i class="fas fa-terminal"></i> Activar Debug
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-database"></i> Gestión de Datos</h6>
+                            <p>Administrar grupos, estudiantes y sus relaciones.</p>
+                            <a href="/GruposEstudiantes" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-users"></i> Gestionar Grupos
+                            </a>
+                            <a href="/Estudiantes" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-user-graduate"></i> Gestionar Estudiantes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.AntiForgeryToken()
+
+@section Scripts {
+    <script>
+        // Función para cargar estado rápido
+        function cargarEstadoRapido() {
+            actualizarIndicadorEstado('Cargando estado rápido...', 'warning');
+            
+            fetch('/DiagnosticoGrupos/EstadoRapido')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    
+                    // Actualizar las estadísticas en tiempo real
+                    document.getElementById('totalGrupos').textContent = data.TotalGrupos;
+                    document.getElementById('gruposActivos').textContent = data.GruposActivos;
+                    document.getElementById('totalEstudiantes').textContent = data.TotalEstudiantes;
+                    document.getElementById('totalRelaciones').textContent = data.TotalRelaciones;
+                    document.getElementById('relacionesActivas').textContent = data.RelacionesActivas;
+                    
+                    // Mostrar mensaje de estado actualizado
+                    const mensaje = `Estado actualizado: ${data.RelacionesActivas} relaciones activas encontradas (${data.Timestamp})`;
+                    mostrarResultadoRapido(data);
+                    actualizarIndicadorEstado('Estado actualizado', 'success');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    mostrarError('Error al cargar estado rápido: ' + error.message);
+                    actualizarIndicadorEstado('Error al cargar', 'danger');
+                });
+        }
+
+        function verificarEstado() {
+            const boton = event.target;
+            const textoOriginal = boton.innerHTML;
+            boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+            boton.disabled = true;
+            
+            actualizarIndicadorEstado('Verificando estado completo...', 'info');
+
+            fetch('/DiagnosticoGrupos/VerificarEstado')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.message || data.error);
+                    }
+                    mostrarResultados(data);
+                    actualizarIndicadorEstado('Verificación completa', 'success');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    mostrarError('Error al verificar el estado: ' + error.message);
+                    actualizarIndicadorEstado('Error en verificación', 'danger');
+                })
+                .finally(() => {
+                    boton.innerHTML = textoOriginal;
+                    boton.disabled = false;
+                });
+        }
+
+        function crearDatosPrueba() {
+            if (!confirm('¿Está seguro de que desea crear datos de prueba? Esta acción creará grupos y estudiantes de ejemplo.')) {
+                return;
+            }
+
+            const boton = event.target;
+            const textoOriginal = boton.innerHTML;
+            boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
+            boton.disabled = true;
+            
+            actualizarIndicadorEstado('Creando datos de prueba...', 'warning');
+
+            fetch('/DiagnosticoGrupos/CrearDatosPrueba', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        mostrarExito('Datos de prueba creados exitosamente', data);
+                        actualizarIndicadorEstado('Datos creados', 'success');
+                        // Recargar la página después de un momento
+                        setTimeout(() => {
+                            if (confirm('Datos creados exitosamente. ¿Desea recargar la página para ver los cambios?')) {
+                                window.location.reload();
+                            }
+                        }, 2000);
+                    } else {
+                        mostrarError(data.message || 'Error al crear datos de prueba');
+                        actualizarIndicadorEstado('Error al crear datos', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    mostrarError('Error al crear datos de prueba: ' + error.message);
+                    actualizarIndicadorEstado('Error al crear', 'danger');
+                })
+                .finally(() => {
+                    boton.innerHTML = textoOriginal;
+                    boton.disabled = false;
+                });
+        }
+
+        function mostrarResultadoRapido(data) {
+            const contenedor = document.getElementById('resultadosDiagnostico');
+            
+            let html = '<div class="alert alert-success"><i class="fas fa-tachometer-alt"></i> <strong>Estado rápido cargado</strong></div>';
+            html += '<div class="row">';
+            html += `<div class="col-md-3"><strong>Grupos:</strong> ${data.TotalGrupos} (${data.GruposActivos} activos)</div>`;
+            html += `<div class="col-md-3"><strong>Estudiantes:</strong> ${data.TotalEstudiantes}</div>`;
+            html += `<div class="col-md-3"><strong>Relaciones:</strong> ${data.TotalRelaciones}</div>`;
+            html += `<div class="col-md-3"><strong>Activas:</strong> ${data.RelacionesActivas}</div>`;
+            html += '</div>';
+            
+            if (data.RelacionesActivas === 0) {
+                html += '<div class="alert alert-danger mt-2">';
+                html += '<i class="fas fa-exclamation-triangle"></i> ';
+                html += '<strong>¡Problema confirmado!</strong> No hay relaciones activas. Use "Crear Datos de Prueba" para solucionarlo.';
+                html += '</div>';
+            }
+            
+            contenedor.innerHTML = html;
+        }
+
+        function mostrarResultados(data) {
+            const contenedor = document.getElementById('resultadosDiagnostico');
+            
+            let html = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> <strong>Estado verificado exitosamente</strong></div>';
+            
+            if (data.Resumen) {
+                html += '<div class="alert alert-info">';
+                html += `<strong>Resumen:</strong> ${data.Resumen.TotalGrupos} grupos, ${data.Resumen.TotalEstudiantes} estudiantes, `;
+                html += `${data.Resumen.AsignacionesActivas} de ${data.Resumen.TotalAsignaciones} asignaciones activas`;
+                html += '</div>';
+            }
+            
+            // Mostrar grupos
+            html += '<h6><i class="fas fa-users"></i> Grupos en el Sistema</h6>';
+            if (data.Grupos && data.Grupos.length > 0) {
+                html += '<div class="table-responsive"><table class="table table-sm table-striped">';
+                html += '<thead><tr><th>ID</th><th>Código</th><th>Nombre</th><th>Estado</th><th>Estudiantes</th></tr></thead><tbody>';
+                data.Grupos.forEach(grupo => {
+                    html += `<tr><td>${grupo.GrupoId}</td><td><span class="badge bg-primary">${grupo.Codigo}</span></td><td>${grupo.Nombre}</td><td><span class="badge bg-${grupo.Estado === 'Activo' ? 'success' : 'secondary'}">${grupo.Estado}</span></td><td><span class="badge bg-info">${grupo.CantidadEstudiantes}</span></td></tr>`;
+                });
+                html += '</tbody></table></div>';
+            } else {
+                html += '<div class="alert alert-warning">No se encontraron grupos en el sistema.</div>';
+            }
+
+            // Mostrar asignaciones
+            html += '<h6 class="mt-3"><i class="fas fa-link"></i> Asignaciones Grupo-Estudiante</h6>';
+            if (data.AsignacionesGrupoEstudiante && data.AsignacionesGrupoEstudiante.length > 0) {
+                html += '<div class="table-responsive"><table class="table table-sm table-striped">';
+                html += '<thead><tr><th>ID</th><th>Estudiante</th><th>Grupo</th><th>Estado</th><th>Fecha</th></tr></thead><tbody>';
+                data.AsignacionesGrupoEstudiante.forEach(asignacion => {
+                    html += `<tr><td>${asignacion.Id}</td><td>${asignacion.EstudianteNombre}</td><td>${asignacion.GrupoNombre}</td><td><span class="badge bg-${asignacion.Estado === 'Activo' ? 'success' : 'secondary'}">${asignacion.Estado}</span></td><td>${asignacion.FechaAsignacion}</td></tr>`;
+                });
+                html += '</tbody></table></div>';
+            } else {
+                html += '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> <strong>¡Problema identificado!</strong> No hay asignaciones entre grupos y estudiantes. Esta es la causa del problema con la carga de estudiantes por grupo.</div>';
+            }
+            
+            contenedor.innerHTML = html;
+        }
+
+        function mostrarExito(mensaje, detalles = null) {
+            let html = `<div class="alert alert-success alert-dismissible"><i class="fas fa-check-circle"></i> <strong>${mensaje}</strong>`;
+            if (detalles && detalles.detalles) {
+                html += `<br><small>Grupos creados: ${detalles.detalles.GruposCreados}, Estudiantes creados: ${detalles.detalles.EstudiantesCreados}, Asignaciones creadas: ${detalles.detalles.AsignacionesCreadas}</small>`;
+            }
+            html += '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
+            document.getElementById('resultadosDiagnostico').innerHTML = html;
+        }
+
+        function mostrarError(mensaje) {
+            const html = `<div class="alert alert-danger alert-dismissible"><i class="fas fa-exclamation-circle"></i> <strong>Error:</strong> ${mensaje}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+            document.getElementById('resultadosDiagnostico').innerHTML = html;
+        }
+
+        function actualizarIndicadorEstado(texto, tipo) {
+            const indicador = document.getElementById('estadoIndicador');
+            indicador.className = `badge bg-${tipo}`;
+            indicador.textContent = texto;
+        }
+
+        function abrirConsola() {
+            console.clear();
+            console.log('?? Modo Debug Activado para Diagnóstico de Grupos');
+            console.log('?? Estadísticas actuales desde la vista:');
+            console.log('   - Total Grupos:', document.getElementById('totalGrupos').textContent);
+            console.log('   - Grupos Activos:', document.getElementById('gruposActivos').textContent);
+            console.log('   - Total Estudiantes:', document.getElementById('totalEstudiantes').textContent);
+            console.log('   - Relaciones Activas:', document.getElementById('relacionesActivas').textContent);
+            console.log('?? Para probar la funcionalidad:');
+            console.log('   1. Use "Estado Rápido" para actualizar datos');
+            console.log('   2. Si "Relaciones Activas" = 0, use "Crear Datos de Prueba"');
+            console.log('   3. Vaya a /Evaluaciones para probar los filtros');
+            console.log('   4. Observe los logs que comienzan con ??, ?, ?? o ?');
+            
+            actualizarIndicadorEstado('Consola activada', 'info');
+            
+            alert('Consola de debug activada. Presione F12 para ver la consola del navegador con información detallada.');
+        }
+
+        // Cargar estado rápido al inicializar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('?? Página de diagnóstico cargada');
+            
+            // Cargar estado rápido automáticamente si no hay errores
+            @if (string.IsNullOrEmpty(error))
+            {
+                <text>
+                // Esperar un momento para que la página termine de cargar
+                setTimeout(cargarEstadoRapido, 1000);
+                </text>
+            }
+        });
+    </script>
+}

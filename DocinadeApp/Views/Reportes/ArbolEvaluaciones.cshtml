@@ -1,0 +1,387 @@
+@model RubricasApp.Web.ViewModels.Reportes.ReporteArbolViewModel
+
+@{
+    ViewData["Title"] = "Reporte en Arbol - Sistema de Evaluaciones";
+}
+
+<div class="container-fluid">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">
+                                <i class="fas fa-sitemap me-2"></i>
+                                Reporte en Arbol - Sistema de Evaluaciones
+                            </h4>
+                            <small>Estructura jerarquica completa del sistema</small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            @if (Model.TotalNodos > 0)
+                            {
+                                <a asp-action="ExportarArbolExcel" 
+                                   asp-route-materiaId="@Model.FiltrosAplicados.MateriaId" 
+                                   asp-route-periodoId="@Model.FiltrosAplicados.PeriodoId"
+                                   asp-route-soloActivos="@Model.FiltrosAplicados.SoloActivos"
+                                   class="btn btn-success btn-sm">
+                                    <i class="fas fa-file-excel me-1"></i>
+                                    Excel
+                                </a>
+                            }
+                            <button type="button" class="btn btn-outline-light btn-sm" onclick="expandirTodos()">
+                                <i class="fas fa-expand-arrows-alt me-1"></i>
+                                Expandir Todo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-filter me-2"></i>
+                        Filtros de Busqueda
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="materiaId" class="form-label">Materia</label>
+                            <select name="materiaId" id="materiaId" class="form-select" asp-items="ViewBag.MateriasDisponibles">
+                                <option value="">-- Todas las materias --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="periodoId" class="form-label">Periodo Academico</label>
+                            <select name="periodoId" id="periodoId" class="form-select" asp-items="ViewBag.PeriodosDisponibles">
+                                <option value="">-- Todos los periodos --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary mt-4">
+                                <i class="fas fa-search me-1"></i>
+                                Filtrar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumen General -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Resumen General del Sistema
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 text-center">
+                        <div class="col-md-2">
+                            <div class="h3 text-primary mb-0">@Model.ResumenGeneral.TotalMaterias</div>
+                            <small class="text-muted">Materias</small>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="h3 text-info mb-0">@Model.ResumenGeneral.TotalPeriodos</div>
+                            <small class="text-muted">Periodos</small>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="h3 text-warning mb-0">@Model.ResumenGeneral.TotalInstrumentos</div>
+                            <small class="text-muted">Instrumentos</small>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="h3 text-success mb-0">@Model.ResumenGeneral.TotalRubricas</div>
+                            <small class="text-muted">Rubricas</small>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="h3 text-danger mb-0">@Model.ResumenGeneral.TotalEvaluaciones</div>
+                            <small class="text-muted">Evaluaciones</small>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="h3 text-dark mb-0">@Model.ResumenGeneral.TotalEstudiantes</div>
+                            <small class="text-muted">Estudiantes</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Arbol Jerarquico -->
+    @if (Model.TotalNodos == 0)
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-warning text-center">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                    <h5>No se encontraron datos</h5>
+                    <p class="mb-0">
+                        No hay datos que mostrar con los filtros aplicados. 
+                        Intente ajustar los criterios de busqueda.
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-tree me-2"></i>
+                            Estructura Jerarquica 
+                            <small class="text-muted">(@Model.TotalNodos nodos)</small>
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="arbol-evaluaciones" class="arbol-container">
+                            @foreach (var materia in Model.Materias.OrderBy(m => m.Codigo))
+                            {
+                                <div class="nodo-materia mb-3" data-nivel="materia" data-id="@materia.MateriaId">
+                                    <div class="nodo-header clickable" onclick="toggleNodo(this)">
+                                        <i class="fas fa-chevron-right toggle-icon"></i>
+                                        <i class="fas fa-book text-primary me-2"></i>
+                                        <strong>[@materia.Codigo] @materia.Nombre</strong>
+                                        <span class="badge bg-secondary ms-2">@materia.Estado</span>
+                                        <div class="estadisticas-nodo">
+                                            <small class="text-muted">
+                                                Periodos: @materia.TotalPeriodos | 
+                                                Estudiantes: @materia.TotalEstudiantes | 
+                                                Instrumentos: @materia.TotalInstrumentos | 
+                                                Rubricas: @materia.TotalRubricas | 
+                                                Evaluaciones: @materia.TotalEvaluaciones
+                                            </small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="nodo-hijos" style="display: none;">
+                                        @foreach (var periodo in materia.Periodos.OrderBy(p => p.PeriodoCompleto))
+                                        {
+                                            <div class="nodo-periodo ms-4 mb-2" data-nivel="periodo" data-id="@periodo.PeriodoId">
+                                                <div class="nodo-header clickable" onclick="toggleNodo(this)">
+                                                    <i class="fas fa-chevron-right toggle-icon"></i>
+                                                    <i class="fas fa-calendar text-info me-2"></i>
+                                                    <strong>@periodo.PeriodoCompleto</strong>
+                                                    <span class="badge bg-info text-dark ms-2">@periodo.CantidadEstudiantes estudiantes</span>
+                                                    <div class="estadisticas-nodo">
+                                                        <small class="text-muted">
+                                                            Instrumentos: @periodo.TotalInstrumentos | 
+                                                            Rubricas: @periodo.TotalRubricas | 
+                                                            Evaluaciones: @periodo.TotalEvaluaciones
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="nodo-hijos" style="display: none;">
+                                                    @foreach (var instrumento in periodo.Instrumentos.OrderBy(i => i.Orden).ThenBy(i => i.Nombre))
+                                                    {
+                                                        <div class="nodo-instrumento ms-4 mb-2" data-nivel="instrumento" data-id="@instrumento.InstrumentoId">
+                                                            <div class="nodo-header clickable" onclick="toggleNodo(this)">
+                                                                <i class="fas fa-chevron-right toggle-icon"></i>
+                                                                <i class="fas fa-tools text-warning me-2"></i>
+                                                                <strong>@instrumento.Nombre</strong>
+                                                                <span class="badge bg-warning text-dark ms-2">@instrumento.TipoCuaderno</span>
+                                                                @if (instrumento.PonderacionTotal > 0)
+                                                                {
+                                                                    <span class="badge bg-success ms-1">@instrumento.PonderacionTotal.ToString("F1")%</span>
+                                                                }
+                                                                <div class="estadisticas-nodo">
+                                                                    <small class="text-muted">
+                                                                        Rubricas: @instrumento.TotalRubricas | 
+                                                                        Evaluaciones: @instrumento.TotalEvaluaciones
+                                                                    </small>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <div class="nodo-hijos" style="display: none;">
+                                                                @foreach (var rubrica in instrumento.Rubricas.OrderBy(r => r.Nombre))
+                                                                {
+                                                                    <div class="nodo-rubrica ms-4 mb-1" data-nivel="rubrica" data-id="@rubrica.RubricaId">
+                                                                        <div class="nodo-header">
+                                                                            <i class="fas fa-clipboard-list text-success me-2"></i>
+                                                                            <strong>@rubrica.Nombre</strong>
+                                                                            @if (rubrica.Ponderacion > 0)
+                                                                            {
+                                                                                <span class="badge bg-primary ms-2">@rubrica.Ponderacion.ToString("F1")%</span>
+                                                                            }
+                                                                            <span class="badge bg-@(rubrica.Estado == "ACTIVO" ? "success" : "secondary") ms-1">@rubrica.Estado</span>
+                                                                            <div class="estadisticas-rubrica">
+                                                                                <small class="text-muted">
+                                                                                    <strong>Evaluaciones:</strong> @rubrica.CantidadEvaluaciones total
+                                                                                    (@rubrica.EvaluacionesFinalizadas finalizadas)
+                                                                                    @if (rubrica.PromedioCalificacion.HasValue)
+                                                                                    {
+                                                                                        <span class="text-primary ms-2">
+                                                                                            <strong>Promedio:</strong> @rubrica.PromedioCalificacion.Value.ToString("F1")
+                                                                                        </span>
+                                                                                    }
+                                                                                </small>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <small class="text-muted">
+                            Reporte generado el @Model.FechaGeneracion.ToString("dd/MM/yyyy HH:mm:ss") | 
+                            Total de nodos: @Model.TotalNodos
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .arbol-container {
+            font-family: 'Courier New', monospace;
+            max-height: 800px;
+            overflow-y: auto;
+        }
+        
+        .nodo-header {
+            padding: 8px 12px;
+            border-left: 3px solid #dee2e6;
+            margin-bottom: 4px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .nodo-header:hover {
+            background-color: #e9ecef;
+            border-left-color: #007bff;
+        }
+        
+        .nodo-header.clickable {
+            cursor: pointer;
+        }
+        
+        .nodo-materia .nodo-header {
+            border-left-color: #007bff;
+            background-color: #f0f8ff;
+        }
+        
+        .nodo-periodo .nodo-header {
+            border-left-color: #17a2b8;
+            background-color: #f0f9ff;
+        }
+        
+        .nodo-instrumento .nodo-header {
+            border-left-color: #ffc107;
+            background-color: #fffef0;
+        }
+        
+        .nodo-rubrica .nodo-header {
+            border-left-color: #28a745;
+            background-color: #f0fff0;
+        }
+        
+        .toggle-icon {
+            transition: transform 0.2s ease;
+            margin-right: 8px;
+            width: 12px;
+        }
+        
+        .toggle-icon.expanded {
+            transform: rotate(90deg);
+        }
+        
+        .estadisticas-nodo {
+            margin-top: 4px;
+        }
+        
+        .estadisticas-rubrica {
+            margin-top: 4px;
+            padding-left: 20px;
+        }
+        
+        .nodo-hijos {
+            margin-left: 16px;
+        }
+        
+        .badge {
+            font-size: 0.75em;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        function toggleNodo(element) {
+            const nodo = element.parentElement;
+            const hijos = nodo.querySelector('.nodo-hijos');
+            const icon = element.querySelector('.toggle-icon');
+            
+            if (hijos) {
+                if (hijos.style.display === 'none' || hijos.style.display === '') {
+                    hijos.style.display = 'block';
+                    icon.classList.add('expanded');
+                } else {
+                    hijos.style.display = 'none';
+                    icon.classList.remove('expanded');
+                }
+            }
+        }
+        
+        function expandirTodos() {
+            const todosLosHijos = document.querySelectorAll('.nodo-hijos');
+            const todosLosIconos = document.querySelectorAll('.toggle-icon');
+            
+            todosLosHijos.forEach(hijo => {
+                hijo.style.display = 'block';
+            });
+            
+            todosLosIconos.forEach(icono => {
+                icono.classList.add('expanded');
+            });
+        }
+        
+        // Auto-expandir el primer nivel si hay pocos elementos
+        document.addEventListener('DOMContentLoaded', function() {
+            const totalMaterias = document.querySelectorAll('.nodo-materia').length;
+            if (totalMaterias <= 3) {
+                expandirTodos();
+            }
+        });
+        
+        // Mantener valores seleccionados
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.get('materiaId')) {
+                document.getElementById('materiaId').value = urlParams.get('materiaId');
+            }
+            
+            if (urlParams.get('periodoId')) {
+                document.getElementById('periodoId').value = urlParams.get('periodoId');
+            }
+        });
+    </script>
+}

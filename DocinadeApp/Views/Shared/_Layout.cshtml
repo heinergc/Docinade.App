@@ -1,0 +1,794 @@
+﻿@using RubricasApp.Web.Models.Permissions
+@using RubricasApp.Web.Extensions
+@using Microsoft.Extensions.Configuration
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Env
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Sistema de Rúbricas</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+    
+    <!-- CSS Local -->
+    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
+    <link rel="stylesheet" href="~/css/select2-bootstrap5.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/sweetalert2/sweetalert2.min.css" />
+    <link rel="stylesheet" href="~/lib/toastr/toastr.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/RubricasApp.Web.styles.css" asp-append-version="true" />
+    
+    <!-- Estilos unificados del sistema -->
+    <link rel="stylesheet" href="~/css/unified-styles.css" asp-append-version="true" />
+    <!-- Estilos genéricos modulares -->
+    <link rel="stylesheet" href="~/css/estilos_genericos.css" asp-append-version="true" />
+    <!-- Componente de búsqueda de estudiantes -->
+    <link rel="stylesheet" href="~/css/components/busqueda-estudiante.css" asp-append-version="true" />
+    @* <link rel="stylesheet" href="~/css/validation-styles.css" asp-append-version="true" /> *@
+
+    @await RenderSectionAsync("Styles", required: false)
+    
+    <style>
+        /* Override footer positioning to prevent overlap */
+        html, body {
+            height: 100%;
+        }
+        
+        body {
+            margin-bottom: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .footer {
+            position: static;
+            margin-top: auto;
+            background-color: #2c3e50;
+            border-top: 1px solid #dee2e6;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Custom Scrollbar Styles */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2c3e50;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1a252f;
+        }
+
+        /* Firefox Scrollbar */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #2c3e50 #f1f1f1;
+        }
+
+        /* Orange separator for navbar */
+        .navbar-modern {
+            border-bottom: 3px solid #FF8927 !important;
+            transition: all 0.3s ease;
+            margin-bottom: 0 !important;
+        }
+
+        /* Navbar shrink effect on scroll */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+        }
+
+        header.shrink .navbar-modern {
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+            background-color: rgba(43, 62, 94, 0.85) !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        header.shrink .navbar-brand {
+            font-size: 1rem;
+        }
+
+        header.shrink .nav-link {
+            padding-top: 0.3rem;
+            padding-bottom: 0.3rem;
+        }
+
+        /* Profile Image Styles */
+        .profile-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #FF8927;
+            margin-right: 8px;
+        }
+
+        .profile-initials {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #FF8927 0%, #ff6b00 100%);
+            color: white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-right: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .user-dropdown:hover .profile-avatar,
+        .user-dropdown:hover .profile-initials {
+            border-color: #ffffff;
+            transform: scale(1.05);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-modern box-shadow mb-0">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-clipboard-check"></i> Sistema de Rúbricas
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home"></i> Inicio
+                            </a>
+                        </li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-cog"></i> Configuración
+                                </a>
+                                <ul class="dropdown-menu">
+                                    @if (User.IsInRole(ApplicationRoles.SuperAdministrador) || User.IsInRole("SuperAdministrador") || User.IsInRole(ApplicationRoles.Administrador) || User.IsInRole(ApplicationRoles.Coordinador) || User.IsInRole(ApplicationRoles.Docente) || User.HasClaim("permission", ApplicationPermissions.Configuracion.VER))
+                                    {
+                                        @if (User.HasClaim("permission", ApplicationPermissions.Periodos.VER))
+                                        {
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="PeriodosAcademicos" asp-action="Index">
+                                                    <i class="fas fa-calendar-alt"></i> Períodos Académicos
+                                                </a>
+                                            </li>
+                                        }
+                                        
+                                        @* Submenú de Rúbricas *@
+                                        @if (User.HasClaim("permission", ApplicationPermissions.Rubricas.VER) || 
+                                             User.HasClaim("permission", ApplicationPermissions.Rubricas.VER_TODAS) ||
+                                             User.HasClaim("permission", ApplicationPermissions.ItemsEvaluacion.VER) ||
+                                             User.HasClaim("permission", ApplicationPermissions.Niveles.VER) ||
+                                             User.HasClaim("permission", ApplicationPermissions.InstrumentoRubrica.VER))
+                                        {
+                                            <li class="dropdown-submenu">
+                                                <a class="dropdown-item dropdown-toggle" href="#" id="rubricasSubmenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="fas fa-clipboard-check"></i> Rúbricas
+                                                </a>
+                                                <ul class="dropdown-menu" aria-labelledby="rubricasSubmenu">
+                                                    @if (User.HasClaim("permission", ApplicationPermissions.Rubricas.VER) || User.HasClaim("permission", ApplicationPermissions.Rubricas.VER_TODAS))
+                                                    {
+                                                        <li>
+                                                            <a class="dropdown-item" asp-controller="Rubricas" asp-action="Index">
+                                                                <i class="fas fa-list"></i> Lista de Rúbricas
+                                                            </a>
+                                                        </li>
+                                                    }
+
+                                                    @if (User.HasClaim("permission", ApplicationPermissions.ItemsEvaluacion.VER))
+                                                    {
+                                                        <li>
+                                                            <a class="dropdown-item" asp-controller="ItemsEvaluacion" asp-action="Index">
+                                                                <i class="fas fa-tasks"></i> Items de Evaluación
+                                                            </a>
+                                                        </li>
+                                                    }
+                                                    
+                                                    @if (User.HasClaim("permission", ApplicationPermissions.Niveles.VER))
+                                                    {
+                                                        <li>
+                                                            <a class="dropdown-item" asp-controller="NivelesCalificacion" asp-action="Index">
+                                                                <i class="fas fa-star"></i> Niveles de Calificación
+                                                            </a>
+                                                        </li>
+
+                                                        <li>
+                                                            <a class="dropdown-item" asp-controller="ValorRubrica" asp-action="Index">
+                                                                <i class="fas fa-calculator"></i> Valores de Rúbricas
+                                                            </a>
+                                                        </li>
+                                                    }
+                                                    
+                                                    @if (User.HasClaim("permission", ApplicationPermissions.InstrumentoRubrica.VER))
+                                                    {
+                                                        <li>
+                                                            <a class="dropdown-item" asp-controller="InstrumentoRubrica" asp-action="Index">
+                                                                <i class="fas fa-link"></i> Asignar Rúbricas a Instrumentos
+                                                            </a>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+
+                                        @* Submenú de Estudiantes *@
+                                        @if (User.HasClaim("permission", ApplicationPermissions.Estudiantes.VER) || User.HasClaim("permission", ApplicationPermissions.GruposEstudiantes.VER))
+                                        {
+                                            <li class="dropdown-submenu">
+                                                <a class="dropdown-item dropdown-toggle" href="#" id="estudiantesSubmenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="fas fa-user-graduate"></i> Estudiantes
+                                                </a>
+                                                <ul class="dropdown-menu" aria-labelledby="estudiantesSubmenu">
+                                                    @if (User.HasClaim("permission", ApplicationPermissions.Estudiantes.VER))
+                                                    {
+                                                        <li><a class="dropdown-item" asp-controller="Estudiantes" asp-action="Index">
+                                                            <i class="fas fa-list"></i> Lista de Estudiantes
+                                                        </a></li>
+                                                    }
+                                                    
+                                                    <li><a class="dropdown-item" asp-controller="Empadronamiento" asp-action="Index">
+                                                        <i class="fas fa-user-plus"></i> Empadronamiento
+                                                    </a></li>
+
+                                                    <li><a class="dropdown-item" asp-controller="EmpadronamientoPublico" asp-action="Index">
+                                                        <i class="fas fa-user-graduate text-warning"></i> Empadronamiento Público
+                                                    </a></li>
+                                                    
+                                                    @if (User.HasClaim("permission", ApplicationPermissions.GruposEstudiantes.VER))
+                                                    {
+                                                        <li><a class="dropdown-item" asp-controller="GruposEstudiantes" asp-action="Index">
+                                                            <i class="fas fa-users-cog"></i> Grupos de Estudiantes
+                                                        </a></li>
+                                                    }
+                                                    
+                                                    @if (User.HasClaim("permission", ApplicationPermissions.TiposGrupo.VER))
+                                                    {
+                                                        <li><a class="dropdown-item" asp-controller="TiposGrupo" asp-action="Index">
+                                                            <i class="fas fa-tags"></i> Tipos de Grupo
+                                                        </a></li>
+                                                    }
+                                                    
+                                                    @if (User.HasClaim("permission", ApplicationPermissions.Asistencia.VER))
+                                                    {
+                                                        <li><hr class="dropdown-divider"></li>
+                                                        <li><h6 class="dropdown-header">Asistencia</h6></li>
+                                                        
+                                                        <li><a class="dropdown-item" asp-controller="Horarios" asp-action="Index">
+                                                            <i class="fas fa-clock"></i> Horarios de Clases
+                                                        </a></li>
+                                                        
+                                                        <li><a class="dropdown-item" asp-controller="AsistenciaLeccion" asp-action="Index">
+                                                            <i class="fas fa-calendar-check"></i> Tomar Asistencia por Lección
+                                                        </a></li>
+                                                        
+                                                        <li><a class="dropdown-item" asp-controller="Asistencia" asp-action="Index">
+                                                            <i class="fas fa-calendar-day"></i> Asistencia Diaria
+                                                        </a></li>
+                                                        
+                                                        <li><a class="dropdown-item" asp-controller="AsistenciaLeccion" asp-action="Estadisticas">
+                                                            <i class="fas fa-chart-bar"></i> Estadísticas de Asistencia
+                                                        </a></li>
+                                                        
+                                                        <li><a class="dropdown-item" asp-controller="AsistenciaLeccion" asp-action="Ausencias">
+                                                            <i class="fas fa-user-times"></i> Reporte de Ausencias
+                                                        </a></li>
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+
+                                        @* Submenú de Materias *@
+                                        @if (User.HasClaim("permission", ApplicationPermissions.Materias.VER) || User.HasClaim("permission", ApplicationPermissions.InstrumentoMaterias.VER) || User.HasClaim("permission", ApplicationPermissions.InstrumentosEvaluacion.VER))
+                                        {
+                                            <li class="dropdown-submenu">
+                                                <a class="dropdown-item dropdown-toggle" href="#" id="materiasSubmenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="fas fa-book"></i> Materias
+                                                </a>
+                                                <ul class="dropdown-menu" aria-labelledby="materiasSubmenu">
+                                                    @if (User.HasClaim("permission", ApplicationPermissions.Materias.VER))
+                                                    {
+                                                        <li><a class="dropdown-item" asp-controller="Materias" asp-action="Index">
+                                                            <i class="fas fa-list"></i> Lista de Materias
+                                                        </a></li>
+                                                    }
+                                                    
+                                                    @if (User.HasClaim("permission", ApplicationPermissions.InstrumentosEvaluacion.VER))
+                                                    {
+                                                        <li><a class="dropdown-item" asp-controller="InstrumentosEvaluacion" asp-action="Index">
+                                                            <i class="fas fa-clipboard-list"></i> Instrumentos de Evaluación
+                                                        </a></li>
+                                                    }
+                                                    
+                                                    @if (User.HasClaim("permission", ApplicationPermissions.InstrumentoMaterias.VER))
+                                                    {
+                                                        <li><a class="dropdown-item" asp-controller="InstrumentoMaterias" asp-action="Index">
+                                                            <i class="fas fa-sitemap"></i> Asignar Instrumentos a Materias
+                                                        </a></li>
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+
+                                        @if (User.HasClaim("permission", ApplicationPermissions.CuadernoCalificador.VER))
+                                        {
+                                            <li><a class="dropdown-item" asp-controller="CuadernoCalificador" asp-action="Index">
+                                                <i class="fas fa-table"></i> Cuadernos Calificadores
+                                            </a></li>
+
+                                            <li><a class="dropdown-item" asp-controller="CalificadorPQ2025" asp-action="Index">
+                                                <i class="fas fa-calculator"></i> Cuaderno Automático PQ2025
+                                            </a></li>
+                                        }
+
+                                        @if (User.HasClaim("permission", ApplicationPermissions.Auditoria.VER))
+                                        {
+                                            <li><a class="dropdown-item" asp-controller="Auditoria" asp-action="Index">
+                                                <i class="fas fa-history"></i> Historial de Auditoría
+                                            </a></li>
+                                        }
+
+                                        @* Solo visible en desarrollo *@
+                                        @if (Env.IsDevelopment())
+                                        {
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><h6 class="dropdown-header text-warning">🔧 Desarrollo</h6></li>
+                                            <li><a class="dropdown-item" asp-controller="Test" asp-action="BuscadorEstudiante">
+                                                <i class="fas fa-search text-warning"></i> Buscador de Estudiantes (Test)
+                                            </a></li>
+                                        }
+                                       
+                                    }
+                                    @if (User.IsInRole(ApplicationRoles.SuperAdministrador) || User.IsInRole("SuperAdministrador") || User.IsInRole(ApplicationRoles.Administrador) || User.HasClaim("permission", ApplicationPermissions.Admin.VER_DASHBOARD))
+                                    {
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><h6 class="dropdown-header">Administración</h6></li>
+                                        <li><a class="dropdown-item" asp-area="Admin" asp-controller="Admin" asp-action="Index">
+                                            <i class="fas fa-tachometer-alt"></i> Panel de Administración
+                                        </a></li>
+                                        <li><a class="dropdown-item" asp-controller="Slider" asp-action="Index">
+                                            <i class="fas fa-images"></i> Gestión de Slider
+                                        </a></li>
+                                    }
+                                </ul>
+                            </li>
+                            @* Menú Profesores *@
+                            @if (User.IsInRole(ApplicationRoles.SuperAdministrador) || User.IsInRole("SuperAdministrador") || User.IsInRole(ApplicationRoles.Administrador) || User.IsInRole(ApplicationRoles.Coordinador) || User.HasClaim("permission", ApplicationPermissions.Profesores.VER))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-white" href="#" id="profesoresDropdown" role="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-chalkboard-teacher"></i> Profesores
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="profesoresDropdown">
+                                        @if (User.HasClaim("permission", ApplicationPermissions.Profesores.VER))
+                                        {
+                                            <li><a class="dropdown-item" asp-controller="Profesores" asp-action="Index">
+                                                <i class="fas fa-list"></i> Lista de Profesores
+                                            </a></li>
+                                        }
+                                        @if (User.HasClaim("permission", ApplicationPermissions.Profesores.CREAR))
+                                        {
+                                            <li><a class="dropdown-item" asp-controller="Profesores" asp-action="Create">
+                                                <i class="fas fa-plus"></i> Nuevo Profesor
+                                            </a></li>
+                                        }
+                                        
+                                        <li><hr class="dropdown-divider"></li>
+                                        
+                                        @if (User.IsInRole(ApplicationRoles.SuperAdministrador) || User.IsInRole("SuperAdministrador") || User.IsInRole(ApplicationRoles.Administrador) || User.IsInRole(ApplicationRoles.Coordinador))
+                                        {
+                                            <li><a class="dropdown-item" asp-controller="ProfesorGuia" asp-action="Index">
+                                                <i class="fas fa-user-tie"></i> Profesores Guía
+                                            </a></li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+                            @* Menú Instituciones *@
+                            @if (User.IsInRole(ApplicationRoles.SuperAdministrador) || User.IsInRole("SuperAdministrador") || User.IsInRole(ApplicationRoles.Administrador) || User.IsInRole(ApplicationRoles.Coordinador) || User.HasClaim("permission", ApplicationPermissions.Instituciones.VER))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-white" href="#" id="institucionesDropdown" role="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-university"></i> Instituciones
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="institucionesDropdown">
+                                        @if (User.HasClaim("permission", ApplicationPermissions.Instituciones.VER))
+                                        {
+                                            <li><a class="dropdown-item" asp-controller="Instituciones" asp-action="Index">
+                                                <i class="fas fa-list"></i> Lista de Instituciones
+                                            </a></li>
+                                        }
+                                        @if (User.HasClaim("permission", ApplicationPermissions.Instituciones.CREAR))
+                                        {
+                                            <li><a class="dropdown-item" asp-controller="Instituciones" asp-action="Create">
+                                                <i class="fas fa-plus"></i> Nueva Institución
+                                            </a></li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+                            @* Menú Evaluaciones *@
+                            @if (User.IsInRole(ApplicationRoles.SuperAdministrador) || User.IsInRole("SuperAdministrador") || User.IsInRole(ApplicationRoles.Administrador) || User.IsInRole(ApplicationRoles.Coordinador) || User.IsInRole(ApplicationRoles.Docente) || User.IsInRole(ApplicationRoles.Evaluador) || User.HasClaim("permission", ApplicationPermissions.Evaluaciones.VER))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-white" href="#" id="evaluacionesDropdown" role="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-clipboard-check"></i> Evaluaciones
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="evaluacionesDropdown">
+                                        @if (User.HasClaim("permission", ApplicationPermissions.Evaluaciones.VER))
+                                        {
+                                            <li><a class="dropdown-item" asp-controller="Evaluaciones" asp-action="Index">
+                                                <i class="fas fa-list"></i> Lista de Evaluaciones
+                                            </a></li>
+                                        }
+                                        @if (User.HasClaim("permission", ApplicationPermissions.Evaluaciones.CREAR))
+                                        {
+                                            <li><a class="dropdown-item" asp-controller="Evaluaciones" asp-action="Create">
+                                                <i class="fas fa-plus"></i> Crear Nueva Evaluación
+                                            </a></li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+                            @* Menú Conducta *@
+                            @if (User.Identity?.IsAuthenticated == true && (User.IsInRole(ApplicationRoles.SuperAdministrador) || User.IsInRole("SuperAdministrador") || User.IsInRole(ApplicationRoles.Administrador) || User.IsInRole(ApplicationRoles.Coordinador) || User.IsInRole(ApplicationRoles.Docente)))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-white" href="#" id="conductaDropdown" role="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-user-shield"></i> Conducta
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="conductaDropdown">
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="NotaConducta" asp-action="Dashboard">
+                                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="BoletasConducta" asp-action="Index">
+                                                <i class="fas fa-file-alt me-2"></i> Registro de Boletas
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="BoletasConducta" asp-action="Create">
+                                                <i class="fas fa-plus-circle me-2"></i> Nueva Boleta
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="NotaConducta" asp-action="EstudiantesRiesgo">
+                                                <i class="fas fa-exclamation-triangle text-warning me-2"></i> Estudiantes en Riesgo
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="NotaConducta" asp-action="EstudiantesAplazados">
+                                                <i class="fas fa-user-times text-danger me-2"></i> Estudiantes Aplazados
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="ProgramaAcciones" asp-action="Index">
+                                                <i class="fas fa-tasks me-2"></i> Programas de Acciones
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Reportes" asp-action="SeleccionarEstudiante">
+                                                <i class="fas fa-chart-line me-2"></i> Historial por Estudiante
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Reportes" asp-action="ReporteGeneralConducta">
+                                                <i class="fas fa-chart-bar me-2"></i> Reporte General
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                            @if (User.IsInRole(ApplicationRoles.SuperAdministrador) || User.IsInRole("SuperAdministrador") || User.IsInRole(ApplicationRoles.Administrador) || User.IsInRole(ApplicationRoles.Coordinador) || User.HasClaim("permission", ApplicationPermissions.Reportes.VER_BASICOS))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-white" href="#" id="reportesDropdown" role="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-chart-bar"></i> Reportes
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Reportes" asp-action="Index">
+                                                <i class="fas fa-home me-2"></i> Centro de Reportes
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Reportes" asp-action="ArbolEvaluaciones">
+                                                <i class="fas fa-sitemap me-2"></i> Reporte en Árbol
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Reportes" asp-action="Dashboard">
+                                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard General
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Evaluaciones" asp-action="Reportes">
+                                                <i class="fas fa-clipboard-list me-2"></i> Reportes de Evaluaciones
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="CuadernoCalificador" asp-action="Index">
+                                                <i class="fas fa-table me-2"></i> Cuaderno Calificador
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="SEA" asp-action="Index">
+                                                <i class="fas fa-file-csv me-2"></i> Reporte SEA (MEP)
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                        }
+                    </ul>
+                    
+                    <!-- Selector de Período Académico -->
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <div class="navbar-nav me-3">
+                            @await Component.InvokeAsync("PeriodoAcademicoSelector", new { 
+                                mostrarTexto = true, 
+                                mostrarIndicador = false,
+                                cssClass = "navbar-periodo-selector"
+                            })
+                        </div>
+                    }
+                    
+                    <!-- Navigation for Authentication -->
+                    <ul class="navbar-nav">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item dropdown user-dropdown">
+                                <a class="nav-link dropdown-toggle text-white d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                    @{
+                                        var userName = User.Identity.Name;
+                                        var userInitials = "";
+                                        if (!string.IsNullOrEmpty(userName) && userName.Contains("@"))
+                                        {
+                                            var name = userName.Split('@')[0];
+                                            userInitials = name.Length >= 2 ? name.Substring(0, 2).ToUpper() : name.ToUpper();
+                                        }
+                                        else if (!string.IsNullOrEmpty(userName))
+                                        {
+                                            userInitials = userName.Length >= 2 ? userName.Substring(0, 2).ToUpper() : userName.ToUpper();
+                                        }
+                                        
+                                        // TODO: Obtener la ruta de la imagen de perfil del usuario desde la base de datos
+                                        // Por ahora usamos una imagen placeholder si existe, sino usamos iniciales
+                                        var profileImageUrl = ViewData["ProfileImageUrl"] as string;
+                                    }
+                                    
+                                    @if (!string.IsNullOrEmpty(profileImageUrl))
+                                    {
+                                        <img src="@profileImageUrl" alt="Profile" class="profile-avatar" />
+                                    }
+                                    else
+                                    {
+                                        <span class="profile-initials">@userInitials</span>
+                                    }
+                                    <span class="d-none d-md-inline">@User.Identity.Name</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">
+                                        <i class="fas fa-user me-2"></i> Mi Perfil
+                                    </a></li>
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="ChangePassword">
+                                        <i class="fas fa-key me-2"></i> Cambiar Contraseña
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Account" asp-action="Register">
+                                    <i class="fas fa-user-plus"></i> Registrarse
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Account" asp-action="Login">
+                                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container-fluid flex-grow-1">
+        <main role="main" class="pb-5 mt-4">
+            <!-- Mensajes de TempData -->
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (TempData["Warning"] != null)
+            {
+                <div class="alert alert-warning alert-dismissible fade show mt-3" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    @TempData["Warning"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (TempData["Info"] != null)
+            {
+                <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    @TempData["Info"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-light mt-auto">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center py-3">
+                <div class="fw-medium">
+                    &copy; 2025 - Sistema de Rúbricas - <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-decoration-none fw-bold text-light">Privacidad</a>
+                </div>
+                
+                @if (Env.IsDevelopment())
+                {
+                    <div class="text-end small">
+                        @{
+                            // 🔧 CORRECCIÓN: Usar Configuration["..."] en lugar de GetConnectionString
+                            var connectionString = Configuration["ConnectionStrings:DefaultConnection"];
+                            var dbName = "";
+                            var dbType = "";
+                            
+                            if (!string.IsNullOrEmpty(connectionString))
+                            {
+                                if (connectionString.Contains("Data Source="))
+                                {
+                                    // SQLite
+                                    dbType = "SQLite";
+                                    var dataSourceIndex = connectionString.IndexOf("Data Source=") + "Data Source=".Length;
+                                    var endIndex = connectionString.IndexOf(";", dataSourceIndex);
+                                    if (endIndex == -1) endIndex = connectionString.Length;
+                                    dbName = connectionString.Substring(dataSourceIndex, endIndex - dataSourceIndex);
+                                    
+                                    // Extraer solo el nombre del archivo sin la ruta
+                                    if (dbName.Contains("\\") || dbName.Contains("/"))
+                                    {
+                                        dbName = System.IO.Path.GetFileName(dbName);
+                                    }
+                                }
+                                else if (connectionString.Contains("Server="))
+                                {
+                                    // SQL Server
+                                    dbType = "SQL Server";
+                                    var dbIndex = connectionString.IndexOf("Database=") + "Database=".Length;
+                                    var endIndex = connectionString.IndexOf(";", dbIndex);
+                                    if (endIndex == -1) endIndex = connectionString.Length;
+                                    dbName = connectionString.Substring(dbIndex, endIndex - dbIndex);
+                                }
+                            }
+                        }
+                        <div class="badge bg-info text-dark">
+                            <i class="fas fa-database me-1"></i>
+                            <strong>DB:</strong> @dbType - @dbName
+                        </div>
+                        <div class="badge bg-warning text-dark ms-1">
+                            <i class="fas fa-cogs me-1"></i>
+                            <strong>ENV:</strong> Desarrollo
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Local -->
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script src="~/lib/sweetalert2/sweetalert2.min.js"></script>
+    <script src="~/lib/toastr/toastr.min.js"></script>
+    <script src="https://cdn.tiny.cloud/1/gkqx9c7er31mxkqpn09gqpnbxz0mo2uvog0742wmj3jdd6dm/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        // Script para manejar submenús desplegables en Bootstrap 5
+        $(document).ready(function() {
+            $('.dropdown-submenu > a').on("click", function(e) {
+                var submenu = $(this).next('.dropdown-menu');
+                if (submenu.length) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Cerrar otros submenús abiertos
+                    $('.dropdown-submenu .dropdown-menu').not(submenu).removeClass('show');
+                    
+                    // Toggle el submenú actual
+                    submenu.toggleClass('show');
+                }
+            });
+
+            // Cerrar submenús cuando se cierra el menú principal
+            $('.dropdown').on('hidden.bs.dropdown', function () {
+                $('.dropdown-submenu .dropdown-menu').removeClass('show');
+            });
+
+            // Mantener el menú abierto al hacer hover
+            $('.dropdown-submenu').hover(
+                function() {
+                    $(this).find('> .dropdown-menu').addClass('show');
+                },
+                function() {
+                    $(this).find('> .dropdown-menu').removeClass('show');
+                }
+            );
+
+            // Efecto shrink en el header al hacer scroll
+            $(window).scroll(function() {
+                var scroll = $(window).scrollTop();
+                if (scroll >= 50) {
+                    $('header').addClass('shrink');
+                } else {
+                    $('header').removeClass('shrink');
+                }
+            });
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

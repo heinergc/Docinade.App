@@ -1,0 +1,64 @@
+﻿@model RubricasApp.Web.Models.Rubrica
+
+@{
+    ViewData["Title"] = "Detalles de Rúbrica";
+}
+
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-info-circle"></i> Detalles de Rúbrica
+                </h4>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.NombreRubrica)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.NombreRubrica)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Descripcion)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Descripcion)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.FechaCreacion)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.FechaCreacion)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Estado)</dt>
+                    <dd class="col-sm-9">
+                        @if (Model.Estado == "ACTIVO")
+                        {
+                            <span class="badge bg-success">@Model.Estado</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">@Model.Estado</span>
+                        }
+                    </dd>
+                </dl>
+
+                <div class="mt-4">
+                    <div class="btn-group me-2" role="group">
+                        <a asp-action="Edit" asp-route-id="@Model?.IdRubrica" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <a asp-action="ConfigureQualificationLevels" asp-route-id="@Model?.IdRubrica" class="btn btn-primary">
+                            <i class="fas fa-cogs"></i> Configurar Niveles
+                        </a>
+                        <a asp-action="GestionarValoresItems" asp-route-id="@Model?.IdRubrica" class="btn btn-success">
+                            <i class="fas fa-magic"></i> Asignar Niveles a Items
+                        </a>
+                        <a asp-controller="ValorRubrica" asp-action="ConfigurarRubrica" asp-route-id="@Model?.IdRubrica" class="btn btn-info">
+                            <i class="fas fa-table"></i> Gestionar Valores
+                        </a>
+                        <a asp-action="ExportarExcel" asp-route-id="@Model?.IdRubrica" class="btn btn-outline-success">
+                            <i class="fas fa-file-excel"></i> Descargar Excel
+                        </a>
+                    </div>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver a la lista
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

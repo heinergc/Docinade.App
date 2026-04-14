@@ -1,0 +1,141 @@
+@model RubricasApp.Web.ViewModels.InstitucionDetailsViewModel
+
+@{
+    ViewData["Title"] = "Eliminar Institución";
+}
+
+<!-- Contenido Principal -->
+<main class="main-content fade-in">
+    <div class="container-fluid px-4">
+        <!-- Header de Página -->
+        <div class="page-header">
+            <h3 class="page-title-white">
+                <i class="fas fa-trash-alt"></i>
+                Eliminar Institución
+            </h3>
+        </div>
+
+        <!-- Alerta de advertencia -->
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">
+                <i class="fas fa-exclamation-triangle"></i> Confirmación de Eliminación
+            </h4>
+            <p>Está a punto de desactivar la siguiente institución educativa. Esta acción cambiará su estado a <strong>Inactiva</strong>.</p>
+            <hr>
+            <p class="mb-0">
+                <i class="fas fa-info-circle"></i> 
+                <strong>Nota:</strong> La institución no será eliminada físicamente de la base de datos, solo será marcada como inactiva.
+            </p>
+        </div>
+
+        @if (Model.CantidadFacultades > 0)
+        {
+            <div class="alert alert-warning" role="alert">
+                <h5 class="alert-heading">
+                    <i class="fas fa-exclamation-circle"></i> Advertencia
+                </h5>
+                <p class="mb-0">
+                    Esta institución tiene <strong>@Model.CantidadFacultades facultades activas</strong> asociadas. 
+                    No es posible desactivarla mientras tenga facultades activas.
+                </p>
+            </div>
+        }
+
+        <!-- Información de la institución -->
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-university"></i> Información de la Institución a Eliminar
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="fas fa-building"></i> Nombre:</strong>
+                        <p class="mb-0">@Model.Nombre</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="fas fa-tag"></i> Siglas:</strong>
+                        <p class="mb-0">@(Model.Siglas ?? "No especificado")</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="fas fa-graduation-cap"></i> Tipo:</strong>
+                        <p class="mb-0"><span class="badge bg-info">@Model.TipoInstitucion</span></p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="fas fa-barcode"></i> Código MEP:</strong>
+                        <p class="mb-0">@(Model.CodigoMEP ?? "No especificado")</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="fas fa-map"></i> Dirección Regional:</strong>
+                        <p class="mb-0">@(Model.DireccionRegional ?? "No especificado")</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="fas fa-network-wired"></i> Circuito Escolar:</strong>
+                        <p class="mb-0">@(Model.CircuitoEscolar ?? "No especificado")</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="fas fa-phone"></i> Teléfono:</strong>
+                        <p class="mb-0">@(Model.Telefono ?? "No especificado")</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="fas fa-envelope"></i> Email:</strong>
+                        <p class="mb-0">@(Model.Email ?? "No especificado")</p>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <strong><i class="fas fa-map-marker-alt"></i> Dirección:</strong>
+                        <p class="mb-0">@(Model.Direccion ?? "No especificado")</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="fas fa-calendar-alt"></i> Fecha de Creación:</strong>
+                        <p class="mb-0">@Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="fas fa-school"></i> Facultades:</strong>
+                        <p class="mb-0">@Model.CantidadFacultades</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        @if (Model.CantidadFacultades == 0)
+                        {
+                            <form asp-action="Delete" method="post">
+                                <input type="hidden" asp-for="Id" />
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash"></i> Sí, Desactivar Institución
+                                </button>
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> No, Cancelar
+                                </a>
+                                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-info">
+                                    <i class="fas fa-eye"></i> Ver Detalles
+                                </a>
+                            </form>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning mb-0">
+                                <i class="fas fa-ban"></i> 
+                                No se puede desactivar esta institución. Primero debe desactivar o eliminar todas las facultades asociadas.
+                            </div>
+                            <div class="mt-3">
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Volver a la Lista
+                                </a>
+                                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-info">
+                                    <i class="fas fa-eye"></i> Ver Detalles
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

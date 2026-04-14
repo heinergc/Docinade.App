@@ -1,0 +1,802 @@
+:root {
+    --primary-color: #007bff;
+    --primary-dark: #0056b3;
+    --success-color: #28a745;
+    --success-dark: #1e7e34;
+    --secondary-color: #6c757d;
+    --light-bg: #f8f9fa;
+    --border-color: #e9ecef;
+    --shadow-light: 0 2px 8px rgba(0,0,0,0.1);
+    --shadow-medium: 0 4px 12px rgba(0,123,255,0.3);
+    --border-radius: 8px;
+    --transition: all 0.3s ease;
+}
+
+/* Layout Principal */
+.main-content {
+    padding: 2rem 0;
+    min-height: calc(100vh - 120px);
+}
+
+.container-improved {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* Navegación Mejorada */
+.navbar-modern {
+    background: linear-gradient(135deg, #ffffff, var(--light-bg));
+    box-shadow: var(--shadow-light);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    color: var(--primary-color) !important;
+    font-size: 1.5rem;
+}
+
+.nav-link {
+    transition: var(--transition);
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    border-radius: 6px;
+    margin: 0 0.25rem;
+}
+
+.nav-link:hover {
+    color: var(--primary-color) !important;
+    background-color: rgba(0,123,255,0.1);
+}
+
+.navbar-toggler {
+    border: none;
+    padding: 0.5rem;
+    border-radius: 6px;
+}
+
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
+}
+
+/* Header de Página */
+.page-header {
+    margin-bottom: 2rem;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, var(--light-bg), #ffffff);
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--primary-color);
+    box-shadow: var(--shadow-light);
+}
+
+.page-header h3 {
+    margin: 0;
+    color: #495057;
+    font-weight: 600;
+}
+
+.page-header i {
+    color: var(--primary-color);
+    margin-right: 0.75rem;
+}
+
+/* Tarjetas Modernas */
+.modern-card {
+    background: #ffffff;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    transition: var(--transition);
+}
+
+.modern-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+/* Botones Mejorados */
+.btn-modern {
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    transition: var(--transition);
+    border: 2px solid transparent;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.btn-modern.primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.btn-modern.primary:hover {
+    background: linear-gradient(135deg, var(--primary-dark), #004085);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+    color: white;
+}
+
+.btn-modern.success {
+    background: linear-gradient(135deg, var(--success-color), var(--success-dark));
+    color: white;
+    border-color: var(--success-color);
+}
+
+.btn-modern.success:hover {
+    background: linear-gradient(135deg, var(--success-dark), #155724);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+    color: white;
+}
+
+.btn-modern.secondary {
+    background: var(--secondary-color);
+    color: white;
+    border-color: var(--secondary-color);
+}
+
+.btn-modern.secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    color: white;
+}
+
+.btn-modern.danger {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+    border-color: #dc3545;
+}
+
+.btn-modern.danger:hover {
+    background: linear-gradient(135deg, #c82333, #a71e2a);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220,53,69,0.3);
+    color: white;
+}
+
+.btn-modern:focus {
+    outline: 3px solid rgba(0,123,255,0.3);
+    outline-offset: 2px;
+}
+
+/* Grupo de Botones Responsive */
+.btn-group-responsive {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .btn-group-responsive {
+        justify-content: center;
+    }
+}
+
+/* Filtros Mejorados */
+.filters-container {
+    background: var(--light-bg);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+}
+
+.filters-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    color: #495057;
+}
+
+.filters-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.form-control,
+.form-select {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    transition: var(--transition);
+    font-size: 0.95rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+    outline: none;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+@media (max-width: 768px) {
+    .filters-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-actions {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+}
+
+/* Tabla Mejorada */
+.table-container {
+    background: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-light);
+    border: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+}
+
+.table-header {
+    background: linear-gradient(135deg, var(--light-bg), #ffffff);
+    padding: 1rem 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+    display: flex;
+    align-items: center;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+.table-modern {
+    margin: 0;
+    width: 100%;
+    min-width: 800px;
+}
+
+.table-modern thead th {
+    background: linear-gradient(135deg, var(--light-bg), #ffffff);
+    border-bottom: 2px solid var(--border-color);
+    font-weight: 600;
+    padding: 1rem;
+    color: #495057;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table-modern tbody tr {
+    transition: var(--transition);
+}
+
+.table-modern tbody tr:hover {
+    background-color: rgba(0,123,255,0.05);
+}
+
+.table-modern tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+/* Centrado de botones en tabla */
+.table-modern .btn-group {
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    gap: 0.25rem;
+}
+
+.table-modern td:last-child {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+/* Estilo compacto para tabla */
+.table-compact {
+    margin-bottom: 1rem;
+}
+
+.table-compact thead th {
+    background-color: #343a40 !important; /* Gris más oscuro */
+    color: white !important;
+    font-weight: 600;
+    padding: 0.75rem 0.5rem;
+    font-size: 0.9rem;
+    border-bottom: 2px solid #495057;
+}
+
+.table-compact tbody td {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    vertical-align: middle;
+}
+
+.table-compact tbody tr:hover {
+    background-color: rgba(0,123,255,0.05);
+}
+
+/* Botón eliminar mostrados - rojo suave */
+.btn-delete-soft {
+    background-color: #dc3545 !important;
+    background: linear-gradient(135deg, #dc3545, #c82333) !important;
+    border-color: #dc3545 !important;
+    color: white !important;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    border-radius: 0.375rem;
+    transition: all 0.15s ease-in-out;
+}
+
+.btn-delete-soft:hover {
+    background: linear-gradient(135deg, #c82333, #a71e2a) !important;
+    border-color: #bd2130 !important;
+    color: white !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(220,53,69,0.3);
+}
+
+/* Iconos a la izquierda en botones de acción */
+.btn-action {
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.8rem !important;
+    border-radius: 0.25rem !important;
+    text-decoration: none !important;
+    border: 1px solid transparent !important;
+    transition: all 0.15s ease-in-out !important;
+}
+
+.btn-action i {
+    margin-right: 0 !important;
+    width: 14px;
+    text-align: center;
+}
+
+.btn-action:hover {
+    transform: translateY(-1px) !important;
+    text-decoration: none !important;
+}
+
+/* Botones de acción específicos */
+.btn-info-action {
+    background-color: #17a2b8 !important;
+    border-color: #17a2b8 !important;
+    color: white !important;
+}
+
+.btn-info-action:hover {
+    background-color: #138496 !important;
+    border-color: #117a8b !important;
+    color: white !important;
+    box-shadow: 0 4px 8px rgba(23,162,184,0.3) !important;
+}
+
+.btn-warning-action {
+    background-color: #ffc107 !important;
+    border-color: #ffc107 !important;
+    color: #212529 !important;
+}
+
+.btn-warning-action:hover {
+    background-color: #e0a800 !important;
+    border-color: #d39e00 !important;
+    color: #212529 !important;
+    box-shadow: 0 4px 8px rgba(255,193,7,0.3) !important;
+}
+
+.btn-danger-action {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: white !important;
+}
+
+.btn-danger-action:hover {
+    background-color: #c82333 !important;
+    border-color: #bd2130 !important;
+    color: white !important;
+    box-shadow: 0 4px 8px rgba(220,53,69,0.3) !important;
+}
+
+/* Estado Vacío Mejorado */
+.table-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: linear-gradient(135deg, var(--light-bg), #ffffff);
+    border-radius: var(--border-radius);
+    border: 2px dashed var(--border-color);
+    margin: 2rem;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+    opacity: 0.7;
+}
+
+.empty-title {
+    color: #495057;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.empty-description {
+    color: #6c757d;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.empty-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Animaciones */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Alertas Modernas */
+.alert-modern {
+    border-radius: var(--border-radius);
+    border: none;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.alert-modern.info {
+    background: linear-gradient(135deg, #d1ecf1, #b8daff);
+    color: #0c5460;
+}
+
+.alert-modern.success {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    color: #155724;
+}
+
+.alert-modern.warning {
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    color: #856404;
+}
+
+.alert-modern.danger {
+    background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+    color: #721c24;
+}
+
+/* Badges modernos */
+.badge-modern {
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.badge-modern.secondary {
+    background: linear-gradient(135deg, var(--secondary-color), #5a6268);
+    color: white;
+}
+
+.badge-modern.info {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    color: white;
+}
+
+/* Contenedor de tabla de ancho completo */
+.table-container-fullwidth {
+    margin: 1.5rem 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.table-container-fullwidth .table-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: white;
+    padding: 1rem 1.5rem;
+    margin: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.table-container-fullwidth .table-responsive {
+    border-radius: 0;
+    margin: 0;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.table-container-fullwidth .table-modern {
+    margin: 0;
+    width: 100%;
+    table-layout: fixed;
+}
+
+/* Ajustes específicos de columnas para la tabla de estudiantes */
+.table-modern th:nth-child(1), /* Nombre */
+.table-modern td:nth-child(1) {
+    width: 12%;
+    min-width: 120px;
+}
+
+.table-modern th:nth-child(2), /* Apellidos */
+.table-modern td:nth-child(2) {
+    width: 15%;
+    min-width: 150px;
+}
+
+.table-modern th:nth-child(3), /* Número ID */
+.table-modern td:nth-child(3) {
+    width: 10%;
+    min-width: 100px;
+}
+
+.table-modern th:nth-child(4), /* Correo */
+.table-modern td:nth-child(4) {
+    width: 18%;
+    min-width: 180px;
+}
+
+.table-modern th:nth-child(5), /* Institución */
+.table-modern td:nth-child(5) {
+    width: 12%;
+    min-width: 120px;
+}
+
+.table-modern th:nth-child(6), /* Grupos */
+.table-modern td:nth-child(6) {
+    width: 20%;
+    min-width: 200px;
+}
+
+.table-modern th:nth-child(7), /* Período */
+.table-modern td:nth-child(7) {
+    width: 8%;
+    min-width: 80px;
+}
+
+.table-modern th:nth-child(8), /* Año */
+.table-modern td:nth-child(8) {
+    width: 5%;
+    min-width: 60px;
+}
+
+.table-modern th:nth-child(9), /* Acciones */
+.table-modern td:nth-child(9) {
+    width: 10%;
+    min-width: 140px;
+    text-align: center;
+}
+
+/* Mejoras de texto en celdas */
+.table-modern td {
+    padding: 0.75rem 0.5rem;
+    word-wrap: break-word;
+    vertical-align: middle;
+}
+
+.table-modern td small {
+    display: block;
+    line-height: 1.3;
+}
+
+/* Centrado de botones de acción */
+.table-modern .btn-group {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 0.25rem;
+}
+
+.table-modern .btn-group .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+    border-radius: 4px;
+}
+
+/* Responsive específico para tabla de estudiantes */
+@media (max-width: 1400px) {
+    .table-modern th:nth-child(6), /* Grupos */
+    .table-modern td:nth-child(6) {
+        width: 18%;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 1200px) {
+    .table-container-fullwidth .table-responsive {
+        max-height: 60vh;
+    }
+    
+    .table-modern {
+        font-size: 0.9rem;
+    }
+    
+    .table-modern th:nth-child(6), /* Grupos */
+    .table-modern td:nth-child(6) {
+        width: 16%;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .container-fluid.px-4 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    
+    .table-modern {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .table-container-fullwidth .table-responsive {
+        max-height: 50vh;
+    }
+    
+    .table-modern {
+        font-size: 0.8rem;
+    }
+    
+    .table-modern td {
+        padding: 0.5rem 0.25rem;
+    }
+    
+    /* Ocultar columnas menos importantes en mobile */
+    .table-modern th:nth-child(5), /* Institución */
+    .table-modern td:nth-child(5),
+    .table-modern th:nth-child(8), /* Año */
+    .table-modern td:nth-child(8) {
+        display: none;
+    }
+    
+    /* Ajustar anchos para mobile */
+    .table-modern th:nth-child(6), /* Grupos */
+    .table-modern td:nth-child(6) {
+        width: 25%;
+        font-size: 0.75rem;
+    }
+}
+
+.btn-modern.warning {
+    background: linear-gradient(135deg, #f0ad4e, #ec971f);
+    color: white;
+    border: 1px solid #ec971f;
+}
+
+.btn-modern.warning:hover {
+    background: linear-gradient(135deg, #ec971f, #d58512);
+    border-color: #d58512;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(236, 151, 31, 0.3);
+}
+
+/* Título de página en blanco para mejor visibilidad */
+.page-title-white {
+    color: white !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    font-weight: 600;
+}
+
+.page-title-white i {
+    color: white !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Versiones más oscuras de botones existentes */
+.btn-modern.success-dark {
+    background: linear-gradient(135deg, #1e7e34, #155724);
+    color: white;
+    border: 1px solid #155724;
+}
+
+.btn-modern.success-dark:hover {
+    background: linear-gradient(135deg, #155724, #0d3d1a);
+    border-color: #0d3d1a;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(21, 87, 36, 0.3);
+}
+
+.btn-modern.primary-dark {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    color: white;
+    border: 1px solid #004085;
+}
+
+.btn-modern.primary-dark:hover {
+    background: linear-gradient(135deg, #004085, #002752);
+    border-color: #002752;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 64, 133, 0.3);
+}
+
+/* Responsive adicional */
+@media (max-width: 576px) {
+    .container-improved {
+        padding: 0 10px;
+    }
+    
+    .page-header {
+        padding: 1rem 1.5rem;
+    }
+    
+    .page-header h3 {
+        font-size: 1.5rem;
+    }
+    
+    .modern-card {
+        padding: 1rem;
+    }
+    
+    .btn-modern {
+        padding: 0.65rem 1.25rem;
+        font-size: 0.9rem;
+    }
+    
+    .table-modern {
+        min-width: 600px;
+    }
+    
+    .table-modern thead th,
+    .table-modern tbody td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.9rem;
+    }
+}

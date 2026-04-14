@@ -1,0 +1,204 @@
+﻿@model RubricasApp.Web.ViewModels.InstrumentoMateriaViewModel
+
+@{
+    ViewData["Title"] = "Eliminar Relación Instrumento-Materia";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> @ViewData["Title"]
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Advertencia principal -->
+                    <div class="alert alert-danger" role="alert">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-warning"></i> ¡Atención! Eliminación Permanente
+                        </h5>
+                        <p class="mb-0">
+                            Esta acción <strong>eliminará permanentemente</strong> la relación entre el instrumento de evaluación y la materia. 
+                            Esta operación <strong>NO se puede deshacer</strong>.
+                        </p>
+                    </div>
+
+                    <!-- Información de la relación a eliminar -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card border-primary">
+                                <div class="card-header bg-primary text-white">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-clipboard-list"></i> Instrumento de Evaluación
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="text-primary">@Model.InstrumentoNombre</h5>
+                                    <p class="mb-1">
+                                        <strong>ID:</strong> @Model.InstrumentoId
+                                    </p>
+                                    <p class="mb-0">
+                                        <strong>Estado:</strong> 
+                                        @if (Model.InstrumentoActivo == true)
+                                        {
+                                            <span class="badge bg-success">Activo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Inactivo</span>
+                                        }
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card border-info">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-book"></i> Materia
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="text-info">@Model.MateriaNombre</h5>
+                                    <p class="mb-1">
+                                        <strong>ID:</strong> @Model.MateriaId
+                                    </p>
+                                    @if (!string.IsNullOrEmpty(Model.MateriaDescripcion))
+                                    {
+                                        <p class="mb-0">
+                                            <small class="text-muted">@Model.MateriaDescripcion</small>
+                                        </p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Detalles de la relación -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="card border-warning">
+                                <div class="card-header bg-warning text-dark">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-link"></i> Detalles de la Relación
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <strong>Período Académico:</strong>
+                                            <br><span class="badge bg-warning text-dark">@Model.PeriodoAcademicoNombre</span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Clave Compuesta:</strong>
+                                            <br><code>@Model.InstrumentoId-@Model.MateriaId</code>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Tipo de Relación:</strong>
+                                            <br><span class="text-muted">Instrumento-Materia</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Consecuencias de la eliminación -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="alert alert-warning">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-info-circle"></i> Consecuencias de esta Eliminación:
+                                </h6>
+                                <ul class="mb-0">
+                                    <li>Se eliminará la relación entre <strong>@Model.InstrumentoNombre</strong> y <strong>@Model.MateriaNombre</strong></li>
+                                    <li>El instrumento ya no estará asociado a esta materia para el período <strong>@Model.PeriodoAcademicoNombre</strong></li>
+                                    <li>Las evaluaciones existentes <strong>NO</strong> se verán afectadas</li>
+                                    <li>Será necesario crear una nueva relación si desea vincular estos elementos nuevamente</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formulario de confirmación -->
+                    <form asp-action="Delete" method="post" class="mt-4">
+                        <input type="hidden" asp-for="InstrumentoId" />
+                        <input type="hidden" asp-for="MateriaId" />
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <a asp-action="Index" class="btn btn-secondary me-2">
+                                    <i class="fas fa-arrow-left"></i> Cancelar
+                                </a>
+                                <a asp-action="Details" 
+                                   asp-route-instrumentoId="@Model.InstrumentoId" 
+                                   asp-route-materiaId="@Model.MateriaId" 
+                                   class="btn btn-info">
+                                    <i class="fas fa-eye"></i> Ver Detalles
+                                </a>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-danger" id="btnEliminar">
+                                <i class="fas fa-trash"></i> Confirmar Eliminación
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            var confirmationRequired = false;
+            
+            $('#btnEliminar').click(function(e) {
+                if (!confirmationRequired) {
+                    e.preventDefault();
+                    
+                    // Cambiar el botón para requerir doble confirmación
+                    $(this).removeClass('btn-danger').addClass('btn-outline-danger')
+                           .html('<i class="fas fa-exclamation-triangle"></i> ¿Está Seguro? Clic de Nuevo');
+                    
+                    confirmationRequired = true;
+                    
+                    // Resetear después de 5 segundos
+                    setTimeout(function() {
+                        $('#btnEliminar').removeClass('btn-outline-danger').addClass('btn-danger')
+                                       .html('<i class="fas fa-trash"></i> Confirmar Eliminación');
+                        confirmationRequired = false;
+                    }, 5000);
+                    
+                } else {
+                    // Segunda confirmación
+                    if (!confirm('CONFIRMACIÓN FINAL: ¿Está completamente seguro de que desea eliminar esta relación instrumento-materia? Esta acción NO se puede deshacer.')) {
+                        e.preventDefault();
+                        confirmationRequired = false;
+                        $(this).removeClass('btn-outline-danger').addClass('btn-danger')
+                               .html('<i class="fas fa-trash"></i> Confirmar Eliminación');
+                    }
+                }
+            });
+
+            // Efecto visual para resaltar la importancia
+            $('.alert-danger').addClass('animate__animated animate__pulse');
+            
+            // Contador regresivo visual (opcional)
+            var timeLeft = 5;
+            function updateCountdown() {
+                if (confirmationRequired && timeLeft > 0) {
+                    $('#btnEliminar').html('<i class="fas fa-exclamation-triangle"></i> ¿Está Seguro? (' + timeLeft + 's)');
+                    timeLeft--;
+                    setTimeout(updateCountdown, 1000);
+                } else if (confirmationRequired) {
+                    timeLeft = 5;
+                }
+            }
+        });
+    </script>
+}

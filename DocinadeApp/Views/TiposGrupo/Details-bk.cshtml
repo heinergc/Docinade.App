@@ -1,0 +1,301 @@
+@model RubricasApp.Web.ViewModels.Grupos.TipoGrupoDetailsViewModel
+
+@{
+    ViewData["Title"] = $"Tipo: {Model.Nombre}";
+}
+
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="page-title">
+                <span class="badge bg-@(Model.EsActivo ? "success" : "secondary") fs-4 me-3">
+                    <i class="fas fa-tag me-2"></i>
+                    @Model.Nombre
+                </span>
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index", "Home")">
+                            <i class="fas fa-home"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index")">
+                            <i class="fas fa-tags"></i> Tipos de Grupo
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">@Model.Nombre</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-auto">
+            <div class="btn-group">
+                <a href="@Url.Action("Edit", new { id = Model.IdTipoGrupo })" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+                @if (Model.GruposAsociados.Count == 0)
+                {
+                    <a href="@Url.Action("Delete", new { id = Model.IdTipoGrupo })" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </a>
+                }
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="@Url.Action("Create", "GruposEstudiantes", new { tipoId = Model.IdTipoGrupo })">
+                                <i class="fas fa-plus me-2"></i>Crear Grupo de este Tipo
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="@Url.Action("Index")">
+                                <i class="fas fa-list me-2"></i>Volver a Lista
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas del tipo -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="modern-card stat-card">
+            <div class="card-body text-center">
+                <div class="stat-icon mb-2">
+                    <i class="fas fa-users fa-2x text-primary"></i>
+                </div>
+                <h3 class="stat-number">@Model.GruposAsociados.Count</h3>
+                <p class="stat-label">Grupos Creados</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="modern-card stat-card">
+            <div class="card-body text-center">
+                <div class="stat-icon mb-2">
+                    <i class="fas fa-check-circle fa-2x text-success"></i>
+                </div>
+                <h3 class="stat-number">@Model.GruposAsociados.Count(g => g.Estado == RubricasApp.Web.Models.EstadoGrupo.Activo)</h3>
+                <p class="stat-label">Grupos Activos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="modern-card stat-card">
+            <div class="card-body text-center">
+                <div class="stat-icon mb-2">
+                    <i class="fas fa-tag fa-2x text-info"></i>
+                </div>
+                <h3 class="stat-number">@Model.IdTipoGrupo</h3>
+                <p class="stat-label">ID Tipo</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="modern-card stat-card">
+            <div class="card-body text-center">
+                <div class="stat-icon mb-2">
+                    <i class="fas fa-@(Model.EsActivo ? "toggle-on" : "toggle-off") fa-2x text-@(Model.EsActivo ? "success" : "secondary")"></i>
+                </div>
+                <h3 class="stat-number">
+                    <span class="badge bg-@(Model.EsActivo ? "success" : "secondary")">
+                        @Model.Estado
+                    </span>
+                </h3>
+                <p class="stat-label">Estado</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Información del tipo -->
+    <div class="col-md-4">
+        <div class="modern-card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Información del Tipo
+                </h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <td><strong>ID:</strong></td>
+                        <td><span class="badge bg-secondary">@Model.IdTipoGrupo</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nombre:</strong></td>
+                        <td>@Model.Nombre</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Estado:</strong></td>
+                        <td>
+                            <span class="badge bg-@(Model.EsActivo ? "success" : "secondary")">
+                                @Model.Estado
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Registrado:</strong></td>
+                        <td>
+                            @Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm")
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grupos asociados -->
+    <div class="col-md-8">
+        <div class="modern-card">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h5 class="mb-0">
+                            <i class="fas fa-users me-2"></i>
+                            Grupos de este Tipo (@Model.GruposAsociados.Count)
+                        </h5>
+                    </div>
+                    <div class="col-auto">
+                        <a href="@Url.Action("Create", "GruposEstudiantes", new { tipoId = Model.IdTipoGrupo })" 
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-plus"></i> Crear Grupo
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (Model.GruposAsociados.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Período</th>
+                                    <th>Estado</th>
+                                    <th>Creado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var grupo in Model.GruposAsociados)
+                                {
+                                    <tr>
+                                        <td>
+                                            <code>@grupo.Codigo</code>
+                                        </td>
+                                        <td>
+                                            <strong>@grupo.Nombre</strong>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">@grupo.PeriodoAcademico</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-@(grupo.Estado == RubricasApp.Web.Models.EstadoGrupo.Activo ? "success" : 
+                                                  grupo.Estado == RubricasApp.Web.Models.EstadoGrupo.Inactivo ? "secondary" : "warning")">
+                                                @grupo.EstadoDisplay
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">
+                                                @grupo.FechaCreacion.ToString("dd/MM/yyyy")
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="@Url.Action("Details", "GruposEstudiantes", new { id = grupo.GrupoId })" 
+                                                   class="btn btn-sm btn-outline-info" 
+                                                   title="Ver detalles del grupo">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="@Url.Action("Edit", "GruposEstudiantes", new { id = grupo.GrupoId })" 
+                                                   class="btn btn-sm btn-outline-warning" 
+                                                   title="Editar grupo">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <i class="fas fa-tag fa-3x text-muted mb-3"></i>
+                        <h6 class="text-muted">No hay grupos de este tipo</h6>
+                        <p class="text-muted">Aún no se han creado grupos usando este tipo.</p>
+                        <a href="@Url.Action("Create", "GruposEstudiantes", new { tipoId = Model.IdTipoGrupo })" 
+                           class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Crear Primer Grupo
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .stat-card {
+            transition: transform 0.2s;
+            border: none;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-icon {
+            opacity: 0.8;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .stat-label {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .modern-card {
+            border: none;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        .table-borderless td {
+            border: none;
+            padding: 0.5rem 0;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .page-title .badge {
+            vertical-align: middle;
+        }
+    </style>
+}

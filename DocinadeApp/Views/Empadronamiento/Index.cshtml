@@ -1,0 +1,348 @@
+@model IEnumerable<RubricasApp.Web.DTOs.EstudianteEmpadronamientoListDto>
+@{
+    ViewData["Title"] = "Empadronamiento Estudiantil";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">@ViewData["Title"]</h4>
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript: void(0);">Estudiantes</a></li>
+                        <li class="breadcrumb-item active">Empadronamiento</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h4 class="card-title mb-0">
+                                <i class="mdi mdi-account-multiple-plus me-2"></i>
+                                Gestión de Empadronamiento
+                            </h4>
+                        </div>
+                        <div class="col-auto">
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="btnFiltros">
+                                    <i class="mdi mdi-filter-variant"></i> Filtros
+                                </button>
+                                <a href="@Url.Action("Index", "Estudiantes")" class="btn btn-outline-secondary btn-sm">
+                                    <i class="mdi mdi-account-group"></i> Ver Estudiantes
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Panel de Filtros (colapsable) -->
+                    <div class="collapse" id="filtrosPanel">
+                        <div class="row mb-3 p-3 bg-light rounded">
+                            <div class="col-md-3">
+                                <label class="form-label">Estado de Empadronamiento</label>
+                                <select class="form-select" id="filtroEstado">
+                                    <option value="">Todos los estados</option>
+                                    <option value="sin-empadronamiento">Sin empadronamiento</option>
+                                    <option value="PreRegistro">Pre-registro</option>
+                                    <option value="RevisionDocumental">Revisión Documental</option>
+                                    <option value="Aprobacion">Aprobación</option>
+                                    <option value="MatriculaFinalizada">Matrícula Finalizada</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Institución</label>
+                                <select class="form-select" id="filtroInstitucion">
+                                    <option value="">Todas las instituciones</option>
+                                    @foreach (var institucion in Model.Select(e => e.Institucion).Distinct().OrderBy(i => i))
+                                    {
+                                        <option value="@institucion">@institucion</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Período Académico</label>
+                                <select class="form-select" id="filtroPeriodo">
+                                    <option value="">Todos los períodos</option>
+                                    @foreach (var periodo in Model.Select(e => e.PeriodoNombre).Distinct().OrderBy(p => p))
+                                    {
+                                        <option value="@periodo">@periodo</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="button" class="btn btn-primary" id="btnAplicarFiltros">
+                                    <i class="mdi mdi-magnify"></i> Aplicar
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary ms-2" id="btnLimpiarFiltros">
+                                    <i class="mdi mdi-refresh"></i> Limpiar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estadísticas rápidas -->
+                    <div class="row mb-4">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card mini-stats-wid">
+                                <div class="card-body">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <p class="text-muted fw-medium">Total Estudiantes</p>
+                                            <h4 class="mb-0">@Model.Count()</h4>
+                                        </div>
+                                        <div class="flex-shrink-0 align-self-center">
+                                            <div class="mini-stat-icon avatar-sm rounded-circle bg-primary">
+                                                <span class="avatar-title">
+                                                    <i class="bx bx-group font-size-24"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card mini-stats-wid">
+                                <div class="card-body">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <p class="text-muted fw-medium">Con Empadronamiento</p>
+                                            <h4 class="mb-0">@Model.Count(e => e.TieneEmpadronamiento)</h4>
+                                        </div>
+                                        <div class="flex-shrink-0 align-self-center">
+                                            <div class="mini-stat-icon avatar-sm rounded-circle bg-success">
+                                                <span class="avatar-title">
+                                                    <i class="bx bx-check-circle font-size-24"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card mini-stats-wid">
+                                <div class="card-body">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <p class="text-muted fw-medium">Sin Empadronamiento</p>
+                                            <h4 class="mb-0">@Model.Count(e => !e.TieneEmpadronamiento)</h4>
+                                        </div>
+                                        <div class="flex-shrink-0 align-self-center">
+                                            <div class="mini-stat-icon avatar-sm rounded-circle bg-warning">
+                                                <span class="avatar-title">
+                                                    <i class="bx bx-error-circle font-size-24"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card mini-stats-wid">
+                                <div class="card-body">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <p class="text-muted fw-medium">Matrículas Finalizadas</p>
+                                            <h4 class="mb-0">@Model.Count(e => e.EtapaActual == "MatriculaFinalizada")</h4>
+                                        </div>
+                                        <div class="flex-shrink-0 align-self-center">
+                                            <div class="mini-stat-icon avatar-sm rounded-circle bg-info">
+                                                <span class="avatar-title">
+                                                    <i class="bx bx-trophy font-size-24"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de estudiantes -->
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="tablaEstudiantes">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Estudiante</th>
+                                    <th>Número ID</th>
+                                    <th>Correo</th>
+                                    <th>Institución</th>
+                                    <th>Período</th>
+                                    <th>Estado Empadronamiento</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var estudiante in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-xs me-3">
+                                                    <span class="avatar-title rounded-circle bg-soft-primary text-primary">
+                                                        @estudiante.NombreCompleto.Substring(0, 1).ToUpper()
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0 font-size-14">@estudiante.NombreCompleto</h6>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-soft-secondary text-secondary">@estudiante.NumeroId</span>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">@estudiante.DireccionCorreo</small>
+                                        </td>
+                                        <td>@estudiante.Institucion</td>
+                                        <td>
+                                            <span class="badge bg-soft-info text-info">@estudiante.PeriodoNombre</span>
+                                        </td>
+                                        <td>
+                                            @if (estudiante.TieneEmpadronamiento)
+                                            {
+                                                @switch (estudiante.EtapaActual)
+                                                {
+                                                    case "PreRegistro":
+                                                        <span class="badge bg-soft-warning text-warning">
+                                                            <i class="mdi mdi-clock-outline me-1"></i>Pre-registro
+                                                        </span>
+                                                        break;
+                                                    case "RevisionDocumental":
+                                                        <span class="badge bg-soft-primary text-primary">
+                                                            <i class="mdi mdi-file-document-outline me-1"></i>Revisión Documental
+                                                        </span>
+                                                        break;
+                                                    case "Aprobacion":
+                                                        <span class="badge bg-soft-info text-info">
+                                                            <i class="mdi mdi-check-circle-outline me-1"></i>Aprobación
+                                                        </span>
+                                                        break;
+                                                    case "MatriculaFinalizada":
+                                                        <span class="badge bg-soft-success text-success">
+                                                            <i class="mdi mdi-trophy-outline me-1"></i>Finalizada
+                                                        </span>
+                                                        break;
+                                                    default:
+                                                        <span class="badge bg-soft-secondary text-secondary">
+                                                            <i class="mdi mdi-help-circle-outline me-1"></i>@estudiante.EtapaActual
+                                                        </span>
+                                                        break;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-soft-danger text-danger">
+                                                    <i class="mdi mdi-close-circle-outline me-1"></i>Sin empadronamiento
+                                                </span>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="dropdown">
+                                                <a href="#" class="dropdown-toggle card-drop" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="mdi mdi-dots-horizontal font-size-18"></i>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    <a class="dropdown-item" href="@Url.Action("Details", new { id = estudiante.IdEstudiante })">
+                                                        <i class="mdi mdi-eye-outline me-2"></i>Ver detalles
+                                                    </a>
+                                                    @if (estudiante.TieneEmpadronamiento)
+                                                    {
+                                                        <a class="dropdown-item" href="@Url.Action("Edit", new { id = estudiante.IdEstudiante })">
+                                                            <i class="mdi mdi-pencil-outline me-2"></i>Editar
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a class="dropdown-item" href="@Url.Action("Create", new { id = estudiante.IdEstudiante })">
+                                                            <i class="mdi mdi-plus-circle-outline me-2"></i>Crear empadronamiento
+                                                        </a>
+                                                    }
+                                                    <div class="dropdown-divider"></div>
+                                                    <a class="dropdown-item" href="@Url.Action("Details", "Estudiantes", new { id = estudiante.IdEstudiante })">
+                                                        <i class="mdi mdi-account-outline me-2"></i>Ver estudiante
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Inicializar DataTable
+            var table = $('#tablaEstudiantes').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
+                },
+                pageLength: 25,
+                responsive: true,
+                order: [[0, 'asc']],
+                columnDefs: [
+                    { orderable: false, targets: [6] }
+                ]
+            });
+
+            // Toggle filtros
+            $('#btnFiltros').click(function() {
+                $('#filtrosPanel').collapse('toggle');
+            });
+
+            // Aplicar filtros
+            $('#btnAplicarFiltros').click(function() {
+                var estado = $('#filtroEstado').val();
+                var institucion = $('#filtroInstitucion').val();
+                var periodo = $('#filtroPeriodo').val();
+
+                table.columns().search('');
+
+                if (estado) {
+                    if (estado === 'sin-empadronamiento') {
+                        table.column(5).search('Sin empadronamiento');
+                    } else {
+                        table.column(5).search(estado);
+                    }
+                }
+
+                if (institucion) {
+                    table.column(3).search(institucion);
+                }
+
+                if (periodo) {
+                    table.column(4).search(periodo);
+                }
+
+                table.draw();
+            });
+
+            // Limpiar filtros
+            $('#btnLimpiarFiltros').click(function() {
+                $('#filtroEstado, #filtroInstitucion, #filtroPeriodo').val('');
+                table.search('').columns().search('').draw();
+            });
+
+            // Mostrar tooltips
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+    </script>
+}

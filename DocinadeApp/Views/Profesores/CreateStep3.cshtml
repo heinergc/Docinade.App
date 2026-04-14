@@ -1,0 +1,231 @@
+@model RubricasApp.Web.ViewModels.ProfesorViewModel
+@{
+    ViewData["Title"] = "Nuevo Profesor - Dirección";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Header con progreso -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h1 class="h4 mb-0 text-gray-800">
+                                <i class="fas fa-user-plus"></i> Nuevo Profesor: @Model.NombreCompleto
+                            </h1>
+                            <p class="mb-0 text-muted">Paso 3 de 6: Dirección</p>
+                        </div>
+                        <div>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver a Lista
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Barra de progreso -->
+                    <div class="progress mb-3" style="height: 8px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    
+                    <!-- Indicadores de pasos -->
+                    <div class="row text-center small">
+                        <div class="col-2 text-success">
+                            <i class="fas fa-check-circle"></i><br>Personal
+                        </div>
+                        <div class="col-2 text-success">
+                            <i class="fas fa-check-circle"></i><br>Contacto
+                        </div>
+                        <div class="col-2">
+                            <div class="text-primary font-weight-bold">
+                                <i class="fas fa-map-marker-alt"></i><br>Dirección
+                            </div>
+                        </div>
+                        <div class="col-2 text-muted">
+                            <i class="fas fa-graduation-cap"></i><br>Académica
+                        </div>
+                        <div class="col-2 text-muted">
+                            <i class="fas fa-briefcase"></i><br>Laboral
+                        </div>
+                        <div class="col-2 text-muted">
+                            <i class="fas fa-check-circle"></i><br>Final
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-map-marker-alt"></i> Dirección de Residencia
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateStep3" method="post" novalidate>
+                        
+                        <!-- División Territorial -->
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="ProvinciaId" class="form-label">Provincia</label>
+                                    <select asp-for="ProvinciaId" id="provinciaSelect" class="form-control" asp-items="@Model.Provincias">
+                                        <option value="">-- Seleccione una provincia --</option>
+                                    </select>
+                                    <span asp-validation-for="ProvinciaId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="CantonId" class="form-label">Cantón</label>
+                                    <select asp-for="CantonId" id="cantonSelect" class="form-control" asp-items="@Model.Cantones">
+                                        <option value="">-- Seleccione un cantón --</option>
+                                    </select>
+                                    <span asp-validation-for="CantonId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="DistritoId" class="form-label">Distrito</label>
+                                    <select asp-for="DistritoId" id="distritoSelect" class="form-control" asp-items="@Model.Distritos">
+                                        <option value="">-- Seleccione un distrito --</option>
+                                    </select>
+                                    <span asp-validation-for="DistritoId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dirección Específica -->
+                        <div class="row">
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <label asp-for="DireccionExacta" class="form-label">Dirección Exacta</label>
+                                    <textarea asp-for="DireccionExacta" class="form-control" rows="3" 
+                                              placeholder="Ingrese la dirección exacta (señas específicas, nombre de calle, número de casa, etc.)"></textarea>
+                                    <span asp-validation-for="DireccionExacta" class="text-danger"></span>
+                                    <small class="form-text text-muted">
+                                        Ejemplo: Del semáforo de la iglesia 200m norte, casa #123, portón blanco
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label asp-for="CodigoPostal" class="form-label">Código Postal</label>
+                                    <input asp-for="CodigoPostal" class="form-control" placeholder="10101" />
+                                    <span asp-validation-for="CodigoPostal" class="text-danger"></span>
+                                    <small class="form-text text-muted">Código postal (opcional)</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información de ubicación -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>Información:</strong> Esta dirección se utilizará para correspondencia oficial, 
+                                    reportes administrativos y contacto en caso de emergencia. Asegúrese de que sea precisa y actualizada.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de navegación -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a asp-action="CreateStep2" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left"></i> Anterior
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        Continuar <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.progress {
+    border-radius: 10px;
+}
+
+.progress-bar {
+    border-radius: 10px;
+}
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            // Manejar cambio de provincia
+            $('#provinciaSelect').change(function() {
+                var provinciaId = $(this).val();
+                var cantonSelect = $('#cantonSelect');
+                var distritoSelect = $('#distritoSelect');
+                
+                // Limpiar cantones y distritos
+                cantonSelect.empty().append('<option value="">-- Seleccione un cantón --</option>');
+                distritoSelect.empty().append('<option value="">-- Seleccione un distrito --</option>');
+                
+                if (provinciaId) {
+                    // Cargar cantones
+                    $.get('@Url.Action("GetCantonesByProvincia")', { provinciaId: provinciaId })
+                        .done(function(data) {
+                            $.each(data, function(index, item) {
+                                cantonSelect.append('<option value="' + item.value + '">' + item.text + '</option>');
+                            });
+                        })
+                        .fail(function() {
+                            console.error('Error al cargar cantones');
+                        });
+                }
+            });
+
+            // Manejar cambio de cantón
+            $('#cantonSelect').change(function() {
+                var cantonId = $(this).val();
+                var distritoSelect = $('#distritoSelect');
+                
+                // Limpiar distritos
+                distritoSelect.empty().append('<option value="">-- Seleccione un distrito --</option>');
+                
+                if (cantonId) {
+                    // Cargar distritos
+                    $.get('@Url.Action("GetDistritosByCanton")', { cantonId: cantonId })
+                        .done(function(data) {
+                            $.each(data, function(index, item) {
+                                distritoSelect.append('<option value="' + item.value + '">' + item.text + '</option>');
+                            });
+                        })
+                        .fail(function() {
+                            console.error('Error al cargar distritos');
+                        });
+                }
+            });
+
+            // Trigger inicial para cargar datos si ya hay valores seleccionados
+            if ($('#provinciaSelect').val()) {
+                $('#provinciaSelect').trigger('change');
+            }
+        });
+    </script>
+}

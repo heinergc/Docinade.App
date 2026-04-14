@@ -1,0 +1,203 @@
+@model RubricasApp.Web.ViewModels.InstitucionEditViewModel
+
+@{
+    ViewData["Title"] = "Editar Institución";
+}
+
+<!-- Contenido Principal -->
+<main class="main-content fade-in">
+    <div class="container-fluid px-4">
+        <!-- Header de Página -->
+        <div class="page-header">
+            <h3 class="page-title-white">
+                <i class="fas fa-edit"></i>
+                Editar Institución: @Model.Nombre
+            </h3>
+        </div>
+
+        <!-- Mensajes de validación -->
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger alert-dismissible fade show">
+                <i class="fas fa-exclamation-circle"></i>
+                <strong>Por favor, corrija los siguientes errores:</strong>
+                <div asp-validation-summary="All" class="mt-2"></div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <!-- Formulario -->
+        <div class="card">
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="FechaCreacion" />
+
+                    <div class="row">
+                        <!-- Información Básica -->
+                        <div class="col-12">
+                            <h5 class="card-title mb-3">
+                                <i class="fas fa-info-circle text-primary"></i> Información Básica
+                            </h5>
+                        </div>
+
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label asp-for="Nombre" class="form-label">
+                                    <i class="fas fa-building"></i> <strong>Nombre de la Institución</strong>
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Nombre" class="form-control" />
+                                <span asp-validation-for="Nombre" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label asp-for="Siglas" class="form-label">
+                                    <i class="fas fa-tag"></i> Siglas
+                                </label>
+                                <input asp-for="Siglas" class="form-control" />
+                                <span asp-validation-for="Siglas" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="TipoInstitucion" class="form-label">
+                                    <i class="fas fa-graduation-cap"></i> <strong>Tipo de Institución</strong>
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="TipoInstitucion" asp-items="ViewBag.TiposInstitucion" class="form-select">
+                                    <option value="">-- Seleccione un tipo --</option>
+                                </select>
+                                <span asp-validation-for="TipoInstitucion" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="CodigoMEP" class="form-label">
+                                    <i class="fas fa-barcode"></i> Código MEP
+                                </label>
+                                <input asp-for="CodigoMEP" class="form-control" />
+                                <span asp-validation-for="CodigoMEP" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Ubicación MEP -->
+                        <div class="col-12 mt-4">
+                            <h5 class="card-title mb-3">
+                                <i class="fas fa-map-marker-alt text-success"></i> Ubicación Según MEP
+                            </h5>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="DireccionRegional" class="form-label">
+                                    <i class="fas fa-map"></i> Dirección Regional
+                                </label>
+                                <input asp-for="DireccionRegional" class="form-control" />
+                                <span asp-validation-for="DireccionRegional" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="CircuitoEscolar" class="form-label">
+                                    <i class="fas fa-network-wired"></i> Circuito Escolar
+                                </label>
+                                <input asp-for="CircuitoEscolar" class="form-control" />
+                                <span asp-validation-for="CircuitoEscolar" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Información de Contacto -->
+                        <div class="col-12 mt-4">
+                            <h5 class="card-title mb-3">
+                                <i class="fas fa-address-card text-info"></i> Información de Contacto
+                            </h5>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label asp-for="Telefono" class="form-label">
+                                    <i class="fas fa-phone"></i> Teléfono
+                                </label>
+                                <input asp-for="Telefono" class="form-control" />
+                                <span asp-validation-for="Telefono" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label asp-for="Email" class="form-label">
+                                    <i class="fas fa-envelope"></i> Correo Electrónico
+                                </label>
+                                <input asp-for="Email" class="form-control" type="email" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label asp-for="SitioWeb" class="form-label">
+                                    <i class="fas fa-globe"></i> Sitio Web
+                                </label>
+                                <input asp-for="SitioWeb" class="form-control" />
+                                <span asp-validation-for="SitioWeb" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label asp-for="Direccion" class="form-label">
+                                    <i class="fas fa-map-marker-alt"></i> Dirección Física
+                                </label>
+                                <textarea asp-for="Direccion" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="Direccion" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Estado y Fecha de Creación -->
+                        <div class="col-md-6 mt-3">
+                            <div class="form-check">
+                                <input asp-for="Estado" class="form-check-input" type="checkbox" />
+                                <label asp-for="Estado" class="form-check-label">
+                                    <i class="fas fa-check-circle text-success"></i> Institución Activa
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mt-3">
+                            <p class="text-muted">
+                                <i class="fas fa-calendar-alt"></i> 
+                                <strong>Creada el:</strong> @Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <hr />
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Guardar Cambios
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-info">
+                                <i class="fas fa-eye"></i> Ver Detalles
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,365 @@
+﻿@model IEnumerable<RubricasApp.Web.Models.Estudiante>
+
+@{
+    ViewData["Title"] = "Gestión de Estudiantes";
+}
+
+<!-- Contenido Principal -->
+<main class="main-content fade-in">
+    <div class="container-fluid px-4">
+        <!-- Header de Página Mejorado -->
+        <div class="page-header">
+            <h3 class="page-title-white">
+                <i class="fas fa-users"></i>
+                Gestión de Estudiantes
+            </h3>
+        </div>
+
+        <!-- Mensajes de alerta modernos -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert-modern success">
+                <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert-modern danger">
+                <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+            </div>
+        }
+        @if (TempData["WarningMessage"] != null)
+        {
+            <div class="alert-modern warning">
+                <i class="fas fa-exclamation-triangle"></i> @Html.Raw(TempData["WarningMessage"])
+            </div>
+        }
+
+        <!-- Botones de Acción Principales -->
+        <div class="modern-card">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <h5 class="mb-0">Acciones Principales</h5>
+                <div class="btn-group-responsive">
+                    <a asp-action="Create" class="btn-modern primary-dark">
+                        <i class="fas fa-plus"></i> Nuevo Estudiante
+                    </a>
+                    <a asp-action="ImportarExcel" class="btn-modern success-dark">
+                        <i class="fas fa-file-excel"></i> Importar Excel
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros Mejorados -->
+        <div class="filters-container">
+            <div class="filters-header">
+                <div class="filters-icon">
+                    <i class="fas fa-filter"></i>
+                </div>
+                <h5 class="mb-0">Filtros de Búsqueda</h5>
+            </div>
+            
+            <form method="get" asp-action="Index">
+                <div class="filters-grid">
+                    <div class="form-group">
+                        <label for="periodoId" class="form-label">Período Académico</label>
+                        <select name="periodoId" class="form-select">
+                            <option value="">Todos los períodos</option>
+                            @if (ViewBag.Periodos != null)
+                            {
+                                @foreach (var periodo in (IEnumerable<SelectListItem>)ViewBag.Periodos)
+                                {
+                                    @if (periodo.Value == ViewBag.PeriodoSeleccionado?.ToString())
+                                    {
+                                        <option value="@periodo.Value" selected>@periodo.Text</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@periodo.Value">@periodo.Text</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="año" class="form-label">Año</label>
+                        <select name="año" class="form-select">
+                            <option value="">Todos los años</option>
+                            @if (ViewBag.Años != null)
+                            {
+                                @foreach (var año in (IEnumerable<SelectListItem>)ViewBag.Años)
+                                {
+                                    @if (año.Value == ViewBag.AñoSeleccionado?.ToString())
+                                    {
+                                        <option value="@año.Value" selected>@año.Text</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@año.Value">@año.Text</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="filter-actions">
+                    <button type="submit" class="btn-modern primary">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                    <a asp-action="Index" class="btn-modern secondary">
+                        <i class="fas fa-times"></i> Limpiar
+                    </a>
+                </div>
+            </form>
+            
+            <!-- Información de resultados y eliminación por filtro -->
+            @if (Model.Any())
+            {
+                <div class="mt-4">
+                    <div class="alert-modern info">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <div>
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Estudiantes mostrados:</strong> @Model.Count()
+                                @if (ViewBag.PeriodoSeleccionado != null || ViewBag.AñoSeleccionado != null)
+                                {
+                                    <span class="text-muted">(filtrados)</span>
+                                }
+                            </div>
+                            <div>
+                                <button type="button" class="btn-modern warning" data-bs-toggle="modal" data-bs-target="#eliminarFiltroModal">
+                                    <i class="fas fa-trash"></i> Eliminar Mostrados
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Tabla Mejorada -->
+        <div class="table-container-fullwidth">
+            @if (Model.Any())
+            {
+                <div class="table-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-table me-2"></i>
+                        Lista de Estudiantes (@Model.Count())
+                    </h6>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Apellidos</th>
+                                <th>Número ID</th>
+                                <th>Correo</th>
+                                <th>Institución</th>
+                                <th>Adecuación</th>
+                                <th>Período</th>
+                                <th>Año</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>@item.Nombre</strong>
+                                        @if (item.RequiereACS)
+                                        {
+                                            <i class="fas fa-user-graduate text-warning ms-1" title="Estudiante con ACS"></i>
+                                        }
+                                    </td>
+                                    <td>@item.Apellidos</td>
+                                    <td>
+                                        <span class="badge-modern secondary">@item.NumeroId</span>
+                                    </td>
+                                    <td>
+                                        <a href="mailto:@item.DireccionCorreo" class="text-decoration-none">
+                                            @item.DireccionCorreo
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">@item.Institucion</small>
+                                    </td>
+                                    <td>
+                                        @{
+                                            var badgeClass = "secondary";
+                                            var iconClass = "fas fa-user";
+                                            var textoCorto = "N/A";
+                                            
+                                            switch (item.TipoAdecuacion)
+                                            {
+                                                case "Significativa":
+                                                    badgeClass = "warning";
+                                                    iconClass = "fas fa-user-graduate";
+                                                    textoCorto = "ACS";
+                                                    break;
+                                                case "NoSignificativa":
+                                                    badgeClass = "info";
+                                                    iconClass = "fas fa-user-check";
+                                                    textoCorto = "No Sig.";
+                                                    break;
+                                                case "Acceso":
+                                                    badgeClass = "secondary";
+                                                    iconClass = "fas fa-universal-access";
+                                                    textoCorto = "Acceso";
+                                                    break;
+                                                default:
+                                                    badgeClass = "light";
+                                                    iconClass = "fas fa-user";
+                                                    textoCorto = "Sin Adec.";
+                                                    break;
+                                            }
+                                        }
+                                        <span class="badge-modern @badgeClass" title="@item.TipoAdecuacion">
+                                            <i class="@iconClass"></i> @textoCorto
+                                        </span>
+                                        @if (!string.IsNullOrEmpty(item.DetallesACS))
+                                        {
+                                            <i class="fas fa-info-circle text-muted ms-1" title="@item.DetallesACS" data-bs-toggle="tooltip"></i>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (item.PeriodoAcademico != null)
+                                        {
+                                            <span class="badge-modern info">@item.PeriodoAcademico.Codigo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Sin período</span>
+                                        }
+                                    </td>
+                                    <td>@item.Anio</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="Details" asp-route-id="@item.IdEstudiante" class="btn btn-sm btn-outline-info" title="Ver detalles">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@item.IdEstudiante" class="btn btn-sm btn-outline-warning" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@item.IdEstudiante" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="table-empty">
+                    <div class="empty-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="empty-title">
+                        No hay estudiantes registrados
+                    </div>
+                    <div class="empty-description">
+                        Comienza agregando estudiantes manualmente o importando un archivo Excel con los datos de tus estudiantes.
+                    </div>
+                    <div class="empty-actions">
+                        <a asp-action="Create" class="btn-modern primary-dark">
+                            <i class="fas fa-plus"></i> Agregar Estudiante
+                        </a>
+                        <a asp-action="ImportarExcel" class="btn-modern success-dark">
+                            <i class="fas fa-file-excel"></i> Importar Excel
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (Model.Any())
+        {
+            <div class="modern-card">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle"></i> 
+                            Total de estudiantes: <strong>@Model.Count()</strong>
+                        </small>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <a asp-action="ImportarExcel" class="btn-modern success-dark">
+                            <i class="fas fa-file-excel"></i> Importar más estudiantes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</main>
+
+<!-- Modal de confirmación para eliminar estudiantes por filtro -->
+<div class="modal fade" id="eliminarFiltroModal" tabindex="-1" aria-labelledby="eliminarFiltroModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
+                <h5 class="modal-title" id="eliminarFiltroModalLabel">
+                    <i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert-modern warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>¡Atención!</strong> Esta acción no se puede deshacer.
+                </div>
+                <p>¿Está seguro de que desea eliminar <strong>@Model.Count() estudiante(s)</strong> mostrados actualmente?</p>
+                
+                @if (ViewBag.PeriodoSeleccionado != null || ViewBag.AñoSeleccionado != null)
+                {
+                    <div class="modern-card">
+                        <h6><i class="fas fa-filter"></i> Filtros aplicados:</h6>
+                        <ul class="mb-0">
+                            @if (ViewBag.PeriodoSeleccionado != null)
+                            {
+                                var periodo = ((IEnumerable<SelectListItem>)ViewBag.Periodos).FirstOrDefault(p => p.Value == ViewBag.PeriodoSeleccionado.ToString());
+                                <li><strong>Período:</strong> @periodo?.Text</li>
+                            }
+                            @if (ViewBag.AñoSeleccionado != null)
+                            {
+                                <li><strong>Año:</strong> @ViewBag.AñoSeleccionado</li>
+                            }
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert-modern info">
+                        <i class="fas fa-info-circle"></i>
+                        Se eliminarán <strong>TODOS</strong> los estudiantes (no hay filtros aplicados).
+                    </div>
+                }
+                
+                <p class="text-muted mt-3">
+                    <i class="fas fa-info-circle"></i>
+                    Los estudiantes que tengan evaluaciones asociadas no podrán ser eliminados.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-modern secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <form asp-action="EliminarPorFiltro" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="periodoId" value="@ViewBag.PeriodoSeleccionado" />
+                    <input type="hidden" name="año" value="@ViewBag.AñoSeleccionado" />
+                    <button type="submit" class="btn-modern danger">
+                        <i class="fas fa-trash"></i> Eliminar Estudiantes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,392 @@
+﻿@model RubricasApp.Web.Models.Estudiante
+
+@{
+    ViewData["Title"] = "Editar Estudiante";
+}
+
+<!-- Contenido Principal -->
+<main class="main-content fade-in">
+    <div class="container-fluid px-4">
+        <!-- Header de Página Mejorado -->
+        <div class="page-header">
+            <h3 class="page-title-white">
+                <i class="fas fa-edit"></i>
+                Editar Estudiante
+            </h3>
+        </div>
+
+        <!-- Mensajes de alerta modernos -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert-modern success">
+                <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert-modern danger">
+                <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Formulario Principal -->
+                <div class="modern-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user-edit"></i>
+                            Modificar Información del Estudiante
+                        </h5>
+                        <small class="text-muted">ID: @Model.IdEstudiante</small>
+                    </div>
+
+                    <form asp-action="Edit" method="post">
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div class="alert-modern danger">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <strong>Por favor, corrija los siguientes errores:</strong>
+                                <div asp-validation-summary="ModelOnly" class="mt-2"></div>
+                            </div>
+                        }
+                        
+                        <input type="hidden" asp-for="IdEstudiante" />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Nombre" class="form-label">
+                                        <i class="fas fa-user"></i> @Html.DisplayNameFor(m => m.Nombre)
+                                    </label>
+                                    <input asp-for="Nombre" class="form-control" placeholder="Ingrese el nombre del estudiante" />
+                                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Apellidos" class="form-label">
+                                        <i class="fas fa-user"></i> @Html.DisplayNameFor(m => m.Apellidos)
+                                    </label>
+                                    <input asp-for="Apellidos" class="form-control" placeholder="Ingrese los apellidos del estudiante" />
+                                    <span asp-validation-for="Apellidos" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="NumeroId" class="form-label">
+                                        <i class="fas fa-id-card"></i> @Html.DisplayNameFor(m => m.NumeroId)
+                                    </label>
+                                    <input asp-for="NumeroId" class="form-control" placeholder="Ej: 0208390339" />
+                                    <span asp-validation-for="NumeroId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="DireccionCorreo" class="form-label">
+                                        <i class="fas fa-envelope"></i> @Html.DisplayNameFor(m => m.DireccionCorreo)
+                                    </label>
+                                    <input asp-for="DireccionCorreo" type="email" class="form-control" placeholder="usuario@email.com" />
+                                    <span asp-validation-for="DireccionCorreo" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Institucion" class="form-label">
+                                <i class="fas fa-building"></i> @Html.DisplayNameFor(m => m.Institucion)
+                            </label>
+                            <input asp-for="Institucion" class="form-control" placeholder="Ej: PALMARES (06)" />
+                            <span asp-validation-for="Institucion" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Grupos" class="form-label">
+                                <i class="fas fa-users"></i> @Html.DisplayNameFor(m => m.Grupos)
+                            </label>
+                            <input asp-for="Grupos" class="form-control" placeholder="Información de grupos" />
+                            <span asp-validation-for="Grupos" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Anio" class="form-label">
+                                        <i class="fas fa-calendar"></i> @Html.DisplayNameFor(m => m.Anio)
+                                    </label>
+                                    <input asp-for="Anio" type="number" class="form-control" min="2020" max="2035" />
+                                    <span asp-validation-for="Anio" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    <label asp-for="PeriodoAcademicoId" class="form-label">
+                                        <i class="fas fa-calendar-check"></i> @Html.DisplayNameFor(m => m.PeriodoAcademico)
+                                    </label>
+                                    <select asp-for="PeriodoAcademicoId" class="form-select" asp-items="ViewBag.PeriodosAcademicos">
+                                        <option value="">Seleccionar período académico</option>
+                                    </select>
+                                    <span asp-validation-for="PeriodoAcademicoId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-toggle-on"></i> Estado
+                                    </label>
+                                    <div class="form-check form-switch" style="padding-top: 8px;">
+                                        <input asp-for="EstaActivo" class="form-check-input" type="checkbox" id="estadoCheckbox" />
+                                        <label class="form-check-label" for="estadoCheckbox" id="estadoLabel">
+                                            @(Model.Estado == 1 ? "Activo" : "Inactivo")
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted d-block">
+                                        <i class="fas fa-info-circle"></i> Acceso al sistema
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECCIÓN ACS: Adecuación Curricular Significativa -->
+                        <div class="modern-card bg-light mt-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-user-graduate text-warning me-2" style="font-size: 1.5rem;"></i>
+                                <h5 class="mb-0">Adecuación Curricular</h5>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="TipoAdecuacion" class="form-label">
+                                            <i class="fas fa-clipboard-check"></i> Tipo de Adecuación
+                                        </label>
+                                        <select asp-for="TipoAdecuacion" class="form-select" id="tipoAdecuacion">
+                                            <option value="NoPresenta">No presenta</option>
+                                            <option value="Acceso">Adecuación de Acceso</option>
+                                            <option value="NoSignificativa">Adecuación No Significativa</option>
+                                            <option value="Significativa">Adecuación Curricular Significativa (ACS)</option>
+                                        </select>
+                                        <span asp-validation-for="TipoAdecuacion" class="text-danger"></span>
+                                        <small class="form-text text-muted">
+                                            <i class="fas fa-info-circle"></i> Según lineamientos MEP
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="DetallesACS" class="form-label">
+                                            <i class="fas fa-notes-medical"></i> Detalles / Observaciones
+                                        </label>
+                                        <textarea asp-for="DetallesACS" class="form-control" rows="3" 
+                                                  placeholder="Descripción de las necesidades específicas del estudiante"></textarea>
+                                        <span asp-validation-for="DetallesACS" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Panel de opciones ACS (se muestra solo si es Significativa) -->
+                            <div id="acsOptions" style="display:none;" class="mt-3">
+                                <div class="alert alert-warning">
+                                    <div class="d-flex align-items-start">
+                                        <i class="fas fa-exclamation-triangle me-3" style="font-size: 1.5rem;"></i>
+                                        <div>
+                                            <h6 class="alert-heading">Estudiante con ACS</h6>
+                                            <p class="mb-2">Este estudiante será evaluado en <strong>secciones separadas</strong> en el Cuaderno Calificador.</p>
+                                            <ul class="mb-0">
+                                                <li>Permitirá configurar rúbricas adaptadas</li>
+                                                <li>Ponderaciones personalizadas por instrumento</li>
+                                                <li>Exención de instrumentos específicos</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @if (ViewBag.EsPrimerPeriodo == false)
+                                {
+                                    <div class="form-check">
+                                        <input asp-for="AplicarACSPeriodosAnteriores" class="form-check-input" type="checkbox" 
+                                               id="aplicarRetroactivo" />
+                                        <label class="form-check-label" for="aplicarRetroactivo">
+                                            <strong>Aplicar también a períodos anteriores</strong>
+                                        </label>
+                                        <small class="form-text text-muted d-block ms-4">
+                                            <i class="fas fa-clock"></i> Se aplicará la configuración ACS retroactivamente
+                                        </small>
+                                    </div>
+                                }
+
+                                <div class="mt-3">
+                                    <a href="#" class="btn btn-sm btn-outline-primary" id="btnConfigDetallada">
+                                        <i class="fas fa-cog"></i> Configuración Detallada por Instrumento
+                                    </a>
+                                    <small class="text-muted ms-2">
+                                        (Disponible después de guardar)
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- Aviso si cambia de ACS a otro tipo -->
+                            <div id="acsWarning" style="display:none;" class="alert alert-danger mt-3">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-exclamation-circle me-3" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <h6 class="alert-heading">ADVERTENCIA: Cambio de Tipo de Adecuación</h6>
+                                        <p class="mb-0">
+                                            Al cambiar de <strong>ACS</strong> a otro tipo, se <strong>eliminarán todas las configuraciones personalizadas</strong> 
+                                            (rúbricas adaptadas, ponderaciones, exenciones).
+                                            <br><br>
+                                            <strong>Recomendación:</strong> Descargue un reporte del estudiante antes de realizar este cambio.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-4">
+                            <div class="btn-group-responsive">
+                                <button type="submit" class="btn-modern warning">
+                                    <i class="fas fa-save"></i> Actualizar Cambios
+                                </button>
+                                <a asp-action="Details" asp-route-id="@Model.IdEstudiante" class="btn-modern info">
+                                    <i class="fas fa-eye"></i> Ver Detalles
+                                </a>
+                                <a asp-action="Index" class="btn-modern secondary">
+                                    <i class="fas fa-arrow-left"></i> Cancelar
+                                </a>
+                            </div>
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i>
+                                Última modificación: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+                            </small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Card de Información -->
+                <div class="modern-card">
+                    <h5 class="mb-3">
+                        <i class="fas fa-info-circle"></i>
+                        Información del Estudiante
+                    </h5>
+                    
+                    <div class="alert-modern info">
+                        <i class="fas fa-user-graduate"></i>
+                        <strong>Estudiante:</strong> @Model.NombreCompleto
+                    </div>
+
+                    @if (Model.PeriodoAcademico != null)
+                    {
+                        <div class="alert-modern success">
+                            <i class="fas fa-calendar-check"></i>
+                            <strong>Período Actual:</strong><br>
+                            @Model.PeriodoAcademico.Nombre (@Model.PeriodoAcademico.Codigo)
+                        </div>
+                    }
+
+                    @if (Model.Evaluaciones != null && Model.Evaluaciones.Any())
+                    {
+                        <div class="alert-modern warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Atención:</strong> Este estudiante tiene @Model.Evaluaciones.Count() evaluación(es) registrada(s).
+                            Los cambios importantes pueden afectar los reportes existentes.
+                        </div>
+                    }
+                </div>
+
+                <!-- Card de Acciones Adicionales -->
+                <div class="modern-card">
+                    <h5 class="mb-3">
+                        <i class="fas fa-tools"></i>
+                        Acciones Adicionales
+                    </h5>
+                    
+                    <div class="d-grid gap-2">
+                        <a asp-action="Details" asp-route-id="@Model.IdEstudiante" class="btn-modern info">
+                            <i class="fas fa-eye"></i> Ver Detalles Completos
+                        </a>
+                        
+                        <a asp-controller="Evaluaciones" asp-action="Create" asp-route-estudianteId="@Model.IdEstudiante" 
+                           class="btn-modern primary">
+                            <i class="fas fa-plus"></i> Nueva Evaluación
+                        </a>
+                        
+                        <hr class="my-3">
+                        
+                        <a asp-action="Delete" asp-route-id="@Model.IdEstudiante" class="btn-modern danger">
+                            <i class="fas fa-trash"></i> Eliminar Estudiante
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Manejador del checkbox de estado
+            $('#estadoCheckbox').on('change', function() {
+                const estadoLabel = $('#estadoLabel');
+                if ($(this).is(':checked')) {
+                    estadoLabel.text('Activo').removeClass('text-danger').addClass('text-success');
+                } else {
+                    estadoLabel.text('Inactivo').removeClass('text-success').addClass('text-danger');
+                }
+            });
+            
+            // Set initial color based on state
+            const estadoLabel = $('#estadoLabel');
+            if ($('#estadoCheckbox').is(':checked')) {
+                estadoLabel.addClass('text-success');
+            } else {
+                estadoLabel.addClass('text-danger');
+            }
+
+            // LÓGICA ACS: Manejar cambios en tipo de adecuación
+            const tipoAdecuacionOriginal = $('#tipoAdecuacion').val();
+            
+            function actualizarVisibilidadACS() {
+                const tipoSeleccionado = $('#tipoAdecuacion').val();
+                const acsOptions = $('#acsOptions');
+                const acsWarning = $('#acsWarning');
+                
+                // Mostrar opciones si es Significativa
+                if (tipoSeleccionado === 'Significativa') {
+                    acsOptions.slideDown(300);
+                } else {
+                    acsOptions.slideUp(300);
+                }
+                
+                // Mostrar advertencia si cambia DE Significativa A otro tipo
+                if (tipoAdecuacionOriginal === 'Significativa' && tipoSeleccionado !== 'Significativa') {
+                    acsWarning.slideDown(300);
+                } else {
+                    acsWarning.slideUp(300);
+                }
+            }
+            
+            // Ejecutar al cargar
+            actualizarVisibilidadACS();
+            
+            // Ejecutar al cambiar
+            $('#tipoAdecuacion').on('change', actualizarVisibilidadACS);
+            
+            // Botón de configuración detallada
+            $('#btnConfigDetallada').on('click', function(e) {
+                e.preventDefault();
+                const estudianteId = '@Model.IdEstudiante';
+                // TODO: Implementar modal o redirección a página de configuración ACS
+                alert('Funcionalidad de configuración detallada estará disponible después de guardar los cambios.');
+            });
+        });
+    </script>
+}

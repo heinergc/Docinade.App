@@ -1,0 +1,862 @@
+@model RubricasApp.Web.ViewModels.ProfesorViewModel
+@{
+    ViewData["Title"] = "Nuevo Profesor - Información Académica";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Header con progreso -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h1 class="h4 mb-0 text-gray-800">
+                                <i class="fas fa-user-plus"></i> Nuevo Profesor: @Model.NombreCompleto
+                            </h1>
+                            <p class="mb-0 text-muted">Paso 4 de 6: Información Académica</p>
+                        </div>
+                        <div>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver a Lista
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Barra de progreso -->
+                    <div class="progress mb-3" style="height: 8px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 66.67%" aria-valuenow="66.67" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    
+                    <!-- Indicadores de pasos -->
+                    <div class="row text-center small">
+                        <div class="col-2">
+                            <a href="@Url.Action("CreateStep1", "Profesores")" class="text-decoration-none text-success step-link" title="Ver información personal">
+                                <i class="fas fa-check-circle"></i><br>Personal
+                            </a>
+                        </div>
+                        <div class="col-2">
+                            <a href="@Url.Action("CreateStep2", "Profesores")" class="text-decoration-none text-success step-link" title="Ver información de contacto">
+                                <i class="fas fa-check-circle"></i><br>Contacto
+                            </a>
+                        </div>
+                        <div class="col-2">
+                            <a href="@Url.Action("CreateStep3", "Profesores")" class="text-decoration-none text-success step-link" title="Ver información de dirección">
+                                <i class="fas fa-check-circle"></i><br>Dirección
+                            </a>
+                        </div>
+                        <div class="col-2">
+                            <div class="text-primary font-weight-bold">
+                                <i class="fas fa-graduation-cap"></i><br>Académica
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <a href="@Url.Action("CreateStep5", "Profesores")" class="text-decoration-none text-muted step-link" title="Ver experiencia laboral">
+                                <i class="fas fa-briefcase"></i><br>Laboral
+                            </a>
+                        </div>
+                        <div class="col-2">
+                            <a href="@Url.Action("CreateStep6", "Profesores")" class="text-decoration-none text-muted step-link" title="Ver resumen y confirmación">
+                                <i class="fas fa-check-circle"></i><br>Final
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-graduation-cap"></i> Información Académica
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateStep4" method="post" novalidate>
+                        @if (ViewBag.FromEdit != null && ViewBag.FromEdit)
+                        {
+                            <input type="hidden" name="FromEdit" value="true" />
+                            <input type="hidden" name="ProfesorId" value="@ViewBag.ProfesorId" />
+                        }
+                        
+                        <!-- Lista de Formaciones Académicas -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-list"></i> Formaciones Académicas Registradas
+                                    </h5>
+                                    <button type="button" class="btn btn-success" onclick="mostrarModalFormacion()">
+                                        <i class="fas fa-plus"></i> Agregar Formación
+                                    </button>
+                                </div>
+                                
+                                <div id="listaFormaciones" class="table-responsive">
+                                    @if (Model.FormacionAcademica != null && Model.FormacionAcademica.Any())
+                                    {
+                                        <table class="table table-bordered table-hover">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Tipo</th>
+                                                    <th>Título</th>
+                                                    <th>Institución</th>
+                                                    <th>País</th>
+                                                    <th>Año</th>
+                                                    <th>Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @for (int i = 0; i < Model.FormacionAcademica.Count; i++)
+                                                {
+                                                    <tr>
+                                                        <td>@Model.FormacionAcademica[i].TipoFormacion</td>
+                                                        <td>@Model.FormacionAcademica[i].TituloObtenido</td>
+                                                        <td>@Model.FormacionAcademica[i].InstitucionEducativa</td>
+                                                        <td>@Model.FormacionAcademica[i].PaisInstitucion</td>
+                                                        <td>
+                                                            @if (Model.FormacionAcademica[i].EnCurso)
+                                                            {
+                                                                <span class="badge badge-info">En Curso</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                @Model.FormacionAcademica[i].AnioFinalizacion
+                                                            }
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-sm btn-danger" 
+                                                                    onclick="eliminarFormacion(@i)">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    
+                                                    @* Hidden inputs para enviar los datos *@
+                                                    <input type="hidden" name="FormacionAcademica[@i].TipoFormacion" value="@Model.FormacionAcademica[i].TipoFormacion" />
+                                                    <input type="hidden" name="FormacionAcademica[@i].TituloObtenido" value="@Model.FormacionAcademica[i].TituloObtenido" />
+                                                    <input type="hidden" name="FormacionAcademica[@i].InstitucionEducativa" value="@Model.FormacionAcademica[i].InstitucionEducativa" />
+                                                    <input type="hidden" name="FormacionAcademica[@i].PaisInstitucion" value="@Model.FormacionAcademica[i].PaisInstitucion" />
+                                                    <input type="hidden" name="FormacionAcademica[@i].AnioInicio" value="@Model.FormacionAcademica[i].AnioInicio" />
+                                                    <input type="hidden" name="FormacionAcademica[@i].AnioFinalizacion" value="@Model.FormacionAcademica[i].AnioFinalizacion" />
+                                                    <input type="hidden" name="FormacionAcademica[@i].EnCurso" value="@Model.FormacionAcademica[i].EnCurso" />
+                                                    <input type="hidden" name="FormacionAcademica[@i].PromedioGeneral" value="@Model.FormacionAcademica[i].PromedioGeneral" />
+                                                    <input type="hidden" name="FormacionAcademica[@i].EsTituloReconocidoCONARE" value="@Model.FormacionAcademica[i].EsTituloReconocidoCONARE" />
+                                                    <input type="hidden" name="FormacionAcademica[@i].NumeroReconocimiento" value="@Model.FormacionAcademica[i].NumeroReconocimiento" />
+                                                }
+                                            </tbody>
+                                        </table>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-warning">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            No hay formaciones académicas registradas. Haga clic en "Agregar Formación" para añadir una.
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información adicional académica -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>Nota:</strong> El último título agregado se establecerá como el título principal del profesor 
+                                    en los campos: Grado Académico, Título Académico, Institución de Graduación, País y Año de Graduación.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección de Capacitaciones y Desarrollo Profesional -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card border-primary">
+                                    <div class="card-header bg-primary text-white">
+                                        <h6 class="m-0">
+                                            <i class="fas fa-certificate"></i> Capacitaciones y Desarrollo Profesional
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h6 class="mb-0">
+                                                <i class="fas fa-list"></i> Capacitaciones Registradas
+                                            </h6>
+                                            <button type="button" class="btn btn-success btn-sm" onclick="mostrarModalCapacitacion()">
+                                                <i class="fas fa-plus"></i> Agregar Capacitación
+                                            </button>
+                                        </div>
+                                        
+                                        <div id="listaCapacitaciones">
+                                            @if (Model.Capacitaciones != null && Model.Capacitaciones.Any())
+                                            {
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered table-sm">
+                                                        <thead class="thead-light">
+                                                            <tr>
+                                                                <th>Nombre</th>
+                                                                <th>Institución</th>
+                                                                <th>Tipo</th>
+                                                                <th>Horas</th>
+                                                                <th>Certificado</th>
+                                                                <th>Acciones</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @for (int i = 0; i < Model.Capacitaciones.Count; i++)
+                                                            {
+                                                                <tr>
+                                                                    <td>@Model.Capacitaciones[i].NombreCapacitacion</td>
+                                                                    <td>@Model.Capacitaciones[i].InstitucionOrganizadora</td>
+                                                                    <td>@Model.Capacitaciones[i].TipoCapacitacion</td>
+                                                                    <td>@Model.Capacitaciones[i].HorasCapacitacion</td>
+                                                                    <td>
+                                                                        @if (Model.Capacitaciones[i].CertificadoObtenido)
+                                                                        {
+                                                                            <span class="badge badge-success">Sí</span>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <span class="badge badge-secondary">No</span>
+                                                                        }
+                                                                    </td>
+                                                                    <td>
+                                                                        <button type="button" class="btn btn-sm btn-danger" 
+                                                                                onclick="eliminarCapacitacion(@i)">
+                                                                            <i class="fas fa-trash"></i>
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                
+                                                                @* Hidden inputs para enviar los datos *@
+                                                                <input type="hidden" name="Capacitaciones[@i].NombreCapacitacion" value="@Model.Capacitaciones[i].NombreCapacitacion" />
+                                                                <input type="hidden" name="Capacitaciones[@i].InstitucionOrganizadora" value="@Model.Capacitaciones[i].InstitucionOrganizadora" />
+                                                                <input type="hidden" name="Capacitaciones[@i].TipoCapacitacion" value="@Model.Capacitaciones[i].TipoCapacitacion" />
+                                                                <input type="hidden" name="Capacitaciones[@i].Modalidad" value="@Model.Capacitaciones[i].Modalidad" />
+                                                                <input type="hidden" name="Capacitaciones[@i].FechaInicio" value="@Model.Capacitaciones[i].FechaInicio?.ToString("yyyy-MM-dd")" />
+                                                                <input type="hidden" name="Capacitaciones[@i].FechaFin" value="@Model.Capacitaciones[i].FechaFin?.ToString("yyyy-MM-dd")" />
+                                                                <input type="hidden" name="Capacitaciones[@i].HorasCapacitacion" value="@Model.Capacitaciones[i].HorasCapacitacion" />
+                                                                <input type="hidden" name="Capacitaciones[@i].CertificadoObtenido" value="@Model.Capacitaciones[i].CertificadoObtenido" />
+                                                                <input type="hidden" name="Capacitaciones[@i].CalificacionObtenida" value="@Model.Capacitaciones[i].CalificacionObtenida" />
+                                                                <input type="hidden" name="Capacitaciones[@i].AreaConocimiento" value="@Model.Capacitaciones[i].AreaConocimiento" />
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="alert alert-info">
+                                                    <i class="fas fa-info-circle"></i>
+                                                    No hay capacitaciones registradas. Las capacitaciones son <strong>opcionales</strong>, 
+                                                    pero ayudan a documentar el desarrollo profesional continuo.
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ejemplos de títulos comunes -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i class="fas fa-lightbulb text-warning"></i> Ejemplos de títulos académicos:
+                                        </h6>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <small>
+                                                    <strong>Ingeniería:</strong><br>
+                                                    • Ingeniería de Sistemas<br>
+                                                    • Ingeniería Industrial<br>
+                                                    • Ingeniería Civil<br>
+                                                </small>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <small>
+                                                    <strong>Educación:</strong><br>
+                                                    • Educación Primaria<br>
+                                                    • Educación Secundaria<br>
+                                                    • Administración Educativa<br>
+                                                </small>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <small>
+                                                    <strong>Otros campos:</strong><br>
+                                                    • Administración de Empresas<br>
+                                                    • Contaduría Pública<br>
+                                                    • Psicología<br>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de navegación -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a asp-action="CreateStep3" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left"></i> Anterior
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        Continuar <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para agregar Capacitación -->
+<div class="modal fade" id="modalCapacitacion" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-certificate"></i> Agregar Capacitación o Desarrollo Profesional
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formCapacitacion">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Nombre de la Capacitación *</label>
+                                <input type="text" id="nombreCapacitacion" class="form-control" 
+                                       placeholder="Ej: Metodologías Ágiles en Educación" required />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label>Institución Organizadora</label>
+                                <input type="text" id="institucionOrganizadora" class="form-control" 
+                                       placeholder="Ej: Universidad de Costa Rica" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Horas</label>
+                                <input type="number" id="horasCapacitacion" class="form-control" 
+                                       min="0" max="1000" placeholder="Horas" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Tipo de Capacitación</label>
+                                <select id="tipoCapacitacion" class="form-control">
+                                    <option value="">-- Seleccione --</option>
+                                    <option value="Curso">Curso</option>
+                                    <option value="Taller">Taller</option>
+                                    <option value="Seminario">Seminario</option>
+                                    <option value="Congreso">Congreso</option>
+                                    <option value="Diplomado">Diplomado</option>
+                                    <option value="Certificación">Certificación</option>
+                                    <option value="Webinar">Webinar</option>
+                                    <option value="Conferencia">Conferencia</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Modalidad</label>
+                                <select id="modalidad" class="form-control">
+                                    <option value="">-- Seleccione --</option>
+                                    <option value="Presencial">Presencial</option>
+                                    <option value="Virtual">Virtual</option>
+                                    <option value="Híbrida">Híbrida</option>
+                                    <option value="Autoaprendizaje">Autoaprendizaje</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Fecha Inicio</label>
+                                <input type="date" id="fechaInicio" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Fecha Fin</label>
+                                <input type="date" id="fechaFin" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Área de Conocimiento</label>
+                                <input type="text" id="areaConocimiento" class="form-control" 
+                                       placeholder="Ej: Tecnologías Educativas" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Calificación Obtenida</label>
+                                <input type="number" id="calificacionObtenida" class="form-control" 
+                                       min="0" max="100" step="0.01" placeholder="Ej: 95.5" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="certificadoObtenido">
+                                    <label class="custom-control-label" for="certificadoObtenido">
+                                        Se obtuvo certificado
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="agregarCapacitacion()">
+                    <i class="fas fa-plus"></i> Agregar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para agregar Formación Académica -->
+<div class="modal fade" id="modalFormacion" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-graduation-cap"></i> Agregar Formación Académica
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formFormacion">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Tipo de Formación *</label>
+                                <select id="tipoFormacion" class="form-control" required>
+                                    <option value="">-- Seleccione --</option>
+                                    <option value="Bachillerato">Bachillerato</option>
+                                    <option value="Licenciatura">Licenciatura</option>
+                                    <option value="Maestría">Maestría</option>
+                                    <option value="Doctorado">Doctorado</option>
+                                    <option value="Especialización">Especialización</option>
+                                    <option value="Post-Doctorado">Post-Doctorado</option>
+                                    <option value="Técnico">Técnico</option>
+                                    <option value="Diplomado">Diplomado</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Título Obtenido *</label>
+                                <input type="text" id="tituloObtenido" class="form-control" 
+                                       placeholder="Ej: Licenciatura en Ingeniería de Sistemas" required />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label>Institución Educativa *</label>
+                                <input type="text" id="institucionEducativa" class="form-control" 
+                                       placeholder="Ej: Universidad de Costa Rica" required />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>País *</label>
+                                <select id="paisInstitucion" class="form-control" required>
+                                    <option value="Costa Rica" selected>Costa Rica</option>
+                                    <option value="Estados Unidos">Estados Unidos</option>
+                                    <option value="Canadá">Canadá</option>
+                                    <option value="España">España</option>
+                                    <option value="México">México</option>
+                                    <option value="Colombia">Colombia</option>
+                                    <option value="Argentina">Argentina</option>
+                                    <option value="Chile">Chile</option>
+                                    <option value="Alemania">Alemania</option>
+                                    <option value="Francia">Francia</option>
+                                    <option value="Reino Unido">Reino Unido</option>
+                                    <option value="Australia">Australia</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Año Inicio</label>
+                                <input type="number" id="anioInicio" class="form-control" 
+                                       min="1950" max="@DateTime.Now.Year" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Año Finalización</label>
+                                <input type="number" id="anioFinalizacion" class="form-control" 
+                                       min="1950" max="@DateTime.Now.Year" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>&nbsp;</label>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="enCurso">
+                                    <label class="custom-control-label" for="enCurso">En Curso</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Promedio General</label>
+                                <input type="number" id="promedioGeneral" class="form-control" 
+                                       min="0" max="100" step="0.01" placeholder="Ej: 85.50" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>&nbsp;</label>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="esTituloReconocido" checked>
+                                    <label class="custom-control-label" for="esTituloReconocido">
+                                        Título Reconocido por CONARE
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Número de Reconocimiento</label>
+                                <input type="text" id="numeroReconocimiento" class="form-control" 
+                                       placeholder="Número de reconocimiento CONARE (si aplica)" />
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="agregarFormacion()">
+                    <i class="fas fa-plus"></i> Agregar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.progress {
+    border-radius: 10px;
+}
+
+.progress-bar {
+    border-radius: 10px;
+}
+
+.card.bg-light {
+    border: 1px solid #e3e6f0;
+}
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        let formaciones = @Html.Raw(Json.Serialize(Model.FormacionAcademica ?? new List<RubricasApp.Web.ViewModels.ProfesorFormacionAcademicaDto>()));
+        let capacitaciones = @Html.Raw(Json.Serialize(Model.Capacitaciones ?? new List<RubricasApp.Web.ViewModels.ProfesorCapacitacionDto>()));
+
+        // ===== FUNCIONES PARA FORMACIONES ACADÉMICAS =====
+        function mostrarModalFormacion() {
+            $('#modalFormacion').modal('show');
+        }
+
+        function agregarFormacion() {
+            // Validar campos requeridos
+            if (!$('#tipoFormacion').val() || !$('#tituloObtenido').val() || !$('#institucionEducativa').val()) {
+                alert('Por favor complete los campos obligatorios marcados con *');
+                return;
+            }
+
+            const formacion = {
+                TipoFormacion: $('#tipoFormacion').val(),
+                TituloObtenido: $('#tituloObtenido').val(),
+                InstitucionEducativa: $('#institucionEducativa').val(),
+                PaisInstitucion: $('#paisInstitucion').val(),
+                AnioInicio: $('#anioInicio').val() ? parseInt($('#anioInicio').val()) : null,
+                AnioFinalizacion: $('#anioFinalizacion').val() ? parseInt($('#anioFinalizacion').val()) : null,
+                EnCurso: $('#enCurso').is(':checked'),
+                PromedioGeneral: $('#promedioGeneral').val() ? parseFloat($('#promedioGeneral').val()) : null,
+                EsTituloReconocidoCONARE: $('#esTituloReconocido').is(':checked'),
+                NumeroReconocimiento: $('#numeroReconocimiento').val()
+            };
+
+            formaciones.push(formacion);
+            actualizarListaFormaciones();
+            
+            // Limpiar formulario
+            $('#formFormacion')[0].reset();
+            $('#paisInstitucion').val('Costa Rica');
+            $('#esTituloReconocido').prop('checked', true);
+            
+            $('#modalFormacion').modal('hide');
+        }
+
+        function eliminarFormacion(index) {
+            if (confirm('¿Está seguro de eliminar esta formación académica?')) {
+                formaciones.splice(index, 1);
+                actualizarListaFormaciones();
+            }
+        }
+
+        function actualizarListaFormaciones() {
+            const container = $('#listaFormaciones');
+            
+            if (formaciones.length === 0) {
+                container.html(`
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        No hay formaciones académicas registradas. Haga clic en "Agregar Formación" para añadir una.
+                    </div>
+                `);
+                return;
+            }
+
+            let html = `
+                <table class="table table-bordered table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Título</th>
+                            <th>Institución</th>
+                            <th>País</th>
+                            <th>Año</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            formaciones.forEach((formacion, index) => {
+                html += `
+                    <tr>
+                        <td>${formacion.TipoFormacion}</td>
+                        <td>${formacion.TituloObtenido}</td>
+                        <td>${formacion.InstitucionEducativa}</td>
+                        <td>${formacion.PaisInstitucion}</td>
+                        <td>${formacion.EnCurso ? '<span class="badge badge-info">En Curso</span>' : formacion.AnioFinalizacion}</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="eliminarFormacion(${index})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+                
+                // Agregar campos hidden para cada formación
+                html += `
+                    <input type="hidden" name="FormacionAcademica[${index}].TipoFormacion" value="${formacion.TipoFormacion}" />
+                    <input type="hidden" name="FormacionAcademica[${index}].TituloObtenido" value="${formacion.TituloObtenido}" />
+                    <input type="hidden" name="FormacionAcademica[${index}].InstitucionEducativa" value="${formacion.InstitucionEducativa}" />
+                    <input type="hidden" name="FormacionAcademica[${index}].PaisInstitucion" value="${formacion.PaisInstitucion}" />
+                    <input type="hidden" name="FormacionAcademica[${index}].AnioInicio" value="${formacion.AnioInicio || ''}" />
+                    <input type="hidden" name="FormacionAcademica[${index}].AnioFinalizacion" value="${formacion.AnioFinalizacion || ''}" />
+                    <input type="hidden" name="FormacionAcademica[${index}].EnCurso" value="${formacion.EnCurso}" />
+                    <input type="hidden" name="FormacionAcademica[${index}].PromedioGeneral" value="${formacion.PromedioGeneral || ''}" />
+                    <input type="hidden" name="FormacionAcademica[${index}].EsTituloReconocidoCONARE" value="${formacion.EsTituloReconocidoCONARE}" />
+                    <input type="hidden" name="FormacionAcademica[${index}].NumeroReconocimiento" value="${formacion.NumeroReconocimiento || ''}" />`;
+            });
+
+            html += `
+                    </tbody>
+                </table>`;
+
+            container.html(html);
+        }
+
+        // ===== FUNCIONES PARA CAPACITACIONES =====
+        function mostrarModalCapacitacion() {
+            $('#modalCapacitacion').modal('show');
+            // Limpiar formulario
+            $('#formCapacitacion')[0].reset();
+        }
+
+        function agregarCapacitacion() {
+            // Validar campo requerido
+            if (!$('#nombreCapacitacion').val()) {
+                alert('Por favor ingrese el nombre de la capacitación');
+                return;
+            }
+
+            const capacitacion = {
+                NombreCapacitacion: $('#nombreCapacitacion').val(),
+                InstitucionOrganizadora: $('#institucionOrganizadora').val(),
+                TipoCapacitacion: $('#tipoCapacitacion').val(),
+                Modalidad: $('#modalidad').val(),
+                FechaInicio: $('#fechaInicio').val() ? $('#fechaInicio').val() : null,
+                FechaFin: $('#fechaFin').val() ? $('#fechaFin').val() : null,
+                HorasCapacitacion: $('#horasCapacitacion').val() ? parseInt($('#horasCapacitacion').val()) : null,
+                CertificadoObtenido: $('#certificadoObtenido').is(':checked'),
+                CalificacionObtenida: $('#calificacionObtenida').val() ? parseFloat($('#calificacionObtenida').val()) : null,
+                AreaConocimiento: $('#areaConocimiento').val()
+            };
+
+            capacitaciones.push(capacitacion);
+            actualizarListaCapacitaciones();
+            
+            $('#modalCapacitacion').modal('hide');
+        }
+
+        function eliminarCapacitacion(index) {
+            if (confirm('¿Está seguro de eliminar esta capacitación?')) {
+                capacitaciones.splice(index, 1);
+                actualizarListaCapacitaciones();
+            }
+        }
+
+        function actualizarListaCapacitaciones() {
+            const container = $('#listaCapacitaciones');
+            
+            if (capacitaciones.length === 0) {
+                container.html(`
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        No hay capacitaciones registradas. Las capacitaciones son <strong>opcionales</strong>, 
+                        pero ayudan a documentar el desarrollo profesional continuo.
+                    </div>
+                `);
+                return;
+            }
+
+            let html = `
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Institución</th>
+                                <th>Tipo</th>
+                                <th>Horas</th>
+                                <th>Certificado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+            capacitaciones.forEach((cap, index) => {
+                html += `
+                    <tr>
+                        <td>${cap.NombreCapacitacion}</td>
+                        <td>${cap.InstitucionOrganizadora || '-'}</td>
+                        <td>${cap.TipoCapacitacion || '-'}</td>
+                        <td>${cap.HorasCapacitacion || '-'}</td>
+                        <td>${cap.CertificadoObtenido ? '<span class="badge badge-success">Sí</span>' : '<span class="badge badge-secondary">No</span>'}</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="eliminarCapacitacion(${index})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+                
+                // Agregar campos hidden para cada capacitación
+                html += `
+                    <input type="hidden" name="Capacitaciones[${index}].NombreCapacitacion" value="${cap.NombreCapacitacion}" />
+                    <input type="hidden" name="Capacitaciones[${index}].InstitucionOrganizadora" value="${cap.InstitucionOrganizadora || ''}" />
+                    <input type="hidden" name="Capacitaciones[${index}].TipoCapacitacion" value="${cap.TipoCapacitacion || ''}" />
+                    <input type="hidden" name="Capacitaciones[${index}].Modalidad" value="${cap.Modalidad || ''}" />
+                    <input type="hidden" name="Capacitaciones[${index}].FechaInicio" value="${cap.FechaInicio || ''}" />
+                    <input type="hidden" name="Capacitaciones[${index}].FechaFin" value="${cap.FechaFin || ''}" />
+                    <input type="hidden" name="Capacitaciones[${index}].HorasCapacitacion" value="${cap.HorasCapacitacion || ''}" />
+                    <input type="hidden" name="Capacitaciones[${index}].CertificadoObtenido" value="${cap.CertificadoObtenido}" />
+                    <input type="hidden" name="Capacitaciones[${index}].CalificacionObtenida" value="${cap.CalificacionObtenida || ''}" />
+                    <input type="hidden" name="Capacitaciones[${index}].AreaConocimiento" value="${cap.AreaConocimiento || ''}" />`;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>`;
+
+            container.html(html);
+        }
+
+        // Manejar checkbox "En Curso"
+        $('#enCurso').change(function() {
+            if ($(this).is(':checked')) {
+                $('#anioFinalizacion').prop('disabled', true).val('');
+            } else {
+                $('#anioFinalizacion').prop('disabled', false);
+            }
+        });
+    </script>
+    
+    <style>
+        .step-link {
+            display: block;
+            padding: 5px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .step-link:hover {
+            background-color: #f8f9fc;
+            color: #4e73df !important;
+            transform: translateY(-2px);
+        }
+        
+        .step-link i {
+            transition: transform 0.3s ease;
+        }
+        
+        .step-link:hover i {
+            transform: scale(1.1);
+        }
+    </style>
+}

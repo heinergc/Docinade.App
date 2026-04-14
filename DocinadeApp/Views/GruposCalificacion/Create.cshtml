@@ -1,0 +1,77 @@
+﻿@model RubricasApp.Web.Models.GrupoCalificacion
+
+@{
+    ViewData["Title"] = "Crear Grupo de Calificación";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-plus me-2"></i>
+                        Crear Nuevo Grupo de Calificación
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="NombreGrupo" class="form-label"></label>
+                            <input asp-for="NombreGrupo" class="form-control" placeholder="Ej: Evaluación Estándar" />
+                            <span asp-validation-for="NombreGrupo" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Descripcion" class="form-label"></label>
+                            <textarea asp-for="Descripcion" class="form-control" rows="3" 
+                                      placeholder="Descripción del grupo de calificación..."></textarea>
+                            <span asp-validation-for="Descripcion" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>
+                                Crear Grupo
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i>
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-info-circle me-2"></i>Información</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Grupos de Calificación</strong><br>
+                        Los grupos permiten organizar y gestionar conjuntos de niveles de calificación 
+                        que pueden ser reutilizados en múltiples rúbricas.
+                    </div>
+                    
+                    <h6>Características:</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-1"></i> Organización de niveles</li>
+                        <li><i class="fas fa-check text-success me-1"></i> Reutilización en rúbricas</li>
+                        <li><i class="fas fa-check text-success me-1"></i> Gestión centralizada</li>
+                        <li><i class="fas fa-check text-success me-1"></i> Creación dinámica</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

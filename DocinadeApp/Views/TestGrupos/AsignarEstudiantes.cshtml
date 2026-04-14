@@ -1,0 +1,82 @@
+@{
+    ViewData["Title"] = "Test - AsignarEstudiantes";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">?? Test: AsignarEstudiantes</h4>
+        </div>
+        <div class="card-body">
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">
+                    <h5>? Error Detectado</h5>
+                    <p>@ViewBag.Error</p>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-success">
+                    <h5>? Test Exitoso</h5>
+                    <p>@ViewBag.Mensaje</p>
+                </div>
+            }
+
+            <h5>Información de la Prueba:</h5>
+            <ul>
+                <li><strong>Grupo ID:</strong> @ViewBag.GrupoId</li>
+                <li><strong>Controlador:</strong> TestGrupos</li>
+                <li><strong>Acción:</strong> AsignarEstudiantes</li>
+                <li><strong>Ruta:</strong> /TestGrupos/AsignarEstudiantes/@ViewBag.GrupoId</li>
+            </ul>
+
+            <div class="mt-4">
+                <h5>Pruebas Adicionales:</h5>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-info" onclick="verificarGrupo(@ViewBag.GrupoId)">
+                        Verificar Grupo
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="testServicio()">
+                        Test Servicio
+                    </button>
+                    <a href="/GruposEstudiantes/AsignarEstudiantes/@ViewBag.GrupoId" class="btn btn-primary">
+                        Ir a Ruta Original
+                    </a>
+                </div>
+            </div>
+
+            <div id="resultados" class="mt-4" style="display: none;">
+                <h6>Resultados:</h6>
+                <pre id="resultadosContent" class="bg-light p-3 rounded"></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function verificarGrupo(id) {
+        try {
+            const response = await fetch(`/TestGrupos/VerificarGrupo/${id}`);
+            const data = await response.json();
+            mostrarResultados(data);
+        } catch (error) {
+            mostrarResultados({ success: false, message: `Error: ${error.message}` });
+        }
+    }
+
+    async function testServicio() {
+        try {
+            const response = await fetch('/TestGrupos/TestServicio');
+            const data = await response.json();
+            mostrarResultados(data);
+        } catch (error) {
+            mostrarResultados({ success: false, message: `Error: ${error.message}` });
+        }
+    }
+
+    function mostrarResultados(data) {
+        document.getElementById('resultados').style.display = 'block';
+        document.getElementById('resultadosContent').textContent = JSON.stringify(data, null, 2);
+    }
+</script>

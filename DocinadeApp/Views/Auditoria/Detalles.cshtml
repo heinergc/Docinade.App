@@ -1,0 +1,308 @@
+@model RubricasApp.Web.ViewModels.Auditoria.AuditoriaOperacionViewModel
+@{
+    ViewData["Title"] = "Detalles de Operación de Auditoría";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas @Model.IconoOperacion"></i>
+                        @ViewData["Title"]
+                    </h3>
+                    <div class="card-tools">
+                        <a href="@Url.Action("Index")" class="btn btn-sm btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver al Historial
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Información Principal -->
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-@Model.ColorOperacion">
+                                    <i class="fas @Model.IconoOperacion"></i>
+                                </span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Operación</span>
+                                    <span class="info-box-number">@Model.TipoOperacionDisplay</span>
+                                    <span class="progress-description">
+                                        @if (Model.OperacionExitosa)
+                                        {
+                                            <span class="badge badge-success">
+                                                <i class="fas fa-check"></i> Exitosa
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-danger">
+                                                <i class="fas fa-times"></i> Con Error
+                                            </span>
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-info-circle"></i> Información General
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <dl class="row">
+                                        <dt class="col-sm-4">ID:</dt>
+                                        <dd class="col-sm-8"><code>@Model.Id</code></dd>
+
+                                        <dt class="col-sm-4">Descripción:</dt>
+                                        <dd class="col-sm-8">@Model.Descripcion</dd>
+
+                                        <dt class="col-sm-4">Fecha/Hora:</dt>
+                                        <dd class="col-sm-8">
+                                            <i class="fas fa-calendar"></i>
+                                            @Model.FechaOperacion.ToString("dd/MM/yyyy HH:mm:ss")
+                                        </dd>
+
+                                        <dt class="col-sm-4">Usuario:</dt>
+                                        <dd class="col-sm-8">
+                                            <strong>@Model.UsuarioNombre</strong>
+                                            @if (!string.IsNullOrEmpty(Model.UsuarioEmail))
+                                            {
+                                                <br><small class="text-muted">@Model.UsuarioEmail</small>
+                                            }
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información Técnica -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-server"></i> Información Técnica
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <dl class="row">
+                                        @if (!string.IsNullOrEmpty(Model.DireccionIP))
+                                        {
+                                            <dt class="col-sm-4">Dirección IP:</dt>
+                                            <dd class="col-sm-8"><code>@Model.DireccionIP</code></dd>
+                                        }
+
+                                        @if (!string.IsNullOrEmpty(Model.UserAgent))
+                                        {
+                                            <dt class="col-sm-4">User Agent:</dt>
+                                            <dd class="col-sm-8">
+                                                <small class="text-muted">@Model.UserAgent</small>
+                                            </dd>
+                                        }
+
+                                        <dt class="col-sm-4">Estado:</dt>
+                                        <dd class="col-sm-8">
+                                            @if (Model.OperacionExitosa)
+                                            {
+                                                <span class="badge badge-success">
+                                                    <i class="fas fa-check-circle"></i> Operación Exitosa
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-danger">
+                                                    <i class="fas fa-exclamation-triangle"></i> Operación con Error
+                                                </span>
+                                            }
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(Model.Motivo))
+                            {
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-comment"></i> Motivo
+                                        </h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-quote-left"></i>
+                                            @Model.Motivo
+                                            <i class="fas fa-quote-right"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(Model.MensajeError))
+                            {
+                                <div class="card">
+                                    <div class="card-header bg-danger">
+                                        <h3 class="card-title text-white">
+                                            <i class="fas fa-exclamation-triangle"></i> Error
+                                        </h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-danger">
+                                            <i class="fas fa-bug"></i>
+                                            @Model.MensajeError
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Datos de la Operación -->
+                    @if (Model.TieneDatosAnteriores || Model.TieneDatosNuevos)
+                    {
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">
+                                            <i class="fas fa-database"></i> Datos de la Operación
+                                        </h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            @if (Model.TieneDatosAnteriores)
+                                            {
+                                                <div class="col-md-6">
+                                                    <h5>
+                                                        <i class="fas fa-history text-warning"></i> 
+                                                        Datos Anteriores
+                                                    </h5>
+                                                    <div class="card">
+                                                        <div class="card-body p-2">
+                                                            <pre class="bg-light p-3" style="max-height: 300px; overflow-y: auto; font-size: 12px;">@Html.Raw(Model.DatosAnteriores)</pre>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+
+                                            @if (Model.TieneDatosNuevos)
+                                            {
+                                                <div class="col-md-6">
+                                                    <h5>
+                                                        <i class="fas fa-plus text-success"></i> 
+                                                        Datos Nuevos
+                                                    </h5>
+                                                    <div class="card">
+                                                        <div class="card-body p-2">
+                                                            <pre class="bg-light p-3" style="max-height: 300px; overflow-y: auto; font-size: 12px;">@Html.Raw(Model.DatosNuevos)</pre>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+
+                                        @if (Model.TieneDatosAnteriores && Model.TieneDatosNuevos)
+                                        {
+                                            <div class="row mt-3">
+                                                <div class="col-12 text-center">
+                                                    <button type="button" class="btn btn-info" onclick="compararDatos()">
+                                                        <i class="fas fa-exchange-alt"></i> Comparar Datos
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-clock"></i>
+                                Registrado el @Model.FechaOperacion.ToString("dd/MM/yyyy 'a las' HH:mm:ss")
+                            </small>
+                        </div>
+                        <div class="col-6 text-right">
+                            <a href="@Url.Action("Index")" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver al Historial
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para comparación de datos -->
+@if (Model.TieneDatosAnteriores && Model.TieneDatosNuevos)
+{
+    <div class="modal fade" id="modalComparacion" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <i class="fas fa-exchange-alt"></i> 
+                        Comparación de Datos
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-warning">
+                                <i class="fas fa-history"></i> Antes
+                            </h5>
+                            <pre id="datosAntes" class="bg-light p-3" style="height: 400px; overflow-y: auto;"></pre>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-success">
+                                <i class="fas fa-plus"></i> Después
+                            </h5>
+                            <pre id="datosDespues" class="bg-light p-3" style="height: 400px; overflow-y: auto;"></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        function compararDatos() {
+            try {
+                // Formatear JSON para mejor comparación
+                var datosAnteriores = @Html.Raw(Json.Serialize(Model.DatosAnteriores ?? ""));
+                var datosNuevos = @Html.Raw(Json.Serialize(Model.DatosNuevos ?? ""));
+
+                if (datosAnteriores) {
+                    var objAntes = JSON.parse(datosAnteriores);
+                    $('#datosAntes').text(JSON.stringify(objAntes, null, 2));
+                }
+
+                if (datosNuevos) {
+                    var objDespues = JSON.parse(datosNuevos);
+                    $('#datosDespues').text(JSON.stringify(objDespues, null, 2));
+                }
+
+                $('#modalComparacion').modal('show');
+            } catch (error) {
+                console.error('Error al formatear datos para comparación:', error);
+                toastr.error('Error al formatear los datos para la comparación');
+            }
+        }
+    </script>
+}

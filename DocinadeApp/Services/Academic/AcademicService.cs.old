@@ -1,0 +1,367 @@
+using AutoMapper;
+using RubricasApp.Web.ViewModels.Academic;
+using RubricasApp.Web.Services.Academic;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace RubricasApp.Web.Services.Academic
+{
+    public interface IAcademicService
+    {
+        // Materias
+        Task<MateriaListVm> GetMateriasPagedAsync(int page, int pageSize, string? searchTerm, string? sortBy);
+        Task<MateriaDetalleVm?> GetMateriaDetalleAsync(int id);
+        Task<MateriaEditVm?> GetMateriaForEditAsync(int id);
+        Task<int> CreateMateriaAsync(MateriaEditVm viewModel);
+        Task<bool> UpdateMateriaAsync(int id, MateriaEditVm viewModel);
+        Task<bool> DeleteMateriaAsync(int id);
+        Task<bool> CodigoMateriaExistsAsync(string codigo, int? excludeId = null);
+
+        // Rúbricas
+        Task<RubricaListVm> GetRubricasPagedAsync(int page, int pageSize, string? searchTerm, string? sortBy);
+        Task<RubricaDetalleVm?> GetRubricaDetalleAsync(int id);
+        Task<RubricaEditVm?> GetRubricaForEditAsync(int id);
+        Task<int> CreateRubricaAsync(RubricaEditVm viewModel);
+        Task<bool> UpdateRubricaAsync(int id, RubricaEditVm viewModel);
+        Task<bool> DeleteRubricaAsync(int id);
+        Task<bool> CodigoRubricaExistsAsync(string codigo, int? excludeId = null);
+
+        // Períodos Académicos
+        Task<PeriodoListVm> GetPeriodosPagedAsync(int page, int pageSize, string? searchTerm, string? sortBy);
+        Task<PeriodoDetalleVm?> GetPeriodoDetalleAsync(int id);
+        Task<PeriodoEditVm?> GetPeriodoForEditAsync(int id);
+        Task<int> CreatePeriodoAsync(PeriodoEditVm viewModel);
+        Task<bool> UpdatePeriodoAsync(int id, PeriodoEditVm viewModel);
+        Task<bool> DeletePeriodoAsync(int id);
+        Task<bool> ActivarPeriodoAsync(int id);
+        Task<bool> ValidarFechasPeriodoAsync(DateTime fechaInicio, DateTime fechaFin, int? excludeId = null);
+
+        // Asignaciones Materia-Rúbrica
+        Task<AsignarRubricasVm?> GetAsignarRubricasViewModelAsync(int materiaId);
+        Task<bool> AsignarRubricasAsync(AsignarRubricasVm viewModel);
+        Task<bool> QuitarRubricaAsync(int materiaId, int rubricaId);
+
+        // Ofertas Materia-Período
+        Task<CrearOfertaMateriaVm?> GetCrearOfertaViewModelAsync(int materiaId);
+        Task<int> CrearOfertaAsync(CrearOfertaMateriaVm viewModel);
+        Task<bool> CerrarOfertaAsync(int ofertaId);
+
+        // Utilidades
+        Task<List<SelectListItem>> GetRubricasSelectListAsync();
+        Task<List<SelectListItem>> GetPeriodosSelectListAsync();
+        Task<List<SelectListItem>> GetMateriasSelectListAsync();
+    }
+
+    public class AcademicService : IAcademicService
+    {
+        private readonly IMateriaRepository _materiaRepository;
+        private readonly IRubricaRepository _rubricaRepository;
+        private readonly IPeriodoAcademicoRepository _periodoRepository;
+        private readonly IMateriaRubricaRepository _materiaRubricaRepository;
+        private readonly IMateriaPeriodoRepository _materiaPeriodoRepository;
+        private readonly IMapper _mapper;
+
+        public AcademicService(
+            IMateriaRepository materiaRepository,
+            IRubricaRepository rubricaRepository,
+            IPeriodoAcademicoRepository periodoRepository,
+            IMateriaRubricaRepository materiaRubricaRepository,
+            IMateriaPeriodoRepository materiaPeriodoRepository,
+            IMapper mapper)
+        {
+            _materiaRepository = materiaRepository;
+            _rubricaRepository = rubricaRepository;
+            _periodoRepository = periodoRepository;
+            _materiaRubricaRepository = materiaRubricaRepository;
+            _materiaPeriodoRepository = materiaPeriodoRepository;
+            _mapper = mapper;
+        }
+
+        // ============== MATERIAS ==============
+
+        public async Task<MateriaListVm> GetMateriasPagedAsync(int page, int pageSize, string? searchTerm, string? sortBy)
+        {
+            var (items, totalCount) = await _materiaRepository.GetPagedAsync(page, pageSize, searchTerm, sortBy);
+            
+            return new MateriaListVm
+            {
+                Items = _mapper.Map<IEnumerable<MateriaItemVm>>(items),
+                Paginacion = new PaginacionVm
+                {
+                    PaginaActual = page,
+                    ItemsPorPagina = pageSize,
+                    TotalItems = totalCount
+                },
+                Busqueda = searchTerm,
+                Orden = sortBy
+            };
+        }
+
+        public async Task<MateriaDetalleVm?> GetMateriaDetalleAsync(int id)
+        {
+            var materia = await _materiaRepository.GetByIdAsync(id);
+            return materia == null ? null : _mapper.Map<MateriaDetalleVm>(materia);
+        }
+
+        public async Task<MateriaEditVm?> GetMateriaForEditAsync(int id)
+        {
+            var materia = await _materiaRepository.GetByIdAsync(id);
+            return materia == null ? null : _mapper.Map<MateriaEditVm>(materia);
+        }
+
+        public async Task<int> CreateMateriaAsync(MateriaEditVm viewModel)
+        {
+            var materia = _mapper.Map<Models.Materia>(viewModel);
+            var created = await _materiaRepository.CreateAsync(materia);
+            return created.MateriaId;
+        }
+
+        public async Task<bool> UpdateMateriaAsync(int id, MateriaEditVm viewModel)
+        {
+            var materia = await _materiaRepository.GetByIdAsync(id);
+            if (materia == null) return false;
+
+            _mapper.Map(viewModel, materia);
+            await _materiaRepository.UpdateAsync(materia);
+            return true;
+        }
+
+        public async Task<bool> DeleteMateriaAsync(int id)
+        {
+            return await _materiaRepository.DeleteAsync(id);
+        }
+
+        public async Task<bool> CodigoMateriaExistsAsync(string codigo, int? excludeId = null)
+        {
+            return await _materiaRepository.CodigoExistsAsync(codigo, excludeId);
+        }
+
+        // ============== RUBRICAS ==============
+
+        public async Task<RubricaListVm> GetRubricasPagedAsync(int page, int pageSize, string? searchTerm, string? sortBy)
+        {
+            var (items, totalCount) = await _rubricaRepository.GetPagedAsync(page, pageSize, searchTerm, sortBy);
+            
+            return new RubricaListVm
+            {
+                Items = _mapper.Map<IEnumerable<RubricaItemVm>>(items),
+                Paginacion = new PaginacionVm
+                {
+                    PaginaActual = page,
+                    ItemsPorPagina = pageSize,
+                    TotalItems = totalCount
+                },
+                Busqueda = searchTerm,
+                Orden = sortBy
+            };
+        }
+
+        public async Task<RubricaDetalleVm?> GetRubricaDetalleAsync(int id)
+        {
+            var rubrica = await _rubricaRepository.GetByIdAsync(id);
+            return rubrica == null ? null : _mapper.Map<RubricaDetalleVm>(rubrica);
+        }
+
+        public async Task<RubricaEditVm?> GetRubricaForEditAsync(int id)
+        {
+            var rubrica = await _rubricaRepository.GetByIdAsync(id);
+            return rubrica == null ? null : _mapper.Map<RubricaEditVm>(rubrica);
+        }
+
+        public async Task<int> CreateRubricaAsync(RubricaEditVm viewModel)
+        {
+            var rubrica = _mapper.Map<Models.Rubrica>(viewModel);
+            var created = await _rubricaRepository.CreateAsync(rubrica);
+            return created.IdRubrica;
+        }
+
+        public async Task<bool> UpdateRubricaAsync(int id, RubricaEditVm viewModel)
+        {
+            var rubrica = await _rubricaRepository.GetByIdAsync(id);
+            if (rubrica == null) return false;
+
+            _mapper.Map(viewModel, rubrica);
+            await _rubricaRepository.UpdateAsync(rubrica);
+            return true;
+        }
+
+        public async Task<bool> DeleteRubricaAsync(int id)
+        {
+            return await _rubricaRepository.DeleteAsync(id);
+        }
+
+        public async Task<bool> CodigoRubricaExistsAsync(string codigo, int? excludeId = null)
+        {
+            return await _rubricaRepository.CodigoExistsAsync(codigo, excludeId);
+        }
+
+        // ============== PERIODOS ACADEMICOS ==============
+
+        public async Task<PeriodoListVm> GetPeriodosPagedAsync(int page, int pageSize, string? searchTerm, string? sortBy)
+        {
+            var (items, totalCount) = await _periodoRepository.GetPagedAsync(page, pageSize, searchTerm, sortBy);
+            
+            return new PeriodoListVm
+            {
+                Items = _mapper.Map<IEnumerable<PeriodoItemVm>>(items),
+                Paginacion = new PaginacionVm
+                {
+                    PaginaActual = page,
+                    ItemsPorPagina = pageSize,
+                    TotalItems = totalCount
+                },
+                Busqueda = searchTerm,
+                Orden = sortBy
+            };
+        }
+
+        public async Task<PeriodoDetalleVm?> GetPeriodoDetalleAsync(int id)
+        {
+            var periodo = await _periodoRepository.GetByIdAsync(id);
+            return periodo == null ? null : _mapper.Map<PeriodoDetalleVm>(periodo);
+        }
+
+        public async Task<PeriodoEditVm?> GetPeriodoForEditAsync(int id)
+        {
+            var periodo = await _periodoRepository.GetByIdAsync(id);
+            return periodo == null ? null : _mapper.Map<PeriodoEditVm>(periodo);
+        }
+
+        public async Task<int> CreatePeriodoAsync(PeriodoEditVm viewModel)
+        {
+            var periodo = _mapper.Map<Models.PeriodoAcademico>(viewModel);
+            var created = await _periodoRepository.CreateAsync(periodo);
+            return created.Id;
+        }
+
+        public async Task<bool> UpdatePeriodoAsync(int id, PeriodoEditVm viewModel)
+        {
+            var periodo = await _periodoRepository.GetByIdAsync(id);
+            if (periodo == null) return false;
+
+            _mapper.Map(viewModel, periodo);
+            await _periodoRepository.UpdateAsync(periodo);
+            return true;
+        }
+
+        public async Task<bool> DeletePeriodoAsync(int id)
+        {
+            return await _periodoRepository.DeleteAsync(id);
+        }
+
+        public async Task<bool> ActivarPeriodoAsync(int id)
+        {
+            return await _periodoRepository.ActivarAsync(id);
+        }
+
+        public async Task<bool> ValidarFechasPeriodoAsync(DateTime fechaInicio, DateTime fechaFin, int? excludeId = null)
+        {
+            return await _periodoRepository.ValidarFechasAsync(fechaInicio, fechaFin, excludeId);
+        }
+
+        // ============== ASIGNACIONES ==============
+
+        public async Task<AsignarRubricasVm?> GetAsignarRubricasViewModelAsync(int materiaId)
+        {
+            var materia = await _materiaRepository.GetByIdAsync(materiaId);
+            if (materia == null) return null;
+
+            var todasRubricas = await _rubricaRepository.GetAllAsync();
+            var rubricasAsignadas = await _materiaRepository.GetRubricasAsync(materiaId);
+
+            return new AsignarRubricasVm
+            {
+                MateriaId = materia.MateriaId,
+                MateriaCodigo = materia.Codigo,
+                MateriaNombre = materia.Nombre,
+                RubricasDisponibles = todasRubricas.Select(r => new SelectListItem
+                {
+                    Value = r.IdRubrica.ToString(),
+                    Text = $"{r.Codigo} - {r.Titulo}"
+                }).ToList(),
+                RubricasSeleccionadasIds = rubricasAsignadas.Select(r => r.IdRubrica).ToList()
+            };
+        }
+
+        public async Task<bool> AsignarRubricasAsync(AsignarRubricasVm viewModel)
+        {
+            await _materiaRepository.AsignarRubricasAsync(
+                viewModel.MateriaId, 
+                viewModel.RubricasSeleccionadasIds, 
+                viewModel.ObservacionesGenerales);
+            return true;
+        }
+
+        public async Task<bool> QuitarRubricaAsync(int materiaId, int rubricaId)
+        {
+            await _materiaRepository.QuitarRubricaAsync(materiaId, rubricaId);
+            return true;
+        }
+
+        public async Task<CrearOfertaMateriaVm?> GetCrearOfertaViewModelAsync(int materiaId)
+        {
+            var materia = await _materiaRepository.GetByIdAsync(materiaId);
+            if (materia == null) return null;
+
+            var periodos = await _periodoRepository.GetActivosAsync();
+
+            return new CrearOfertaMateriaVm
+            {
+                MateriaId = materia.MateriaId,
+                MateriaCodigo = materia.Codigo,
+                MateriaNombre = materia.Nombre,
+                PeriodosDisponibles = periodos.Select(p => new SelectListItem
+                {
+                    Value = p.Id.ToString(),
+                    Text = $"{p.Anio} - {p.Ciclo}"
+                }).ToList()
+            };
+        }
+
+        public async Task<int> CrearOfertaAsync(CrearOfertaMateriaVm viewModel)
+        {
+            var oferta = await _materiaRepository.CrearOfertaAsync(
+                viewModel.MateriaId,
+                viewModel.PeriodoAcademicoId,
+                viewModel.Cupo,
+                viewModel.Estado);
+            return oferta.Id;
+        }
+
+        public async Task<bool> CerrarOfertaAsync(int ofertaId)
+        {
+            return await _materiaRepository.CerrarOfertaAsync(ofertaId);
+        }
+
+        // ============== UTILIDADES ==============
+
+        public async Task<List<SelectListItem>> GetRubricasSelectListAsync()
+        {
+            var rubricas = await _rubricaRepository.GetAllAsync();
+            return rubricas.Where(r => r.Vigente).Select(r => new SelectListItem
+            {
+                Value = r.IdRubrica.ToString(),
+                Text = $"{r.Codigo} - {r.Titulo}"
+            }).ToList();
+        }
+
+        public async Task<List<SelectListItem>> GetPeriodosSelectListAsync()
+        {
+            var periodos = await _periodoRepository.GetActivosAsync();
+            return periodos.Select(p => new SelectListItem
+            {
+                Value = p.Id.ToString(),
+                Text = $"{p.Anio} - {p.Ciclo}"
+            }).ToList();
+        }
+
+        public async Task<List<SelectListItem>> GetMateriasSelectListAsync()
+        {
+            var materias = await _materiaRepository.GetAllAsync();
+            return materias.Where(m => m.Activa).Select(m => new SelectListItem
+            {
+                Value = m.MateriaId.ToString(),
+                Text = $"{m.Codigo} - {m.Nombre}"
+            }).ToList();
+        }
+    }
+}

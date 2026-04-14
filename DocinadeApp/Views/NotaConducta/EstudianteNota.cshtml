@@ -1,0 +1,625 @@
+@model RubricasApp.Web.ViewModels.Conducta.EstudianteNotaConductaViewModel
+
+@{
+    ViewData["Title"] = "Nota de Conducta";
+}
+
+@section Styles {
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Nota de Conducta</li>
+                </ol>
+            </nav>
+            <h2><i class="fas fa-user-graduate"></i> Nota de Conducta del Estudiante</h2>
+        </div>
+    </div>
+
+    <!-- Información del estudiante -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-id-card"></i> Información del Estudiante</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Nombre:</strong> @Model.NombreEstudiante</p>
+                            <p><strong>Identificación:</strong> @Model.NumeroIdentificacion</p>
+                            <p><strong>Grupo:</strong> @Model.NombreGrupo</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Período:</strong> @Model.NombrePeriodo</p>
+                            <p><strong>Profesor Guía:</strong> @Model.NombreProfesorGuia</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumen de nota -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm @(Model.Estado == "Aprobado" ? "border-success" : Model.Estado == "Riesgo" ? "border-warning" : "border-danger")">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-2">NOTA FINAL DE CONDUCTA</h6>
+                    <h1 class="display-3 mb-2 @(Model.Estado == "Aprobado" ? "text-success" : Model.Estado == "Riesgo" ? "text-warning" : "text-danger")">
+                        @Model.NotaFinal.ToString("F2")
+                    </h1>
+                    <p class="mb-2">
+                        @if (Model.Estado == "Aprobado")
+                        {
+                            <span class="badge bg-success fs-5">APROBADO</span>
+                        }
+                        else if (Model.Estado == "Riesgo")
+                        {
+                            <span class="badge bg-warning fs-5">EN RIESGO</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger fs-5">APLAZADO</span>
+                        }
+                    </p>
+                    <small class="text-muted">100 - @Model.TotalRebajos pts = @Model.NotaFinal.ToString("F2")</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4 g-3">
+        <div class="col-lg col-md-6">
+            <div class="card border-info shadow-sm h-100">
+                <div class="card-body text-center py-3">
+                    <div class="text-info mb-2">
+                        <i class="fas fa-file-alt fa-2x"></i>
+                    </div>
+                    <h6 class="text-muted mb-2">Total Boletas</h6>
+                    <h2 class="text-info mb-0">@Model.CantidadBoletas</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg col-md-6">
+            <div class="card border-danger shadow-sm h-100">
+                <div class="card-body text-center py-3">
+                    <div class="text-danger mb-2">
+                        <i class="fas fa-minus-circle fa-2x"></i>
+                    </div>
+                    <h6 class="text-muted mb-2">Total Rebajos</h6>
+                    <h2 class="text-danger mb-0">@Model.TotalRebajos</h2>
+                    <small class="text-muted">puntos</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg col-md-6">
+            <div class="card border-warning shadow-sm h-100">
+                <div class="card-body text-center py-3">
+                    <div class="text-warning mb-2">
+                        <i class="fas fa-bell fa-2x"></i>
+                    </div>
+                    <h6 class="text-muted mb-2">Notificaciones</h6>
+                    <h2 class="text-warning mb-0">@Model.NotificacionesEnviadas</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg col-md-6">
+            <div class="card border-secondary shadow-sm h-100">
+                <div class="card-body text-center py-3">
+                    <div class="text-secondary mb-2">
+                        <i class="fas fa-calendar-alt fa-2x"></i>
+                    </div>
+                    <h6 class="text-muted mb-2">Última Boleta</h6>
+                    <h5 class="mb-0">@(Model.FechaUltimaBoleta?.ToString("dd/MM/yyyy") ?? "N/A")</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg col-md-6">
+            <div class="card border-dark shadow-sm h-100">
+                <div class="card-body text-center py-3">
+                    <div class="text-dark mb-2">
+                        <i class="fas fa-ban fa-2x"></i>
+                    </div>
+                    <h6 class="text-muted mb-2">Boletas Anuladas</h6>
+                    <h2 class="text-dark mb-0">@Model.BoletasAnuladas</h2>
+                    <small class="text-muted">@Model.RebajosAnulados pts (no cuentan)</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+    @if (Model.Estado == "Riesgo")
+    {
+        <div class="alert alert-warning border-warning">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                <div>
+                    <h5 class="alert-heading">Estudiante en Riesgo</h5>
+                    <p class="mb-0">
+                        Este estudiante tiene una nota entre 60 y 64 puntos. Se recomienda seguimiento especial y acciones preventivas.
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+    else if (Model.Estado == "Aplazado")
+    {
+        <div class="alert alert-danger border-danger">
+            <div class="d-flex align-items-start">
+                <i class="fas fa-times-circle fa-2x me-3"></i>
+                <div class="flex-grow-1">
+                    <h5 class="alert-heading">Estudiante Aplazado</h5>
+                    <p class="mb-0">
+                        Este estudiante tiene una nota menor a @Model.NotaMinima puntos. Según el REA 40862-V21, debe participar en un Programa de Acciones Institucional (Opción B) o el comité puede aplicar una Decisión Profesional (Opción C).
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Acciones de Programa y Decisión Profesional - Siempre visible -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-warning shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Acciones Requeridas para Estudiante Aplazado</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <div class="d-flex align-items-start">
+                                <div class="text-warning me-3">
+                                    <i class="fas fa-clipboard-list fa-2x"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-2">Programa de Acciones Institucional</h6>
+                                    <p class="text-muted small mb-2">Crear un plan de mejora con compromisos del estudiante y la familia</p>
+                                    @if (Model.TieneProgramaAcciones && Model.IdProgramaAcciones.HasValue)
+                                    {
+                                        <div class="mb-2">
+                                            <span class="badge bg-success"><i class="fas fa-check-circle"></i> Programa Asignado</span>
+                                        </div>
+                                        <a asp-action="ReporteProgramaAcciones" asp-route-id="@Model.IdProgramaAcciones" 
+                                           class="btn btn-primary btn-sm" target="_blank">
+                                            <i class="fas fa-file-pdf"></i> Ver PDF
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="CrearPrograma" asp-route-idEstudiante="@Model.IdEstudiante" asp-route-idPeriodo="@Model.IdPeriodo" 
+                                           class="btn btn-warning">
+                                            <i class="fas fa-clipboard-list"></i> Crear Programa de Acciones
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start">
+                                <div class="text-info me-3">
+                                    <i class="fas fa-gavel fa-2x"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-2">Decisión Profesional del Comité</h6>
+                                    <p class="text-muted small mb-2">El Comité de Apoyo Educativo puede tomar una decisión profesional</p>
+                                    @if (Model.TieneDecisionProfesional && Model.IdDecisionProfesional.HasValue)
+                                    {
+                                        <div class="mb-2">
+                                            <span class="badge bg-success"><i class="fas fa-check-circle"></i> Decisión Aplicada</span>
+                                        </div>
+                                        <a asp-action="ReporteDecisionProfesional" asp-route-id="@Model.IdDecisionProfesional" 
+                                           class="btn btn-primary btn-sm" target="_blank">
+                                            <i class="fas fa-file-pdf"></i> Ver PDF
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="AplicarDecisionProfesional" asp-route-idEstudiante="@Model.IdEstudiante" asp-route-idPeriodo="@Model.IdPeriodo" 
+                                           class="btn btn-info">
+                                            <i class="fas fa-gavel"></i> Aplicar Decisión Profesional
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historial de boletas -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center mb-0">
+                    <h5 class="mb-0 text-black py-2 px-3 rounded d-flex align-items-center">
+                        <i class="fas fa-history me-2"></i>
+                        Historial de Boletas de Conducta
+                    </h5>
+                </div>
+                <a asp-controller="BoletasConducta" asp-action="Create" asp-route-idEstudiante="@Model.IdEstudiante" 
+                   class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus"></i> Nueva Boleta
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (Model.Boletas != null && Model.Boletas.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tablaBoletas">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tipo de Falta</th>
+                                <th>Rebajo</th>
+                                <th>Emitida Por</th>
+                                <th>Estado</th>
+                                <th>Notificación</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var boleta in Model.Boletas.OrderByDescending(b => b.FechaEmision))
+                            {
+                                <tr class="@(boleta.Estado == "Anulada" ? "table-secondary" : "")">
+                                    <td>@boleta.FechaEmision.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        @if (boleta.TipoFalta == "Muy leve")
+                                        {
+                                            <span class="badge bg-info">@boleta.TipoFalta</span>
+                                        }
+                                        else if (boleta.TipoFalta == "Leve")
+                                        {
+                                            <span class="badge bg-primary">@boleta.TipoFalta</span>
+                                        }
+                                        else if (boleta.TipoFalta == "Grave")
+                                        {
+                                            <span class="badge bg-warning">@boleta.TipoFalta</span>
+                                        }
+                                        else if (boleta.TipoFalta == "Muy Grave")
+                                        {
+                                            <span class="badge bg-orange text-white">@boleta.TipoFalta</span>
+                                        }
+                                        else if (boleta.TipoFalta == "Gravísima")
+                                        {
+                                            <span class="badge bg-danger">@boleta.TipoFalta</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@boleta.TipoFalta</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <strong class="text-danger">-@boleta.Rebajo</strong>
+                                    </td>
+                                    <td>@boleta.EmitidaPor</td>
+                                    <td>
+                                        @if (boleta.Estado == "Activa")
+                                        {
+                                            <span class="badge bg-success">Activa</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Anulada</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (boleta.NotificacionEnviada)
+                                        {
+                                            <i class="fas fa-check-circle text-success" title="Notificación enviada: @boleta.FechaNotificacion?.ToString("dd/MM/yyyy HH:mm")"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-times-circle text-danger" title="No enviada"></i>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <a asp-controller="BoletasConducta" asp-action="Details" asp-route-id="@boleta.IdBoleta" 
+                                           class="btn btn-sm btn-info" title="Ver detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        @if (boleta.Estado == "Activa")
+                                        {
+                                            <a asp-controller="BoletasConducta" asp-action="Anular" asp-route-id="@boleta.IdBoleta" 
+                                               class="btn btn-sm btn-danger" title="Anular boleta">
+                                                <i class="fas fa-ban"></i>
+                                            </a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle fa-3x mb-3"></i>
+                    <p class="mb-0">Este estudiante no tiene boletas de conducta registradas en este período.</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="mt-4">
+        <a asp-action="Dashboard" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+        </a>
+        <a asp-controller="BoletasConducta" asp-action="Create" asp-route-idEstudiante="@Model.IdEstudiante" 
+           class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nueva Boleta
+        </a>
+        
+        <!-- Botón para recalcular nota -->
+        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalRecalcularNota">
+            <i class="fas fa-calculator"></i> Recalcular Nota
+        </button>
+        
+        <button onclick="window.print()" class="btn btn-info">
+            <i class="fas fa-print"></i> Imprimir
+        </button>
+    </div>
+</div>
+
+<!-- Modal para recalcular nota -->
+<div class="modal fade" id="modalRecalcularNota" tabindex="-1" aria-labelledby="modalRecalcularNotaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="modalRecalcularNotaLabel">
+                    <i class="fas fa-calculator"></i> Recalcular Nota de Conducta
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> 
+                    <strong>Información:</strong> Esta acción recalculará la nota de conducta basándose en las boletas activas actuales.
+                </div>
+
+                @if (Model.TieneProgramaAcciones)
+                {
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Advertencia:</strong> Este estudiante tiene un <strong>Programa de Acciones Institucional</strong> activo.
+                        El recálculo no afectará el programa, pero es importante verificar si sigue siendo necesario.
+                    </div>
+                }
+
+                @if (Model.TieneDecisionProfesional)
+                {
+                    <div class="alert alert-primary">
+                        <i class="fas fa-gavel"></i>
+                        <strong>Nota:</strong> Este estudiante tiene una <strong>Decisión Profesional</strong> aplicada.
+                        El recálculo actualizará la nota calculada, pero la decisión profesional prevalecerá si así está establecido.
+                    </div>
+                }
+
+                <div class="mb-3">
+                    <h6>Estado actual:</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Nota actual:</strong> @Model.NotaFinal.ToString("F2")</li>
+                        <li><strong>Estado:</strong> 
+                            @if (Model.Estado == "Aprobado")
+                            {
+                                <span class="badge bg-success">APROBADO</span>
+                            }
+                            else if (Model.Estado == "Riesgo")
+                            {
+                                <span class="badge bg-warning">EN RIESGO</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">APLAZADO</span>
+                            }
+                        </li>
+                        <li><strong>Boletas activas:</strong> @Model.Boletas.Count(b => b.Estado == "Activa")</li>
+                        <li><strong>Total rebajos:</strong> @Model.TotalRebajos puntos</li>
+                    </ul>
+                </div>
+
+                <p class="mb-0">¿Está seguro que desea recalcular la nota de conducta?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <form asp-action="RecalcularNota" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="idEstudiante" value="@Model.IdEstudiante" />
+                    <input type="hidden" name="idPeriodo" value="@Model.IdPeriodo" />
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-calculator"></i> Sí, Recalcular
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            $('#tablaBoletas').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
+                },
+                order: [[0, 'desc']], // Ordenar por fecha descendente
+                pageLength: 10
+            });
+        });
+    </script>
+}
+
+<style>
+    .bg-orange {
+        background-color: #fd7e14 !important;
+    }
+    
+    /* Estilos para impresión mejorados */
+    @@media print {
+        /* Orientación horizontal */
+        @@page {
+            size: landscape;
+            margin: 1cm;
+        }
+        
+        /* Ocultar elementos no necesarios */
+        .btn, nav, .breadcrumb, .modal, #modalRecalcularNota,
+        .card-header .btn, .no-print {
+            display: none !important;
+        }
+        
+        /* Ajustar el contenedor */
+        .container-fluid {
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+        
+        /* Mejorar las tarjetas */
+        .card {
+            break-inside: avoid;
+            page-break-inside: avoid;
+            border: 1px solid #000 !important;
+            box-shadow: none !important;
+            margin-bottom: 10px !important;
+        }
+        
+        .card-header {
+            background-color: #f8f9fa !important;
+            border-bottom: 2px solid #000 !important;
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+        }
+        
+        /* Resumen de nota más destacado */
+        .display-3 {
+            font-size: 3rem !important;
+        }
+        
+        /* Estadísticas en una sola línea */
+        .row.g-3 {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+        }
+        
+        .row.g-3 .col-lg {
+            flex: 1 !important;
+            max-width: 20% !important;
+        }
+        
+        /* Tabla de boletas optimizada */
+        .table {
+            font-size: 10pt !important;
+            width: 100% !important;
+        }
+        
+        .table thead {
+            background-color: #343a40 !important;
+            color: white !important;
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+        }
+        
+        .table td, .table th {
+            padding: 6px !important;
+            border: 1px solid #000 !important;
+        }
+        
+        /* Badges y colores */
+        .badge, .text-success, .text-danger, .text-warning, .text-info {
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+        }
+        
+        .badge {
+            border: 1px solid #000 !important;
+            padding: 3px 6px !important;
+        }
+        
+        /* Alertas */
+        .alert {
+            border: 2px solid #000 !important;
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+            page-break-inside: avoid;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da !important;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd !important;
+        }
+        
+        /* Tarjeta de acciones */
+        .card.border-warning {
+            border-width: 2px !important;
+            page-break-inside: avoid;
+        }
+        
+        .card.border-warning .card-header {
+            background-color: #fff3cd !important;
+        }
+        
+        /* Información del estudiante destacada */
+        h2 {
+            font-size: 18pt !important;
+            margin-bottom: 10px !important;
+        }
+        
+        h5, h6 {
+            font-size: 11pt !important;
+        }
+        
+        /* Evitar saltos de página en secciones importantes */
+        .row.mb-4 {
+            page-break-inside: avoid;
+        }
+        
+        /* DataTables: mostrar todos los registros */
+        .dataTables_wrapper .dataTables_paginate,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter {
+            display: none !important;
+        }
+        
+        /* Encabezado de página */
+        body::before {
+            content: "REPORTE DE CONDUCTA DEL ESTUDIANTE";
+            display: block;
+            text-align: center;
+            font-size: 16pt;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #000;
+        }
+        
+        /* Pie de página */
+        @@page {
+            @@bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+            }
+        }
+    }
+</style>

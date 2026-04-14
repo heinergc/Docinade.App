@@ -1,0 +1,254 @@
+@model RubricasApp.Web.ViewModels.Auditoria.HistorialAuditoriaViewModel
+@{
+    ViewData["Title"] = "Historial de Auditoría";
+    var filtros = ViewBag.Filtros as RubricasApp.Web.ViewModels.Auditoria.FiltrosAuditoriaViewModel ?? new RubricasApp.Web.ViewModels.Auditoria.FiltrosAuditoriaViewModel();
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-history"></i>
+                        @ViewData["Title"]
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-sm btn-primary" data-toggle="collapse" data-target="#filtrosCollapse">
+                            <i class="fas fa-filter"></i> Filtros
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Panel de Filtros -->
+                <div class="collapse" id="filtrosCollapse">
+                    <div class="card-body border-bottom">
+                        <form method="get" asp-action="Index">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="TablaAfectada">Tabla</label>
+                                        <select class="form-control" id="TablaAfectada" name="TablaAfectada">
+                                            <option value="">Todas las tablas</option>
+                                            <option value="GruposEstudiantes" selected="@(filtros.TablaAfectada == "GruposEstudiantes")">Grupos de Estudiantes</option>
+                                            <option value="Estudiantes" selected="@(filtros.TablaAfectada == "Estudiantes")">Estudiantes</option>
+                                            <option value="Evaluaciones" selected="@(filtros.TablaAfectada == "Evaluaciones")">Evaluaciones</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="TipoOperacion">Operación</label>
+                                        <select class="form-control" id="TipoOperacion" name="TipoOperacion">
+                                            <option value="">Todas</option>
+                                            <option value="CREATE" selected="@(filtros.TipoOperacion == "CREATE")">Creación</option>
+                                            <option value="UPDATE" selected="@(filtros.TipoOperacion == "UPDATE")">Actualización</option>
+                                            <option value="DELETE" selected="@(filtros.TipoOperacion == "DELETE")">Eliminación</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="FechaDesde">Fecha Desde</label>
+                                        <input type="date" class="form-control" id="FechaDesde" name="FechaDesde" 
+                                               value="@(filtros.FechaDesde?.ToString("yyyy-MM-dd"))">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="FechaHasta">Fecha Hasta</label>
+                                        <input type="date" class="form-control" id="FechaHasta" name="FechaHasta" 
+                                               value="@(filtros.FechaHasta?.ToString("yyyy-MM-dd"))">
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <label>&nbsp;</label>
+                                        <button type="submit" class="btn btn-primary btn-block">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Información del registro -->
+                @if (Model.RegistroId > 0)
+                {
+                    <div class="card-body border-bottom bg-light">
+                        <h5 class="mb-2">@Model.TituloRegistro</h5>
+                        <small class="text-muted">
+                            <i class="fas fa-table"></i> Tabla: @Model.TablaAfectada |
+                            <i class="fas fa-key"></i> ID: @Model.RegistroId |
+                            <i class="fas fa-list"></i> Total de operaciones: @Model.TotalOperaciones
+                        </small>
+                    </div>
+                }
+
+                <div class="card-body">
+                    @if (Model.Operaciones.Any())
+                    {
+                        <div class="timeline">
+                            @foreach (var operacion in Model.Operaciones.OrderByDescending(o => o.FechaOperacion))
+                            {
+                                <div class="time-label">
+                                    <span class="bg-info">
+                                        @operacion.FechaOperacion.ToString("dd/MM/yyyy")
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <i class="fas @operacion.IconoOperacion bg-@operacion.ColorOperacion"></i>
+                                    <div class="timeline-item">
+                                        <span class="time">
+                                            <i class="fas fa-clock"></i> 
+                                            @operacion.FechaOperacion.ToString("HH:mm:ss")
+                                        </span>
+                                        
+                                        <h3 class="timeline-header">
+                                            <span class="badge badge-@operacion.ColorOperacion">@operacion.TipoOperacionDisplay</span>
+                                            @operacion.Descripcion
+                                            @if (!operacion.OperacionExitosa)
+                                            {
+                                                <span class="badge badge-danger ml-2">
+                                                    <i class="fas fa-exclamation-triangle"></i> Error
+                                                </span>
+                                            }
+                                        </h3>
+
+                                        <div class="timeline-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <strong>Usuario:</strong> @operacion.UsuarioNombre<br>
+                                                    @if (!string.IsNullOrEmpty(operacion.UsuarioEmail))
+                                                    {
+                                                        <small class="text-muted">@operacion.UsuarioEmail</small><br>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(operacion.DireccionIP))
+                                                    {
+                                                        <strong>IP:</strong> <code>@operacion.DireccionIP</code><br>
+                                                    }
+                                                </div>
+                                                <div class="col-md-6">
+                                                    @if (!string.IsNullOrEmpty(operacion.Motivo))
+                                                    {
+                                                        <strong>Motivo:</strong><br>
+                                                        <div class="alert alert-info p-2 mt-1">
+                                                            <i class="fas fa-comment"></i> @operacion.Motivo
+                                                        </div>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(operacion.MensajeError))
+                                                    {
+                                                        <strong>Error:</strong><br>
+                                                        <div class="alert alert-danger p-2 mt-1">
+                                                            <i class="fas fa-exclamation-triangle"></i> @operacion.MensajeError
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+
+                                            @if (operacion.TieneDatosAnteriores || operacion.TieneDatosNuevos)
+                                            {
+                                                <div class="mt-3">
+                                                    <div class="btn-group" role="group">
+                                                        @if (operacion.TieneDatosAnteriores)
+                                                        {
+                                                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                                    onclick="mostrarDatosJson(@operacion.Id, 'anteriores')">
+                                                                <i class="fas fa-eye"></i> Datos Anteriores
+                                                            </button>
+                                                        }
+                                                        @if (operacion.TieneDatosNuevos)
+                                                        {
+                                                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                                                    onclick="mostrarDatosJson(@operacion.Id, 'nuevos')">
+                                                                <i class="fas fa-eye"></i> Datos Nuevos
+                                                            </button>
+                                                        }
+                                                        <a href="@Url.Action("Detalles", new { id = operacion.Id })" 
+                                                           class="btn btn-sm btn-outline-info">
+                                                            <i class="fas fa-info-circle"></i> Detalles
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <div class="mb-3">
+                                <i class="fas fa-history fa-3x text-muted"></i>
+                            </div>
+                            <h5 class="text-muted">No se encontraron operaciones de auditoría</h5>
+                            <p class="text-muted">No hay registros que coincidan con los filtros seleccionados.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para mostrar datos JSON -->
+<div class="modal fade" id="modalDatosJson" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modalTitulo">Datos de la Operación</h4>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <pre id="datosJsonContent" class="bg-light p-3" style="max-height: 400px; overflow-y: auto;"></pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function mostrarDatosJson(operacionId, tipo) {
+            $.get('@Url.Action("ObtenerDatosJson")', { id: operacionId, tipo: tipo })
+                .done(function(response) {
+                    if (response.error) {
+                        toastr.error(response.error);
+                        return;
+                    }
+
+                    var titulo = tipo === 'anteriores' ? 'Datos Anteriores' : 'Datos Nuevos';
+                    $('#modalTitulo').text(titulo);
+                    
+                    if (response.datos) {
+                        $('#datosJsonContent').text(response.datos);
+                    } else {
+                        $('#datosJsonContent').text(response.mensaje || 'No hay datos disponibles');
+                    }
+                    
+                    $('#modalDatosJson').modal('show');
+                })
+                .fail(function() {
+                    toastr.error('Error al cargar los datos');
+                });
+        }
+
+        // Auto-expandir filtros si hay filtros aplicados
+        $(document).ready(function() {
+            @if (!string.IsNullOrEmpty(filtros.TablaAfectada) || !string.IsNullOrEmpty(filtros.TipoOperacion) || 
+                 filtros.FechaDesde.HasValue || filtros.FechaHasta.HasValue)
+            {
+                <text>$('#filtrosCollapse').collapse('show');</text>
+            }
+        });
+    </script>
+}

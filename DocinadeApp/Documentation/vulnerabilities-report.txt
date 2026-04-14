@@ -1,0 +1,21 @@
+﻿  Determinando los proyectos que se van a restaurar...
+D:\Fuentes_gitHub\RubricasApp.Web\RubricasApp.Web.csproj : warning NU1608: Se detect├│ una versi├│n del paquete fuera de la restricci├│n de dependencia: AutoMapper.Extensions.Microsoft.DependencyInjection 12.0.1 requiere AutoMapper (= 12.0.1), pero la versi├│n AutoMapper 16.1.1 ya se resolvi├│. [D:\Fuentes_gitHub\RubricasApp.Web\RubricasApp.Web.sln]
+  Todos los proyectos est├ín actualizados para la restauraci├│n.
+
+Se han usado los or├¡genes siguientes:
+   https://api.nuget.org/v3/index.json
+   C:\Program Files (x86)\Microsoft SDKs\NuGetPackages\
+
+El proyecto "RubricasApp.Web" tiene los paquetes vulnerables siguientes
+   [net8.0]: 
+   Paquete transitivo                         Resuelto   Gravedad   Direcci├│n URL de asesor├¡a                        
+   > Microsoft.AspNetCore.Http                2.0.1      High       https://github.com/advisories/GHSA-hxrm-9w7p-39cc
+   > Microsoft.Data.SqlClient                 5.1.1      High       https://github.com/advisories/GHSA-98g6-xh36-x2p7
+   > Microsoft.Extensions.Caching.Memory      8.0.0      High       https://github.com/advisories/GHSA-qj66-m88j-hmgj
+   > NuGet.Packaging                          6.3.1      Critical   https://github.com/advisories/GHSA-68w7-72jg-6qpp
+   > NuGet.Protocol                           6.3.1      High       https://github.com/advisories/GHSA-6qmf-mmc7-6c2p
+   > System.Formats.Asn1                      5.0.0      High       https://github.com/advisories/GHSA-447r-wph3-92pm
+   > System.IdentityModel.Tokens.Jwt          6.24.0     Moderate   https://github.com/advisories/GHSA-59j7-ghrg-fj52
+   > System.Net.Http                          4.3.0      High       https://github.com/advisories/GHSA-7jgj-8wvc-jh57
+   > System.Text.RegularExpressions           4.3.0      High       https://github.com/advisories/GHSA-cmhx-cq75-c4mj
+

@@ -1,0 +1,291 @@
+@model RubricasApp.Web.ViewModels.SEA.ConfiguracionSEAViewModel
+@{
+    ViewData["Title"] = "Configurar Componentes SEA";
+    var componentesDisponibles = ViewBag.ComponentesSEA as List<SelectListItem> ?? new List<SelectListItem>();
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2>
+                        <i class="fas fa-cog me-2 text-primary"></i>
+                        Configurar Componentes SEA
+                    </h2>
+                    <p class="text-muted mb-0">
+                        Materia: <strong>@Model.NombreMateria</strong>
+                    </p>
+                </div>
+                <div>
+                    <a asp-action="Index" asp-route-materiaId="@Model.MateriaId" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Volver al Reporte
+                    </a>
+                </div>
+            </div>
+
+            <!-- Alertas de validación -->
+            @if (!string.IsNullOrEmpty(TempData["Error"] as string))
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(TempData["Success"] as string))
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <!-- Card de Información -->
+            <div class="card mb-4 border-info">
+                <div class="card-header bg-info text-white">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Información sobre Componentes SEA
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        <strong>Sistema de Evaluación del MEP (SEA)</strong> requiere mapear los instrumentos de evaluación a componentes específicos:
+                    </p>
+                    <ul class="mb-0">
+                        <li><strong>Trabajo Cotidiano:</strong> Participación diaria, prácticas en clase, asignaciones cortas</li>
+                        <li><strong>Tareas:</strong> Trabajos extraclase, investigaciones, ejercicios asignados</li>
+                        <li><strong>Pruebas:</strong> Exámenes, quizzes, evaluaciones escritas</li>
+                        <li><strong>Proyecto:</strong> Trabajos finales, proyectos de curso, investigaciones extensas</li>
+                        <li><strong>Asistencia:</strong> Se calcula automáticamente desde registros de asistencia (no se configura aquí)</li>
+                    </ul>
+                    <div class="alert alert-warning mt-3 mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Importante:</strong> La suma de los porcentajes debe ser exactamente 100%.
+                    </div>
+                </div>
+            </div>
+
+            <form asp-action="Configurar" method="post" id="formConfiguracion">
+                <input type="hidden" name="materiaId" value="@Model.MateriaId" />
+                @Html.AntiForgeryToken()
+
+                <!-- Card de Configuración -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list-check me-2"></i>
+                            Asignar Instrumentos a Componentes SEA
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        
+                        @if (Model.InstrumentosDisponibles.Count == 0)
+                        {
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                No hay instrumentos de evaluación disponibles para esta materia.
+                                <a asp-controller="InstrumentosEvaluacion" asp-action="Create" class="alert-link">Crear instrumento</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 30%">Instrumento de Evaluación</th>
+                                            <th style="width: 25%">Componente SEA</th>
+                                            <th style="width: 20%">Porcentaje (%)</th>
+                                            <th style="width: 15%" class="text-center">Activo</th>
+                                            <th style="width: 10%" class="text-center">Rúbricas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbody-configuraciones">
+                                        @for (int i = 0; i < Model.InstrumentosDisponibles.Count; i++)
+                                        {
+                                            var instrumento = Model.InstrumentosDisponibles[i];
+                                            var configuracionExistente = Model.ConfiguracionesActuales
+                                                .FirstOrDefault(c => c.InstrumentoEvaluacionId == instrumento.InstrumentoId);
+                                            
+                                            <tr data-instrumento-id="@instrumento.InstrumentoId">
+                                                <td>
+                                                    <strong>@instrumento.Nombre</strong>
+                                                    <input type="hidden" name="configuraciones[@i].InstrumentoEvaluacionId" value="@instrumento.InstrumentoId" />
+                                                    <input type="hidden" name="configuraciones[@i].NombreInstrumento" value="@instrumento.Nombre" />
+                                                    @if (configuracionExistente != null)
+                                                    {
+                                                        <input type="hidden" name="configuraciones[@i].Id" value="@configuracionExistente.Id" />
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <select name="configuraciones[@i].ComponenteSEA" 
+                                                            class="form-select componente-select" 
+                                                            required>
+                                                        <option value="">-- Seleccionar --</option>
+                                                        @foreach (var componente in componentesDisponibles)
+                                                        {
+                                                            var selected = configuracionExistente?.ComponenteSEA == componente.Value;
+                                                            <option value="@componente.Value" selected="@selected">
+                                                                @componente.Text
+                                                            </option>
+                                                        }
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <div class="input-group">
+                                                        <input type="number" 
+                                                               name="configuraciones[@i].Porcentaje" 
+                                                               class="form-control porcentaje-input" 
+                                                               min="0" 
+                                                               max="100" 
+                                                               step="0.01" 
+                                                               value="@(configuracionExistente?.Porcentaje ?? 0)"
+                                                               required />
+                                                        <span class="input-group-text">%</span>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="form-check form-switch d-inline-block">
+                                                        <input type="checkbox" 
+                                                               name="configuraciones[@i].Activo" 
+                                                               class="form-check-input activo-checkbox" 
+                                                               value="true"
+                                                               checked="@(configuracionExistente?.Activo ?? true)" />
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="badge bg-secondary">@instrumento.TotalRubricas</span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot class="table-light">
+                                        <tr>
+                                            <td colspan="2" class="text-end"><strong>Total Ponderación:</strong></td>
+                                            <td>
+                                                <div class="input-group">
+                                                    <input type="text" 
+                                                           id="totalPonderacion" 
+                                                           class="form-control fw-bold" 
+                                                           readonly 
+                                                           value="0.00" />
+                                                    <span class="input-group-text">%</span>
+                                                </div>
+                                            </td>
+                                            <td colspan="2">
+                                                <span id="validacionMensaje" class="badge bg-secondary">Calculando...</span>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        }
+                    </div>
+                    
+                    @if (Model.InstrumentosDisponibles.Count > 0)
+                    {
+                        <div class="card-footer bg-light">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-info-circle text-muted me-2"></i>
+                                    <small class="text-muted">
+                                        La suma de porcentajes debe ser 100% para guardar la configuración
+                                    </small>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-outline-secondary me-2" onclick="resetearFormulario()">
+                                        <i class="fas fa-undo me-1"></i>
+                                        Resetear
+                                    </button>
+                                    <button type="submit" class="btn btn-success" id="btnGuardar">
+                                        <i class="fas fa-save me-1"></i>
+                                        Guardar Configuración
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            calcularTotal();
+            
+            // Recalcular al cambiar porcentajes
+            $('.porcentaje-input').on('input change', function() {
+                calcularTotal();
+            });
+            
+            // Recalcular al activar/desactivar
+            $('.activo-checkbox').on('change', function() {
+                calcularTotal();
+            });
+        });
+        
+        function calcularTotal() {
+            let total = 0;
+            
+            $('.porcentaje-input').each(function() {
+                const $row = $(this).closest('tr');
+                const isActivo = $row.find('.activo-checkbox').is(':checked');
+                
+                if (isActivo) {
+                    const valor = parseFloat($(this).val()) || 0;
+                    total += valor;
+                }
+            });
+            
+            $('#totalPonderacion').val(total.toFixed(2));
+            
+            // Validar y cambiar color
+            const $validacion = $('#validacionMensaje');
+            const $btnGuardar = $('#btnGuardar');
+            
+            if (Math.abs(total - 100) < 0.01) {
+                $validacion.removeClass('bg-danger bg-warning bg-secondary').addClass('bg-success');
+                $validacion.html('<i class="fas fa-check-circle me-1"></i>Válido (100%)');
+                $btnGuardar.prop('disabled', false);
+            } else if (total === 0) {
+                $validacion.removeClass('bg-danger bg-warning bg-success').addClass('bg-secondary');
+                $validacion.html('<i class="fas fa-info-circle me-1"></i>Sin configurar');
+                $btnGuardar.prop('disabled', true);
+            } else {
+                $validacion.removeClass('bg-success bg-secondary').addClass('bg-warning');
+                $validacion.html('<i class="fas fa-exclamation-triangle me-1"></i>Suma incorrecta');
+                $btnGuardar.prop('disabled', true);
+            }
+        }
+        
+        function resetearFormulario() {
+            if (confirm('¿Estás seguro de resetear toda la configuración?')) {
+                $('.porcentaje-input').val(0);
+                $('.componente-select').val('');
+                $('.activo-checkbox').prop('checked', true);
+                calcularTotal();
+            }
+        }
+        
+        // Validación antes de enviar
+        $('#formConfiguracion').on('submit', function(e) {
+            const total = parseFloat($('#totalPonderacion').val());
+            
+            if (Math.abs(total - 100) >= 0.01) {
+                e.preventDefault();
+                alert('La suma de porcentajes debe ser exactamente 100%. Suma actual: ' + total.toFixed(2) + '%');
+                return false;
+            }
+            
+            return true;
+        });
+    </script>
+}

@@ -1,0 +1,128 @@
+﻿@model RubricasApp.Web.Models.GrupoCalificacion
+
+@{
+    ViewData["Title"] = "Eliminar Grupo";
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        ¿Eliminar Grupo de Calificación?
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>¡Atención!</strong> Esta acción no se puede deshacer.
+                    </div>
+                    
+                    <h5>Está a punto de eliminar el siguiente grupo:</h5>
+                    
+                    <dl class="row mt-3">
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.NombreGrupo)</dt>
+                        <dd class="col-sm-9">
+                            <strong>@Html.DisplayFor(model => model.NombreGrupo)</strong>
+                        </dd>
+
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Descripcion)</dt>
+                        <dd class="col-sm-9">
+                            @if (!string.IsNullOrEmpty(Model.Descripcion))
+                            {
+                                @Html.DisplayFor(model => model.Descripcion)
+                            }
+                            else
+                            {
+                                <span class="text-muted">Sin descripción</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Estado)</dt>
+                        <dd class="col-sm-9">
+                            @if (Model.Estado == "ACTIVO")
+                            {
+                                <span class="badge bg-success">@Model.Estado</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">@Model.Estado</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-3">Niveles Asociados</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge bg-info">@Model.NivelesCalificacion.Count niveles</span>
+                        </dd>
+
+                        <dt class="col-sm-3">Rúbricas Asociadas</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge bg-warning text-dark">@Model.Rubricas.Count rúbricas</span>
+                        </dd>
+
+                        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.FechaCreacion)</dt>
+                        <dd class="col-sm-9">@Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</dd>
+                    </dl>
+                    
+                    @if (Model.NivelesCalificacion.Any() || Model.Rubricas.Any())
+                    {
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Dependencias encontradas:</strong><br>
+                            Este grupo tiene @Model.NivelesCalificacion.Count nivel(es) de calificación y 
+                            @Model.Rubricas.Count rúbrica(s) asociada(s). No se puede eliminar hasta que 
+                            se desvinculen estas dependencias.
+                        </div>
+                        
+                        <div class="mt-4">
+                            <a asp-action="Details" asp-route-id="@Model.IdGrupo" class="btn btn-info">
+                                <i class="fas fa-eye me-1"></i>
+                                Ver Detalles
+                            </a>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>
+                                Volver a la Lista
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Este grupo no tiene dependencias y puede ser eliminado de forma segura.
+                        </div>
+                        
+                        <form asp-action="Delete" method="post" class="mt-4">
+                            <input type="hidden" asp-for="IdGrupo" />
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i>
+                                Sí, Eliminar Grupo
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i>
+                                Cancelar
+                            </a>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteForm = document.querySelector('form[asp-action="Delete"]');
+            if (deleteForm) {
+                deleteForm.addEventListener('submit', function(e) {
+                    if (!confirm('¿Está completamente seguro de que desea eliminar este grupo de calificación?')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        });
+    </script>
+}

@@ -1,0 +1,175 @@
+@model RubricasApp.Web.ViewModels.EmpadronamientoPublicoViewModel
+
+@{
+    ViewData["Title"] = "Paso 2: Contacto y Residencia";
+}
+
+<!-- Barra de progreso -->
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="progress" style="height: 30px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                     role="progressbar" 
+                     style="width: 40%;" 
+                     aria-valuenow="40" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                    Paso @Model.PasoActual de @Model.TotalPasos (40%)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-map-marker-alt"></i> Paso 2: Información de Contacto y Residencia
+                    </h3>
+                    <small>Complete sus datos de contacto y dirección</small>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Paso2" method="post">
+                        @Html.AntiForgeryToken()
+                        
+                        <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+                        
+                        <h5 class="text-primary mb-3"><i class="fas fa-envelope"></i> Información de Contacto</h5>
+                        
+                        <!-- Correos Electrónicos -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DireccionCorreo" class="form-label fw-bold">
+                                    Correo Electrónico Principal <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="DireccionCorreo" type="email" class="form-control" 
+                                       placeholder="ejemplo@correo.com" required />
+                                <span asp-validation-for="DireccionCorreo" class="text-danger"></span>
+                                <small class="form-text text-muted">Se enviará confirmación a este correo</small>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CorreoAlterno" class="form-label fw-bold">
+                                    Correo Electrónico Alterno
+                                </label>
+                                <input asp-for="CorreoAlterno" type="email" class="form-control" 
+                                       placeholder="opcional@correo.com" />
+                                <span asp-validation-for="CorreoAlterno" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Teléfono -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="TelefonoAlterno" class="form-label fw-bold">
+                                    Teléfono Principal <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="TelefonoAlterno" type="tel" class="form-control" 
+                                       placeholder="8888-8888" required />
+                                <span asp-validation-for="TelefonoAlterno" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <h5 class="text-primary mb-3"><i class="fas fa-home"></i> Dirección de Residencia</h5>
+                        
+                        <!-- Provincia, Cantón, Distrito -->
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Provincia" class="form-label fw-bold">
+                                    Provincia <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="Provincia" class="form-select" id="provinciaSelect" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="San José">San José</option>
+                                    <option value="Alajuela">Alajuela</option>
+                                    <option value="Cartago">Cartago</option>
+                                    <option value="Heredia">Heredia</option>
+                                    <option value="Guanacaste">Guanacaste</option>
+                                    <option value="Puntarenas">Puntarenas</option>
+                                    <option value="Limón">Limón</option>
+                                </select>
+                                <span asp-validation-for="Provincia" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Canton" class="form-label fw-bold">
+                                    Cantón <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Canton" class="form-control" 
+                                       placeholder="Ej: Central" required />
+                                <span asp-validation-for="Canton" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Distrito" class="form-label fw-bold">
+                                    Distrito <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Distrito" class="form-control" 
+                                       placeholder="Ej: Carmen" required />
+                                <span asp-validation-for="Distrito" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Barrio -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="Barrio" class="form-label fw-bold">
+                                    Barrio o Localidad
+                                </label>
+                                <input asp-for="Barrio" class="form-control" 
+                                       placeholder="Ej: Los Yoses" />
+                                <span asp-validation-for="Barrio" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Señas Exactas -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="Senas" class="form-label fw-bold">
+                                    Señas Exactas de Domicilio <span class="text-danger">*</span>
+                                </label>
+                                <textarea asp-for="Senas" class="form-control" rows="3" 
+                                          placeholder="Ej: De la iglesia, 200 metros al norte, casa amarilla con portón negro..." required></textarea>
+                                <span asp-validation-for="Senas" class="text-danger"></span>
+                                <small class="form-text text-muted">
+                                    Sea lo más específico posible para facilitar la ubicación
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- Campos ocultos -->
+                        <input type="hidden" asp-for="PasoActual" />
+                        <input type="hidden" asp-for="TotalPasos" />
+                        <input type="hidden" asp-for="SessionId" />
+                        
+                        <hr class="my-4">
+                        
+                        <!-- Botones de navegación -->
+                        <div class="row">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                                    <i class="fas fa-arrow-left"></i> Anterior
+                                </button>
+                            </div>
+                            <div class="col-6 text-end">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    Siguiente <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

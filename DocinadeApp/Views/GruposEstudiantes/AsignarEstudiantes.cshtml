@@ -1,0 +1,901 @@
+﻿@model RubricasApp.Web.ViewModels.Grupos.AsignarEstudiantesViewModel
+
+@{
+    ViewData["Title"] = $"Asignar Estudiantes - {Model.GrupoCodigo}";
+}
+<link rel="stylesheet" href="~/css/estilos_genericos.css" />
+
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="page-title" style="color: white;">
+                <i class="fas fa-user-plus me-2" style="color: white;"></i>
+                Asignar Estudiantes
+            </h1>
+          
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb b                        .done(function(result) {
+                            if (result.success) {
+                                Swal.fire({
+                                    title: '¡Éxito!',
+                                    text: 'Estudiante asignado correctamente',
+                                    icon: 'success',
+                                    timer: 2000,
+                                    timerProgressBar: true
+                                });
+                                // Recargar ambas tablas para reflejar los cambios
+                                recargarTablas({ mantenerFiltros: true });
+                            } else {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: result.message || 'Error al asignar estudiante',
+                                    icon: 'error'
+                                });
+                            }
+                        })
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index")" style="color: white !important;">
+                            <i class="fas fa-users-cog"></i> Grupos
+                        </a>
+                    </li>
+                  <li class="breadcrumb-item">
+                        <a href="@Url.Action("Details", new { id = Model.GrupoId })">
+                            @Model.GrupoCodigo
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" style="color: white !important;">Asignar Estudiantes</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="content-wrapper">
+        <!-- Información del Grupo -->
+        <div class="header-section">
+            <div>
+                <h2>Gestión de Estudiantes</h2>
+                <p class="subtitle">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Capacidad: @(ViewBag.CapacidadMaxima?.ToString() ?? "Ilimitada") | 
+                    Estudiantes actuales: @(ViewBag.TotalEstudiantesAsignados ?? 0)
+                </p>
+            </div>
+            <div class="header-actions">
+                <button type="button" class="btn btn-success" id="btnAsignarSeleccionados" disabled>
+                    <i class="fas fa-plus-circle"></i> Asignar Seleccionados
+                </button>
+                <button type="button" class="btn btn-warning" id="btnDesasignarSeleccionados" disabled>
+                    <i class="fas fa-minus-circle"></i> Desasignar Seleccionados
+                </button>
+                <a href="@Url.Action("Details", new { id = Model.GrupoId })" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver al Grupo
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Panel de Estudiantes Disponibles -->
+            <div class="col-lg-6 mb-4">
+                <div class="card card-modern">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-users me-2"></i>
+                            Estudiantes Disponibles
+                            <span class="badge badge-light ms-2" id="badgeDisponibles">0</span>
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <!-- Filtros de búsqueda -->
+                        <div class="p-3 border-bottom">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Buscar estudiantes</label>
+                                <input type="text" id="buscarDisponibles" class="form-control" 
+                                       placeholder="Buscar por nombre, apellido o cédula...">
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-small btn-primary" id="btnSeleccionarTodos">
+                                    <i class="fas fa-check-square"></i> Seleccionar Todos
+                                </button>
+                                <button type="button" class="btn btn-small btn-secondary" id="btnDeseleccionarTodos">
+                                    <i class="fas fa-square"></i> Deseleccionar Todos
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Lista de estudiantes disponibles -->
+                        <div class="table-container">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th width="40">
+                                                <input type="checkbox" id="checkAllDisponibles" class="form-check-input">
+                                            </th>
+                                            <th>Estudiante</th>
+                                            <th>Cédula</th>
+                                            <th width="60">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaDisponibles">
+                                        <!-- Los datos se cargarán dinámicamente via JavaScript/AJAX -->
+                                        <tr id="loadingDisponibles">
+                                            <td colspan="4" class="text-center p-4">
+                                                <i class="fas fa-spinner fa-spin me-2"></i>
+                                                Cargando estudiantes disponibles...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div id="emptyDisponibles" class="p-4 text-center text-muted" style="display: none;">
+                                    <i class="fas fa-inbox fa-2x mb-2"></i>
+                                    <p class="mb-0">No hay estudiantes disponibles para asignar</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Estudiantes Asignados -->
+            <div class="col-lg-6 mb-4">
+                <div class="card card-modern">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user-check me-2"></i>
+                            Estudiantes Asignados
+                            <span class="badge badge-success ms-2" id="badgeAsignados">0</span>
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <!-- Filtros de búsqueda -->
+                        <div class="p-3 border-bottom">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Buscar estudiantes asignados</label>
+                                <input type="text" id="buscarAsignados" class="form-control" 
+                                       placeholder="Buscar por nombre, apellido o cédula...">
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-small btn-warning" id="btnSeleccionarTodosAsignados">
+                                    <i class="fas fa-check-square"></i> Seleccionar Todos
+                                </button>
+                                <button type="button" class="btn btn-small btn-secondary" id="btnDeseleccionarTodosAsignados">
+                                    <i class="fas fa-square"></i> Deseleccionar Todos
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Lista de estudiantes asignados -->
+                        <div class="table-container">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th width="40">
+                                                <input type="checkbox" id="checkAllAsignados" class="form-check-input">
+                                            </th>
+                                            <th>Estudiante</th>
+                                            <th>Fecha Asignación</th>
+                                            <th width="60">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaAsignados">
+                                        <!-- Los datos se cargarán dinámicamente via JavaScript/AJAX -->
+                                        <tr id="loadingAsignados">
+                                            <td colspan="4" class="text-center p-4">
+                                                <i class="fas fa-spinner fa-spin me-2"></i>
+                                                Cargando estudiantes asignados...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div id="emptyAsignados" class="p-4 text-center text-muted" style="display: none;">
+                                    <i class="fas fa-user-slash fa-2x mb-2"></i>
+                                    <p class="mb-0">No hay estudiantes asignados a este grupo</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de Resumen -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-subtle">
+                    <div class="card-body">
+                        <!-- Token de verificación antifalsificación -->
+                        @Html.AntiForgeryToken()
+                        
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-users fa-2x text-primary me-3"></i>
+                                    <div>
+                                        <h3 class="mb-0" id="totalDisponibles">0</h3>
+                                        <small class="text-muted">Disponibles</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-user-check fa-2x text-success me-3"></i>
+                                    <div>
+                                        <h3 class="mb-0" id="totalAsignados">0</h3>
+                                        <small class="text-muted">Asignados</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-percentage fa-2x text-info me-3"></i>
+                                    <div>
+                                        <h3 class="mb-0" id="porcentajeOcupacion">0%</h3>
+                                        <small class="text-muted">Ocupación</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-chart-line fa-2x text-warning me-3"></i>
+                                    <div>
+                                        <h3 class="mb-0" id="espaciosDisponibles">∞</h3>
+                                        <small class="text-muted">Espacios Libres</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Variables globales
+            const grupoId = @Model.GrupoId;
+            const capacidadMaxima = @(Model.CapacidadMaxima ?? 0);
+            
+            // Función para cargar datos iniciales
+            function cargarDatos() {
+                console.log('🔄 Recargando datos de estudiantes...');
+                cargarEstudiantesDisponibles();
+                cargarEstudiantesAsignados();
+            }
+
+            // Función para recargar solo tablas específicas
+            function recargarTablas(options = {}) {
+                const { soloDisponibles = false, soloAsignados = false, mantenerFiltros = true } = options;
+                
+                // Guardar filtros actuales si se solicita
+                let filtroDisponibles = '';
+                let filtroAsignados = '';
+                
+                if (mantenerFiltros) {
+                    filtroDisponibles = $('#buscarDisponibles').val();
+                    filtroAsignados = $('#buscarAsignados').val();
+                }
+                
+                if (!soloAsignados) {
+                    cargarEstudiantesDisponibles().then(() => {
+                        if (mantenerFiltros && filtroDisponibles) {
+                            $('#buscarDisponibles').val(filtroDisponibles).trigger('keyup');
+                        }
+                    });
+                }
+                
+                if (!soloDisponibles) {
+                    cargarEstudiantesAsignados().then(() => {
+                        if (mantenerFiltros && filtroAsignados) {
+                            $('#buscarAsignados').val(filtroAsignados).trigger('keyup');
+                        }
+                    });
+                }
+            }
+
+            // Función para cargar estudiantes disponibles via AJAX
+            function cargarEstudiantesDisponibles() {
+                return new Promise((resolve, reject) => {
+                    // Mostrar indicador de carga
+                    $('#tablaDisponibles').html('<tr id="loadingDisponibles"><td colspan="4" class="text-center p-4"><i class="fas fa-spinner fa-spin me-2"></i>Cargando estudiantes disponibles...</td></tr>');
+                    $('#emptyDisponibles').hide();
+                    
+                    $.get('@Url.Action("GetEstudiantesDisponibles")', { grupoId: grupoId })
+                        .done(function(data) {
+                            $('#loadingDisponibles').remove();
+                            
+                            if (data && data.length > 0) {
+                                renderizarEstudiantesDisponibles(data);
+                                $('#badgeDisponibles').text(data.length);
+                                $('#totalDisponibles').text(data.length);
+                                $('#emptyDisponibles').hide();
+                                console.log(`✅ Cargados ${data.length} estudiantes disponibles`);
+                            } else {
+                                $('#tablaDisponibles').empty();
+                                $('#emptyDisponibles').show();
+                                $('#badgeDisponibles').text('0');
+                                $('#totalDisponibles').text('0');
+                                console.log('ℹ️ No hay estudiantes disponibles');
+                            }
+                            resolve(data);
+                        })
+                        .fail(function(xhr, status, error) {
+                            console.error('❌ Error cargando estudiantes disponibles:', error);
+                            $('#tablaDisponibles').html('<tr><td colspan="4" class="text-center p-4 text-danger"><i class="fas fa-exclamation-triangle"></i> Error al cargar datos</td></tr>');
+                            reject(error);
+                        });
+                });
+            }
+
+            // Función para cargar estudiantes asignados via AJAX
+            function cargarEstudiantesAsignados() {
+                return new Promise((resolve, reject) => {
+                    // Mostrar indicador de carga
+                    $('#tablaAsignados').html('<tr id="loadingAsignados"><td colspan="4" class="text-center p-4"><i class="fas fa-spinner fa-spin me-2"></i>Cargando estudiantes asignados...</td></tr>');
+                    $('#emptyAsignados').hide();
+                    
+                    $.get('@Url.Action("GetEstudiantesAsignados")', { grupoId: grupoId })
+                        .done(function(data) {
+                            $('#loadingAsignados').remove();
+                            
+                            if (data && data.length > 0) {
+                                renderizarEstudiantesAsignados(data);
+                                $('#badgeAsignados').text(data.length);
+                                $('#totalAsignados').text(data.length);
+                                actualizarEstadisticas(data.length);
+                                $('#emptyAsignados').hide();
+                                console.log(`✅ Cargados ${data.length} estudiantes asignados`);
+                            } else {
+                                $('#tablaAsignados').empty();
+                                $('#emptyAsignados').show();
+                                $('#badgeAsignados').text('0');
+                                $('#totalAsignados').text('0');
+                                actualizarEstadisticas(0);
+                                console.log('ℹ️ No hay estudiantes asignados');
+                            }
+                            resolve(data);
+                        })
+                        .fail(function(xhr, status, error) {
+                            console.error('❌ Error cargando estudiantes asignados:', error);
+                            $('#tablaAsignados').html('<tr><td colspan="4" class="text-center p-4 text-danger"><i class="fas fa-exclamation-triangle"></i> Error al cargar datos</td></tr>');
+                            reject(error);
+                        });
+                });
+            }
+
+            // Renderizar estudiantes disponibles
+            function renderizarEstudiantesDisponibles(estudiantes) {
+                let html = '';
+                estudiantes.forEach(function(estudiante) {
+                    html += `
+                        <tr data-estudiante-id="${estudiante.estudianteId}" 
+                            data-search="${estudiante.nombreCompleto} ${estudiante.cedula}">
+                            <td>
+                                <input type="checkbox" class="form-check-input check-disponible" 
+                                       value="${estudiante.estudianteId}">
+                            </td>
+                            <td>
+                                <div>
+                                    <strong>${estudiante.nombreCompleto}</strong>
+                                    ${estudiante.email ? `<br><small class="text-muted">${estudiante.email}</small>` : ''}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge badge-secondary">${estudiante.cedula}</span>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-small btn-success btn-asignar" 
+                                        data-estudiante-id="${estudiante.estudianteId}"
+                                        title="Asignar estudiante">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </td>
+                        </tr>`;
+                });
+                $('#tablaDisponibles').html(html);
+                configurarEventosDisponibles();
+            }
+
+            // Renderizar estudiantes asignados
+            function renderizarEstudiantesAsignados(estudiantes) {
+                let html = '';
+                estudiantes.forEach(function(estudiante) {
+                    html += `
+                        <tr data-estudiante-id="${estudiante.estudianteId}" 
+                            data-search="${estudiante.nombreCompleto} ${estudiante.cedula}">
+                            <td>
+                                <input type="checkbox" class="form-check-input check-asignado" 
+                                       value="${estudiante.estudianteId}">
+                            </td>
+                            <td>
+                                <div>
+                                    <strong>${estudiante.nombreCompleto}</strong>
+                                    <br><small class="text-muted">${estudiante.cedula}</small>
+                                    ${estudiante.email ? `<br><small class="text-muted">${estudiante.email}</small>` : ''}
+                                </div>
+                            </td>
+                            <td>
+                                <small class="text-muted">
+                                    ${new Date(estudiante.fechaAsignacion).toLocaleDateString('es-ES')}
+                                </small>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-small btn-danger btn-desasignar" 
+                                        data-estudiante-id="${estudiante.estudianteId}"
+                                        title="Desasignar estudiante">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </td>
+                        </tr>`;
+                });
+                $('#tablaAsignados').html(html);
+                configurarEventosAsignados();
+            }
+
+            // Configurar eventos para estudiantes disponibles
+            function configurarEventosDisponibles() {
+                $('.check-disponible').off('change').on('change', actualizarBotonesAccion);
+                $('.btn-asignar').off('click').on('click', function() {
+                    const estudianteId = $(this).data('estudiante-id');
+                    asignarEstudiante(estudianteId);
+                });
+            }
+
+            // Configurar eventos para estudiantes asignados
+            function configurarEventosAsignados() {
+                $('.check-asignado').off('change').on('change', actualizarBotonesAccion);
+                $('.btn-desasignar').off('click').on('click', function() {
+                    const estudianteId = $(this).data('estudiante-id');
+                    desasignarEstudiante(estudianteId);
+                });
+            }
+
+            // Función para actualizar estadísticas
+            function actualizarEstadisticas(totalAsignados) {
+                if (capacidadMaxima > 0) {
+                    const porcentaje = Math.round((totalAsignados / capacidadMaxima) * 100);
+                    const espaciosLibres = capacidadMaxima - totalAsignados;
+                    
+                    $('#porcentajeOcupacion').text(porcentaje + '%');
+                    $('#espaciosDisponibles').text(espaciosLibres);
+                } else {
+                    $('#porcentajeOcupacion').text('N/A');
+                    $('#espaciosDisponibles').text('∞');
+                }
+            }
+
+            // Función para filtrar tablas
+            function filtrarTabla(inputId, tablaId) {
+                $(inputId).on('keyup', function() {
+                    const valor = $(this).val().toLowerCase();
+                    
+                    $(tablaId + ' tr').each(function() {
+                        const textoFila = $(this).data('search');
+                        if (textoFila) {
+                            const mostrar = textoFila.toLowerCase().includes(valor);
+                            $(this).toggle(mostrar);
+                        }
+                    });
+                });
+            }
+
+            // Aplicar filtros
+            filtrarTabla('#buscarDisponibles', '#tablaDisponibles');
+            filtrarTabla('#buscarAsignados', '#tablaAsignados');
+
+            // Gestión de checkboxes
+            $('#checkAllDisponibles').change(function() {
+                $('.check-disponible:visible').prop('checked', this.checked);
+                actualizarBotonesAccion();
+            });
+
+            $('#checkAllAsignados').change(function() {
+                $('.check-asignado:visible').prop('checked', this.checked);
+                actualizarBotonesAccion();
+            });
+
+            function actualizarBotonesAccion() {
+                const disponiblesSeleccionados = $('.check-disponible:checked').length;
+                const asignadosSeleccionados = $('.check-asignado:checked').length;
+
+                $('#btnAsignarSeleccionados').prop('disabled', disponiblesSeleccionados === 0);
+                $('#btnDesasignarSeleccionados').prop('disabled', asignadosSeleccionados === 0);
+            }
+
+            // Botones de selección masiva
+            $('#btnSeleccionarTodos').click(function() {
+                $('.check-disponible:visible').prop('checked', true);
+                actualizarBotonesAccion();
+            });
+
+            $('#btnDeseleccionarTodos').click(function() {
+                $('.check-disponible').prop('checked', false);
+                actualizarBotonesAccion();
+            });
+
+            $('#btnSeleccionarTodosAsignados').click(function() {
+                $('.check-asignado:visible').prop('checked', true);
+                actualizarBotonesAccion();
+            });
+
+            $('#btnDeseleccionarTodosAsignados').click(function() {
+                $('.check-asignado').prop('checked', false);
+                actualizarBotonesAccion();
+            });
+
+            // Asignar seleccionados
+            $('#btnAsignarSeleccionados').click(function() {
+                const estudiantesIds = $('.check-disponible:checked').map(function() {
+                    return $(this).val();
+                }).get();
+
+                if (estudiantesIds.length > 0) {
+                    asignarEstudiantesMultiples(estudiantesIds);
+                }
+            });
+
+            // Desasignar seleccionados
+            $('#btnDesasignarSeleccionados').click(function() {
+                const estudiantesIds = $('.check-asignado:checked').map(function() {
+                    return $(this).val();
+                }).get();
+
+                if (estudiantesIds.length > 0) {
+                    desasignarEstudiantesMultiples(estudiantesIds);
+                }
+            });
+
+            // Funciones AJAX para asignación/desasignación
+            function asignarEstudiante(estudianteId) {
+                Swal.fire({
+                    title: 'Asignando estudiante...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                $.post('@Url.Action("AsignarEstudiante")', {
+                    grupoId: grupoId,
+                    estudianteId: estudianteId,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                })
+                .done(function(result) {
+                    if (result.success) {
+                        Swal.fire({
+                            title: '¡Éxito!',
+                            text: 'Estudiante asignado correctamente',
+                            icon: 'success',
+                            timer: 2000
+                        });
+                        cargarDatos(); // Recargar datos
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: result.message || 'Error al asignar estudiante',
+                            icon: 'error'
+                        });
+                    }
+                })
+                .fail(function() {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Error de comunicación con el servidor',
+                        icon: 'error'
+                    });
+                });
+            }
+
+            function desasignarEstudiante(estudianteId) {
+                Swal.fire({
+                    title: '¿Desasignar estudiante?',
+                    text: 'Esta acción removerá al estudiante del grupo',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, desasignar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Desasignando estudiante...',
+                            allowOutsideClick: false,
+                            didOpen: () => Swal.showLoading()
+                        });
+
+                        $.post('@Url.Action("DesasignarEstudianteSingle")', {
+                            grupoId: grupoId,
+                            estudianteId: estudianteId,
+                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                        })
+                        .done(function(result) {
+                            if (result.success) {
+                                Swal.fire({
+                                    title: '¡Éxito!',
+                                    text: 'Estudiante desasignado correctamente',
+                                    icon: 'success',
+                                    timer: 2000,
+                                    timerProgressBar: true
+                                });
+                                // Recargar ambas tablas para reflejar los cambios
+                                recargarTablas({ mantenerFiltros: true });
+                            } else {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: result.message || 'Error al desasignar estudiante',
+                                    icon: 'error'
+                                });
+                            }
+                        })
+                        .fail(function() {
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Error de comunicación con el servidor',
+                                icon: 'error'
+                            });
+                        });
+                    }
+                });
+            }
+
+            function asignarEstudiantesMultiples(estudiantesIds) {
+                Swal.fire({
+                    title: `¿Asignar ${estudiantesIds.length} estudiante(s)?`,
+                    text: 'Esta acción asignará los estudiantes seleccionados al grupo',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, asignar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Asignando estudiantes...',
+                            allowOutsideClick: false,
+                            didOpen: () => Swal.showLoading()
+                        });
+
+                        $.post('@Url.Action("AsignarEstudiantesMultiples")', {
+                            grupoId: grupoId,
+                            estudiantesIds: estudiantesIds,
+                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                        })
+                        .done(function(result) {
+                            if (result.success) {
+                                Swal.fire({
+                                    title: '¡Éxito!',
+                                    text: `${result.asignados || estudiantesIds.length} estudiante(s) asignado(s) correctamente`,
+                                    icon: 'success',
+                                    timer: 3000,
+                                    timerProgressBar: true
+                                });
+                                // Recargar ambas tablas y limpiar selecciones
+                                recargarTablas({ mantenerFiltros: true });
+                                // Limpiar checkboxes después de un breve delay
+                                setTimeout(() => {
+                                    $('.check-disponible').prop('checked', false);
+                                    $('#checkAllDisponibles').prop('checked', false);
+                                    actualizarBotonesAccion();
+                                }, 500);
+                            } else {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: result.message || 'Error al asignar estudiantes',
+                                    icon: 'error'
+                                });
+                            }
+                        })
+                        .fail(function() {
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Error de comunicación con el servidor',
+                                icon: 'error'
+                            });
+                        });
+                    }
+                });
+            }
+
+            function desasignarEstudiantesMultiples(estudiantesIds) {
+                Swal.fire({
+                    title: `¿Desasignar ${estudiantesIds.length} estudiante(s)?`,
+                    text: 'Esta acción removerá los estudiantes seleccionados del grupo',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, desasignar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Desasignando estudiantes...',
+                            allowOutsideClick: false,
+                            didOpen: () => Swal.showLoading()
+                        });
+
+                        $.post('@Url.Action("DesasignarEstudiantesMultiplesAjax")', {
+                            grupoId: grupoId,
+                            estudiantesIds: estudiantesIds,
+                            motivo: '', // Motivo opcional
+                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                        })
+                        .done(function(result) {
+                            if (result.success) {
+                                Swal.fire({
+                                    title: '¡Éxito!',
+                                    text: `${result.desasignados || estudiantesIds.length} estudiante(s) desasignado(s) correctamente`,
+                                    icon: 'success',
+                                    timer: 3000,
+                                    timerProgressBar: true
+                                });
+                                // Recargar ambas tablas y limpiar selecciones
+                                recargarTablas({ mantenerFiltros: true });
+                                // Limpiar checkboxes después de un breve delay
+                                setTimeout(() => {
+                                    $('.check-asignado').prop('checked', false);
+                                    $('#checkAllAsignados').prop('checked', false);
+                                    actualizarBotonesAccion();
+                                }, 500);
+                            } else {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: result.message || 'Error al desasignar estudiantes',
+                                    icon: 'error'
+                                });
+                            }
+                        })
+                        .fail(function() {
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Error de comunicación con el servidor',
+                                icon: 'error'
+                            });
+                        });
+                    }
+                });
+            }
+
+            // Inicializar aplicación
+            cargarDatos();
+            actualizarBotonesAccion();
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        /* Estilos específicos para la vista de asignación */
+        
+        /* Estilos para breadcrumb blanco */
+        .breadcrumb-white {
+            background: transparent;
+        }
+
+        .breadcrumb-white .breadcrumb-item {
+            color: white !important;
+        }
+
+        .breadcrumb-white .breadcrumb-item a {
+            color: white !important;
+            text-decoration: none;
+        }
+
+        .breadcrumb-white .breadcrumb-item a:hover {
+            color: #f8f9fa !important;
+            text-decoration: underline;
+        }
+
+        .breadcrumb-white .breadcrumb-item.active {
+            color: white !important;
+        }
+
+        .breadcrumb-white .breadcrumb-item + .breadcrumb-item::before {
+            color: white !important;
+            content: var(--bs-breadcrumb-divider, "/");
+        }
+
+        /* Estilos adicionales para header */
+        .page-header .breadcrumb-item,
+        .page-header .breadcrumb-item a,
+        .page-header .breadcrumb-item.active {
+            color: white !important;
+        }
+
+        .page-header .breadcrumb-item + .breadcrumb-item::before {
+            color: white !important;
+        }
+
+        .page-header .breadcrumb a {
+            color: white !important;
+            text-decoration: none;
+            opacity: 0.9;
+        }
+
+        .page-header .breadcrumb a:hover {
+            color: white !important;
+            text-decoration: underline;
+            opacity: 1;
+        }
+
+        /* Mejoras específicas para esta vista */
+        .table tbody tr:hover {
+            background-color: var(--bg-light);
+        }
+
+        .btn-small {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .card-modern {
+            transition: transform 0.2s ease;
+        }
+
+        .card-modern:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Espaciado para badges en encabezados */
+        .card-header .badge {
+            font-size: 0.7rem;
+        }
+
+        /* Iconos de estado en resumen */
+        .fa-2x {
+            opacity: 0.8;
+        }
+
+        /* Estados de carga */
+        .fa-spin {
+            animation: fa-spin 2s infinite linear;
+        }
+
+        @@keyframes fa-spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(359deg);
+            }
+        }
+
+        /* Responsive adjustments */
+        @@media (max-width: 768px) {
+            .header-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .header-actions {
+                margin-top: 1rem;
+                flex-wrap: wrap;
+            }
+            
+            .btn {
+                margin-bottom: 0.5rem;
+            }
+
+            .col-md-3 {
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Animaciones suaves */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Highlight para filas seleccionadas */
+        .table tbody tr:has(.form-check-input:checked) {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid var(--primary-color);
+        }
+    </style>
+}

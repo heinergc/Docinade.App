@@ -1,0 +1,113 @@
+Módulo de Conducta Integrado al Sistema de Rúbricas (MEP – REA 40862-V21)
+
+Objetivo:
+Implementar un módulo de registro y valoración de faltas de conducta, vinculado a la nota de conducta por período, conforme al Reglamento de Evaluación de los Aprendizajes (REA) Decreto 40862-V21 del MEP. 
+
+REA V21 OCTUBRE 24
+
+1. Clasificación de faltas y rebajos automáticos (Art. 137)
+Tipo de falta	Rebajo automático
+Muy leve	1 a 5 puntos
+Leve	6 a 10 puntos
+Grave	11 a 19 puntos
+Muy grave	20 a 32 puntos
+Gravísima	33 a 45 puntos
+
+Al seleccionar una falta, el sistema debe:
+
+Mostrar definición y ejemplos
+
+Mostrar acción correctiva correspondiente (Art. 148–150)
+
+Aplicar rebajo automáticamente a la nota de conducta acumulada
+
+2. Registro de boleta
+
+Al registrar una boleta:
+
+Seleccionar estudiante
+
+Seleccionar tipo de falta
+
+Adjuntar descripción y evidencia (opcional)
+
+Guardar quién la emitió (docente) y fecha
+
+Al guardar:
+El sistema debe:
+
+Ubicar automáticamente el grupo del estudiante
+
+Identificar el profesor guía asignado al grupo
+
+Notificarle (bandeja interna + correo + bitácora institucional)
+
+Registrar la boleta en el expediente del estudiante
+
+3. Cálculo y estado de la nota de conducta
+
+Parámetro institucional configurable (tabla ParametrosInstitucion):
+
+NotaMinimaAprobacionConducta = 65   // Se debe permitir cambiar a 70 u otro
+
+
+Estado automático:
+
+>= Nota mínima → Estado: Aprobado
+
+Entre Nota mínima y Nota mínima - 5 → Estado: Riesgo
+
+< Nota mínima → Estado: Aplazado en conducta (Art. 132) 
+
+REA V21 OCTUBRE 24
+
+4. Si el estudiante queda APLAZADO (Art. 132)
+
+El sistema debe mostrar mensaje en cuaderno calificador:
+
+“Estudiante aplazado en conducta. Debe realizar un Programa de Acciones de Interés Institucional o Comunal, supervisado por el Comité de Evaluación, para optar por la condición de aprobado.” 
+
+REA V21 OCTUBRE 24
+
+Registrar:
+
+Programa asignado
+
+Responsable
+
+Fechas de cumplimiento
+
+Verificación de cierre
+
+5. Opción C — Decisión Profesional Docente
+
+Si el estudiante queda Aplazado:
+Mostrar botón: “Resolver mediante criterio profesional”
+Requiere:
+
+Descripción de justificación pedagógica obligatoria
+
+Opciones:
+
+Mantener estado aplazado
+
+Asignar condición de aprobado (ajustar nota a la mínima)
+
+Toda decisión queda registrada en:
+
+Acta del Comité de Evaluación
+
+Expediente del estudiante
+
+6. Reportes a generar
+
+Historial de boletas por estudiante
+
+Registro de faltas por grupo / docente / período
+
+Estudiantes en riesgo y aplazados
+
+Seguimiento de programas de acciones
+
+smpt --- brevo key 
+[REDACTED - use environment variable BREVO_API_KEY]

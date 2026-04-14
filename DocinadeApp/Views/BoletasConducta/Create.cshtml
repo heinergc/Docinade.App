@@ -1,0 +1,278 @@
+@model RubricasApp.Web.ViewModels.Conducta.RegistrarBoletaConductaViewModel
+
+@{
+    ViewData["Title"] = "Nueva Boleta de Conducta";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index">Boletas de Conducta</a></li>
+                    <li class="breadcrumb-item active">Nueva Boleta</li>
+                </ol>
+            </nav>
+            <h2><i class="fas fa-clipboard-list text-primary"></i> Registrar Boleta de Conducta</h2>
+            <p class="text-muted">Complete el formulario para registrar un incidente de conducta (REA 40862-V21 Art. 137)</p>
+        </div>
+    </div>
+
+    <form asp-action="Create" method="post" enctype="multipart/form-data" id="formBoleta">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+        <div class="row">
+            <!-- Columna izquierda: Datos básicos -->
+            <div class="col-lg-6">
+                <!-- Información del estudiante -->
+                <div class="card mb-3">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-user"></i> Información del Estudiante</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="IdEstudiante" class="form-label required">Estudiante</label>
+                            <select asp-for="IdEstudiante" class="form-select" required>
+                                <option value="">Seleccione un estudiante...</option>
+                                @if (ViewBag.Estudiantes != null)
+                                {
+                                    @foreach (var estudiante in ViewBag.Estudiantes)
+                                    {
+                                        <option value="@estudiante.Value" selected="@estudiante.Selected">
+                                            @estudiante.Text
+                                        </option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="IdEstudiante" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="IdPeriodo" class="form-label required">Período Académico</label>
+                            <select asp-for="IdPeriodo" class="form-select" required>
+                                @if (ViewBag.Periodos != null)
+                                {
+                                    @foreach (var periodo in ViewBag.Periodos)
+                                    {
+                                        <option value="@periodo.Value" selected="@periodo.Selected">
+                                            @periodo.Text
+                                        </option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="IdPeriodo" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tipo de falta y rebajo -->
+                <div class="card mb-3">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Clasificación de la Falta</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="IdTipoFalta" class="form-label required">Tipo de Falta</label>
+                            <select asp-for="IdTipoFalta" class="form-select" id="tipoFaltaSelect" required>
+                                <option value="">Seleccione el tipo de falta...</option>
+                                @if (ViewBag.TiposFalta != null)
+                                {
+                                    @foreach (var tipo in ViewBag.TiposFalta)
+                                    {
+                                        <option value="@tipo.IdTipoFalta" 
+                                                data-rebajo-min="@tipo.RebajoMinimo" 
+                                                data-rebajo-max="@tipo.RebajoMaximo">
+                                            @tipo.Nombre (@tipo.RebajoMinimo - @tipo.RebajoMaximo pts)
+                                        </option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="IdTipoFalta" class="text-danger"></span>
+                        </div>
+
+                        <!-- Info del tipo de falta seleccionado -->
+                        <div id="infoTipoFalta" class="alert alert-info d-none">
+                            <h6 class="alert-heading">Información del Tipo de Falta</h6>
+                            <p class="mb-1"><strong>Definición:</strong> <span id="definicion"></span></p>
+                            <p class="mb-1"><strong>Ejemplos:</strong> <span id="ejemplos"></span></p>
+                            <p class="mb-0"><strong>Acción Correctiva:</strong> <span id="accionCorrectiva"></span></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="RebajoAplicado" class="form-label required">Rebajo Aplicado (puntos)</label>
+                            <input asp-for="RebajoAplicado" type="number" class="form-control" 
+                                   min="1" max="45" step="1" required id="rebajoInput" />
+                            <div class="form-text">
+                                Rango permitido: <span id="rangoRebajo" class="text-primary fw-bold">Seleccione un tipo de falta</span>
+                            </div>
+                            <span asp-validation-for="RebajoAplicado" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna derecha: Descripción del incidente -->
+            <div class="col-lg-6">
+                <!-- Detalles del incidente -->
+                <div class="card mb-3">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0"><i class="fas fa-file-alt"></i> Descripción del Incidente</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="Descripcion" class="form-label required">Descripción Detallada</label>
+                            <textarea asp-for="Descripcion" class="form-control" rows="4" required 
+                                      placeholder="Describa en detalle el incidente de conducta..."></textarea>
+                            <div class="form-text">Incluya: qué pasó, cuándo, cómo y por qué</div>
+                            <span asp-validation-for="Descripcion" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="LugarIncidente" class="form-label">Lugar del Incidente</label>
+                            <input asp-for="LugarIncidente" class="form-control" 
+                                   placeholder="Ej: Aula 201, Cafetería, Patio, etc." />
+                            <span asp-validation-for="LugarIncidente" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Testigos" class="form-label">Testigos</label>
+                            <input asp-for="Testigos" class="form-control" 
+                                   placeholder="Nombres de testigos presentes" />
+                            <span asp-validation-for="Testigos" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="AccionInmediata" class="form-label">Acción Inmediata Tomada</label>
+                            <textarea asp-for="AccionInmediata" class="form-control" rows="3" 
+                                      placeholder="Describa qué acción se tomó inmediatamente..."></textarea>
+                            <span asp-validation-for="AccionInmediata" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Observaciones" class="form-label">Observaciones Adicionales</label>
+                            <textarea asp-for="Observaciones" class="form-control" rows="2" 
+                                      placeholder="Cualquier otra observación relevante..."></textarea>
+                            <span asp-validation-for="Observaciones" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Evidencia -->
+                <div class="card mb-3">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-paperclip"></i> Evidencia (Opcional)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="archivoEvidencia" class="form-label">Adjuntar Archivo</label>
+                            <input type="file" class="form-control" id="archivoEvidencia" name="archivoEvidencia" 
+                                   accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" />
+                            <div class="form-text">
+                                Formatos permitidos: JPG, PNG, PDF, DOC, DOCX. Tamaño máximo: 5 MB
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg" id="btnGuardar">
+                                <i class="fas fa-save"></i> Registrar Boleta
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Cargar información del tipo de falta seleccionado
+            $('#tipoFaltaSelect').on('change', function() {
+                const idTipoFalta = $(this).val();
+                const selectedOption = $(this).find('option:selected');
+                
+                if (idTipoFalta) {
+                    // Mostrar rango de rebajo
+                    const rebajoMin = selectedOption.data('rebajo-min');
+                    const rebajoMax = selectedOption.data('rebajo-max');
+                    $('#rangoRebajo').text(`${rebajoMin} - ${rebajoMax} puntos`);
+                    $('#rebajoInput').attr('min', rebajoMin).attr('max', rebajoMax).val(rebajoMin);
+
+                    // Cargar detalles del tipo de falta
+                    $.ajax({
+                        url: '@Url.Action("GetTipoFalta", "BoletasConducta")/' + idTipoFalta,
+                        method: 'GET',
+                        success: function(data) {
+                            $('#definicion').text(data.definicion);
+                            $('#ejemplos').text(data.ejemplos);
+                            $('#accionCorrectiva').text(data.accionCorrectiva);
+                            $('#infoTipoFalta').removeClass('d-none');
+                        },
+                        error: function() {
+                            toastr.error('Error al cargar información del tipo de falta');
+                        }
+                    });
+                } else {
+                    $('#rangoRebajo').text('Seleccione un tipo de falta');
+                    $('#infoTipoFalta').addClass('d-none');
+                    $('#rebajoInput').val('').attr('min', 1).attr('max', 45);
+                }
+            });
+
+            // Validación del formulario
+            $('#formBoleta').on('submit', function(e) {
+                const idTipoFalta = $('#tipoFaltaSelect').val();
+                const rebajo = parseInt($('#rebajoInput').val());
+                const selectedOption = $('#tipoFaltaSelect').find('option:selected');
+                const rebajoMin = parseInt(selectedOption.data('rebajo-min'));
+                const rebajoMax = parseInt(selectedOption.data('rebajo-max'));
+
+                if (idTipoFalta && (rebajo < rebajoMin || rebajo > rebajoMax)) {
+                    e.preventDefault();
+                    toastr.error(`El rebajo debe estar entre ${rebajoMin} y ${rebajoMax} puntos para este tipo de falta`);
+                    return false;
+                }
+
+                // Confirmar antes de enviar
+                if (!confirm('¿Está seguro de registrar esta boleta de conducta? Se notificará automáticamente al profesor guía.')) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                $('#btnGuardar').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+            });
+
+            // Validar tamaño del archivo
+            $('#archivoEvidencia').on('change', function() {
+                const file = this.files[0];
+                if (file && file.size > 5 * 1024 * 1024) {
+                    toastr.error('El archivo no debe superar 5 MB');
+                    $(this).val('');
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .required::after {
+        content: " *";
+        color: red;
+    }
+</style>

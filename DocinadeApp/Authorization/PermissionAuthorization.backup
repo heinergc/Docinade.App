@@ -1,0 +1,69 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
+using RubricasApp.Web.Services.Permissions;
+
+namespace RubricasApp.Web.Authorization
+{
+    /// <summary>
+    /// Atributo de autorización basado en permisos
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
+    public class RequirePermissionAttribute : AuthorizeAttribute
+    {
+        public string Permission { get; }
+
+        public RequirePermissionAttribute(string permission)
+        {
+            Permission = permission;
+            Policy = $"RequirePermission:{permission}";
+        }
+    }
+
+    /// <summary>
+    /// Atributo alternativo para verificación de permisos (alias para RequirePermissionAttribute)
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
+    public class HasPermissionAttribute : RequirePermissionAttribute
+    {
+        public HasPermissionAttribute(string permission) : base(permission)
+        {
+        }
+    }
+
+    /// <summary>
+    /// Requirement para el sistema de autorización basado en permisos
+    /// </summary>
+    public class PermissionRequirement : IAuthorizationRequirement
+    {
+        public string Permission { get; }
+
+        public PermissionRequirement(string permission) => Permission = permission;
+    }
+
+    /// <summary>
+    /// Handler para validar permisos
+    /// </summary>
+    public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionRequirement>
+    {
+        private readonly IPermissionService _permissionService;
+
+        public PermissionAuthorizationHandler(IPermissionService permissionService)
+        {
+            _permissionService = permissionService;
+        }
+
+        protected override async Task HandleRequirementAsync(
+            AuthorizationHandlerContext context,
+            PermissionRequirement requirement)
+        {
+            if (context.User.Identity?.IsAuthenticated == true)
+            {
+                var hasPermission = await _permissionService.HasPermissionAsync(context.User, requirement.Permission);
+                if (hasPermission)
+                {
+                    context.Succeed(requirement);
+                }
+            }
+        }
+    }
+}

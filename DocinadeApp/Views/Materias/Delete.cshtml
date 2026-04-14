@@ -1,0 +1,109 @@
+﻿@model RubricasApp.Web.Models.Materia
+
+@{
+    ViewData["Title"] = "Eliminar Materia";
+}
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-exclamation-triangle"></i> Eliminar Materia
+                </h3>
+                <div class="card-subtitle mt-1 text-light">
+                    Confirme la eliminación de la siguiente materia
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Advertencia:</strong> Esta acción eliminará permanentemente la materia y no se puede deshacer.
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Código</label>
+                            <div class="fw-bold">
+                                <span class="badge bg-primary px-3 py-2 fs-6">@Model.Codigo</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Nombre</label>
+                            <div class="fw-bold fs-5">@Model.Nombre</div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Créditos</label>
+                            <div class="fw-bold">
+                                <span class="badge bg-info px-3 py-2 fs-6">@Model.Creditos créditos</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Tipo</label>
+                            <div class="fw-bold">
+                                <span class="badge @(Model.Tipo == "Teórica" ? "bg-secondary" : Model.Tipo == "Práctica" ? "bg-success" : "bg-warning") px-3 py-2 fs-6">
+                                    @Model.Tipo
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Ciclo Sugerido</label>
+                            <div class="fw-bold">
+                                <span class="badge bg-dark px-3 py-2 fs-6">Ciclo @Model.CicloSugerido</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                @if (Model.Prerequisitos != null && Model.Prerequisitos.Any())
+                {
+                    <hr class="my-4" />
+                    <div class="mb-3">
+                        <label class="form-label text-muted">
+                            <i class="fas fa-link"></i> Prerrequisitos que se eliminarán
+                        </label>
+                        <div class="mt-2">
+                            @foreach (var prerrequisito in Model.Prerequisitos)
+                            {
+                                <span class="badge bg-outline-primary me-2 mb-2 px-3 py-2 border">
+                                    <i class="fas fa-book"></i> @prerrequisito.Requisito.Codigo - @prerrequisito.Requisito.Nombre
+                                </span>
+                            }
+                        </div>
+                    </div>
+                }
+                
+                <div class="mt-4">
+                    <p class="text-danger fw-bold mb-0">
+                        <i class="fas fa-question-circle"></i> ¿Está seguro que desea eliminar esta materia?
+                    </p>
+                </div>
+            </div>
+            
+            <div class="card-footer d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+                
+                <div class="btn-group" role="group">
+                    <a asp-action="Details" asp-route-id="@Model.MateriaId" class="btn btn-info">
+                        <i class="fas fa-eye"></i> Ver Detalles
+                    </a>
+                    <form asp-action="Delete" method="post" class="d-inline">
+                        <input type="hidden" asp-for="MateriaId" />
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Está completamente seguro? Esta acción no se puede deshacer.')">
+                            <i class="fas fa-trash"></i> Confirmar Eliminación
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

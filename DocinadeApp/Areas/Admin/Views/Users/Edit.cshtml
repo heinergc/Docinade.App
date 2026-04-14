@@ -1,0 +1,437 @@
+@model RubricasApp.Web.ViewModels.Admin.EditUserViewModel
+
+@{
+    ViewData["Title"] = "Editar Usuario";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a asp-area="Admin" asp-controller="Admin" asp-action="Index">
+                    <i class="fas fa-home"></i> Administración
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a asp-area="Admin" asp-controller="Users" asp-action="Index">
+                    <i class="fas fa-users"></i> Usuarios
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-edit"></i> Editar Usuario
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="fas fa-user-edit text-primary"></i>
+                        Editar Usuario
+                    </h2>
+                    <p class="text-muted mb-0">
+                        Modifica la información del usuario @Model.Email
+                    </p>
+                </div>
+                <div>
+                    <a asp-area="Admin" asp-controller="Users" asp-action="Index" 
+                       class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver a Lista
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de Edición -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user-cog"></i>
+                        Información del Usuario
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-area="Admin" asp-controller="Users" asp-action="Edit" method="post" 
+                          id="editUserForm" class="needs-validation" novalidate>
+                        <input type="hidden" asp-for="Id" />
+                    
+                        
+                        @Html.AntiForgeryToken()
+
+                        <!-- Información Personal -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="border-bottom pb-2 mb-3">
+                                    <i class="fas fa-id-card text-info"></i>
+                                    Información Personal
+                                </h6>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Nombre" class="form-label">
+                                    <i class="fas fa-user"></i> Nombre *
+                                </label>
+                                <input asp-for="Nombre" class="form-control" placeholder="Ingrese el nombre" required />
+                                <span asp-validation-for="Nombre" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Apellido" class="form-label">
+                                    <i class="fas fa-user"></i> Apellidos *
+                                </label>
+                                <input asp-for="Apellido" class="form-control" placeholder="Ingrese los apellidos" required />
+                                <span asp-validation-for="Apellido" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Email" class="form-label">
+                                    <i class="fas fa-envelope"></i> Email *
+                                </label>
+                                <input asp-for="Email" type="email" class="form-control" placeholder="email@ejemplo.com" required />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PhoneNumber" class="form-label">
+                                    <i class="fas fa-phone"></i> Teléfono
+                                </label>
+                                <input asp-for="PhoneNumber" class="form-control" placeholder="Número de teléfono" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Estado de la Cuenta -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="border-bottom pb-2 mb-3">
+                                    <i class="fas fa-cog text-warning"></i>
+                                    Estado de la Cuenta
+                                </h6>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check form-switch">
+                                    <input asp-for="IsActive" class="form-check-input" type="checkbox" 
+                                           id="isActiveSwitch" />
+                                    <label class="form-check-label" for="isActiveSwitch">
+                                        <i class="fas fa-power-off"></i>
+                                        <span id="statusLabel">@(Model.IsActive ? "Usuario Activo" : "Usuario Inactivo")</span>
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">
+                                    Los usuarios inactivos no pueden iniciar sesión en el sistema
+                                </small>
+                            </div>
+
+                        </div>
+
+                        <!-- Roles del Usuario -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="border-bottom pb-2 mb-3">
+                                    <i class="fas fa-shield-alt text-success"></i>
+                                    Roles del Usuario
+                                </h6>
+                            </div>
+                            
+                            <div class="col-12">
+                                @if (Model.AvailableRoles != null && Model.AvailableRoles.Any())
+                                {
+                                    <div class="row">
+                                        @foreach (var role in Model.AvailableRoles)
+                                        {
+                                            <div class="col-md-4 col-sm-6 mb-2">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" 
+                                                           name="SelectedRoles" value="@role.Name" 
+                                                           id="role_@role.Id"
+                                                           @(Model.SelectedRoles != null && Model.SelectedRoles.Contains(role.Name) ? "checked" : "") />
+                                                    <label class="form-check-label" for="role_@role.Id">
+                                                        <i class="fas fa-user-tag"></i>
+                                                        @role.Name
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle"></i>
+                                        No hay roles disponibles en el sistema.
+                                    </div>
+                                }
+                                <span asp-validation-for="SelectedRoles" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="row">
+                            <div class="col-12">
+                                <hr />
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-save"></i>
+                                            Guardar Cambios
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary btn-lg ms-2" 
+                                                onclick="resetForm()">
+                                            <i class="fas fa-undo"></i>
+                                            Restaurar
+                                        </button>
+                                        <a asp-area="Admin" asp-controller="Users" asp-action="ResetPassword" 
+                                           asp-route-id="@Model.Id" class="btn btn-warning btn-lg ms-2">
+                                            <i class="fas fa-key"></i>
+                                            Resetear Contraseña
+                                        </a>
+                                    </div>
+                                    
+                                    <div>
+                                        <a asp-area="Admin" asp-controller="Users" asp-action="Details" 
+                                           asp-route-id="@Model.Id" class="btn btn-outline-info">
+                                            <i class="fas fa-eye"></i>
+                                            Ver Detalles
+                                        </a>
+                                        <a asp-area="Admin" asp-controller="Users" asp-action="Index" 
+                                           class="btn btn-outline-secondary ms-2">
+                                            <i class="fas fa-list"></i>
+                                            Lista de Usuarios
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación para Desactivar Usuario -->
+<div class="modal fade" id="deactivateUserModal" tabindex="-1" aria-labelledby="deactivateUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="deactivateUserModalLabel">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Confirmar Desactivación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>¿Está seguro de que desea desactivar este usuario?</strong></p>
+                <p class="text-muted">
+                    <i class="fas fa-info-circle"></i>
+                    El usuario no podrá iniciar sesión hasta que sea reactivado.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-warning" id="confirmDeactivate">
+                    <i class="fas fa-power-off"></i> Desactivar Usuario
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        $(document).ready(function() {
+            // Inicializar validación de formulario
+            initializeFormValidation();
+            
+            // Manejar cambio de estado activo/inactivo
+            $('#isActiveSwitch').on('change', function() {
+                const isActive = $(this).is(':checked');
+                const statusLabel = $('#statusLabel');
+                
+                if (isActive) {
+                    statusLabel.text('Usuario Activo').removeClass('text-danger').addClass('text-success');
+                } else {
+                    statusLabel.text('Usuario Inactivo').removeClass('text-success').addClass('text-danger');
+                    // Mostrar modal de confirmación para desactivar
+                    if (!$(this).data('programmatic')) {
+                        $('#deactivateUserModal').modal('show');
+                    }
+                }
+            });
+            
+            // Confirmar desactivación
+            $('#confirmDeactivate').on('click', function() {
+                $('#deactivateUserModal').modal('hide');
+                $('#isActiveSwitch').data('programmatic', true).prop('checked', false).trigger('change');
+            });
+            
+            // Si se cancela la desactivación
+            $('#deactivateUserModal').on('hidden.bs.modal', function() {
+                if (!$('#isActiveSwitch').data('programmatic')) {
+                    $('#isActiveSwitch').prop('checked', true).trigger('change');
+                }
+                $('#isActiveSwitch').removeData('programmatic');
+            });
+        });
+
+        function initializeFormValidation() {
+            // Validación en tiempo real
+            $('#editUserForm input').on('blur', function() {
+                if (this.checkValidity()) {
+                    $(this).removeClass('is-invalid').addClass('is-valid');
+                } else {
+                    $(this).removeClass('is-valid').addClass('is-invalid');
+                }
+            });
+
+            // Validación al enviar formulario
+            $('#editUserForm').on('submit', function(e) {
+                if (!this.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                $(this).addClass('was-validated');
+            });
+        }
+
+        function resetForm() {
+            if (confirm('¿Está seguro de que desea restaurar todos los campos a sus valores originales?')) {
+                location.reload();
+            }
+        }
+
+        // Mostrar mensaje de éxito si hay
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>
+            $(document).ready(function() {
+                showToast('success', '@TempData["SuccessMessage"]');
+            });
+            </text>
+        }
+
+        // Mostrar mensaje de error si hay
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>
+            $(document).ready(function() {
+                showToast('error', '@TempData["ErrorMessage"]');
+            });
+            </text>
+        }
+
+        function showToast(type, message) {
+            const toastClass = type === 'success' ? 'bg-success' : 'bg-danger';
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+            
+            const toast = $(`
+                <div class="toast align-items-center text-white ${toastClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="fas ${icon} me-2"></i>${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `);
+            
+            $('.toast-container').append(toast);
+            toast.toast('show');
+            
+            // Remover el toast después de que se oculte
+            toast.on('hidden.bs.toast', function() {
+                $(this).remove();
+            });
+        }
+    </script>
+}
+
+@section Styles {
+    <style>
+        .card {
+            border: none;
+            border-radius: 10px;
+        }
+        
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+        }
+        
+        .form-control:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        .form-check-input:checked {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        
+        .btn-lg {
+            padding: 0.75rem 1.5rem;
+        }
+        
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1055;
+        }
+        
+        .breadcrumb {
+            background-color: #f8f9fa;
+            border-radius: 0.375rem;
+            padding: 0.75rem 1rem;
+        }
+        
+        .breadcrumb-item a {
+            text-decoration: none;
+            color: #6c757d;
+        }
+        
+        .breadcrumb-item a:hover {
+            color: #0d6efd;
+        }
+        
+        .border-bottom {
+            border-bottom: 2px solid #e9ecef !important;
+        }
+        
+        h6 i {
+            margin-right: 0.5rem;
+        }
+        
+        .form-label i {
+            margin-right: 0.25rem;
+        }
+        
+        .form-check-label i {
+            margin-right: 0.25rem;
+            color: #6c757d;
+        }
+        
+        .alert i {
+            margin-right: 0.5rem;
+        }
+        
+        .modal-header i {
+            margin-right: 0.5rem;
+        }
+    </style>
+}
+
+<!-- Container para toasts -->
+<div class="toast-container"></div>

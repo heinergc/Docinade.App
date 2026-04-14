@@ -1,0 +1,254 @@
+@model RubricasApp.Web.ViewModels.Conducta.CrearProgramaAccionesViewModel
+
+@{
+    ViewData["Title"] = "Crear Programa de Acciones Institucional";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-action="EstudiantesAplazados">Estudiantes Aplazados</a></li>
+                    <li class="breadcrumb-item active">Crear Programa</li>
+                </ol>
+            </nav>
+            <h2><i class="fas fa-clipboard-list text-warning"></i> Programa de Acciones Institucional</h2>
+            <p class="text-muted">Opción B - REA 40862-V21, Artículo 132</p>
+        </div>
+    </div>
+
+    <!-- Información normativa -->
+    <div class="alert alert-info border-info">
+        <h5 class="alert-heading"><i class="fas fa-info-circle"></i> Marco Normativo</h5>
+        <p>
+            Según el REA 40862-V21, Artículo 132, el Programa de Acciones Institucional es una estrategia 
+            para que el estudiante que aplace conducta pueda mejorar su comportamiento mediante:
+        </p>
+        <ul class="mb-0">
+            <li>Acompañamiento del Comité de Apoyo Educativo</li>
+            <li>Actividades formativas y de reflexión</li>
+            <li>Participación de la familia</li>
+            <li>Seguimiento y evaluación periódica</li>
+        </ul>
+    </div>
+
+    <!-- Información del estudiante -->
+    <div class="card mb-4">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0"><i class="fas fa-user-graduate"></i> Información del Estudiante</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Nombre:</strong> @Model.NombreEstudiante</p>
+                    <p><strong>Identificación:</strong> @Model.NumeroIdentificacion</p>
+                    <p><strong>Grupo:</strong> @Model.NombreGrupo</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Período:</strong> @Model.NombrePeriodo</p>
+                    <p><strong>Nota de Conducta:</strong> <span class="badge bg-danger">@Model.NotaConducta.ToString("F2")</span></p>
+                    <p><strong>Estado:</strong> <span class="badge bg-danger">APLAZADO</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <form asp-action="CrearPrograma" method="post">
+        <input type="hidden" asp-for="IdEstudiante" />
+        <input type="hidden" asp-for="IdPeriodo" />
+
+        <!-- Descripción del programa -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-file-alt"></i> Descripción del Programa</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label asp-for="Descripcion" class="form-label required">Descripción del Programa</label>
+                    <textarea asp-for="Descripcion" class="form-control" rows="4" required 
+                              placeholder="Describa detalladamente el programa de acciones que se implementará..."></textarea>
+                    <span asp-validation-for="Descripcion" class="text-danger"></span>
+                    <div class="form-text">
+                        Incluya: objetivos, actividades específicas, metodología y resultados esperados
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Objetivos" class="form-label required">Objetivos del Programa</label>
+                    <textarea asp-for="Objetivos" class="form-control" rows="3" required 
+                              placeholder="Especifique los objetivos claros y medibles del programa..."></textarea>
+                    <span asp-validation-for="Objetivos" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ActividadesPropuestas" class="form-label required">Actividades Propuestas</label>
+                    <textarea asp-for="ActividadesPropuestas" class="form-control" rows="5" required 
+                              placeholder="Liste las actividades que realizará el estudiante..."></textarea>
+                    <span asp-validation-for="ActividadesPropuestas" class="text-danger"></span>
+                    <div class="form-text">
+                        <strong>Ejemplos:</strong> charlas formativas, trabajos comunitarios, sesiones de orientación, 
+                        participación en actividades institucionales, etc.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fechas y supervisión -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Fechas y Supervisión</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="FechaInicio" class="form-label required">Fecha de Inicio</label>
+                        <input asp-for="FechaInicio" type="date" class="form-control" required />
+                        <span asp-validation-for="FechaInicio" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="FechaFinPrevista" class="form-label required">Fecha de Finalización Prevista</label>
+                        <input asp-for="FechaFinPrevista" type="date" class="form-control" required />
+                        <span asp-validation-for="FechaFinPrevista" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="IdSupervisor" class="form-label required">Supervisor del Programa</label>
+                    <select asp-for="IdSupervisor" class="form-select" required>
+                        <option value="">-- Seleccione un supervisor --</option>
+                        @foreach (var supervisor in ViewBag.Supervisores)
+                        {
+                            <option value="@supervisor.Value">@supervisor.Text</option>
+                        }
+                    </select>
+                    <span asp-validation-for="IdSupervisor" class="text-danger"></span>
+                    <div class="form-text">
+                        Puede ser un orientador, psicólogo o miembro del Comité de Apoyo Educativo
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Participación de la familia -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-users"></i> Participación de la Familia</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label asp-for="CompromisosEstudiante" class="form-label required">Compromisos del Estudiante</label>
+                    <textarea asp-for="CompromisosEstudiante" class="form-control" rows="3" required 
+                              placeholder="Especifique los compromisos que asume el estudiante..."></textarea>
+                    <span asp-validation-for="CompromisosEstudiante" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CompromisosFamilia" class="form-label required">Compromisos de la Familia</label>
+                    <textarea asp-for="CompromisosFamilia" class="form-control" rows="3" required 
+                              placeholder="Especifique los compromisos de los padres o encargados..."></textarea>
+                    <span asp-validation-for="CompromisosFamilia" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Criterios de evaluación -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0"><i class="fas fa-check-square"></i> Criterios de Evaluación</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label asp-for="CriteriosEvaluacion" class="form-label required">Criterios de Evaluación del Programa</label>
+                    <textarea asp-for="CriteriosEvaluacion" class="form-control" rows="4" required 
+                              placeholder="Defina cómo se evaluará el cumplimiento del programa..."></textarea>
+                    <span asp-validation-for="CriteriosEvaluacion" class="text-danger"></span>
+                    <div class="form-text">
+                        Especifique los indicadores que se utilizarán para determinar si el estudiante cumplió satisfactoriamente el programa
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirmación -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="confirmarCreacion" required>
+                    <label class="form-check-label" for="confirmarCreacion">
+                        <strong>Confirmo que la información es correcta y que se ha comunicado este programa al estudiante y su familia</strong>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <a asp-action="EstudiantesAplazados" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-success btn-lg" id="btnGuardar">
+                        <i class="fas fa-save"></i> Crear Programa
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Validar fechas
+            $('#@Html.IdFor(m => m.FechaInicio), #@Html.IdFor(m => m.FechaFinPrevista)').on('change', function() {
+                const fechaInicio = new Date($('#@Html.IdFor(m => m.FechaInicio)').val());
+                const fechaFin = new Date($('#@Html.IdFor(m => m.FechaFinPrevista)').val());
+                
+                if (fechaFin <= fechaInicio) {
+                    toastr.error('La fecha de finalización debe ser posterior a la fecha de inicio');
+                    $('#@Html.IdFor(m => m.FechaFinPrevista)').val('');
+                }
+            });
+
+            // Validar longitud de textos
+            $('textarea[required]').on('blur', function() {
+                const minLength = 20;
+                if ($(this).val().trim().length < minLength) {
+                    toastr.warning('Este campo requiere al menos ' + minLength + ' caracteres');
+                }
+            });
+
+            // Confirmación antes de enviar
+            $('form').on('submit', function(e) {
+                if (!$('#confirmarCreacion').is(':checked')) {
+                    e.preventDefault();
+                    toastr.error('Debe confirmar la creación del programa');
+                    return false;
+                }
+
+                if (!confirm('¿Está seguro de crear este Programa de Acciones Institucional?\n\nSe notificará al supervisor asignado.')) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                $('#btnGuardar')
+                    .prop('disabled', true)
+                    .html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+            });
+        });
+    </script>
+}
+
+<style>
+    .required::after {
+        content: " *";
+        color: red;
+    }
+</style>

@@ -1,0 +1,313 @@
+@model RubricasApp.Web.ViewModels.Admin.RoleSelectionViewModel
+
+@{
+    ViewData["Title"] = "Seleccionar Rol para Asignar Permisos";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Home", new { area = "" })">
+                    <i class="fas fa-home"></i> Inicio
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Permissions")">
+                    <i class="fas fa-shield-alt"></i> Permisos
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-users"></i> Seleccionar Rol
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="mb-0">
+                <i class="fas fa-users text-primary"></i>
+                Seleccionar Rol para Asignar Permisos
+            </h2>
+            <p class="text-muted mt-2">Elija el rol al que desea asignar o modificar permisos</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Volver a Permisos
+            </a>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center bg-primary text-white">
+                <div class="card-body">
+                    <i class="fas fa-users fa-2x mb-2"></i>
+                    <h4>@Model.TotalRoles</h4>
+                    <p class="mb-0">Total Roles</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-success text-white">
+                <div class="card-body">
+                    <i class="fas fa-cog fa-2x mb-2"></i>
+                    <h4>@Model.SystemRoles</h4>
+                    <p class="mb-0">Roles del Sistema</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-info text-white">
+                <div class="card-body">
+                    <i class="fas fa-user-plus fa-2x mb-2"></i>
+                    <h4>@Model.CustomRoles</h4>
+                    <p class="mb-0">Roles Personalizados</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-warning text-white">
+                <div class="card-body">
+                    <i class="fas fa-user-friends fa-2x mb-2"></i>
+                    <h4>@Model.AvailableRoles.Sum(r => r.UserCount)</h4>
+                    <p class="mb-0">Total Usuarios</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-filter"></i> Filtros de Búsqueda
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="searchInput" class="form-label">Buscar Rol:</label>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Nombre del rol...">
+                </div>
+                <div class="col-md-3">
+                    <label for="typeFilter" class="form-label">Tipo de Rol:</label>
+                    <select id="typeFilter" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="system">Roles del Sistema</option>
+                        <option value="custom">Roles Personalizados</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="userFilter" class="form-label">Por Usuarios:</label>
+                    <select id="userFilter" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="withUsers">Con Usuarios</option>
+                        <option value="withoutUsers">Sin Usuarios</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de roles -->
+    <div class="row" id="rolesContainer">
+        @foreach (var role in Model.AvailableRoles.OrderBy(r => r.RoleName))
+        {
+            <div class="col-md-6 col-lg-4 mb-4 role-card" 
+                 data-role="@role.RoleName.ToLower()" 
+                 data-type="@(role.IsSystemRole ? "system" : "custom")"
+                 data-users="@(role.UserCount > 0 ? "withUsers" : "withoutUsers")">
+                <div class="card h-100 @(role.IsSystemRole ? "border-primary" : "border-info")">
+                    <div class="card-header @(role.IsSystemRole ? "bg-primary" : "bg-info") text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">
+                                <i class="fas @(role.IsSystemRole ? "fa-cog" : "fa-user-plus")"></i>
+                                @role.RoleName
+                            </h6>
+                            @if (role.IsSystemRole)
+                            {
+                                <span class="badge bg-light text-dark">
+                                    <small>Sistema</small>
+                                </span>
+                            }
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">Usuarios Asignados:</span>
+                                <span class="badge @(role.UserCount > 0 ? "bg-success" : "bg-secondary")">
+                                    @role.UserCount
+                                </span>
+                            </div>
+                            @if (role.UserCount > 0)
+                            {
+                                <small class="text-success">
+                                    <i class="fas fa-users"></i>
+                                    Este rol tiene usuarios activos
+                                </small>
+                            }
+                            else
+                            {
+                                <small class="text-muted">
+                                    <i class="fas fa-user-slash"></i>
+                                    Sin usuarios asignados
+                                </small>
+                            }
+                        </div>
+                        
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                @if (role.IsSystemRole)
+                                {
+                                    <i class="fas fa-shield-alt text-primary"></i>
+                                    <span>Rol del sistema con permisos predefinidos</span>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-edit text-info"></i>
+                                    <span>Rol personalizado configurable</span>
+                                }
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-grid gap-2">
+                            <a href="@Url.Action("AssignToRole", new { roleId = role.RoleId })" 
+                               class="btn @(role.IsSystemRole ? "btn-primary" : "btn-info")">
+                                <i class="fas fa-shield-alt"></i>
+                                Gestionar Permisos
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Mensaje cuando no hay resultados -->
+    <div class="row d-none" id="noResultsMessage">
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-search"></i>
+                <strong>No se encontraron roles</strong>
+                <p class="mb-0">Intente modificar los filtros de búsqueda.</p>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.AvailableRoles.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-warning text-center">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>No hay roles disponibles</strong>
+                    <p class="mb-0">No se han encontrado roles en el sistema.</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Aplicar filtros
+            function applyFilters() {
+                const searchTerm = $('#searchInput').val().toLowerCase();
+                const typeFilter = $('#typeFilter').val();
+                const userFilter = $('#userFilter').val();
+                
+                let visibleCount = 0;
+                
+                $('.role-card').each(function() {
+                    const card = $(this);
+                    const roleName = card.data('role');
+                    const roleType = card.data('type');
+                    const userStatus = card.data('users');
+                    
+                    let show = true;
+                    
+                    // Filtro por nombre
+                    if (searchTerm && !roleName.includes(searchTerm)) {
+                        show = false;
+                    }
+                    
+                    // Filtro por tipo
+                    if (typeFilter && roleType !== typeFilter) {
+                        show = false;
+                    }
+                    
+                    // Filtro por usuarios
+                    if (userFilter && userStatus !== userFilter) {
+                        show = false;
+                    }
+                    
+                    if (show) {
+                        card.show();
+                        visibleCount++;
+                    } else {
+                        card.hide();
+                    }
+                });
+                
+                // Mostrar mensaje si no hay resultados
+                if (visibleCount === 0) {
+                    $('#noResultsMessage').removeClass('d-none');
+                } else {
+                    $('#noResultsMessage').addClass('d-none');
+                }
+            }
+            
+            // Eventos de filtros
+            $('#searchInput').on('input', applyFilters);
+            $('#typeFilter, #userFilter').on('change', applyFilters);
+            
+            // Efecto hover en las cards
+            $('.role-card .card').hover(
+                function() {
+                    $(this).addClass('shadow-lg').css('transform', 'translateY(-5px)');
+                },
+                function() {
+                    $(this).removeClass('shadow-lg').css('transform', 'translateY(0)');
+                }
+            );
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .role-card .card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .role-card .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            font-weight: 600;
+        }
+        
+        .badge {
+            font-size: 0.75em;
+        }
+        
+        .btn {
+            transition: all 0.2s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+    </style>
+}

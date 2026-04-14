@@ -1,0 +1,294 @@
+﻿@{
+    ViewData["Title"] = "Importar Rúbrica desde Excel";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-file-excel text-success"></i> @ViewData["Title"]
+                        </h4>
+                        <div>
+                            <a asp-controller="Rubricas" asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver a Rúbricas
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    
+                    <!-- Instrucciones -->
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-info-circle"></i> Instrucciones para la Importación</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Formato requerido del archivo Excel:</h6>
+                                <ul>
+                                    <li>La primera fila debe contener los encabezados</li>
+                                    <li>Primera columna: <strong>"Criterio"</strong> (nombre del item)</li>
+                                    <li>Siguientes columnas: <strong>Niveles de calificación</strong> (ej: "Excelente", "Bien", "Regular", "Deficiente")</li>
+                                    <li>Las filas siguientes contienen los criterios y sus valores numéricos</li>
+                                    <li>Los valores deben ser números (pueden tener decimales)</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Ejemplo de estructura:</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered">
+                                        <thead class="table-secondary">
+                                            <tr>
+                                                <th>Criterio</th>
+                                                <th>Excelente</th>
+                                                <th>Bien</th>
+                                                <th>Regular</th>
+                                                <th>Deficiente</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Formato del documento</td>
+                                                <td>3</td>
+                                                <td>2</td>
+                                                <td>1</td>
+                                                <td>0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Desarrollo del contenido</td>
+                                                <td>11</td>
+                                                <td>7</td>
+                                                <td>3</td>
+                                                <td>0</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formulario de importación -->
+                    <form asp-action="ImportarExcel" method="post" enctype="multipart/form-data" id="formImportacion">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="nombreRubrica" class="form-label">
+                                        <i class="fas fa-tag"></i> Nombre de la Rúbrica *
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="nombreRubrica" 
+                                           name="nombreRubrica" 
+                                           required 
+                                           maxlength="100"
+                                           placeholder="Ingrese el nombre de la rúbrica">
+                                    <div class="form-text">Máximo 100 caracteres</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="archivo" class="form-label">
+                                        <i class="fas fa-file-excel"></i> Archivo Excel *
+                                    </label>
+                                    <input type="file" 
+                                           class="form-control" 
+                                           id="archivo" 
+                                           name="archivo" 
+                                           accept=".xlsx,.xls" 
+                                           required>
+                                    <div class="form-text">Formatos permitidos: .xlsx, .xls</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="descripcionRubrica" class="form-label">
+                                <i class="fas fa-align-left"></i> Descripción (Opcional)
+                            </label>
+                            <textarea class="form-control" 
+                                      id="descripcionRubrica" 
+                                      name="descripcionRubrica" 
+                                      rows="3" 
+                                      maxlength="500"
+                                      placeholder="Descripción opcional de la rúbrica"></textarea>
+                            <div class="form-text">Máximo 500 caracteres</div>
+                        </div>
+
+                        <!-- Vista previa del archivo -->
+                        <div id="vistaPrevia" class="mb-4" style="display: none;">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-eye"></i> Vista Previa del Archivo
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div id="contenidoPrevia">
+                                        <!-- Se llenará dinámicamente con JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a asp-controller="Rubricas" asp-action="Index" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-lg" id="btnImportar">
+                                <i class="fas fa-upload"></i> Importar Rúbrica
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de progreso -->
+<div class="modal fade" id="modalProgreso" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Procesando...</span>
+                </div>
+                <h5>Procesando archivo Excel...</h5>
+                <p class="text-muted mb-0">Por favor espere mientras se importa la rúbrica.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Manejar cambio de archivo para vista previa
+            $('#archivo').on('change', function() {
+                var file = this.files[0];
+                if (file) {
+                    mostrarVistaPrevia(file);
+                } else {
+                    $('#vistaPrevia').hide();
+                }
+            });
+
+            // Manejar envío del formulario
+            $('#formImportacion').on('submit', function(e) {
+                // Validaciones básicas
+                var archivo = $('#archivo')[0].files[0];
+                var nombre = $('#nombreRubrica').val().trim();
+                
+                if (!archivo) {
+                    e.preventDefault();
+                    alert('Por favor seleccione un archivo Excel.');
+                    return false;
+                }
+                
+                if (!nombre) {
+                    e.preventDefault();
+                    alert('Por favor ingrese un nombre para la rúbrica.');
+                    $('#nombreRubrica').focus();
+                    return false;
+                }
+
+                // Mostrar modal de progreso
+                $('#modalProgreso').modal('show');
+                $('#btnImportar').prop('disabled', true);
+                
+                return true;
+            });
+
+            // Validar tamaño del archivo
+            $('#archivo').on('change', function() {
+                var file = this.files[0];
+                if (file && file.size > 5 * 1024 * 1024) { // 5MB
+                    alert('El archivo es demasiado grande. Máximo 5MB permitido.');
+                    this.value = '';
+                    $('#vistaPrevia').hide();
+                }
+            });
+        });
+
+        function mostrarVistaPrevia(file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    var data = new Uint8Array(e.target.result);
+                    var workbook = XLSX.read(data, {type: 'array'});
+                    var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    var jsonData = XLSX.utils.sheet_to_json(firstSheet, {header: 1, range: 0});
+                    
+                    // Mostrar solo las primeras 10 filas
+                    var maxFilas = Math.min(10, jsonData.length);
+                    var html = '<div class="table-responsive">';
+                    html += '<table class="table table-sm table-bordered">';
+                    
+                    // Encabezados
+                    if (jsonData.length > 0) {
+                        html += '<thead class="table-primary">';
+                        html += '<tr>';
+                        for (var j = 0; j < jsonData[0].length && j < 6; j++) {
+                            html += '<th>' + (jsonData[0][j] || 'Columna ' + (j + 1)) + '</th>';
+                        }
+                        if (jsonData[0].length > 6) {
+                            html += '<th class="text-muted">...</th>';
+                        }
+                        html += '</tr>';
+                        html += '</thead>';
+                    }
+                    
+                    // Datos
+                    html += '<tbody>';
+                    for (var i = 1; i < maxFilas; i++) {
+                        if (jsonData[i]) {
+                            html += '<tr>';
+                            for (var j = 0; j < jsonData[i].length && j < 6; j++) {
+                                var valor = jsonData[i][j] || '';
+                                html += '<td>' + valor + '</td>';
+                            }
+                            if (jsonData[i].length > 6) {
+                                html += '<td class="text-muted">...</td>';
+                            }
+                            html += '</tr>';
+                        }
+                    }
+                    
+                    if (jsonData.length > maxFilas) {
+                        html += '<tr><td colspan="' + Math.min(6, jsonData[0]?.length || 1) + '" class="text-center text-muted">';
+                        html += '... y ' + (jsonData.length - maxFilas) + ' filas más';
+                        html += '</td></tr>';
+                    }
+                    
+                    html += '</tbody>';
+                    html += '</table>';
+                    html += '</div>';
+                    
+                    // Información adicional
+                    html += '<div class="mt-2">';
+                    html += '<small class="text-muted">';
+                    html += '<i class="fas fa-info-circle"></i> ';
+                    html += 'Total de filas: ' + jsonData.length + ' | ';
+                    html += 'Total de columnas: ' + (jsonData[0]?.length || 0);
+                    html += '</small>';
+                    html += '</div>';
+                    
+                    $('#contenidoPrevia').html(html);
+                    $('#vistaPrevia').show();
+                    
+                } catch (error) {
+                    $('#contenidoPrevia').html('<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Error al leer el archivo: ' + error.message + '</div>');
+                    $('#vistaPrevia').show();
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+    </script>
+}

@@ -1,0 +1,576 @@
+/*
+    Estilos para la página de inicio de sesión - Sistema de Rúbricas
+    Fecha: 13 de agosto de 2025
+    Descripción: Estilos para crear una interfaz de inicio de sesión limpia, 
+                 moderna y con enfoque académico.
+*/
+
+:root {
+    --primary-color: #2563eb;
+    --primary-hover-color: #1d4ed8;
+    --secondary-color: #10b981;
+    --secondary-hover-color: #059669;
+    --accent-color: #f59e0b;
+    --light-gray-bg: #f8fafc ;
+    --text-color: #1e293b;
+    --border-color: #e2e8f0;
+    --card-bg: #ffffff;
+    --card-shadow: 0 20px 50px rgba(37, 99, 235, 0.15);
+    --card-border-radius: 20px;
+    --gradient-primary: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #10b981 100%);
+    --gradient-secondary: linear-gradient(45deg, #f59e0b 0%, #ef4444 100%);
+}
+
+/* Estilo base para el cuerpo de la página de login */
+.login-page-background {
+/*    background: linear-gradient(
+  to right,
+  #ffffff,
+  #cedef6,
+  #764ba2 5%,
+  #d0d3d7
+);*/
+    background: linear-gradient(135deg,
+        #ffffff 0%,    /* Pure white */
+        #f8fafc 15%,   /* Very light gray */
+        #e2e8f0 30%,   /* Light blue-gray */
+        #cbd5e1 45%,   /* Soft blue */
+        #f1f5f9 60%,   /* Light gray-blue */
+        #e0f2fe 75%,   /* Very light blue */
+        #f8fafc 90%,   /* Very light gray */
+        #ffffff 100%   /* Pure white */
+    );
+    background-size: 400% 400%;
+    animation: gradientAnimation 20s ease infinite;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+@keyframes gradientAnimation {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Contenedor principal del formulario */
+.login-container {
+    max-width: 420px;
+    width: 100%;
+}
+
+/* Tarjeta de inicio de sesión */
+.login-card {
+    background-color: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: var(--card-border-radius);
+    box-shadow: var(--card-shadow);
+    padding: 40px;
+    text-align: center;
+    animation: fadeInScale 0.8s ease-in-out;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* Logo dinámico con íconos de Font Awesome */
+.dynamic-logo {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    box-shadow: 0 15px 35px rgba(37, 99, 235, 0.3);
+    animation: logoRotate 8s linear infinite;
+}
+
+.logo-stack {
+    position: relative;
+    width: 80%;
+    height: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
+    backdrop-filter: blur(10px);
+}
+
+.primary-icon {
+    font-size: 48px;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    z-index: 2;
+    animation: floatIcon 3s ease-in-out infinite;
+    filter: drop-shadow(0 4px 12px rgba(37, 99, 235, 0.4));
+    position: relative;
+}
+
+.secondary-icon {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    font-size: 20px;
+    background: var(--gradient-secondary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    z-index: 3;
+    animation: sparkle 2s ease-in-out infinite;
+    filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.5));
+}
+
+.logo-pulse {
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    width: calc(100% + 30px);
+    height: calc(100% + 30px);
+    border: 3px solid transparent;
+    border-radius: 50%;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+    background-size: 300% 300%;
+    animation: gradientShift 4s ease-in-out infinite, pulseBorder 3s ease-in-out infinite;
+    opacity: 0.6;
+}
+
+/* Animaciones mejoradas para el logo dinámico */
+@keyframes logoRotate {
+    0% {
+        transform: rotate(0deg);
+        box-shadow: 0 15px 35px rgba(37, 99, 235, 0.3);
+    }
+    25% {
+        box-shadow: 0 15px 35px rgba(16, 185, 129, 0.3);
+    }
+    50% {
+        transform: rotate(180deg);
+        box-shadow: 0 15px 35px rgba(245, 158, 11, 0.3);
+    }
+    75% {
+        box-shadow: 0 15px 35px rgba(239, 68, 68, 0.3);
+    }
+    100% {
+        transform: rotate(360deg);
+        box-shadow: 0 15px 35px rgba(37, 99, 235, 0.3);
+    }
+}
+
+@keyframes floatIcon {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    25% {
+        transform: translateY(-8px) scale(1.05);
+    }
+    50% {
+        transform: translateY(-12px) scale(1.1);
+    }
+    75% {
+        transform: translateY(-6px) scale(1.03);
+    }
+}
+
+@keyframes sparkle {
+    0%, 100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+    25% {
+        transform: scale(1.3) rotate(90deg);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.5) rotate(180deg);
+        opacity: 0.6;
+    }
+    75% {
+        transform: scale(1.2) rotate(270deg);
+        opacity: 0.9;
+    }
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes pulseBorder {
+    0% {
+        transform: scale(0.8);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.4;
+    }
+    100% {
+        transform: scale(1.3);
+        opacity: 0;
+    }
+}
+
+/* Efecto hover mejorado para el logo completo */
+.dynamic-logo:hover {
+    transform: scale(1.1);
+    box-shadow: 0 25px 50px rgba(37, 99, 235, 0.5);
+    animation-play-state: paused;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.dynamic-logo:hover .primary-icon {
+    transform: scale(1.2) rotate(10deg);
+    animation-play-state: paused;
+    transition: all 0.4s ease;
+}
+
+.dynamic-logo:hover .secondary-icon {
+    transform: scale(1.5) rotate(45deg);
+    animation-play-state: paused;
+    transition: all 0.4s ease;
+}
+
+.dynamic-logo:hover .logo-pulse {
+    animation-play-state: paused;
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+/* Logo de AcademiaPro en la parte superior (fallback) */
+.login-card .login-logo {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 20px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+    transition: transform 0.3s ease;
+    display: none; /* Oculto cuando se usa el logo dinámico */
+}
+
+.login-card .login-logo:hover {
+    transform: scale(1.05);
+}
+
+/* Nombre de la marca mejorado */
+.login-card .brand-name {
+    font-size: 28px;
+    font-weight: 800;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 15px;
+    margin-top: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-align: center;
+    animation: textGlow 3s ease-in-out infinite;
+    position: relative;
+}
+
+.login-card .brand-name::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: var(--gradient-secondary);
+    border-radius: 2px;
+    animation: underlineGlow 2s ease-in-out infinite;
+}
+
+@keyframes textGlow {
+    0%, 100% {
+        filter: drop-shadow(0 0 5px rgba(37, 99, 235, 0.3));
+    }
+    50% {
+        filter: drop-shadow(0 0 15px rgba(37, 99, 235, 0.6));
+    }
+}
+
+@keyframes underlineGlow {
+    0%, 100% {
+        opacity: 0.7;
+        transform: translateX(-50%) scaleX(1);
+    }
+    50% {
+        opacity: 1;
+        transform: translateX(-50%) scaleX(1.2);
+    }
+}
+
+/* Icono académico (fallback) */
+.login-card .academic-icon {
+    font-size: 65px;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    display: none; /* Oculto cuando se usa el logo */
+}
+
+/* Título "Bienvenido de vuelta" */
+.login-card h2 {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 30px;
+}
+
+/* Estilo para los grupos de formulario */
+.form-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+.form-group .form-control {
+    width: 100%; /* Hace que el campo de texto ocupe el 100% de su contenedor */
+    box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
+}
+
+.form-group label {
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: block;
+    color: #555;
+}
+
+.input-group {
+    position: relative;
+}
+
+.form-control {
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    padding: 12px 15px 12px 45px; /* Espacio para el ícono */
+    height: auto;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+    outline: none;
+}
+
+/* Íconos dentro de los campos de texto */
+.input-group .input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+    font-size: 18px;
+}
+
+/* Botón principal de "Iniciar Sesión" mejorado */
+.btn-login {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    width: 100%;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-login::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.6s;
+}
+
+.btn-login:hover::before {
+    left: 100%;
+}
+
+.btn-login:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(37, 99, 235, 0.5);
+    background: var(--gradient-primary);
+    background-size: 200% 200%;
+    animation: gradientShift 2s ease infinite;
+}
+
+.btn-login:active {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+}
+
+/* Enlaces de "Olvidaste tu contraseña" y "Crear cuenta" */
+.login-links {
+    margin-top: 20px;
+}
+
+.login-links a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s;
+}
+
+.login-links a:hover {
+    text-decoration: underline;
+}
+
+/* Separador */
+.login-divider {
+    border-top: 1px solid #e9ecef;
+    margin: 25px 0;
+}
+
+/* Botón secundario "Crear una cuenta" mejorado */
+.btn-create-account {
+    background: transparent;
+    color: var(--primary-color);
+    border: 3px solid transparent;
+    background-image: linear-gradient(white, white), var(--gradient-primary);
+    background-origin: border-box;
+    background-clip: content-box, border-box;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 700;
+    width: 100%;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.2);
+}
+
+.btn-create-account::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--gradient-primary);
+    transition: left 0.5s ease;
+    z-index: -1;
+      border-radius: 12px;
+}
+
+.btn-create-account:hover::before {
+    left: 0;
+}
+
+.btn-create-account:hover {
+    color: white;
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 15px 40px rgba(37, 99, 235, 0.4);
+    background-image: none;
+    border-color: transparent;
+    border-radius: 12px;
+}
+
+.btn-create-account:active {
+    transform: translateY(-1px) scale(1.01);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+}
+
+/* Animación de entrada */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Botón toggle para mostrar/ocultar contraseña */
+.btn-toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 5px 10px;
+    z-index: 10;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.btn-toggle-password:hover {
+    color: #495057;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.btn-toggle-password:focus {
+    color: var(--primary-color);
+    outline: none;
+}
+
+.btn-toggle-password:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.input-group {
+    position: relative;
+}
+
+/* Ajustar padding del input cuando hay botón de toggle */
+.form-group .input-group input[type="password"],
+.form-group .input-group input[type="text"] {
+    padding-right: 45px;
+}
+
+/* Diseño responsivo */
+@media (max-width: 480px) {
+    .login-card {
+        padding: 25px;
+    }
+
+    .login-card h2 {
+        font-size: 24px;
+    }
+    
+    .btn-toggle-password {
+        right: 10px;
+        padding: 3px 8px;
+    }
+}

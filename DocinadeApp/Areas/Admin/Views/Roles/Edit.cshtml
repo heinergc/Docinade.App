@@ -1,0 +1,324 @@
+@model RubricasApp.Web.ViewModels.Admin.EditRoleViewModel
+@{
+    ViewData["Title"] = "Editar Rol";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2><i class="fas fa-edit text-warning"></i> Editar Rol</h2>
+                <p class="text-muted">Modifica la información y permisos del rol "@Model.Name"</p>
+            </div>
+            <div>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver a Roles
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 col-md-10 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-user-tag"></i> Información del Rol
+                </h5>
+                @if (Model.IsSystemRole)
+                {
+                    <span class="badge bg-warning text-dark">
+                        <i class="fas fa-shield-alt"></i> Rol del Sistema
+                    </span>
+                }
+            </div>
+            <div class="card-body">
+                @if (Model.IsSystemRole)
+                {
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Advertencia:</strong> Este es un rol del sistema. Algunos cambios pueden estar restringidos.
+                    </div>
+                }
+
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+                    <input asp-for="Name" class="form-control" 
+                           readonly="@(Model.IsSystemRole ? "readonly" : null)" 
+                           placeholder="Ej: Editor, Administrador" />
+                    <input type="hidden" asp-for="IsSystemRole" />
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Name" class="form-label required">Nombre del Rol</label>
+                      @*           <input asp-for="Name" class="form-control" 
+                                       @(Model.IsSystemRole ? "readonly" : "") 
+                                       placeholder="Ej: Editor, Administrador" />
+                                <span asp-validation-for="Name" class="text-danger"></span> *@
+                                @if (Model.IsSystemRole)
+                                {
+                                    <div class="form-text text-warning">
+                                        <i class="fas fa-lock"></i> El nombre de los roles del sistema no se puede modificar
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Description" class="form-label">Descripción</label>
+                                <input asp-for="Description" class="form-control" placeholder="Descripción del rol..." />
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="text-primary">@Model.UserCount</h5>
+                                    <small class="text-muted">Usuarios Asignados</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="text-info">@Model.SelectedPermissionIds?.Count() ?? 0</h5>
+                                    <small class="text-muted">Permisos Actuales</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="text-success">@(Model.AvailablePermissions?.Count() ?? 0)</h5>
+                                    <small class="text-muted">Permisos Disponibles</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-shield-alt"></i> Permisos del Rol
+                            </label>
+                            <div>
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAllPermissions()">
+                                    <i class="fas fa-check-square"></i> Seleccionar Todos
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deselectAllPermissions()">
+                                    <i class="fas fa-square"></i> Deseleccionar Todos
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-text mb-3">
+                            Configura los permisos específicos para este rol. Los cambios se aplicarán a todos los usuarios que tengan este rol asignado.
+                        </div>
+                        
+                        @if (Model.AvailablePermissions != null && Model.AvailablePermissions.Any())
+                        {
+                            <div class="accordion" id="permissionsAccordion">
+                                @{
+                                    var groupedPermissions = Model.AvailablePermissions.GroupBy(p => p.Module).OrderBy(g => g.Key);
+                                    int accordionIndex = 0;
+                                }
+                                
+                                @foreach (var group in groupedPermissions)
+                                {
+                                    string collapseId = $"collapse{accordionIndex}";
+                                    string headingId = $"heading{accordionIndex}";
+                                    var modulePermissions = group.ToList();
+                                    var selectedInModule = modulePermissions.Count(p => Model.SelectedPermissionIds?.Contains(p.Id) == true);
+                                    
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="@headingId">
+                                            <button class="accordion-button collapsed" type="button" 
+                                                    data-bs-toggle="collapse" data-bs-target="#@collapseId" 
+                                                    aria-expanded="false" aria-controls="@collapseId">
+                                                <i class="fas fa-folder text-primary me-2"></i>
+                                                <strong>@group.Key</strong>
+                                                <span class="badge bg-secondary ms-2">@selectedInModule/@modulePermissions.Count</span>
+                                            </button>
+                                        </h2>
+                                        <div id="@collapseId" class="accordion-collapse collapse" 
+                                             aria-labelledby="@headingId" data-bs-parent="#permissionsAccordion">
+                                            <div class="accordion-body">
+                                                <div class="row">
+                                                    @foreach (var permission in modulePermissions.OrderBy(p => p.Name))
+                                                    {
+                                                        <div class="col-md-6 mb-2">
+                                                            <div class="form-check">
+                                                                <input type="checkbox" class="form-check-input" 
+                                                                       id="permission_@permission.Id" 
+                                                                       name="SelectedPermissionIds" 
+                                                                       value="@permission.Id"
+                                                                       data-module="@group.Key.Replace(" ", "_")"
+                                                                       @(Model.SelectedPermissionIds?.Contains(permission.Id) == true ? "checked" : "") />
+                                                                <label class="form-check-label" for="permission_@permission.Id">
+                                                                    <strong>@permission.Name</strong>
+                                                                    @if (!string.IsNullOrEmpty(permission.Description))
+                                                                    {
+                                                                        <br>
+                                                                        <small class="text-muted">@permission.Description</small>
+                                                                    }
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                                
+                                                <div class="mt-2">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                            onclick="selectAllInModule('@group.Key.Replace(" ", "_")')">
+                                                        <i class="fas fa-check-square"></i> Seleccionar Módulo
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                                            onclick="deselectAllInModule('@group.Key.Replace(" ", "_")')">
+                                                        <i class="fas fa-square"></i> Deseleccionar Módulo
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    accordionIndex++;
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                No hay permisos disponibles para asignar. 
+                                <a href="#" onclick="syncPermissions()">Sincronizar permisos</a>
+                            </div>
+                        }
+                        
+                        <span asp-validation-for="SelectedPermissionIds" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            @if (!Model.IsSystemRole && Model.UserCount == 0)
+                            {
+                                <button type="button" class="btn btn-outline-danger" onclick="deleteRole()">
+                                    <i class="fas fa-trash"></i> Eliminar Rol
+                                </button>
+                            }
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Función para seleccionar todos los permisos
+        function selectAllPermissions() {
+            $('input[name="SelectedPermissionIds"]').prop('checked', true);
+            updatePermissionCounts();
+        }
+
+        // Función para deseleccionar todos los permisos
+        function deselectAllPermissions() {
+            $('input[name="SelectedPermissionIds"]').prop('checked', false);
+            updatePermissionCounts();
+        }
+
+        // Función para seleccionar todos los permisos de un módulo
+        function selectAllInModule(moduleKey) {
+            $('input[data-module="' + moduleKey + '"]').prop('checked', true);
+            updatePermissionCounts();
+        }
+
+        // Función para deseleccionar todos los permisos de un módulo
+        function deselectAllInModule(moduleKey) {
+            $('input[data-module="' + moduleKey + '"]').prop('checked', false);
+            updatePermissionCounts();
+        }
+
+        // Función para actualizar contadores de permisos por módulo
+        function updatePermissionCounts() {
+            $('.accordion-item').each(function() {
+                var $item = $(this);
+                var moduleKey = $item.find('.accordion-button strong').text().trim().replace(' ', '_');
+                var total = $item.find('input[type="checkbox"]').length;
+                var selected = $item.find('input[type="checkbox"]:checked').length;
+                
+                $item.find('.badge').text(selected + '/' + total);
+            });
+        }
+
+        // Función para eliminar rol
+        function deleteRole() {
+            if (confirm('¿Está seguro que desea eliminar este rol? Esta acción no se puede deshacer.')) {
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '@Url.Action("Delete", new { id = Model.Id })';
+                
+                var token = document.createElement('input');
+                token.type = 'hidden';
+                token.name = '__RequestVerificationToken';
+                token.value = $('input[name="__RequestVerificationToken"]').val();
+                
+                form.appendChild(token);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        // Función para sincronizar permisos
+        function syncPermissions() {
+            if (confirm('¿Desea sincronizar los permisos disponibles? Esto puede agregar nuevos permisos al sistema.')) {
+                window.location.href = '@Url.Action("SyncPermissions", "Roles", new { area = "Admin" })';
+            }
+        }
+
+        $(document).ready(function() {
+            // Actualizar contadores al cargar la página
+            updatePermissionCounts();
+            
+            // Actualizar contadores cuando cambien los checkboxes
+            $('input[name="SelectedPermissionIds"]').change(function() {
+                updatePermissionCounts();
+            });
+
+            // Resaltar cambios
+            var originalPermissions = [@string.Join(",", Model.SelectedPermissionIds?.Select(id => $"\"{id}\"") ?? new string[0])];
+            
+            $('input[name="SelectedPermissionIds"]').change(function() {
+                var currentPermissions = $('input[name="SelectedPermissionIds"]:checked').map(function() {
+                    return $(this).val();
+                }).get();
+                
+                var hasChanges = JSON.stringify(originalPermissions.sort()) !== JSON.stringify(currentPermissions.sort());
+                
+                if (hasChanges) {
+                    $('button[type="submit"]').removeClass('btn-warning').addClass('btn-success');
+                    $('button[type="submit"] i').removeClass('fa-save').addClass('fa-check');
+                } else {
+                    $('button[type="submit"]').removeClass('btn-success').addClass('btn-warning');
+                    $('button[type="submit"] i').removeClass('fa-check').addClass('fa-save');
+                }
+            });
+        });
+    </script>
+}

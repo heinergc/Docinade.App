@@ -1,0 +1,417 @@
+@model RubricasApp.Web.Models.Asistencia
+@using RubricasApp.Web.Models
+
+@{
+    ViewData["Title"] = "Detalles del Registro de Asistencia";
+    Layout = "_Layout";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">@ViewData["Title"]</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Inicio</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index")">Asistencias</a></li>
+                        <li class="breadcrumb-item active">Detalles</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-eye mr-2"></i>Detalles del Registro de Asistencia #@Model.AsistenciaId
+                            </h3>
+                            <div class="card-tools">
+                                @switch (Model.Estado)
+                                {
+                                    case "P":
+                                        <span class="badge badge-success badge-lg"><i class="fas fa-check mr-1"></i>Presente</span>
+                                        break;
+                                    case "A":
+                                        <span class="badge badge-danger badge-lg"><i class="fas fa-times mr-1"></i>Ausente</span>
+                                        break;
+                                    case "T":
+                                        <span class="badge badge-warning badge-lg"><i class="fas fa-clock mr-1"></i>Tardanza</span>
+                                        break;
+                                    case "AJ":
+                                        <span class="badge badge-info badge-lg"><i class="fas fa-file-medical mr-1"></i>Ausencia Justificada</span>
+                                        break;
+                                }
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <!-- Información del Estudiante -->
+                            <div class="row mb-4">
+                                <div class="col-md-12">
+                                    <h5 class="text-primary border-bottom pb-2">
+                                        <i class="fas fa-user mr-2"></i>Información del Estudiante
+                                    </h5>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Nombre Completo:</strong></td>
+                                            <td>@Html.DisplayFor(model => model.Estudiante.NombreCompleto)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Número de Identificación:</strong></td>
+                                            <td>@Html.DisplayFor(model => model.Estudiante.NumeroId)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Correo:</strong></td>
+                                            <td>@(Model.Estudiante?.DireccionCorreo ?? "No especificado")</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Institución:</strong></td>
+                                            <td>@Html.DisplayFor(model => model.Estudiante.Institucion)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Año:</strong></td>
+                                            <td>@Html.DisplayFor(model => model.Estudiante.Anio)</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Información del Grupo y Clase -->
+                            <div class="row mb-4">
+                                <div class="col-md-12">
+                                    <h5 class="text-primary border-bottom pb-2">
+                                        <i class="fas fa-users mr-2"></i>Información del Grupo y Clase
+                                    </h5>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Grupo:</strong></td>
+                                            <td>@Html.DisplayFor(model => model.Grupo.Nombre)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Período Académico:</strong></td>
+                                            <td>@Html.DisplayFor(model => model.Grupo.PeriodoAcademico.Nombre)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Fecha de la Clase:</strong></td>
+                                            <td>
+                                                <i class="fas fa-calendar mr-1"></i>
+                                                @Model.Fecha.ToString("dddd, dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-ES"))
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Estado del Grupo:</strong></td>
+                                            <td>
+                                                @if (Model.Grupo.Estado == EstadoGrupo.Activo)
+                                                {
+                                                    <span class="badge badge-success">Activo</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-secondary">@Model.Grupo.Estado</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                        @if (Model.HoraLlegada.HasValue)
+                                        {
+                                            <tr>
+                                                <td><strong>Hora de Llegada:</strong></td>
+                                                <td>
+                                                    <i class="fas fa-clock mr-1"></i>
+                                                    @Model.HoraLlegada.Value.ToString("HH:mm")
+                                                </td>
+                                            </tr>
+                                        }
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Detalles de la Asistencia -->
+                            <div class="row mb-4">
+                                <div class="col-md-12">
+                                    <h5 class="text-primary border-bottom pb-2">
+                                        <i class="fas fa-clipboard-check mr-2"></i>Detalles de la Asistencia
+                                    </h5>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="info-box">
+                                                <span class="info-box-icon 
+                                                    @switch (Model.Estado)
+                                                    {
+                                                        case "P": @("bg-success"); break;
+                                                        case "A": @("bg-danger"); break;
+                                                        case "T": @("bg-warning"); break;
+                                                        case "AJ": @("bg-info"); break;
+                                                    }">
+                                                    @switch (Model.Estado)
+                                                    {
+                                                        case "P": <i class="fas fa-check"></i>; break;
+                                                        case "A": <i class="fas fa-times"></i>; break;
+                                                        case "T": <i class="fas fa-clock"></i>; break;
+                                                        case "AJ": <i class="fas fa-file-medical"></i>; break;
+                                                    }
+                                                </span>
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Estado de Asistencia</span>
+                                                    <span class="info-box-number">
+                                                        @switch (Model.Estado)
+                                                        {
+                                                            case "P": @("Presente"); break;
+                                                            case "A": @("Ausente"); break;
+                                                            case "T": @("Tardanza"); break;
+                                                            case "AJ": @("Ausencia Justificada"); break;
+                                                        }
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        @if (Model.Estado == "T" && Model.HoraLlegada.HasValue)
+                                        {
+                                            <div class="col-md-6">
+                                                <div class="info-box">
+                                                    <span class="info-box-icon bg-warning">
+                                                        <i class="fas fa-stopwatch"></i>
+                                                    </span>
+                                                    <div class="info-box-content">
+                                                        <span class="info-box-text">Tiempo de Retraso</span>
+                                                        <span class="info-box-number">
+                                                            @{
+                                                                // Calcular retraso aproximado (asumiendo inicio a las 08:00)
+                                                                var horaInicio = new TimeSpan(8, 0, 0);
+                                                                var horaLlegada = Model.HoraLlegada.Value;
+                                                                var retraso = horaLlegada - horaInicio;
+                                                            }
+                                                            @(retraso.TotalMinutes > 0 ? $"{(int)retraso.TotalMinutes} min" : "A tiempo")
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Justificación y Observaciones -->
+                            @if (!string.IsNullOrEmpty(Model.Justificacion) || !string.IsNullOrEmpty(Model.Observaciones))
+                            {
+                                <div class="row mb-4">
+                                    <div class="col-md-12">
+                                        <h5 class="text-primary border-bottom pb-2">
+                                            <i class="fas fa-comment mr-2"></i>Justificación y Observaciones
+                                        </h5>
+                                    </div>
+                                    
+                                    @if (!string.IsNullOrEmpty(Model.Justificacion))
+                                    {
+                                        <div class="col-md-12 mb-3">
+                                            <div class="alert alert-info">
+                                                <h6><i class="fas fa-file-medical mr-2"></i>Justificación:</h6>
+                                                <p class="mb-0">@Model.Justificacion</p>
+                                            </div>
+                                        </div>
+                                    }
+                                    
+                                    @if (!string.IsNullOrEmpty(Model.Observaciones))
+                                    {
+                                        <div class="col-md-12">
+                                            <div class="alert alert-secondary">
+                                                <h6><i class="fas fa-sticky-note mr-2"></i>Observaciones:</h6>
+                                                <p class="mb-0">@Model.Observaciones</p>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+
+                            <!-- Información de Auditoría -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h5 class="text-primary border-bottom pb-2">
+                                        <i class="fas fa-history mr-2"></i>Información de Auditoría
+                                    </h5>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Registrado Por:</strong></td>
+                                            <td>@Html.DisplayFor(model => model.RegistradoPor.UserName)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Fecha de Registro:</strong></td>
+                                            <td>
+                                                <i class="fas fa-calendar-plus mr-1"></i>
+                                                @Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm:ss")
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    @if (Model.EsModificacion)
+                                    {
+                                        <table class="table table-borderless">
+                                            <tr>
+                                                <td><strong>Modificado Por:</strong></td>
+                                                <td>@Html.DisplayFor(model => model.ModificadoPor.UserName)</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Fecha de Modificación:</strong></td>
+                                                <td>
+                                                    <i class="fas fa-edit mr-1"></i>
+                                                    @Model.FechaModificacion?.ToString("dd/MM/yyyy HH:mm:ss")
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-success">
+                                            <i class="fas fa-check-circle mr-2"></i>
+                                            <strong>Registro original</strong><br />
+                                            No ha sido modificado
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <a href="@Url.Action("Edit", new { id = Model.AsistenciaId })" class="btn btn-warning">
+                                        <i class="fas fa-edit mr-1"></i>Editar
+                                    </a>
+                                    <a href="@Url.Action("Index")" class="btn btn-secondary ml-2">
+                                        <i class="fas fa-list mr-1"></i>Volver a Lista
+                                    </a>
+                                    <a href="@Url.Action("Delete", new { id = Model.AsistenciaId })" class="btn btn-danger ml-2">
+                                        <i class="fas fa-trash mr-1"></i>Eliminar
+                                    </a>
+                                </div>
+                                <div class="col-md-6 text-right">
+                                    <button onclick="window.print()" class="btn btn-info">
+                                        <i class="fas fa-print mr-1"></i>Imprimir
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Styles {
+    <style>
+        .info-box {
+            box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+            border-radius: .25rem;
+            background-color: #fff;
+            display: flex;
+            margin-bottom: 1rem;
+            min-height: 80px;
+            padding: .5rem;
+            position: relative;
+            width: 100%;
+        }
+
+        .info-box .info-box-icon {
+            border-radius: .25rem;
+            align-items: center;
+            display: flex;
+            font-size: 1.875rem;
+            justify-content: center;
+            text-align: center;
+            width: 70px;
+            color: rgba(255,255,255,.8);
+            background: rgba(0,0,0,.1);
+        }
+
+        .info-box .info-box-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            line-height: 1.8;
+            margin-left: 10px;
+            overflow: hidden;
+            padding: 5px 10px;
+        }
+
+        .info-box .info-box-text {
+            display: block;
+            font-size: .875rem;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-transform: uppercase;
+            white-space: nowrap;
+            color: #6c757d;
+        }
+
+        .info-box .info-box-number {
+            display: block;
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-top: 0;
+        }
+
+        .table-borderless td {
+            border: none;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .table-borderless td:first-child {
+            width: 40%;
+            font-weight: 600;
+        }
+
+        .border-bottom {
+            border-bottom: 2px solid #dee2e6 !important;
+        }
+
+        .badge-lg {
+            font-size: 0.875rem;
+            padding: 0.5rem 0.75rem;
+        }
+
+        @@media print {
+            .card-footer,
+            .breadcrumb,
+            .content-header {
+                display: none !important;
+            }
+            
+            .content-wrapper {
+                margin: 0;
+                padding: 0;
+            }
+            
+            .card {
+                border: none;
+                box-shadow: none;
+            }
+        }
+    </style>
+}

@@ -1,0 +1,173 @@
+@model RubricasApp.Web.ViewModels.ProfesorViewModel
+@{
+    ViewData["Title"] = "Eliminar Profesor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Header con advertencia -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading">
+                    <i class="fas fa-exclamation-triangle"></i> ¡Advertencia! Eliminación Permanente
+                </h4>
+                <p class="mb-0">
+                    Esta acción es <strong>irreversible</strong>. Se eliminarán permanentemente todos los datos del profesor y sus registros relacionados:
+                </p>
+                <ul class="mb-0 mt-2">
+                    <li>Formaciones académicas</li>
+                    <li>Experiencias laborales</li>
+                    <li>Capacitaciones</li>
+                    <li>Asignaciones de grupos y materias</li>
+                    <li>Asignaciones como profesor guía</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del profesor -->
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-times"></i> Confirmar Eliminación de Profesor
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <h4 class="text-center mb-4">
+                                @Model.NombreCompleto
+                            </h4>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-5">
+                                    <i class="fas fa-id-card"></i> Cédula:
+                                </dt>
+                                <dd class="col-sm-7">
+                                    @Model.Cedula
+                                </dd>
+
+                                <dt class="col-sm-5">
+                                    <i class="fas fa-graduation-cap"></i> Grado Académico:
+                                </dt>
+                                <dd class="col-sm-7">
+                                    @(Model.GradoAcademico ?? "No especificado")
+                                </dd>
+
+                                <dt class="col-sm-5">
+                                    <i class="fas fa-envelope"></i> Email Personal:
+                                </dt>
+                                <dd class="col-sm-7">
+                                    @Model.EmailPersonal
+                                </dd>
+
+                                <dt class="col-sm-5">
+                                    <i class="fas fa-envelope"></i> Email Institucional:
+                                </dt>
+                                <dd class="col-sm-7">
+                                    @(Model.EmailInstitucional ?? "No especificado")
+                                </dd>
+                            </dl>
+                        </div>
+
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-5">
+                                    <i class="fas fa-phone"></i> Teléfono:
+                                </dt>
+                                <dd class="col-sm-7">
+                                    @Model.TelefonoCelular
+                                </dd>
+
+                                <dt class="col-sm-5">
+                                    <i class="fas fa-map-marker-alt"></i> Provincia:
+                                </dt>
+                                <dd class="col-sm-7">
+                                    @(Model.ProvinciaNombre ?? "No especificada")
+                                </dd>
+
+                                <dt class="col-sm-5">
+                                    <i class="fas fa-map-marker-alt"></i> Cantón:
+                                </dt>
+                                <dd class="col-sm-7">
+                                    @(Model.CantonNombre ?? "No especificado")
+                                </dd>
+
+                                <dt class="col-sm-5">
+                                    <i class="fas fa-map-marker-alt"></i> Distrito:
+                                </dt>
+                                <dd class="col-sm-7">
+                                    @(Model.DistritoNombre ?? "No especificado")
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="alert alert-warning">
+                                <h6 class="font-weight-bold">
+                                    <i class="fas fa-info-circle"></i> ¿Considera desactivar en lugar de eliminar?
+                                </h6>
+                                <p class="mb-0">
+                                    Desactivar el profesor mantiene todos los datos históricos y permite reactivarlo en el futuro.
+                                    La eliminación es permanente y no puede deshacerse.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formulario de confirmación -->
+                    <form asp-action="DeleteConfirmed" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                        <i class="fas fa-arrow-left"></i> Cancelar
+                                    </a>
+                                    
+                                    <div>
+                                        <a asp-action="Details" 
+                                           asp-route-id="@Model.Id" 
+                                           class="btn btn-info btn-lg mr-2">
+                                            <i class="fas fa-toggle-off"></i> Ver Opción Desactivar
+                                        </a>
+                                        
+                                        <button type="submit" 
+                                                class="btn btn-danger btn-lg">
+                                            <i class="fas fa-trash-alt"></i> Sí, Eliminar Permanentemente
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Prevenir doble clic en el botón de eliminar
+        document.querySelector('form').addEventListener('submit', function(e) {
+            var submitBtn = this.querySelector('button[type="submit"]');
+            if (submitBtn.disabled) {
+                e.preventDefault();
+                return false;
+            }
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Eliminando...';
+        });
+    </script>
+}

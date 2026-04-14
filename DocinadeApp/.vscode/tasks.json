@@ -1,0 +1,106 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build ASP.NET Core Project",
+      "type": "shell",
+      "command": "dotnet build",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Build InstrumentosEvaluacion",
+      "type": "shell",
+      "command": "dotnet",
+      "args": ["build"],
+      "problemMatcher": "$msCompile",
+      "group": "build"
+    },
+    {
+      "label": "Build InstrumentoRubrica CRUD",
+      "type": "shell",
+      "command": "dotnet",
+      "args": ["build"],
+      "problemMatcher": "$msCompile",
+      "group": "build"
+    },
+    {
+      "label": "Ejecutar aplicación y probar",
+      "type": "shell",
+      "command": "dotnet",
+      "args": ["run", "--urls", "http://localhost:18164"],
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Ejecutar aplicación - Puerto 18163",
+      "type": "shell",
+      "command": "dotnet",
+      "args": ["run", "--urls", "http://localhost:18163"],
+      "isBackground": true,
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Servidor Web - Puerto 5002",
+      "type": "shell",
+      "command": "dotnet",
+      "args": ["run", "--urls", "http://localhost:5002"],
+      "isBackground": true,
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "run-app-port-18163",
+      "type": "shell",
+      "command": "dotnet",
+      "args": ["run", "--urls", "https://localhost:18163"],
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Publicar para IIS",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "publish",
+        "--configuration", "Release",
+        "--output", "bin/Release/Publish",
+        "--self-contained", "false",
+        "--runtime", "win-x64"
+      ],
+      "group": "build",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Publicar en IIS Local (Completo)",
+      "type": "shell",
+      "command": "powershell.exe",
+      "args": [
+        "-ExecutionPolicy", "Bypass",
+        "-File", "./deploy-iis.ps1"
+      ],
+      "group": "build",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Publicar + Desplegar IIS (Todo en uno)",
+      "type": "shell",
+      "command": "powershell.exe",
+      "args": [
+        "-ExecutionPolicy", "Bypass",
+        "-Command", 
+        "Write-Host 'Paso 1: Compilando aplicación...' -ForegroundColor Green; dotnet publish --configuration Release --output bin/Release/Publish --self-contained false --runtime win-x64; if ($LASTEXITCODE -eq 0) { Write-Host 'Paso 2: Desplegando en IIS...' -ForegroundColor Green; & './deploy-iis.ps1' } else { Write-Host 'Error en compilación' -ForegroundColor Red }"
+      ],
+      "group": "build",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    }
+  ]
+}
