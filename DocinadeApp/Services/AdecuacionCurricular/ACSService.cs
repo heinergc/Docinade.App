@@ -1,10 +1,10 @@
-using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.ViewModels;
+﻿using Microsoft.EntityFrameworkCore;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
+using DocinadeApp.ViewModels;
 using System.Text.Json;
 
-namespace RubricasApp.Web.Services.AdecuacionCurricular
+namespace DocinadeApp.Services.AdecuacionCurricular
 {
     /// <summary>
     /// Servicio para gestión de Adecuación Curricular Significativa (ACS)

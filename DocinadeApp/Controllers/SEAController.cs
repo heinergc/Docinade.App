@@ -1,15 +1,15 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Authorization;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models.Permissions;
-using RubricasApp.Web.Models.SEA;
-using RubricasApp.Web.Services;
-using RubricasApp.Web.Services.SEA;
+using DocinadeApp.Authorization;
+using DocinadeApp.Data;
+using DocinadeApp.Models.Permissions;
+using DocinadeApp.Models.SEA;
+using DocinadeApp.Services;
+using DocinadeApp.Services.SEA;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     /// <summary>
     /// Controlador para reportes SEA (Sistema de Evaluación MEP)

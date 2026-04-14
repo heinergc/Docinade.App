@@ -1,11 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
 using System.Text.Json;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     // Modelo simple para estadísticas
     public class EstadisticaPeriodo

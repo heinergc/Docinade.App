@@ -1,7 +1,7 @@
-@model RubricasApp.Web.ViewModels.Grupos.GrupoEstadisticasViewModel
+ï»¿@model DocinadeApp.ViewModels.Grupos.GrupoEstadisticasViewModel
 
 @{
-    ViewData["Title"] = "Estadísticas de Grupos";
+    ViewData["Title"] = "Estadï¿½sticas de Grupos";
 }
 
 <div class="page-header">
@@ -9,9 +9,9 @@
         <div class="col">
             <h1 class="page-title">
                 <i class="fas fa-chart-bar text-info me-2"></i>
-                Estadísticas de Grupos
+                Estadï¿½sticas de Grupos
             </h1>
-            <p class="text-muted">Resumen y análisis del sistema de grupos de estudiantes</p>
+            <p class="text-muted">Resumen y anï¿½lisis del sistema de grupos de estudiantes</p>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item">
@@ -19,7 +19,7 @@
                             <i class="fas fa-users-cog"></i> Grupos
                         </a>
                     </li>
-                    <li class="breadcrumb-item active">Estadísticas</li>
+                    <li class="breadcrumb-item active">Estadï¿½sticas</li>
                 </ol>
             </nav>
         </div>
@@ -31,7 +31,7 @@
     </div>
 </div>
 
-<!-- Métricas principales -->
+<!-- Mï¿½tricas principales -->
 <div class="row mb-4">
     <div class="col-md-3">
         <div class="modern-card stat-card">
@@ -79,20 +79,20 @@
                 </div>
                 <h3 class="stat-number text-info">@Model.GruposCompletos.Count</h3>
                 <p class="stat-label">Grupos Completos</p>
-                <small class="text-muted">capacidad máxima</small>
+                <small class="text-muted">capacidad mï¿½xima</small>
             </div>
         </div>
     </div>
 </div>
 
 <div class="row">
-    <!-- Distribución por tipo -->
+    <!-- Distribuciï¿½n por tipo -->
     <div class="col-md-6 mb-4">
         <div class="modern-card">
             <div class="card-header">
                 <h5 class="mb-0">
                     <i class="fas fa-chart-pie me-2"></i>
-                    Distribución por Tipo
+                    Distribuciï¿½n por Tipo
                 </h5>
             </div>
             <div class="card-body">
@@ -124,13 +124,13 @@
         </div>
     </div>
 
-    <!-- Distribución por estado -->
+    <!-- Distribuciï¿½n por estado -->
     <div class="col-md-6 mb-4">
         <div class="modern-card">
             <div class="card-header">
                 <h5 class="mb-0">
                     <i class="fas fa-chart-donut me-2"></i>
-                    Distribución por Estado
+                    Distribuciï¿½n por Estado
                 </h5>
             </div>
             <div class="card-body">
@@ -164,13 +164,13 @@
 </div>
 
 <div class="row">
-    <!-- Grupos con más estudiantes -->
+    <!-- Grupos con mï¿½s estudiantes -->
     <div class="col-md-6 mb-4">
         <div class="modern-card">
             <div class="card-header">
                 <h5 class="mb-0">
                     <i class="fas fa-trophy me-2"></i>
-                    Grupos con Más Estudiantes
+                    Grupos con Mï¿½s Estudiantes
                 </h5>
             </div>
             <div class="card-body">
@@ -190,7 +190,7 @@
                                             @grupo.CantidadEstudiantes estudiantes
                                             @if (grupo.CapacidadMaxima.HasValue)
                                             {
-                                                @($" de {grupo.CapacidadMaxima} máximo")
+                                                @($" de {grupo.CapacidadMaxima} mï¿½ximo")
                                             }
                                         </small>
                                     </div>
@@ -264,12 +264,12 @@
     </div>
 </div>
 
-<!-- Acciones rápidas -->
+<!-- Acciones rï¿½pidas -->
 <div class="modern-card">
     <div class="card-header">
         <h5 class="mb-0">
             <i class="fas fa-lightning-bolt me-2"></i>
-            Acciones Rápidas
+            Acciones Rï¿½pidas
         </h5>
     </div>
     <div class="card-body">
@@ -394,26 +394,26 @@
 }
 
 @functions {
-    string GetColorForTipo(RubricasApp.Web.Models.TipoGrupo tipo)
+    string GetColorForTipo(DocinadeApp.Models.TipoGrupo tipo)
     {
         return tipo switch
         {
-            RubricasApp.Web.Models.TipoGrupo.Seccion => "primary",
-            RubricasApp.Web.Models.TipoGrupo.Nivel => "success",
-            RubricasApp.Web.Models.TipoGrupo.Modalidad => "warning",
-            RubricasApp.Web.Models.TipoGrupo.Custom => "info",
+            DocinadeApp.Models.TipoGrupo.Seccion => "primary",
+            DocinadeApp.Models.TipoGrupo.Nivel => "success",
+            DocinadeApp.Models.TipoGrupo.Modalidad => "warning",
+            DocinadeApp.Models.TipoGrupo.Custom => "info",
             _ => "secondary"
         };
     }
     
-    string GetColorForEstado(RubricasApp.Web.Models.EstadoGrupo estado)
+    string GetColorForEstado(DocinadeApp.Models.EstadoGrupo estado)
     {
         return estado switch
         {
-            RubricasApp.Web.Models.EstadoGrupo.Activo => "success",
-            RubricasApp.Web.Models.EstadoGrupo.Inactivo => "secondary",
-            RubricasApp.Web.Models.EstadoGrupo.Cerrado => "danger",
-            RubricasApp.Web.Models.EstadoGrupo.Suspendido => "warning",
+            DocinadeApp.Models.EstadoGrupo.Activo => "success",
+            DocinadeApp.Models.EstadoGrupo.Inactivo => "secondary",
+            DocinadeApp.Models.EstadoGrupo.Cerrado => "danger",
+            DocinadeApp.Models.EstadoGrupo.Suspendido => "warning",
             _ => "secondary"
         };
     }

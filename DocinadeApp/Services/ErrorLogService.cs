@@ -1,10 +1,10 @@
-using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
 using System;
 using System.Threading.Tasks;
 
-namespace RubricasApp.Web.Services
+namespace DocinadeApp.Services
 {
     public class ErrorLogService : IErrorLogService
     {

@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Mvc;
-using RubricasApp.Web.Services;
-using RubricasApp.Web.ViewModels;
+﻿using Microsoft.AspNetCore.Mvc;
+using DocinadeApp.Services;
+using DocinadeApp.ViewModels;
 
-namespace RubricasApp.Web.ViewComponents
+namespace DocinadeApp.ViewComponents
 {
     public class PeriodoAcademicoSelectorViewComponent : ViewComponent
     {

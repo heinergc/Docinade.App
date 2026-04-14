@@ -1,4 +1,4 @@
-@model List<RubricasApp.Web.ViewModels.InstitucionListViewModel>
+﻿@model List<DocinadeApp.ViewModels.InstitucionListViewModel>
 
 @{
     ViewData["Title"] = "Instituciones Educativas";
@@ -55,7 +55,7 @@
                         <a href="@Url.Action("Index")" class="btn btn-secondary">
                             <i class="fas fa-times"></i> Limpiar
                         </a>
-                        @if (User.HasClaim("permission", RubricasApp.Web.Models.Permissions.ApplicationPermissions.Instituciones.CREAR))
+                        @if (User.HasClaim("permission", DocinadeApp.Models.Permissions.ApplicationPermissions.Instituciones.CREAR))
                         {
                             <a asp-action="Create" class="btn btn-success ms-auto">
                                 <i class="fas fa-plus"></i> Nueva Institución
@@ -113,21 +113,21 @@
                                         <td>@item.FechaCreacion.ToString("dd/MM/yyyy")</td>
                                         <td>
                                             <div class="btn-group" role="group">
-                                                @if (User.HasClaim("permission", RubricasApp.Web.Models.Permissions.ApplicationPermissions.Instituciones.VER_DETALLES))
+                                                @if (User.HasClaim("permission", DocinadeApp.Models.Permissions.ApplicationPermissions.Instituciones.VER_DETALLES))
                                                 {
                                                     <a asp-action="Details" asp-route-id="@item.Id" 
                                                        class="btn btn-sm btn-info" title="Ver Detalles">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
                                                 }
-                                                @if (User.HasClaim("permission", RubricasApp.Web.Models.Permissions.ApplicationPermissions.Instituciones.EDITAR))
+                                                @if (User.HasClaim("permission", DocinadeApp.Models.Permissions.ApplicationPermissions.Instituciones.EDITAR))
                                                 {
                                                     <a asp-action="Edit" asp-route-id="@item.Id" 
                                                        class="btn btn-sm btn-warning" title="Editar">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
                                                 }
-                                                @if (User.HasClaim("permission", RubricasApp.Web.Models.Permissions.ApplicationPermissions.Instituciones.ELIMINAR) && item.Estado)
+                                                @if (User.HasClaim("permission", DocinadeApp.Models.Permissions.ApplicationPermissions.Instituciones.ELIMINAR) && item.Estado)
                                                 {
                                                     <a asp-action="Delete" asp-route-id="@item.Id" 
                                                        class="btn btn-sm btn-danger" title="Eliminar">
@@ -147,7 +147,7 @@
                     <div class="alert alert-info text-center" role="alert">
                         <i class="fas fa-info-circle fa-2x mb-2"></i>
                         <p class="mb-0">No se encontraron instituciones educativas.</p>
-                        @if (User.HasClaim("permission", RubricasApp.Web.Models.Permissions.ApplicationPermissions.Instituciones.CREAR))
+                        @if (User.HasClaim("permission", DocinadeApp.Models.Permissions.ApplicationPermissions.Instituciones.CREAR))
                         {
                             <a asp-action="Create" class="btn btn-success mt-3">
                                 <i class="fas fa-plus"></i> Crear Primera Institución

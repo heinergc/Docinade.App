@@ -1,6 +1,6 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 
-namespace RubricasApp.Web.Authorization
+namespace DocinadeApp.Authorization
 {
     /// <summary>
     /// Requisito de autorización para permisos específicos

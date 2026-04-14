@@ -1,4 +1,4 @@
-﻿@model RubricasApp.Web.Models.PeriodoAcademico
+﻿@model DocinadeApp.Models.PeriodoAcademico
 
 @{
     ViewData["Title"] = "Eliminar Período Académico";
@@ -30,7 +30,7 @@
                         </div>
                         <div class="mb-3">
                             <strong>Tipo:</strong>
-                            <span class="badge @(Model.Tipo == RubricasApp.Web.Models.TipoPeriodo.Cuatrimestre ? "bg-info" : "bg-warning")">
+                            <span class="badge @(Model.Tipo == DocinadeApp.Models.TipoPeriodo.Cuatrimestre ? "bg-info" : "bg-warning")">
                                 @Model.Tipo.ToString()
                             </span>
                         </div>

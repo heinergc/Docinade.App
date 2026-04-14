@@ -1,7 +1,7 @@
-using RubricasApp.Web.Models;
-using RubricasApp.Web.ViewModels;
+﻿using DocinadeApp.Models;
+using DocinadeApp.ViewModels;
 
-namespace RubricasApp.Web.Services.AdecuacionCurricular
+namespace DocinadeApp.Services.AdecuacionCurricular
 {
     /// <summary>
     /// Interfaz para el servicio de Adecuación Curricular Significativa (ACS)

@@ -1,4 +1,4 @@
-@model RubricasApp.Web.ViewModels.Grupos.TipoGrupoDetailsViewModel
+ï»¿@model DocinadeApp.ViewModels.Grupos.TipoGrupoDetailsViewModel
 
 @{
     ViewData["Title"] = $"Tipo: {Model.Nombre}";
@@ -63,7 +63,7 @@
     </div>
 </div>
 
-<!-- Estadísticas del tipo -->
+<!-- Estadï¿½sticas del tipo -->
 <div class="row mb-4">
     <div class="col-md-3">
         <div class="modern-card stat-card">
@@ -82,7 +82,7 @@
                 <div class="stat-icon mb-2">
                     <i class="fas fa-check-circle fa-2x text-success"></i>
                 </div>
-                <h3 class="stat-number">@Model.GruposAsociados.Count(g => g.Estado == RubricasApp.Web.Models.EstadoGrupo.Activo)</h3>
+                <h3 class="stat-number">@Model.GruposAsociados.Count(g => g.Estado == DocinadeApp.Models.EstadoGrupo.Activo)</h3>
                 <p class="stat-label">Grupos Activos</p>
             </div>
         </div>
@@ -116,13 +116,13 @@
 </div>
 
 <div class="row">
-    <!-- Información del tipo -->
+    <!-- Informaciï¿½n del tipo -->
     <div class="col-md-4">
         <div class="modern-card">
             <div class="card-header">
                 <h5 class="mb-0">
                     <i class="fas fa-info-circle me-2"></i>
-                    Información del Tipo
+                    Informaciï¿½n del Tipo
                 </h5>
             </div>
             <div class="card-body">
@@ -180,9 +180,9 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>Código</th>
+                                    <th>Cï¿½digo</th>
                                     <th>Nombre</th>
-                                    <th>Período</th>
+                                    <th>Perï¿½odo</th>
                                     <th>Estado</th>
                                     <th>Creado</th>
                                     <th>Acciones</th>
@@ -202,8 +202,8 @@
                                             <small class="text-muted">@grupo.PeriodoAcademico</small>
                                         </td>
                                         <td>
-                                            <span class="badge bg-@(grupo.Estado == RubricasApp.Web.Models.EstadoGrupo.Activo ? "success" : 
-                                                  grupo.Estado == RubricasApp.Web.Models.EstadoGrupo.Inactivo ? "secondary" : "warning")">
+                                            <span class="badge bg-@(grupo.Estado == DocinadeApp.Models.EstadoGrupo.Activo ? "success" : 
+                                                  grupo.Estado == DocinadeApp.Models.EstadoGrupo.Inactivo ? "secondary" : "warning")">
                                                 @grupo.EstadoDisplay
                                             </span>
                                         </td>
@@ -237,7 +237,7 @@
                     <div class="text-center py-5">
                         <i class="fas fa-tag fa-3x text-muted mb-3"></i>
                         <h6 class="text-muted">No hay grupos de este tipo</h6>
-                        <p class="text-muted">Aún no se han creado grupos usando este tipo.</p>
+                        <p class="text-muted">Aï¿½n no se han creado grupos usando este tipo.</p>
                         <a href="@Url.Action("Create", "GruposEstudiantes", new { tipoId = Model.IdTipoGrupo })" 
                            class="btn btn-primary">
                             <i class="fas fa-plus"></i> Crear Primer Grupo

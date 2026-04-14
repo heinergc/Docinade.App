@@ -1,9 +1,9 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
-using RubricasApp.Web.Models.Identity;
+using DocinadeApp.Models.Identity;
 
-namespace RubricasApp.Web.Models
+namespace DocinadeApp.Models
 {
     /// <summary>
     /// Modelo para registrar las operaciones de auditoría del sistema

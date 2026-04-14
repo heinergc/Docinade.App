@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Identity;
-using RubricasApp.Web.Models.Identity;
-using RubricasApp.Web.Models.Permissions;
+﻿using Microsoft.AspNetCore.Identity;
+using DocinadeApp.Models.Identity;
+using DocinadeApp.Models.Permissions;
 
-namespace RubricasApp.Web.Utils;
+namespace DocinadeApp.Utils;
 
 /// <summary>
 /// Clase simple para crear un usuario administrador por defecto

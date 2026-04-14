@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace RubricasApp.Web.Models
+namespace DocinadeApp.Models
 {
     /// <summary>
     /// Catálogo de tipos de faltas según REA 40862-V21, Art. 137

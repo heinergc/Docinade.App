@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace RubricasApp.Web.ViewModels
+namespace DocinadeApp.ViewModels
 {
     /// <summary>
     /// ViewModel para la página principal del sistema de asistencia

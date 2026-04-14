@@ -1,9 +1,9 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
 
-namespace RubricasApp.Web.Data
+namespace DocinadeApp.Data
 {
     public static class DbInitializer
     {

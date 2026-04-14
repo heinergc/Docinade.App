@@ -1,19 +1,19 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.Services.Permissions;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
+using DocinadeApp.Services.Permissions;
 using Microsoft.AspNetCore.Identity;
-using RubricasApp.Web.Models.Identity;
+using DocinadeApp.Models.Identity;
 using System.Diagnostics;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using RubricasApp.Web.ViewModels;
+using DocinadeApp.ViewModels;
 
 // Agrega el using para el namespace donde está GrupoCalificacion si es necesario
-// using RubricasApp.Web.Entidades; // <-- Descomenta y ajusta si tu modelo está en otro namespace
+// using DocinadeApp.Entidades; // <-- Descomenta y ajusta si tu modelo está en otro namespace
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     public class HomeController : Controller
     {

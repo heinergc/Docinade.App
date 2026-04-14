@@ -1,6 +1,6 @@
-using RubricasApp.Web.DTOs.Calificador;
+﻿using DocinadeApp.DTOs.Calificador;
 
-namespace RubricasApp.Web.Services.Calificador
+namespace DocinadeApp.Services.Calificador
 {
     public interface ICalificadorService
     {

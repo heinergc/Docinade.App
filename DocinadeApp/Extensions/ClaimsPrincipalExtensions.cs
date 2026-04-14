@@ -1,6 +1,6 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 
-namespace RubricasApp.Web.Extensions
+namespace DocinadeApp.Extensions
 {
     /// <summary>
     /// Extensiones para ClaimsPrincipal para verificación de permisos

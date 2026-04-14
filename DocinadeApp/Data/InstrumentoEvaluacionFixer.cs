@@ -1,8 +1,8 @@
-using Microsoft.EntityFrameworkCore;
+ï»¿using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
-using RubricasApp.Web.Data;
+using DocinadeApp.Data;
 
-namespace RubricasApp.Web.Data
+namespace DocinadeApp.Data
 {
     public static class InstrumentoEvaluacionFixer
     {
@@ -13,7 +13,7 @@ namespace RubricasApp.Web.Data
         {
             try
             {
-                Console.WriteLine("?? Iniciando corrección del esquema de InstrumentosEvaluacion...");
+                Console.WriteLine("?? Iniciando correcciï¿½n del esquema de InstrumentosEvaluacion...");
                 
                 var connection = context.Database.GetDbConnection();
                 await connection.OpenAsync();
@@ -63,7 +63,7 @@ namespace RubricasApp.Web.Data
                 var nullsFixed = await fixNullCommand.ExecuteNonQueryAsync();
                 Console.WriteLine($"??? {nullsFixed} valores NULL corregidos en Activo");
                 
-                // 5. Verificar que todo está correcto
+                // 5. Verificar que todo estï¿½ correcto
                 using var verifyCommand = connection.CreateCommand();
                 verifyCommand.CommandText = "SELECT COUNT(*) FROM InstrumentosEvaluacion WHERE Activo IS NULL";
                 var nullCount = Convert.ToInt32(await verifyCommand.ExecuteScalarAsync());
@@ -74,7 +74,7 @@ namespace RubricasApp.Web.Data
                 }
                 else
                 {
-                    Console.WriteLine($"?? Aún quedan {nullCount} valores NULL en Activo");
+                    Console.WriteLine($"?? Aï¿½n quedan {nullCount} valores NULL en Activo");
                 }
                 
                 await connection.CloseAsync();
@@ -87,7 +87,7 @@ namespace RubricasApp.Web.Data
         }
         
         /// <summary>
-        /// Ejecuta la corrección antes de cualquier operación de la aplicación
+        /// Ejecuta la correcciï¿½n antes de cualquier operaciï¿½n de la aplicaciï¿½n
         /// </summary>
         public static async Task EnsureSchemaIsFixed(RubricasDbContext context)
         {
@@ -98,7 +98,7 @@ namespace RubricasApp.Web.Data
             catch (Exception ex)
             {
                 Console.WriteLine($"? Error en EnsureSchemaIsFixed: {ex.Message}");
-                // No lanzar excepción para no romper la aplicación
+                // No lanzar excepciï¿½n para no romper la aplicaciï¿½n
             }
         }
     }

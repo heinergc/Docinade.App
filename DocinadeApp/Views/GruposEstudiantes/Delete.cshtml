@@ -1,4 +1,4 @@
-﻿@model RubricasApp.Web.ViewModels.Grupos.DetalleGrupoViewModel
+﻿@model DocinadeApp.ViewModels.Grupos.DetalleGrupoViewModel
 
 @{
     ViewData["Title"] = $"Eliminar Grupo: {Model.Codigo}";
@@ -96,7 +96,7 @@
                                     <tr>
                                         <td><strong>Estado:</strong></td>
                                         <td>
-                                            <span class="badge bg-@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Activo ? "success" : Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Inactivo ? "secondary" : "danger")">
+                                            <span class="badge bg-@(Model.Estado == DocinadeApp.Models.EstadoGrupo.Activo ? "success" : Model.Estado == DocinadeApp.Models.EstadoGrupo.Inactivo ? "secondary" : "danger")">
                                                 @Model.EstadoDisplay
                                             </span>
                                         </td>

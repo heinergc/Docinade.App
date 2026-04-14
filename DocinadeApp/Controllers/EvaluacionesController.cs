@@ -1,17 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.Services;
-using RubricasApp.Web.ViewModels;
-using RubricasApp.Web.Extensions;
-using RubricasApp.Web.DTOs;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
+using DocinadeApp.Services;
+using DocinadeApp.ViewModels;
+using DocinadeApp.Extensions;
+using DocinadeApp.DTOs;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json; // AGREGADO para JsonSerializerOptions
 using Microsoft.AspNetCore.Authorization;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     [Authorize]
     public class EvaluacionesController : Controller

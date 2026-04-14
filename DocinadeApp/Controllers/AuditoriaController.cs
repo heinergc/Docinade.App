@@ -1,17 +1,17 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using RubricasApp.Web.Controllers;
-using RubricasApp.Web.Services.Auditoria;
-using RubricasApp.Web.Services;
-using RubricasApp.Web.ViewModels.Admin;
-using RubricasApp.Web.ViewModels.Auditoria;
-using RubricasApp.Web.Data;
+using DocinadeApp.Controllers;
+using DocinadeApp.Services.Auditoria;
+using DocinadeApp.Services;
+using DocinadeApp.ViewModels.Admin;
+using DocinadeApp.ViewModels.Auditoria;
+using DocinadeApp.Data;
 using Microsoft.AspNetCore.Identity;
-using RubricasApp.Web.Models.Identity;
-using RubricasApp.Web.Models.Permissions;
-using RubricasApp.Web.Authorization;
+using DocinadeApp.Models.Identity;
+using DocinadeApp.Models.Permissions;
+using DocinadeApp.Authorization;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     [Authorize]
     public class AuditoriaController : BaseController
@@ -119,7 +119,7 @@ namespace RubricasApp.Web.Controllers
             }
         }
 
-        private AuditoriaViewModel MapToViewModel(RubricasApp.Web.Models.AuditoriaOperacion operacion)
+        private AuditoriaViewModel MapToViewModel(DocinadeApp.Models.AuditoriaOperacion operacion)
         {
             return new AuditoriaViewModel
             {
@@ -140,7 +140,7 @@ namespace RubricasApp.Web.Controllers
             };
         }
 
-        private AuditoriaOperacionViewModel MapToAuditoriaOperacionViewModel(RubricasApp.Web.Models.AuditoriaOperacion operacion)
+        private AuditoriaOperacionViewModel MapToAuditoriaOperacionViewModel(DocinadeApp.Models.AuditoriaOperacion operacion)
         {
             var usuario = (ApplicationUser?)operacion.Usuario;
             return new AuditoriaOperacionViewModel

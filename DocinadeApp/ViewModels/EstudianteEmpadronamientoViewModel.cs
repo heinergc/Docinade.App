@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations;
-using RubricasApp.Web.DTOs;
+﻿using System.ComponentModel.DataAnnotations;
+using DocinadeApp.DTOs;
 
-namespace RubricasApp.Web.ViewModels
+namespace DocinadeApp.ViewModels
 {
     public class EstudianteEmpadronamientoViewModel
     {

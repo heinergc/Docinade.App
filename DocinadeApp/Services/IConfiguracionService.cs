@@ -1,7 +1,7 @@
-using static RubricasApp.Web.Models.Audit.AuditActionTypes;
-using RubricasApp.Web.Models;
+﻿using static DocinadeApp.Models.Audit.AuditActionTypes;
+using DocinadeApp.Models;
 
-namespace RubricasApp.Web.Services
+namespace DocinadeApp.Services
 {
     /// <summary>
     /// Interfaz para el servicio de configuración del sistema

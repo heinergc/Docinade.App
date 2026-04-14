@@ -1,5 +1,5 @@
-@model RubricasApp.Web.ViewModels.Grupos.GrupoEstudianteIndexViewModel
-@using RubricasApp.Web.Models
+ï»¿@model DocinadeApp.ViewModels.Grupos.GrupoEstudianteIndexViewModel
+@using DocinadeApp.Models
 @{
     ViewData["Title"] = "Grupos de Estudiantes";
 }
@@ -11,7 +11,7 @@
                 <i class="fas fa-users-cog text-primary me-2"></i>
                 Grupos de Estudiantes
             </h1>
-            <p class="text-muted mt-2">Gestiona y organiza estudiantes por grupos académicos</p>
+            <p class="text-muted mt-2">Gestiona y organiza estudiantes por grupos acadï¿½micos</p>
         </div>
         <div class="col-md-4 text-end">
             <div class="btn-group">
@@ -19,7 +19,7 @@
                     <i class="fas fa-plus"></i> Crear Grupo
                 </a>
                 <a href="@Url.Action("Estadisticas")" class="btn btn-modern secondary">
-                    <i class="fas fa-chart-bar"></i> Estadísticas
+                    <i class="fas fa-chart-bar"></i> Estadï¿½sticas
                 </a>
                 <a href="@Url.Action("ExportarExcel", Model.Filtros)" class="btn btn-modern info">
                     <i class="fas fa-download"></i> Exportar
@@ -29,7 +29,7 @@
     </div>
 </div>
 
-<!-- Estadísticas rápidas -->
+<!-- Estadï¿½sticas rï¿½pidas -->
 <div class="row mb-4">
     @foreach (var estadistica in Model.EstadisticasPorTipo)
     {
@@ -61,19 +61,19 @@
     <div class="card-header">
         <h5 class="mb-0">
             <i class="fas fa-filter me-2"></i>
-            Filtros de Búsqueda
+            Filtros de Bï¿½squeda
         </h5>
     </div>
     <div class="card-body">
         <form method="get" action="@Url.Action("Index")" id="filtrosForm">
             <div class="row">
                 <div class="col-md-3">
-                    <label class="form-label">Período Académico</label>
+                    <label class="form-label">Perï¿½odo Acadï¿½mico</label>
                     <select name="Filtros.PeriodoAcademicoId" class="form-select" asp-for="Filtros.PeriodoAcademicoId">
-                        <option value="">Todos los períodos</option>
+                        <option value="">Todos los perï¿½odos</option>
                         @if (ViewBag.PeriodosAcademicos != null)
                         {
-                            @foreach (var periodo in (List<RubricasApp.Web.ViewModels.Shared.PeriodoAcademicoDropdownViewModel>)ViewBag.PeriodosAcademicos)
+                            @foreach (var periodo in (List<DocinadeApp.ViewModels.Shared.PeriodoAcademicoDropdownViewModel>)ViewBag.PeriodosAcademicos)
                             {
                                 <option value="@periodo.Id" selected="@(periodo.Id == Model.Filtros.PeriodoAcademicoId)">
                                     @periodo.Nombre
@@ -86,7 +86,7 @@
                     <label class="form-label">Tipo de Grupo</label>
                     <select name="Filtros.TipoGrupo" class="form-select" asp-for="Filtros.TipoGrupo">
                         <option value="">Todos los tipos</option>
-                        <option value="Seccion" selected="@(Model.Filtros.TipoGrupo == TipoGrupo.Seccion)">Sección</option>
+                        <option value="Seccion" selected="@(Model.Filtros.TipoGrupo == TipoGrupo.Seccion)">Secciï¿½n</option>
                         <option value="Nivel" selected="@(Model.Filtros.TipoGrupo == TipoGrupo.Nivel)">Nivel</option>
                         <option value="Modalidad" selected="@(Model.Filtros.TipoGrupo == TipoGrupo.Modalidad)">Modalidad</option>
                         <option value="Custom" selected="@(Model.Filtros.TipoGrupo == TipoGrupo.Custom)">Personalizado</option>
@@ -103,8 +103,8 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">Código</label>
-                    <input type="text" name="Filtros.Codigo" class="form-control" placeholder="Buscar código..." 
+                    <label class="form-label">Cï¿½digo</label>
+                    <input type="text" name="Filtros.Codigo" class="form-control" placeholder="Buscar cï¿½digo..." 
                            value="@Model.Filtros.Codigo" asp-for="Filtros.Codigo">
                 </div>
                 <div class="col-md-3">
@@ -159,7 +159,7 @@
                         <tr>
                             <th>
                                 <i class="fas fa-tag me-1"></i>
-                                Código
+                                Cï¿½digo
                             </th>
                             <th>
                                 <i class="fas fa-users me-1"></i>
@@ -230,7 +230,7 @@
                                             @string.Join(", ", grupo.Materias.Take(2))
                                             @if (grupo.Materias.Count > 2)
                                             {
-                                                <span>y @(grupo.Materias.Count - 2) más...</span>
+                                                <span>y @(grupo.Materias.Count - 2) mï¿½s...</span>
                                             }
                                         </small>
                                     }
@@ -282,7 +282,7 @@
                                                 <li>
                                                     <a class="dropdown-item text-danger" 
                                                        href="@Url.Action("Delete", new { id = grupo.GrupoId })"
-                                                       onclick="return confirm('¿Está seguro de eliminar este grupo?')">
+                                                       onclick="return confirm('ï¿½Estï¿½ seguro de eliminar este grupo?')">
                                                         <i class="fas fa-trash me-2"></i>Eliminar
                                                     </a>
                                                 </li>
@@ -322,10 +322,10 @@
     </div>
 </div>
 
-<!-- Paginación -->
+<!-- Paginaciï¿½n -->
 @if (Model.Paginacion.TotalPaginas > 1)
 {
-    <nav aria-label="Paginación de grupos" class="mt-4">
+    <nav aria-label="Paginaciï¿½n de grupos" class="mt-4">
         <ul class="pagination justify-content-center">
             <li class="page-item @(!Model.Paginacion.TienePaginaAnterior ? "disabled" : "")">
                 <a class="page-link" href="@Url.Action("Index", new { pagina = Model.Paginacion.PaginaActual - 1, Filtros = Model.Filtros })">

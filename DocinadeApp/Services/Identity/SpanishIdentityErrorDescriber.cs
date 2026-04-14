@@ -1,6 +1,6 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
-namespace RubricasApp.Web.Services.Identity
+namespace DocinadeApp.Services.Identity
 {
     /// <summary>
     /// Proveedor de mensajes de error personalizados para Identity en español

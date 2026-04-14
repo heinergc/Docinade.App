@@ -1,4 +1,4 @@
-@model RubricasApp.Web.ViewModels.Admin.PermissionDetailsViewModel
+ï»¿@model DocinadeApp.ViewModels.Admin.PermissionDetailsViewModel
 
 @{
     ViewData["Title"] = $"Detalles del Permiso - {Model.DisplayName}";
@@ -11,7 +11,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
                 <a asp-area="Admin" asp-controller="Admin" asp-action="Index">
-                    <i class="fas fa-home"></i> Administración
+                    <i class="fas fa-home"></i> Administraciï¿½n
                 </a>
             </li>
             <li class="breadcrumb-item">
@@ -35,7 +35,7 @@
                         Detalles del Permiso
                     </h2>
                     <p class="text-muted mb-0">
-                        Información completa del permiso <strong>@Model.DisplayName</strong>
+                        Informaciï¿½n completa del permiso <strong>@Model.DisplayName</strong>
                     </p>
                 </div>
                 <div>
@@ -49,13 +49,13 @@
     </div>
 
     <div class="row">
-        <!-- Información del Permiso -->
+        <!-- Informaciï¿½n del Permiso -->
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm h-100">
                 <div class="card-header bg-primary text-white">
                     <h5 class="card-title mb-0">
                         <i class="fas fa-info-circle"></i>
-                        Información del Permiso
+                        Informaciï¿½n del Permiso
                     </h5>
                 </div>
                 <div class="card-body">
@@ -79,7 +79,7 @@
 
                     <div class="row mb-3">
                         <div class="col-sm-4">
-                            <strong><i class="fas fa-folder text-muted"></i> Categoría:</strong>
+                            <strong><i class="fas fa-folder text-muted"></i> Categorï¿½a:</strong>
                         </div>
                         <div class="col-sm-8">
                             <span class="badge bg-info">@Model.Category</span>
@@ -88,7 +88,7 @@
 
                     <div class="row mb-3">
                         <div class="col-sm-4">
-                            <strong><i class="fas fa-cube text-muted"></i> Módulo:</strong>
+                            <strong><i class="fas fa-cube text-muted"></i> Mï¿½dulo:</strong>
                         </div>
                         <div class="col-sm-8">
                             <span class="badge bg-secondary">@Model.Module</span>
@@ -111,7 +111,7 @@
                     {
                         <div class="row">
                             <div class="col-sm-4">
-                                <strong><i class="fas fa-align-left text-muted"></i> Descripción:</strong>
+                                <strong><i class="fas fa-align-left text-muted"></i> Descripciï¿½n:</strong>
                             </div>
                             <div class="col-sm-8">
                                 <p class="mb-0">@Model.Description</p>
@@ -122,13 +122,13 @@
             </div>
         </div>
 
-        <!-- Estadísticas -->
+        <!-- Estadï¿½sticas -->
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm h-100">
                 <div class="card-header bg-info text-white">
                     <h5 class="card-title mb-0">
                         <i class="fas fa-chart-bar"></i>
-                        Estadísticas de Uso
+                        Estadï¿½sticas de Uso
                     </h5>
                 </div>
                 <div class="card-body">
@@ -200,7 +200,7 @@
                         <div class="text-center py-4">
                             <i class="fas fa-user-slash text-muted" style="font-size: 3rem;"></i>
                             <h6 class="text-muted mt-3">Sin Roles Asignados</h6>
-                            <p class="text-muted small">Este permiso no está asignado a ningún rol actualmente.</p>
+                            <p class="text-muted small">Este permiso no estï¿½ asignado a ningï¿½n rol actualmente.</p>
                         </div>
                     }
                 </div>
@@ -236,7 +236,7 @@
                                     <div>
                                         <h6 class="mb-1">@user.NombreCompleto</h6>
                                         <small class="text-muted d-block">@user.Email</small>
-                                        <small class="text-info">A través del rol: @user.ThroughRole</small>
+                                        <small class="text-info">A travï¿½s del rol: @user.ThroughRole</small>
                                     </div>
                                     <div>
                                         <span class="badge @(user.Activo ? "bg-success" : "bg-danger")">
@@ -255,7 +255,7 @@
                         {
                             <div class="text-center mt-3">
                                 <small class="text-muted">
-                                    y @(Model.UsersWithPermission.Count - 10) usuario(s) más...
+                                    y @(Model.UsersWithPermission.Count - 10) usuario(s) mï¿½s...
                                 </small>
                             </div>
                         }
@@ -265,7 +265,7 @@
                         <div class="text-center py-4">
                             <i class="fas fa-user-slash text-muted" style="font-size: 3rem;"></i>
                             <h6 class="text-muted mt-3">Sin Usuarios</h6>
-                            <p class="text-muted small">Ningún usuario tiene este permiso actualmente.</p>
+                            <p class="text-muted small">Ningï¿½n usuario tiene este permiso actualmente.</p>
                         </div>
                     }
                 </div>
@@ -301,17 +301,17 @@
                         </a>
                     </div>
 
-                    <!-- Información adicional -->
+                    <!-- Informaciï¿½n adicional -->
                     <div class="alert alert-info mt-3">
                         <div class="row">
                             <div class="col-md-8">
                                 <h6 class="alert-heading mb-2">
                                     <i class="fas fa-info-circle"></i>
-                                    Información sobre este Permiso
+                                    Informaciï¿½n sobre este Permiso
                                 </h6>
                                 <ul class="mb-0 small">
-                                    <li><strong>Código Interno:</strong> <code>@Model.Name</code></li>
-                                    <li><strong>Categoría:</strong> @Model.Category</li>
+                                    <li><strong>Cï¿½digo Interno:</strong> <code>@Model.Name</code></li>
+                                    <li><strong>Categorï¿½a:</strong> @Model.Category</li>
                                     <li><strong>Nivel de Acceso:</strong> @(Model.IsSystemPermission ? "Sistema (predefinido)" : "Personalizado")</li>
                                     <li><strong>Impacto:</strong> Afecta a @Model.TotalUsers usuario(s) en @Model.TotalRoles rol(es)</li>
                                 </ul>

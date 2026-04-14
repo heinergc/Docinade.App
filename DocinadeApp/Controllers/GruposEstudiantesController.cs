@@ -2,18 +2,18 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.Models.Identity;
-using RubricasApp.Web.Services.Grupos;
-using RubricasApp.Web.ViewModels.Grupos;
-using RubricasApp.Web.ViewModels.Shared;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
+using DocinadeApp.Models.Identity;
+using DocinadeApp.Services.Grupos;
+using DocinadeApp.ViewModels.Grupos;
+using DocinadeApp.ViewModels.Shared;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.Rendering; // 🔧 CORRECCIÓN: Agregar usando para SelectListItem del framework
-using RubricasApp.Web.Authorization;
-using RubricasApp.Web.Models.Permissions;
+using DocinadeApp.Authorization;
+using DocinadeApp.Models.Permissions;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     [Authorize]
     public class GruposEstudiantesController : Controller

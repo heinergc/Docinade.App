@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace RubricasApp.Web.Models
+namespace DocinadeApp.Models
 {
     /// <summary>
     /// Representa la relaci�n entre un instrumento de evaluaci�n y una materia

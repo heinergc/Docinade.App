@@ -1,7 +1,7 @@
-namespace RubricasApp.Web.ViewModels.Reportes
+ï»¿namespace DocinadeApp.ViewModels.Reportes
 {
     /// <summary>
-    /// ViewModel principal para el reporte en árbol del sistema de evaluaciones
+    /// ViewModel principal para el reporte en ï¿½rbol del sistema de evaluaciones
     /// </summary>
     public class ReporteArbolViewModel
     {
@@ -13,7 +13,7 @@ namespace RubricasApp.Web.ViewModels.Reportes
     }
 
     /// <summary>
-    /// Resumen estadístico general del sistema
+    /// Resumen estadï¿½stico general del sistema
     /// </summary>
     public class ResumenGeneral
     {
@@ -28,7 +28,7 @@ namespace RubricasApp.Web.ViewModels.Reportes
     }
 
     /// <summary>
-    /// Nodo de materia en el árbol jerárquico
+    /// Nodo de materia en el ï¿½rbol jerï¿½rquico
     /// </summary>
     public class MateriaNode
     {
@@ -38,7 +38,7 @@ namespace RubricasApp.Web.ViewModels.Reportes
         public string Estado { get; set; } = string.Empty;
         public List<PeriodoNode> Periodos { get; set; } = new();
         
-        // Estadísticas agregadas de la materia
+        // Estadï¿½sticas agregadas de la materia
         public int TotalPeriodos { get; set; }
         public int TotalEstudiantes { get; set; }
         public int TotalInstrumentos { get; set; }
@@ -49,7 +49,7 @@ namespace RubricasApp.Web.ViewModels.Reportes
     }
 
     /// <summary>
-    /// Nodo de período académico en el árbol jerárquico
+    /// Nodo de perï¿½odo acadï¿½mico en el ï¿½rbol jerï¿½rquico
     /// </summary>
     public class PeriodoNode
     {
@@ -60,7 +60,7 @@ namespace RubricasApp.Web.ViewModels.Reportes
         public int CantidadEstudiantes { get; set; }
         public List<InstrumentoNode> Instrumentos { get; set; } = new();
         
-        // Estadísticas del período
+        // Estadï¿½sticas del perï¿½odo
         public int TotalInstrumentos { get; set; }
         public int TotalRubricas { get; set; }
         public int TotalEvaluaciones { get; set; }
@@ -71,7 +71,7 @@ namespace RubricasApp.Web.ViewModels.Reportes
     }
 
     /// <summary>
-    /// Nodo de instrumento en el árbol jerárquico
+    /// Nodo de instrumento en el ï¿½rbol jerï¿½rquico
     /// </summary>
     public class InstrumentoNode
     {
@@ -81,7 +81,7 @@ namespace RubricasApp.Web.ViewModels.Reportes
         public int Orden { get; set; }
         public List<RubricaNode> Rubricas { get; set; } = new();
         
-        // Estadísticas del instrumento
+        // Estadï¿½sticas del instrumento
         public int TotalRubricas { get; set; }
         public int TotalEvaluaciones { get; set; }
         public decimal PonderacionTotal { get; set; }
@@ -90,7 +90,7 @@ namespace RubricasApp.Web.ViewModels.Reportes
     }
 
     /// <summary>
-    /// Nodo de rúbrica en el árbol jerárquico
+    /// Nodo de rï¿½brica en el ï¿½rbol jerï¿½rquico
     /// </summary>
     public class RubricaNode
     {
@@ -101,7 +101,7 @@ namespace RubricasApp.Web.ViewModels.Reportes
         public decimal Ponderacion { get; set; }
         public int CantidadEvaluaciones { get; set; }
         
-        // Estadísticas de la rúbrica
+        // Estadï¿½sticas de la rï¿½brica
         public int EvaluacionesFinalizadas { get; set; }
         public int EvaluacionesBorrador { get; set; }
         public decimal PorcentajeAvance { get; set; }
@@ -129,7 +129,7 @@ namespace RubricasApp.Web.ViewModels.Reportes
     }
 
     /// <summary>
-    /// Datos sin procesar de la consulta jerárquica
+    /// Datos sin procesar de la consulta jerï¿½rquica
     /// </summary>
     public class DatoJerarquico
     {
@@ -139,7 +139,7 @@ namespace RubricasApp.Web.ViewModels.Reportes
         public string NombreMateria { get; set; } = string.Empty;
         public string EstadoMateria { get; set; } = string.Empty;
         
-        // Nivel Período
+        // Nivel Perï¿½odo
         public int? PeriodoId { get; set; }
         public string? CodigoPeriodo { get; set; }
         public string? NombrePeriodo { get; set; }
@@ -152,14 +152,14 @@ namespace RubricasApp.Web.ViewModels.Reportes
         public string? DescripcionInstrumento { get; set; }
         public int OrdenInstrumento { get; set; }
         
-        // Nivel Rúbrica
+        // Nivel Rï¿½brica
         public int? RubricaId { get; set; }
         public string? NombreRubrica { get; set; }
         public string? TituloRubrica { get; set; }
         public string? EstadoRubrica { get; set; }
         public decimal Ponderacion { get; set; }
         
-        // Estadísticas de evaluaciones
+        // Estadï¿½sticas de evaluaciones
         public int CantidadEvaluaciones { get; set; }
         public int EvaluacionesFinalizadas { get; set; }
         public int EvaluacionesBorrador { get; set; }

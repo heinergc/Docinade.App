@@ -1,4 +1,4 @@
-namespace RubricasApp.Web.Models.Permissions
+﻿namespace DocinadeApp.Models.Permissions
 {
     /// <summary>
     /// Define todos los roles disponibles en el sistema

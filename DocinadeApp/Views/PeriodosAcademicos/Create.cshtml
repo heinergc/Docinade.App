@@ -1,4 +1,4 @@
-﻿@model RubricasApp.Web.ViewModels.Academic.CrearPeriodoVm
+﻿@model DocinadeApp.ViewModels.Academic.CrearPeriodoVm
 
 @{
     ViewData["Title"] = "Nuevo Período Académico";
@@ -37,7 +37,7 @@
                         <div class="col-md-4">
                             <div class="form-group mb-3">
                                 <label asp-for="Tipo" class="form-label"></label>
-                                <select asp-for="Tipo" class="form-control" asp-items="Html.GetEnumSelectList<RubricasApp.Web.Models.TipoPeriodo>()">
+                                <select asp-for="Tipo" class="form-control" asp-items="Html.GetEnumSelectList<DocinadeApp.Models.TipoPeriodo>()">
                                     <option value="">Seleccionar tipo</option>
                                 </select>
                                 <span asp-validation-for="Tipo" class="text-danger"></span>

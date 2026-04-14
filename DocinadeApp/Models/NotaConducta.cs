@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace RubricasApp.Web.Models
+namespace DocinadeApp.Models
 {
     /// <summary>
     /// Nota de conducta acumulada por estudiante y período académico

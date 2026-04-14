@@ -1,17 +1,17 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.ViewModels;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.Authorization;
+using DocinadeApp.Data;
+using DocinadeApp.ViewModels;
+using DocinadeApp.Models;
+using DocinadeApp.Authorization;
 using System.IO;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     /// <summary>
     /// Controlador para el manejo de asistencia y pase de lista de estudiantes

@@ -1,6 +1,6 @@
-using RubricasApp.Web.Models.Permissions;
+﻿using DocinadeApp.Models.Permissions;
 
-namespace RubricasApp.Web.ViewModels.Admin
+namespace DocinadeApp.ViewModels.Admin
 {
     /// <summary>
     /// ViewModel para la vista de permiso

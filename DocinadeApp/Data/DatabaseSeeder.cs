@@ -1,6 +1,6 @@
-using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
 
 public static class DatabaseSeeder
 {

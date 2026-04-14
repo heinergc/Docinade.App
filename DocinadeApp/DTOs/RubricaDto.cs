@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace RubricasApp.Web.DTOs
+namespace DocinadeApp.DTOs
 {
     /// <summary>Datos planos de rúbrica para selects y respuestas JSON.</summary>
     public record RubricaDto(

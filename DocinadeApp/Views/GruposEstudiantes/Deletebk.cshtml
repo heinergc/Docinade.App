@@ -1,4 +1,4 @@
-@model RubricasApp.Web.ViewModels.Grupos.DetalleGrupoViewModel
+ï»¿@model DocinadeApp.ViewModels.Grupos.DetalleGrupoViewModel
 
 @{
     ViewData["Title"] = $"Eliminar Grupo: {Model.Codigo}";
@@ -39,42 +39,42 @@
             <div class="card-header bg-danger text-white">
                 <h5 class="mb-0">
                     <i class="fas fa-exclamation-triangle me-2"></i>
-                    Confirmar Eliminación
+                    Confirmar Eliminaciï¿½n
                 </h5>
             </div>
             <div class="card-body">
                 <div class="alert alert-danger" role="alert">
                     <h4 class="alert-heading">
                         <i class="fas fa-exclamation-triangle me-2"></i>
-                        ¡Atención!
+                        ï¿½Atenciï¿½n!
                     </h4>
                     <p class="mb-0">
-                        Esta acción <strong>eliminará permanentemente</strong> el grupo y no se puede deshacer.
+                        Esta acciï¿½n <strong>eliminarï¿½ permanentemente</strong> el grupo y no se puede deshacer.
                         @if (Model.CantidadEstudiantes > 0)
                         {
-                            <br><strong>El grupo tiene @Model.CantidadEstudiantes estudiante(s) asignado(s) que se desasignarán automáticamente.</strong>
+                            <br><strong>El grupo tiene @Model.CantidadEstudiantes estudiante(s) asignado(s) que se desasignarï¿½n automï¿½ticamente.</strong>
                         }
                         @if (Model.Materias.Any())
                         {
-                            <br><strong>El grupo tiene @Model.Materias.Count materia(s) asociada(s) que se desasociarán automáticamente.</strong>
+                            <br><strong>El grupo tiene @Model.Materias.Count materia(s) asociada(s) que se desasociarï¿½n automï¿½ticamente.</strong>
                         }
                     </p>
                 </div>
 
-                <!-- Información del grupo -->
+                <!-- Informaciï¿½n del grupo -->
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <div class="card bg-light border-0">
                             <div class="card-header bg-transparent border-0">
                                 <h6 class="mb-0">
                                     <i class="fas fa-info-circle me-2"></i>
-                                    Información del Grupo
+                                    Informaciï¿½n del Grupo
                                 </h6>
                             </div>
                             <div class="card-body">
                                 <table class="table table-borderless table-sm">
                                     <tr>
-                                        <td><strong>Código:</strong></td>
+                                        <td><strong>Cï¿½digo:</strong></td>
                                         <td><span class="badge bg-primary">@Model.Codigo</span></td>
                                     </tr>
                                     <tr>
@@ -92,13 +92,13 @@
                                     <tr>
                                         <td><strong>Estado:</strong></td>
                                         <td>
-                                            <span class="badge bg-@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Activo ? "success" : Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Inactivo ? "secondary" : "danger")">
+                                            <span class="badge bg-@(Model.Estado == DocinadeApp.Models.EstadoGrupo.Activo ? "success" : Model.Estado == DocinadeApp.Models.EstadoGrupo.Inactivo ? "secondary" : "danger")">
                                                 @Model.EstadoDisplay
                                             </span>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td><strong>Período:</strong></td>
+                                        <td><strong>Perï¿½odo:</strong></td>
                                         <td>@Model.PeriodoAcademico</td>
                                     </tr>
                                     <tr>
@@ -121,7 +121,7 @@
                             <div class="card-header bg-transparent border-0">
                                 <h6 class="mb-0">
                                     <i class="fas fa-chart-bar me-2"></i>
-                                    Estadísticas
+                                    Estadï¿½sticas
                                 </h6>
                             </div>
                             <div class="card-body">
@@ -159,7 +159,7 @@
                 @if (!string.IsNullOrEmpty(Model.Descripcion))
                 {
                     <div class="mb-3">
-                        <h6><strong>Descripción:</strong></h6>
+                        <h6><strong>Descripciï¿½n:</strong></h6>
                         <p class="text-muted">@Model.Descripcion</p>
                     </div>
                 }
@@ -178,7 +178,7 @@
                     <div class="mb-4">
                         <h6 class="text-warning">
                             <i class="fas fa-users me-2"></i>
-                            Estudiantes que serán desasignados (@Model.Estudiantes.Count)
+                            Estudiantes que serï¿½n desasignados (@Model.Estudiantes.Count)
                         </h6>
                         <div class="table-responsive" style="max-height: 200px; overflow-y: auto;">
                             <table class="table table-sm table-striped">
@@ -198,7 +198,7 @@
                                             <td>
                                                 @if (estudiante.EsGrupoPrincipal)
                                                 {
-                                                    <span class="badge bg-success">Sí</span>
+                                                    <span class="badge bg-success">Sï¿½</span>
                                                 }
                                                 else
                                                 {
@@ -211,7 +211,7 @@
                                     {
                                         <tr>
                                             <td colspan="3" class="text-center text-muted">
-                                                <small>... y @(Model.Estudiantes.Count - 10) estudiante(s) más</small>
+                                                <small>... y @(Model.Estudiantes.Count - 10) estudiante(s) mï¿½s</small>
                                             </td>
                                         </tr>
                                     }
@@ -227,7 +227,7 @@
                     <div class="mb-4">
                         <h6 class="text-info">
                             <i class="fas fa-book me-2"></i>
-                            Materias que serán desasociadas (@Model.Materias.Count)
+                            Materias que serï¿½n desasociadas (@Model.Materias.Count)
                         </h6>
                         <div class="row">
                             @foreach (var materia in Model.Materias)
@@ -240,7 +240,7 @@
                     </div>
                 }
 
-                <!-- Formulario de confirmación -->
+                <!-- Formulario de confirmaciï¿½n -->
                 <form asp-action="Delete" method="post" id="deleteForm">
                     <input type="hidden" asp-for="GrupoId" />
                     
@@ -255,7 +255,7 @@
                                 </div>
                                 <div>
                                     <button type="button" class="btn btn-modern danger" id="confirmDeleteBtn">
-                                        <i class="fas fa-trash"></i> Confirmar Eliminación
+                                        <i class="fas fa-trash"></i> Confirmar Eliminaciï¿½n
                                     </button>
                                 </div>
                             </div>
@@ -275,29 +275,29 @@
                 const cantidadEstudiantes = @Model.CantidadEstudiantes;
                 const cantidadMaterias = @Model.Materias.Count;
                 
-                let mensaje = `¿Está seguro de que desea eliminar el grupo "${grupoNombre}"?`;
+                let mensaje = `ï¿½Estï¿½ seguro de que desea eliminar el grupo "${grupoNombre}"?`;
                 
                 if (cantidadEstudiantes > 0 || cantidadMaterias > 0) {
-                    mensaje += '\n\nEsta acción también:';
+                    mensaje += '\n\nEsta acciï¿½n tambiï¿½n:';
                     if (cantidadEstudiantes > 0) {
-                        mensaje += `\n• Desasignará ${cantidadEstudiantes} estudiante(s)`;
+                        mensaje += `\nï¿½ Desasignarï¿½ ${cantidadEstudiantes} estudiante(s)`;
                     }
                     if (cantidadMaterias > 0) {
-                        mensaje += `\n• Desasociará ${cantidadMaterias} materia(s)`;
+                        mensaje += `\nï¿½ Desasociarï¿½ ${cantidadMaterias} materia(s)`;
                     }
                 }
                 
-                mensaje += '\n\nEsta acción no se puede deshacer.';
+                mensaje += '\n\nEsta acciï¿½n no se puede deshacer.';
                 
                 if (typeof Swal !== 'undefined') {
                     Swal.fire({
-                        title: '¿Confirmar eliminación?',
+                        title: 'ï¿½Confirmar eliminaciï¿½n?',
                         html: mensaje.replace(/\n/g, '<br>'),
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#dc3545',
                         cancelButtonColor: '#6c757d',
-                        confirmButtonText: 'Sí, eliminar',
+                        confirmButtonText: 'Sï¿½, eliminar',
                         cancelButtonText: 'Cancelar',
                         reverseButtons: true
                     }).then((result) => {
@@ -316,7 +316,7 @@
                         }
                     });
                 } else {
-                    // Fallback si SweetAlert no está disponible
+                    // Fallback si SweetAlert no estï¿½ disponible
                     if (confirm(mensaje)) {
                         document.getElementById('deleteForm').submit();
                     }

@@ -1,4 +1,4 @@
-namespace RubricasApp.Web.Models.Audit
+﻿namespace DocinadeApp.Models.Audit
 {
     /// <summary>
     /// Tipos de entidades para auditoría

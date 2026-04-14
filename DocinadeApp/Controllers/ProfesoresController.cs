@@ -1,15 +1,15 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.ViewModels;
-using RubricasApp.Web.Services;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
+using DocinadeApp.ViewModels;
+using DocinadeApp.Services;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     /// <summary>
     /// Controlador para la gestión completa de profesores con formulario multi-step

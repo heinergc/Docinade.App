@@ -1,5 +1,5 @@
-﻿@model RubricasApp.Web.ViewModels.Grupos.GrupoEstudianteIndexViewModel
-@using RubricasApp.Web.Models
+﻿@model DocinadeApp.ViewModels.Grupos.GrupoEstudianteIndexViewModel
+@using DocinadeApp.Models
 @using Microsoft.AspNetCore.Routing
 @{
     ViewData["Title"] = "Grupos de Estudiantes";
@@ -108,7 +108,7 @@
                             <option value="">Todos los períodos</option>
                             @if (ViewBag.PeriodosAcademicos != null)
                             {
-                                @foreach (var periodo in (List<RubricasApp.Web.ViewModels.Shared.PeriodoAcademicoDropdownViewModel>)ViewBag.PeriodosAcademicos)
+                                @foreach (var periodo in (List<DocinadeApp.ViewModels.Shared.PeriodoAcademicoDropdownViewModel>)ViewBag.PeriodosAcademicos)
                                 {
                                     <option value="@periodo.Id" selected="@(periodo.Id == Model.Filtros.PeriodoAcademicoId)">
                                         @periodo.Nombre

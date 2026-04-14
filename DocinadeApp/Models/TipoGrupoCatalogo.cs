@@ -1,10 +1,10 @@
-using System.ComponentModel.DataAnnotations;
+ï»¿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace RubricasApp.Web.Models
+namespace DocinadeApp.Models
 {
     /// <summary>
-    /// Catálogo simple de tipos de grupo
+    /// Catï¿½logo simple de tipos de grupo
     /// </summary>
     [Table("TiposGrupo")]
     public class TipoGrupoCatalogo

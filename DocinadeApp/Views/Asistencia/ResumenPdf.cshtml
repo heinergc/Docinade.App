@@ -1,4 +1,4 @@
-@model RubricasApp.Web.ViewModels.ResumenAsistenciaViewModel
+﻿@model DocinadeApp.ViewModels.ResumenAsistenciaViewModel
 
 @{
     Layout = null; // No layout for PDF generation
@@ -301,7 +301,7 @@
 
     <!-- Pie de página -->
     <div class="footer">
-        <p>Reporte generado por RubricasApp.Web - @DateTime.Now.Year</p>
+        <p>Reporte generado por DocinadeApp - @DateTime.Now.Year</p>
         <p>Grupo: @Model.Grupo.Nombre | Fecha: @Model.Fecha.ToString("dd/MM/yyyy") | Total estudiantes: @Model.TotalEstudiantes</p>
     </div>
 </body>

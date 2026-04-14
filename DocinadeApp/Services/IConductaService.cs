@@ -1,7 +1,7 @@
-using RubricasApp.Web.Models;
-using RubricasApp.Web.ViewModels.Conducta;
+﻿using DocinadeApp.Models;
+using DocinadeApp.ViewModels.Conducta;
 
-namespace RubricasApp.Web.Services
+namespace DocinadeApp.Services
 {
     public interface IConductaService
     {

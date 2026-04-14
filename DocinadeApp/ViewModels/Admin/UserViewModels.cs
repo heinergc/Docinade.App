@@ -1,4 +1,4 @@
-// Este archivo se mantiene por compatibilidad
+﻿// Este archivo se mantiene por compatibilidad
 // Las clases se han movido a archivos separados para mejor organización:
 
 // AdminBaseViewModels.cs - Clases base y comunes
@@ -12,7 +12,7 @@
 // NOTA: Este archivo puede ser eliminado una vez que todas las referencias
 // se hayan actualizado para usar los nuevos archivos separados.
 
-namespace RubricasApp.Web.ViewModels.Admin
+namespace DocinadeApp.ViewModels.Admin
 {
     // Marcador para mantener el namespace activo
     internal static class LegacyViewModelsPlaceholder

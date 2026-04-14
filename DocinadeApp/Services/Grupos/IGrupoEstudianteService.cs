@@ -1,7 +1,7 @@
-using RubricasApp.Web.Models;
-using RubricasApp.Web.ViewModels.Grupos;
+﻿using DocinadeApp.Models;
+using DocinadeApp.ViewModels.Grupos;
 
-namespace RubricasApp.Web.Services.Grupos
+namespace DocinadeApp.Services.Grupos
 {
     public interface IGrupoEstudianteService
     {

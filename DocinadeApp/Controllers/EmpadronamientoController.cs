@@ -1,15 +1,15 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.DTOs;
-using RubricasApp.Web.ViewModels;
-using RubricasApp.Web.Authorization;
-using RubricasApp.Web.Models.Permissions;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
+using DocinadeApp.DTOs;
+using DocinadeApp.ViewModels;
+using DocinadeApp.Authorization;
+using DocinadeApp.Models.Permissions;
 using System.Text.Json;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     [Authorize]
     public class EmpadronamientoController : Controller

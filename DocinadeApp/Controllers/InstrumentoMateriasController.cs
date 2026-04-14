@@ -1,14 +1,14 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.ViewModels;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
+using DocinadeApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using RubricasApp.Web.Authorization;
-using RubricasApp.Web.Models.Permissions;
+using DocinadeApp.Authorization;
+using DocinadeApp.Models.Permissions;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     [Authorize]
     public class InstrumentoMateriasController : Controller

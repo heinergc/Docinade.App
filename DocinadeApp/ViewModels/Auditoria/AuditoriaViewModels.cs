@@ -1,6 +1,6 @@
-using RubricasApp.Web.Models;
+﻿using DocinadeApp.Models;
 
-namespace RubricasApp.Web.ViewModels.Auditoria
+namespace DocinadeApp.ViewModels.Auditoria
 {
     /// <summary>
     /// ViewModel para mostrar una operación de auditoría

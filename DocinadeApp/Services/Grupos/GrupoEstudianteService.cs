@@ -1,11 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.ViewModels.Grupos;
-using RubricasApp.Web.Services.Auditoria;
+﻿using Microsoft.EntityFrameworkCore;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
+using DocinadeApp.ViewModels.Grupos;
+using DocinadeApp.Services.Auditoria;
 using OfficeOpenXml;
 
-namespace RubricasApp.Web.Services.Grupos
+namespace DocinadeApp.Services.Grupos
 {
     public class GrupoEstudianteService : IGrupoEstudianteService
     {

@@ -1,16 +1,16 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Services.Reportes;
-using RubricasApp.Web.ViewModels.Reportes;
-using RubricasApp.Web.ViewModels.Conducta;
-using RubricasApp.Web.Services;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Interfaces;
-using RubricasApp.Web.Models;
+using DocinadeApp.Services.Reportes;
+using DocinadeApp.ViewModels.Reportes;
+using DocinadeApp.ViewModels.Conducta;
+using DocinadeApp.Services;
+using DocinadeApp.Data;
+using DocinadeApp.Interfaces;
+using DocinadeApp.Models;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     [Authorize]
     public class ReportesController : BaseController

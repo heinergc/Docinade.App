@@ -1,16 +1,16 @@
-using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
+ï»¿using Microsoft.EntityFrameworkCore;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
 
-namespace RubricasApp.Web.Utils
+namespace DocinadeApp.Utils
 {
     /// <summary>
-    /// Inicializador para el catálogo simple de tipos de grupo
+    /// Inicializador para el catï¿½logo simple de tipos de grupo
     /// </summary>
     public static class TiposGrupoInitializer
     {
         /// <summary>
-        /// Inicializa el catálogo de tipos de grupo con datos por defecto
+        /// Inicializa el catï¿½logo de tipos de grupo con datos por defecto
         /// </summary>
         public static async Task<bool> InitializeTiposGrupoAsync(RubricasDbContext context)
         {
@@ -20,18 +20,18 @@ namespace RubricasApp.Web.Utils
                 var existenTipos = await context.TiposGrupo.AnyAsync();
                 if (existenTipos)
                 {
-                    Console.WriteLine("? Catálogo de tipos de grupo ya existe");
+                    Console.WriteLine("? Catï¿½logo de tipos de grupo ya existe");
                     return true;
                 }
 
-                Console.WriteLine("?? Creando catálogo de tipos de grupo...");
+                Console.WriteLine("?? Creando catï¿½logo de tipos de grupo...");
 
                 // Crear tipos de grupo por defecto
                 var tiposGrupo = new List<TipoGrupoCatalogo>
                 {
                     new TipoGrupoCatalogo
                     {
-                        Nombre = "Sección",
+                        Nombre = "Secciï¿½n",
                         FechaRegistro = DateTime.Now,
                         Estado = "Activo"
                     },
@@ -73,25 +73,25 @@ namespace RubricasApp.Web.Utils
                 // Guardar cambios
                 var tiposCreados = await context.SaveChangesAsync();
                 
-                Console.WriteLine($"? Se crearon {tiposCreados} tipos de grupo en el catálogo");
+                Console.WriteLine($"? Se crearon {tiposCreados} tipos de grupo en el catï¿½logo");
                 
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"? Error al inicializar catálogo de tipos de grupo: {ex.Message}");
+                Console.WriteLine($"? Error al inicializar catï¿½logo de tipos de grupo: {ex.Message}");
                 return false;
             }
         }
 
         /// <summary>
-        /// Migra grupos existentes para usar el catálogo de tipos
+        /// Migra grupos existentes para usar el catï¿½logo de tipos
         /// </summary>
         public static async Task<bool> MigrarGruposExistentesAsync(RubricasDbContext context)
         {
             try
             {
-                Console.WriteLine("?? Migrando grupos existentes al catálogo de tipos...");
+                Console.WriteLine("?? Migrando grupos existentes al catï¿½logo de tipos...");
 
                 // Obtener grupos que no tengan IdTipoGrupo asignado
                 var gruposSinTipo = await context.GruposEstudiantes
@@ -104,7 +104,7 @@ namespace RubricasApp.Web.Utils
                     return true;
                 }
 
-                // Obtener mapeo de tipos del catálogo
+                // Obtener mapeo de tipos del catï¿½logo
                 var tiposMap = await context.TiposGrupo
                     .ToDictionaryAsync(t => t.Nombre, t => t.IdTipoGrupo);
 
@@ -112,10 +112,10 @@ namespace RubricasApp.Web.Utils
 
                 foreach (var grupo in gruposSinTipo)
                 {
-                    // Mapear enum a nombre del catálogo
+                    // Mapear enum a nombre del catï¿½logo
                     string nombreTipo = grupo.TipoGrupo switch
                     {
-                        TipoGrupo.Seccion => "Sección",
+                        TipoGrupo.Seccion => "Secciï¿½n",
                         TipoGrupo.Nivel => "Nivel",
                         TipoGrupo.Modalidad => "Modalidad",
                         TipoGrupo.Custom => "Personalizado",
@@ -138,7 +138,7 @@ namespace RubricasApp.Web.Utils
                 if (gruposMigrados > 0)
                 {
                     await context.SaveChangesAsync();
-                    Console.WriteLine($"? Se migraron {gruposMigrados} grupos al catálogo de tipos");
+                    Console.WriteLine($"? Se migraron {gruposMigrados} grupos al catï¿½logo de tipos");
                 }
 
                 return true;
@@ -151,7 +151,7 @@ namespace RubricasApp.Web.Utils
         }
 
         /// <summary>
-        /// Inicialización completa del sistema de tipos de grupo
+        /// Inicializaciï¿½n completa del sistema de tipos de grupo
         /// </summary>
         public static async Task<bool> InitializeCompleteAsync(RubricasDbContext context)
         {
@@ -159,11 +159,11 @@ namespace RubricasApp.Web.Utils
             {
                 Console.WriteLine("?? Inicializando sistema completo de tipos de grupo...");
 
-                // 1. Crear catálogo de tipos
+                // 1. Crear catï¿½logo de tipos
                 var catalogoCreado = await InitializeTiposGrupoAsync(context);
                 if (!catalogoCreado)
                 {
-                    Console.WriteLine("? Falló la creación del catálogo de tipos");
+                    Console.WriteLine("? Fallï¿½ la creaciï¿½n del catï¿½logo de tipos");
                     return false;
                 }
 
@@ -171,7 +171,7 @@ namespace RubricasApp.Web.Utils
                 var gruposMigrados = await MigrarGruposExistentesAsync(context);
                 if (!gruposMigrados)
                 {
-                    Console.WriteLine("?? Falló la migración de grupos existentes, pero el catálogo está disponible");
+                    Console.WriteLine("?? Fallï¿½ la migraciï¿½n de grupos existentes, pero el catï¿½logo estï¿½ disponible");
                 }
 
                 Console.WriteLine("?? Sistema de tipos de grupo inicializado completamente");
@@ -179,7 +179,7 @@ namespace RubricasApp.Web.Utils
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"?? Error en inicialización completa: {ex.Message}");
+                Console.WriteLine($"?? Error en inicializaciï¿½n completa: {ex.Message}");
                 return false;
             }
         }

@@ -1,8 +1,8 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
-using RubricasApp.Web.Data;
+using DocinadeApp.Data;
 
-namespace RubricasApp.Web.Utils
+namespace DocinadeApp.Utils
 {
     public static class DatabaseFixer
     {

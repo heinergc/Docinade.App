@@ -1,4 +1,4 @@
-namespace RubricasApp.Web.Services
+﻿namespace DocinadeApp.Services
 {
     /// <summary>
     /// Interfaz para el servicio de correo electrónico

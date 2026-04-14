@@ -1,9 +1,9 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema; // ?? CORRECCI�N: Agregar para NotMapped
-using RubricasApp.Web.Models;
+using DocinadeApp.Models;
 using Microsoft.AspNetCore.Mvc.Rendering; // ?? CORRECCI�N: Usar SelectListItem del framework
 
-namespace RubricasApp.Web.ViewModels.Grupos
+namespace DocinadeApp.ViewModels.Grupos
 {
     public class GrupoEstudianteIndexViewModel
     {

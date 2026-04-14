@@ -1,25 +1,25 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.Models.Identity;
-using RubricasApp.Web.Models.Permissions;
-using RubricasApp.Web.Services;
-using RubricasApp.Web.Services.Identity;
-using RubricasApp.Web.Services.Permissions;
-using RubricasApp.Web.Services.Audit;
-using RubricasApp.Web.Services.CuadernoCalificador;
-using RubricasApp.Web.Services.Calificador;
-using RubricasApp.Web.Services.Grupos;
-using RubricasApp.Web.Scripts;
-using RubricasApp.Web.Configuration;
-using RubricasApp.Web.Middleware;
-using RubricasApp.Web.Authorization;
-using RubricasApp.Web.Utils;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
+using DocinadeApp.Models.Identity;
+using DocinadeApp.Models.Permissions;
+using DocinadeApp.Services;
+using DocinadeApp.Services.Identity;
+using DocinadeApp.Services.Permissions;
+using DocinadeApp.Services.Audit;
+using DocinadeApp.Services.CuadernoCalificador;
+using DocinadeApp.Services.Calificador;
+using DocinadeApp.Services.Grupos;
+using DocinadeApp.Scripts;
+using DocinadeApp.Configuration;
+using DocinadeApp.Middleware;
+using DocinadeApp.Authorization;
+using DocinadeApp.Utils;
 using Microsoft.AspNetCore.Authorization;
 using OfficeOpenXml;
 using System.Text;
-using ApplicationRoles = RubricasApp.Web.Models.Permissions.ApplicationRoles;
+using ApplicationRoles = DocinadeApp.Models.Permissions.ApplicationRoles;
 
 // Configurar EPPlus
 EPPlusConfig.ConfigureLicense();
@@ -214,16 +214,16 @@ builder.Services.AddHttpClient<ICedulaCostaRicaService, CedulaCostaRicaService>(
 builder.Services.AddScoped<IAuditService, AuditService>();
 
 // Add AutoMapper
-builder.Services.AddAutoMapper(cfg => cfg.AddProfile<RubricasApp.Web.Mapping.AcademicMappingProfile>());
+builder.Services.AddAutoMapper(cfg => cfg.AddProfile<DocinadeApp.Mapping.AcademicMappingProfile>());
 
 // Add academic module services
-builder.Services.AddScoped<RubricasApp.Web.Services.Academic.IPeriodosAcademicosService, RubricasApp.Web.Services.Academic.PeriodosAcademicosService>();
-builder.Services.AddScoped<RubricasApp.Web.Services.Academic.IMateriasService, RubricasApp.Web.Services.Academic.MateriasService>();
-builder.Services.AddScoped<RubricasApp.Web.Services.Academic.IPeriodoAcademicoRepository, RubricasApp.Web.Services.Academic.PeriodoAcademicoRepositoryImpl>();
-builder.Services.AddScoped<RubricasApp.Web.Services.Academic.IMateriaRepository, RubricasApp.Web.Services.Academic.MateriaRepositoryImpl>();
-builder.Services.AddScoped<RubricasApp.Web.Services.Academic.IRubricaRepository, RubricasApp.Web.Services.Academic.RubricaRepositoryImpl>();
-builder.Services.AddScoped<RubricasApp.Web.Services.Academic.IMateriaPeriodoRepository, RubricasApp.Web.Services.Academic.MateriaPeriodoRepositoryImpl>();
-builder.Services.AddScoped<RubricasApp.Web.Services.Academic.IInstrumentoRepository, RubricasApp.Web.Services.Academic.InstrumentoRepositoryImpl>();
+builder.Services.AddScoped<DocinadeApp.Services.Academic.IPeriodosAcademicosService, DocinadeApp.Services.Academic.PeriodosAcademicosService>();
+builder.Services.AddScoped<DocinadeApp.Services.Academic.IMateriasService, DocinadeApp.Services.Academic.MateriasService>();
+builder.Services.AddScoped<DocinadeApp.Services.Academic.IPeriodoAcademicoRepository, DocinadeApp.Services.Academic.PeriodoAcademicoRepositoryImpl>();
+builder.Services.AddScoped<DocinadeApp.Services.Academic.IMateriaRepository, DocinadeApp.Services.Academic.MateriaRepositoryImpl>();
+builder.Services.AddScoped<DocinadeApp.Services.Academic.IRubricaRepository, DocinadeApp.Services.Academic.RubricaRepositoryImpl>();
+builder.Services.AddScoped<DocinadeApp.Services.Academic.IMateriaPeriodoRepository, DocinadeApp.Services.Academic.MateriaPeriodoRepositoryImpl>();
+builder.Services.AddScoped<DocinadeApp.Services.Academic.IInstrumentoRepository, DocinadeApp.Services.Academic.InstrumentoRepositoryImpl>();
 
 // Add global period academic filter services
 builder.Services.AddScoped<IPeriodoAcademicoService, PeriodoAcademicoService>();
@@ -233,10 +233,10 @@ builder.Services.AddScoped<ICuadernoCalificadorService, CuadernoCalificadorServi
 builder.Services.AddScoped<ICuadernoCalificadorDinamicoService, CuadernoCalificadorDinamicoService>();
 
 // Add SEA (Sistema Evaluacion MEP) services
-builder.Services.AddScoped<RubricasApp.Web.Services.SEA.ISEAService, RubricasApp.Web.Services.SEA.SEAService>();
+builder.Services.AddScoped<DocinadeApp.Services.SEA.ISEAService, DocinadeApp.Services.SEA.SEAService>();
 
 // Add Reportes services
-builder.Services.AddScoped<RubricasApp.Web.Services.Reportes.IReporteService, RubricasApp.Web.Services.Reportes.ReporteService>();
+builder.Services.AddScoped<DocinadeApp.Services.Reportes.IReporteService, DocinadeApp.Services.Reportes.ReporteService>();
 
 // Add Calificador PQ2025 services (no intrusivo)
 builder.Services.AddScoped<ICalificadorService, CalificadorService>();
@@ -245,13 +245,13 @@ builder.Services.AddScoped<ICalificadorService, CalificadorService>();
 builder.Services.AddScoped<IGrupoEstudianteService, GrupoEstudianteService>();
 
 // 🆕 MÓDULO ACS - Add Adecuación Curricular Significativa services
-builder.Services.AddScoped<RubricasApp.Web.Services.AdecuacionCurricular.IACSService, RubricasApp.Web.Services.AdecuacionCurricular.ACSService>();
+builder.Services.AddScoped<DocinadeApp.Services.AdecuacionCurricular.IACSService, DocinadeApp.Services.AdecuacionCurricular.ACSService>();
 
 // 🔧 NUEVA: Add Auditoria services
-builder.Services.AddScoped<RubricasApp.Web.Services.Auditoria.IAuditoriaService, RubricasApp.Web.Services.Auditoria.AuditoriaService>();
+builder.Services.AddScoped<DocinadeApp.Services.Auditoria.IAuditoriaService, DocinadeApp.Services.Auditoria.AuditoriaService>();
 
 // 📄 Add PDF generation services using Rotativa
-builder.Services.AddScoped<RubricasApp.Web.Services.IPdfService, RubricasApp.Web.Services.PdfService>();
+builder.Services.AddScoped<DocinadeApp.Services.IPdfService, DocinadeApp.Services.PdfService>();
 
 // NUEVA: Add User Context services for access control
 builder.Services.AddScoped<IUserContextService, UserContextService>();
@@ -308,7 +308,7 @@ try
     }
 
     // 🔧 Corregir columnas Observaciones faltantes
-    // await RubricasApp.Web.Utils.DatabaseFixer.FixMissingObservacionesColumns(context);
+    // await DocinadeApp.Utils.DatabaseFixer.FixMissingObservacionesColumns(context);
 
     // Las tablas de grupos ya están creadas, solo verificamos
     logger.LogInformation("[SUCCESS] Tablas del sistema de grupos verificadas");
@@ -316,12 +316,12 @@ try
     // Inicializar tablas de grupos si no existen
     try
     {
-        var groupsInitialized = await RubricasApp.Web.Utils.DatabaseGroupsInitializer.CreateGroupsTablesAsync(context);
+        var groupsInitialized = await DocinadeApp.Utils.DatabaseGroupsInitializer.CreateGroupsTablesAsync(context);
         if (groupsInitialized)
         {
             logger.LogInformation("[SUCCESS] Tablas del sistema de grupos inicializadas correctamente");
             // Inicializar catálogo de tipos de grupo
-            var tiposGrupoInitialized = await RubricasApp.Web.Utils.TiposGrupoInitializer.InitializeCompleteAsync(context);
+            var tiposGrupoInitialized = await DocinadeApp.Utils.TiposGrupoInitializer.InitializeCompleteAsync(context);
             if (tiposGrupoInitialized)
             {
                 logger.LogInformation("[SUCCESS] Catálogo de tipos de grupo inicializado correctamente");
@@ -333,7 +333,7 @@ try
             // Insertar datos de ejemplo si es necesario
             try
             {
-                await RubricasApp.Web.Utils.DatabaseGroupsInitializer.InsertSampleDataAsync(context);
+                await DocinadeApp.Utils.DatabaseGroupsInitializer.InsertSampleDataAsync(context);
                 logger.LogInformation("[SUCCESS] Datos de ejemplo de grupos insertados");
             }
             catch (Exception exSample)
@@ -355,7 +355,7 @@ try
     logger.LogInformation("[INFO] Inicializando datos geográficos de Costa Rica...");
     try
     {
-        var geographicInitialized = await RubricasApp.Web.Utils.CostaRicaGeographicInitializer.InitializeAsync(context);
+        var geographicInitialized = await DocinadeApp.Utils.CostaRicaGeographicInitializer.InitializeAsync(context);
         if (geographicInitialized)
         {
             logger.LogInformation("[SUCCESS] Datos geográficos inicializados correctamente");
@@ -387,15 +387,15 @@ try
     logger.LogInformation("[INFO] Inicializando módulo de conducta (REA 40862-V21)...");
     try
     {
-        var conductaInitialized = await RubricasApp.Web.Utils.ConductaSeedData.InitializeAsync(context);
+        var conductaInitialized = await DocinadeApp.Utils.ConductaSeedData.InitializeAsync(context);
         if (conductaInitialized)
         {
-            var stats = await RubricasApp.Web.Utils.ConductaSeedData.GetEstadisticasAsync(context);
+            var stats = await DocinadeApp.Utils.ConductaSeedData.GetEstadisticasAsync(context);
             logger.LogInformation("[SUCCESS] Módulo de conducta inicializado: {Total} tipos de falta ({Activos} activos, {Inactivos} inactivos)", 
                 stats.TotalTipos, stats.Activos, stats.Inactivos);
             
             // Verificar integridad
-            await RubricasApp.Web.Utils.ConductaSeedData.VerificarIntegridadAsync(context);
+            await DocinadeApp.Utils.ConductaSeedData.VerificarIntegridadAsync(context);
         }
         else
         {
@@ -449,19 +449,19 @@ try
     logger.LogInformation("[INFO] Verificando configuración SMTP en base de datos...");
     try
     {
-        var configuracionService = services.GetRequiredService<RubricasApp.Web.Services.IConfiguracionService>();
+        var configuracionService = services.GetRequiredService<DocinadeApp.Services.IConfiguracionService>();
         var config = services.GetRequiredService<IConfiguration>();
 
         var smtpDefaults = new[]
         {
-            (RubricasApp.Web.Models.ConfiguracionClaves.EmailSmtpServer,   config["Email:SmtpServer"] ?? string.Empty,    "Servidor SMTP"),
-            (RubricasApp.Web.Models.ConfiguracionClaves.EmailSmtpPort,     config["Email:SmtpPort"] ?? "587",             "Puerto SMTP"),
-            (RubricasApp.Web.Models.ConfiguracionClaves.EmailEnableSsl,    "true",                                         "Habilitar SSL"),
-            (RubricasApp.Web.Models.ConfiguracionClaves.EmailSmtpUsername, config["Email:From"] ?? string.Empty,          "Usuario SMTP"),
-            (RubricasApp.Web.Models.ConfiguracionClaves.EmailSmtpPassword, config["Email:Password"] ?? string.Empty,      "Contraseña SMTP"),
-            (RubricasApp.Web.Models.ConfiguracionClaves.EmailFromEmail,    config["Email:From"] ?? string.Empty,          "Email remitente"),
-            (RubricasApp.Web.Models.ConfiguracionClaves.EmailFromName,     config["Email:DisplayName"] ?? "Sistema de Rúbricas", "Nombre remitente"),
-            (RubricasApp.Web.Models.ConfiguracionClaves.EmailHabilitado,   "true",                                         "Habilitar envío de emails"),
+            (DocinadeApp.Models.ConfiguracionClaves.EmailSmtpServer,   config["Email:SmtpServer"] ?? string.Empty,    "Servidor SMTP"),
+            (DocinadeApp.Models.ConfiguracionClaves.EmailSmtpPort,     config["Email:SmtpPort"] ?? "587",             "Puerto SMTP"),
+            (DocinadeApp.Models.ConfiguracionClaves.EmailEnableSsl,    "true",                                         "Habilitar SSL"),
+            (DocinadeApp.Models.ConfiguracionClaves.EmailSmtpUsername, config["Email:From"] ?? string.Empty,          "Usuario SMTP"),
+            (DocinadeApp.Models.ConfiguracionClaves.EmailSmtpPassword, config["Email:Password"] ?? string.Empty,      "Contraseña SMTP"),
+            (DocinadeApp.Models.ConfiguracionClaves.EmailFromEmail,    config["Email:From"] ?? string.Empty,          "Email remitente"),
+            (DocinadeApp.Models.ConfiguracionClaves.EmailFromName,     config["Email:DisplayName"] ?? "Sistema de Rúbricas", "Nombre remitente"),
+            (DocinadeApp.Models.ConfiguracionClaves.EmailHabilitado,   "true",                                         "Habilitar envío de emails"),
         };
 
         foreach (var (clave, valor, descripcion) in smtpDefaults)

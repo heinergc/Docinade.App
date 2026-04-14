@@ -1,4 +1,4 @@
-@model RubricasApp.Web.ViewModels.ProfesorViewModel
+﻿@model DocinadeApp.ViewModels.ProfesorViewModel
 @{
     ViewData["Title"] = "Nuevo Profesor - Información Laboral";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -533,7 +533,7 @@
     <partial name="_ValidationScriptsPartial" />
     <script>
         // Inicializar array de experiencias desde el modelo
-        let experiencias = @Html.Raw(Json.Serialize(Model.ExperienciaLaboral ?? new List<RubricasApp.Web.ViewModels.ProfesorExperienciaLaboralDto>()));
+        let experiencias = @Html.Raw(Json.Serialize(Model.ExperienciaLaboral ?? new List<DocinadeApp.ViewModels.ProfesorExperienciaLaboralDto>()));
         
         $(document).ready(function() {
             // Auto-completar horas según tipo de jornada

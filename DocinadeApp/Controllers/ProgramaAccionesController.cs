@@ -1,15 +1,15 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Interfaces;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.Services;
-using RubricasApp.Web.ViewModels.Conducta;
+using DocinadeApp.Data;
+using DocinadeApp.Interfaces;
+using DocinadeApp.Models;
+using DocinadeApp.Services;
+using DocinadeApp.ViewModels.Conducta;
 using System.Security.Claims;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     [Authorize]
     public class ProgramaAccionesController : BaseController

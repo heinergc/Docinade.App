@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace RubricasApp.Web.ViewModels
+namespace DocinadeApp.ViewModels
 {
     /// <summary>
     /// ViewModel para el flujo de auto-empadronamiento público multi-step

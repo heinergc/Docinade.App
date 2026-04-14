@@ -1,13 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
+ï»¿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using RubricasApp.Web.Data;
+using DocinadeApp.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace RubricasApp.Web.ViewComponents
+namespace DocinadeApp.ViewComponents
 {
     /// <summary>
     /// ViewComponent para el buscador avanzado de estudiantes
-    /// Encapsula la funcionalidad de búsqueda modal con Bootstrap 5
+    /// Encapsula la funcionalidad de bï¿½squeda modal con Bootstrap 5
     /// </summary>
     public class BuscadorEstudianteViewComponent : ViewComponent
     {
@@ -19,13 +19,13 @@ namespace RubricasApp.Web.ViewComponents
         }
 
         /// <summary>
-        /// Renderiza el modal de búsqueda de estudiantes
+        /// Renderiza el modal de bï¿½squeda de estudiantes
         /// </summary>
-        /// <param name="selectId">ID del select que recibirá el valor seleccionado</param>
-        /// <param name="modalId">ID único del modal (por defecto: modalBusquedaEstudiante)</param>
-        /// <param name="controllerName">Nombre del controlador que contiene el endpoint de búsqueda</param>
-        /// <param name="actionName">Nombre de la acción para la búsqueda (por defecto: BuscarEstudiantes)</param>
-        /// <param name="incluirScripts">Si debe incluir los scripts JS automáticamente</param>
+        /// <param name="selectId">ID del select que recibirï¿½ el valor seleccionado</param>
+        /// <param name="modalId">ID ï¿½nico del modal (por defecto: modalBusquedaEstudiante)</param>
+        /// <param name="controllerName">Nombre del controlador que contiene el endpoint de bï¿½squeda</param>
+        /// <param name="actionName">Nombre de la acciï¿½n para la bï¿½squeda (por defecto: BuscarEstudiantes)</param>
+        /// <param name="incluirScripts">Si debe incluir los scripts JS automï¿½ticamente</param>
         /// <returns>Vista del componente</returns>
         public async Task<IViewComponentResult> InvokeAsync(
             string selectId = "estudianteId",
@@ -65,7 +65,7 @@ namespace RubricasApp.Web.ViewComponents
     }
 
     /// <summary>
-    /// ViewModel para el ViewComponent de búsqueda de estudiantes
+    /// ViewModel para el ViewComponent de bï¿½squeda de estudiantes
     /// </summary>
     public class BuscadorEstudianteViewModel
     {

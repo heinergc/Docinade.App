@@ -1,5 +1,5 @@
-{
-  "name": "rubricasapp.web",
+﻿{
+  "name": "DocinadeApp",
   "version": "1.0.0",
   "description": "Pruebas E2E con Playwright para RubricasApp",
   "main": "index.js",
@@ -14,16 +14,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/heinergc/RubricasApp.Web.git"
+    "url": "git+https://github.com/heinergc/DocinadeApp.git"
   },
   "keywords": ["playwright", "e2e", "testing"],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/heinergc/RubricasApp.Web/issues"
+    "url": "https://github.com/heinergc/DocinadeApp/issues"
   },
-  "homepage": "https://github.com/heinergc/RubricasApp.Web#readme",
+  "homepage": "https://github.com/heinergc/DocinadeApp#readme",
   "devDependencies": {
     "@playwright/test": "^1.55.0",
     "@types/node": "^20.0.0",

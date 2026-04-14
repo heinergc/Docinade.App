@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
-using RubricasApp.Web.Services.Permissions;
+using DocinadeApp.Services.Permissions;
 
-namespace RubricasApp.Web.Authorization
+namespace DocinadeApp.Authorization
 {
     /// <summary>
     /// Proveedor de políticas de autorización personalizado para manejar permisos dinámicamente

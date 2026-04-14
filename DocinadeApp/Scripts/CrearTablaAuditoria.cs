@@ -1,7 +1,7 @@
-using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using DocinadeApp.Data;
 
-namespace RubricasApp.Web.Scripts
+namespace DocinadeApp.Scripts
 {
     /// <summary>
     /// Script para crear la tabla de auditoría si no existe

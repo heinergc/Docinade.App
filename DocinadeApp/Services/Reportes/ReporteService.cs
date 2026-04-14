@@ -1,10 +1,10 @@
-using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.ViewModels.Reportes;
+﻿using Microsoft.EntityFrameworkCore;
+using DocinadeApp.Data;
+using DocinadeApp.ViewModels.Reportes;
 using ClosedXML.Excel;
 using System.Text;
 
-namespace RubricasApp.Web.Services.Reportes
+namespace DocinadeApp.Services.Reportes
 {
     public class ReporteService : IReporteService
     {

@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations;
-using RubricasApp.Web.Models.Academic;
+﻿using System.ComponentModel.DataAnnotations;
+using DocinadeApp.Models.Academic;
 
-namespace RubricasApp.Web.Models
+namespace DocinadeApp.Models
 {
     public class PeriodoAcademico
     {

@@ -1,4 +1,4 @@
-// Organización de ViewModels del área de Administración
+﻿// Organización de ViewModels del área de Administración
 // =======================================================
 
 // Este directorio contiene los ViewModels organizados por funcionalidad:
@@ -54,7 +54,7 @@
 // - UserViewModels.cs: Marcador de compatibilidad (puede eliminarse)
 // - AdminViewModels.cs.backup: Backup del archivo original con duplicados
 
-namespace RubricasApp.Web.ViewModels.Admin
+namespace DocinadeApp.ViewModels.Admin
 {
     // Este namespace contiene todos los ViewModels organizados
     // Usar los archivos específicos según la funcionalidad requerida

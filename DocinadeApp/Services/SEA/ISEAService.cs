@@ -1,7 +1,7 @@
-using RubricasApp.Web.Models.SEA;
-using RubricasApp.Web.ViewModels.SEA;
+﻿using DocinadeApp.Models.SEA;
+using DocinadeApp.ViewModels.SEA;
 
-namespace RubricasApp.Web.Services.SEA
+namespace DocinadeApp.Services.SEA
 {
     /// <summary>
     /// Servicio para generación de reportes SEA (Sistema de Evaluación MEP)

@@ -1,10 +1,10 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.Models.Identity;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
+using DocinadeApp.Models.Identity;
 
-namespace RubricasApp.Web.Services.Auditoria
+namespace DocinadeApp.Services.Auditoria
 {
     /// <summary>
     /// Servicio para manejar las operaciones de auditoría del sistema

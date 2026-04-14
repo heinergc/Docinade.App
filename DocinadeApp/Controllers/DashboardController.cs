@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     /// <summary>
     /// Controlador para el dashboard principal del sistema

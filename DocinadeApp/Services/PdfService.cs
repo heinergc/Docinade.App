@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -10,10 +10,10 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using System.Text;
-using RubricasApp.Web.ViewModels;
-using RubricasApp.Web.ViewModels.Conducta;
+using DocinadeApp.ViewModels;
+using DocinadeApp.ViewModels.Conducta;
 
-namespace RubricasApp.Web.Services
+namespace DocinadeApp.Services
 {
     /// <summary>
     /// Servicio para la generación de documentos PDF utilizando QuestPDF

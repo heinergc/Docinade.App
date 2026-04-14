@@ -1,4 +1,4 @@
-@model RubricasApp.Web.ViewModels.Grupos.DetalleGrupoViewModel
+ï»¿@model DocinadeApp.ViewModels.Grupos.DetalleGrupoViewModel
 
 @{
     ViewData["Title"] = $"Grupo: {Model.Codigo}";
@@ -46,7 +46,7 @@
                         <li>
                             <a class="dropdown-item text-danger" 
                                href="@Url.Action("Delete", new { id = Model.GrupoId })"
-                               onclick="return confirm('¿Está seguro de eliminar este grupo?')">
+                               onclick="return confirm('ï¿½Estï¿½ seguro de eliminar este grupo?')">
                                 <i class="fas fa-trash me-2"></i>Eliminar Grupo
                             </a>
                         </li>
@@ -57,7 +57,7 @@
     </div>
 </div>
 
-<!-- Tarjetas de estadísticas -->
+<!-- Tarjetas de estadï¿½sticas -->
 <div class="row mb-4">
     <div class="col-md-3">
         <div class="modern-card stat-card">
@@ -69,7 +69,7 @@
                 <p class="stat-label">Estudiantes</p>
                 @if (Model.CapacidadMaxima.HasValue)
                 {
-                    <small class="text-muted">de @Model.CapacidadMaxima máximo</small>
+                    <small class="text-muted">de @Model.CapacidadMaxima mï¿½ximo</small>
                 }
             </div>
         </div>
@@ -112,7 +112,7 @@
                     <i class="fas fa-info-circle fa-2x text-secondary"></i>
                 </div>
                 <h3 class="stat-number">
-                    <span class="badge bg-@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Activo ? "success" : Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Inactivo ? "secondary" : "danger")">
+                    <span class="badge bg-@(Model.Estado == DocinadeApp.Models.EstadoGrupo.Activo ? "success" : Model.Estado == DocinadeApp.Models.EstadoGrupo.Inactivo ? "secondary" : "danger")">
                         @Model.EstadoDisplay
                     </span>
                 </h3>
@@ -123,20 +123,20 @@
     </div>
 </div>
 
-<!-- Información del grupo -->
+<!-- Informaciï¿½n del grupo -->
 <div class="row">
     <div class="col-md-4">
         <div class="modern-card">
             <div class="card-header">
                 <h5 class="mb-0">
                     <i class="fas fa-info-circle me-2"></i>
-                    Información del Grupo
+                    Informaciï¿½n del Grupo
                 </h5>
             </div>
             <div class="card-body">
                 <table class="table table-borderless">
                     <tr>
-                        <td><strong>Código:</strong></td>
+                        <td><strong>Cï¿½digo:</strong></td>
                         <td><span class="badge bg-primary">@Model.Codigo</span></td>
                     </tr>
                     <tr>
@@ -155,7 +155,7 @@
                         </tr>
                     }
                     <tr>
-                        <td><strong>Período:</strong></td>
+                        <td><strong>Perï¿½odo:</strong></td>
                         <td>@Model.PeriodoAcademico</td>
                     </tr>
                     <tr>
@@ -180,7 +180,7 @@
                 @if (!string.IsNullOrEmpty(Model.Descripcion))
                 {
                     <hr>
-                    <h6><strong>Descripción:</strong></h6>
+                    <h6><strong>Descripciï¿½n:</strong></h6>
                     <p class="text-muted">@Model.Descripcion</p>
                 }
                 
@@ -195,7 +195,7 @@
     </div>
     
     <div class="col-md-8">
-        <!-- Pestañas para estudiantes y materias -->
+        <!-- Pestaï¿½as para estudiantes y materias -->
         <div class="modern-card">
             <div class="card-header">
                 <ul class="nav nav-tabs card-header-tabs" id="groupTabs" role="tablist">
@@ -217,7 +217,7 @@
             </div>
             <div class="card-body">
                 <div class="tab-content" id="groupTabsContent">
-                    <!-- Pestaña de Estudiantes -->
+                    <!-- Pestaï¿½a de Estudiantes -->
                     <div class="tab-pane fade show active" id="students" role="tabpanel">
                         @if (Model.Estudiantes.Any())
                         {
@@ -225,7 +225,7 @@
                                 <h6 class="mb-0">Lista de Estudiantes</h6>
                                 <a href="@Url.Action("AsignarEstudiantes", new { id = Model.GrupoId })" 
                                    class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-plus"></i> Agregar más
+                                    <i class="fas fa-plus"></i> Agregar mï¿½s
                                 </a>
                             </div>
                             
@@ -279,7 +279,7 @@
                                                         <input type="hidden" name="grupoId" value="@Model.GrupoId" />
                                                         <input type="hidden" name="estudianteId" value="@estudiante.EstudianteId" />
                                                         <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                                                onclick="return confirm('¿Desasignar a @estudiante.NombreCompleto del grupo?')"
+                                                                onclick="return confirm('ï¿½Desasignar a @estudiante.NombreCompleto del grupo?')"
                                                                 title="Desasignar estudiante">
                                                             <i class="fas fa-user-minus"></i>
                                                         </button>
@@ -305,7 +305,7 @@
                         }
                     </div>
                     
-                    <!-- Pestaña de Materias -->
+                    <!-- Pestaï¿½a de Materias -->
                     <div class="tab-pane fade" id="subjects" role="tabpanel">
                         @if (Model.Materias.Any())
                         {
@@ -326,7 +326,7 @@
                                                     <div>
                                                         <h6 class="mb-0">@materia.Nombre</h6>
                                                         <small class="text-muted">
-                                                            Código: @materia.Codigo
+                                                            Cï¿½digo: @materia.Codigo
                                                         </small>
                                                         <br>
                                                         <small class="text-muted">
@@ -334,12 +334,12 @@
                                                         </small>
                                                     </div>
                                                     <div>
-                                                        <span class="badge bg-@(materia.Estado == RubricasApp.Web.Models.EstadoAsignacion.Activo ? "success" : "secondary")">
+                                                        <span class="badge bg-@(materia.Estado == DocinadeApp.Models.EstadoAsignacion.Activo ? "success" : "secondary")">
                                                             @materia.EstadoDisplay
                                                         </span>
                                                         <div class="mt-1">
                                                             <form asp-action="DesasignarMateria" method="post" class="d-inline" 
-                                                                  onsubmit="return confirm('¿Desasociar la materia @materia.Nombre?')">
+                                                                  onsubmit="return confirm('ï¿½Desasociar la materia @materia.Nombre?')">
                                                                 <input type="hidden" name="grupoId" value="@Model.GrupoId" />
                                                                 <input type="hidden" name="materiaId" value="@materia.MateriaId" />
                                                                 <button type="submit" class="btn btn-sm btn-outline-danger" title="Desasociar materia">
@@ -366,7 +366,7 @@
                             <div class="text-center py-5">
                                 <i class="fas fa-book fa-3x text-muted mb-3"></i>
                                 <h6 class="text-muted">No hay materias asociadas</h6>
-                                <p class="text-muted">Este grupo no tiene materias específicas asociadas.</p>
+                                <p class="text-muted">Este grupo no tiene materias especï¿½ficas asociadas.</p>
                                 <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#materiasModal">
                                     <i class="fas fa-plus"></i> Asociar Materias
                                 </button>
@@ -399,7 +399,7 @@
                         <p class="text-muted">Seleccione las materias que desea asociar al grupo <strong>@Model.Codigo</strong></p>
                         
                         <div id="materiasContainer" class="row">
-                            <!-- Las materias se cargarán aquí via AJAX -->
+                            <!-- Las materias se cargarï¿½n aquï¿½ via AJAX -->
                             <div class="col-12 text-center">
                                 <div class="spinner-border text-primary" role="status">
                                     <span class="visually-hidden">Cargando materias...</span>
@@ -411,7 +411,7 @@
                     <div class="mb-3">
                         <label for="observacionesMaterias" class="form-label">Observaciones (Opcional)</label>
                         <textarea name="observaciones" id="observacionesMaterias" class="form-control" rows="2" 
-                                  placeholder="Observaciones sobre la asociación de materias..."></textarea>
+                                  placeholder="Observaciones sobre la asociaciï¿½n de materias..."></textarea>
                     </div>
                 </form>
             </div>
@@ -437,20 +437,20 @@
                 cargarMateriasDisponibles();
             });
             
-            // Confirmar desasignación con SweetAlert
+            // Confirmar desasignaciï¿½n con SweetAlert
             $('form[action*="DesasignarEstudiante"]').on('submit', function(e) {
                 e.preventDefault();
                 const form = this;
-                const estudianteNombre = $(this).find('button').attr('onclick').match(/'([^']+)'/)[1].split(' del grupo')[0].replace('¿Desasignar a ', '');
+                const estudianteNombre = $(this).find('button').attr('onclick').match(/'([^']+)'/)[1].split(' del grupo')[0].replace('ï¿½Desasignar a ', '');
                 
                 Swal.fire({
-                    title: '¿Desasignar estudiante?',
-                    text: `Se desasignará a ${estudianteNombre} de este grupo.`,
+                    title: 'ï¿½Desasignar estudiante?',
+                    text: `Se desasignarï¿½ a ${estudianteNombre} de este grupo.`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
                     cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Sí, desasignar',
+                    confirmButtonText: 'Sï¿½, desasignar',
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -542,11 +542,11 @@
                 
                 if (response.ok) {
                     Swal.fire({
-                        title: '¡Éxito!',
+                        title: 'ï¿½ï¿½xito!',
                         text: 'Las materias se han actualizado correctamente.',
                         icon: 'success'
                     }).then(() => {
-                        location.reload(); // Recargar la página para mostrar los cambios
+                        location.reload(); // Recargar la pï¿½gina para mostrar los cambios
                     });
                 } else {
                     throw new Error('Error en el servidor');

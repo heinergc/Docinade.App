@@ -1,8 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-using RubricasApp.Web.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using DocinadeApp.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace RubricasApp.Web.ViewModels
+namespace DocinadeApp.ViewModels
 {
     public class CrearEvaluacionViewModel
     {

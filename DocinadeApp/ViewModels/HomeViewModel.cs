@@ -1,4 +1,4 @@
-namespace RubricasApp.Web.ViewModels
+﻿namespace DocinadeApp.ViewModels
 {
     public class HomeIndexViewModel
     {

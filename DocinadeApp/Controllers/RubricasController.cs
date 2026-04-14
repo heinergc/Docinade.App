@@ -1,18 +1,18 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.Services;
-using RubricasApp.Web.Services.Identity;
-using RubricasApp.Web.Extensions;
-using RubricasApp.Web.Filters;
-using RubricasApp.Web.Models.Permissions;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
+using DocinadeApp.Services;
+using DocinadeApp.Services.Identity;
+using DocinadeApp.Extensions;
+using DocinadeApp.Filters;
+using DocinadeApp.Models.Permissions;
 using Microsoft.AspNetCore.Authorization;
-using ViewModels = RubricasApp.Web.ViewModels;
+using ViewModels = DocinadeApp.ViewModels;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     [Authorize]
     public class RubricasController : BaseController

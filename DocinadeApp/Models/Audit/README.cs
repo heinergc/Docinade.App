@@ -1,4 +1,4 @@
-// Organización de Models del área de Auditoría
+﻿// Organización de Models del área de Auditoría
 // ===============================================
 
 // Este directorio contiene los modelos organizados por funcionalidad:
@@ -57,7 +57,7 @@
 // 📈 Métricas de rendimiento y actividad
 // 🗂️ Filtrado y paginación avanzados
 
-namespace RubricasApp.Web.Models.Audit
+namespace DocinadeApp.Models.Audit
 {
     // Este namespace contiene todos los modelos de auditoría organizados
     // Usar los archivos específicos según la funcionalidad requerida

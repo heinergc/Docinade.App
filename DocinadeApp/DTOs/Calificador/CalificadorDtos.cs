@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+ï»¿using System.ComponentModel.DataAnnotations;
 
-namespace RubricasApp.Web.DTOs.Calificador
+namespace DocinadeApp.DTOs.Calificador
 {
     /// <summary>
     /// DTO que representa una fila del cuaderno calificador para un estudiante
@@ -12,20 +12,20 @@ namespace RubricasApp.Web.DTOs.Calificador
         [Display(Name = "Estudiante")]
         public string EstudianteNombre { get; set; } = string.Empty;
         
-        [Display(Name = "Número ID")]
+        [Display(Name = "Nï¿½mero ID")]
         public string NumeroId { get; set; } = string.Empty;
         
         /// <summary>
-        /// Diccionario dinámico que contiene las calificaciones por cada combinación Instrumento-Rúbrica
+        /// Diccionario dinï¿½mico que contiene las calificaciones por cada combinaciï¿½n Instrumento-Rï¿½brica
         /// Key: "InstrumentoId_RubricaId" (ej: "1_3")
-        /// Value: Calificación obtenida (0-100)
+        /// Value: Calificaciï¿½n obtenida (0-100)
         /// </summary>
         public Dictionary<string, decimal> CalificacionesPorInstrumentoRubrica { get; set; } = new();
         
         /// <summary>
         /// Diccionario con las calificaciones agregadas por instrumento
         /// Key: InstrumentoId como string
-        /// Value: Calificación promedio/total del instrumento
+        /// Value: Calificaciï¿½n promedio/total del instrumento
         /// </summary>
         public Dictionary<string, decimal> CalificacionesPorInstrumento { get; set; } = new();
         
@@ -52,7 +52,7 @@ namespace RubricasApp.Web.DTOs.Calificador
         public int OrdenPresentacion { get; set; }
         
         /// <summary>
-        /// Clave única para identificar la columna: "InstrumentoId_RubricaId"
+        /// Clave ï¿½nica para identificar la columna: "InstrumentoId_RubricaId"
         /// </summary>
         public string ClaveColumna => $"{InstrumentoId}_{RubricaId}";
         
@@ -73,7 +73,7 @@ namespace RubricasApp.Web.DTOs.Calificador
         public string PeriodoAcademicoNombre { get; set; } = string.Empty;
         
         /// <summary>
-        /// Lista de columnas dinámicas (Instrumento ? Rúbrica)
+        /// Lista de columnas dinï¿½micas (Instrumento ? Rï¿½brica)
         /// </summary>
         public List<CalificadorColumnDto> Columnas { get; set; } = new();
         
@@ -83,18 +83,18 @@ namespace RubricasApp.Web.DTOs.Calificador
         public List<CalificadorRowDto> Filas { get; set; } = new();
         
         /// <summary>
-        /// Estadísticas del cuaderno
+        /// Estadï¿½sticas del cuaderno
         /// </summary>
         public CalificadorEstadisticasDto Estadisticas { get; set; } = new();
         
         /// <summary>
-        /// Fecha de generación del cuaderno
+        /// Fecha de generaciï¿½n del cuaderno
         /// </summary>
         public DateTime FechaGeneracion { get; set; } = DateTime.Now;
     }
     
     /// <summary>
-    /// Estadísticas generales del cuaderno calificador
+    /// Estadï¿½sticas generales del cuaderno calificador
     /// </summary>
     public class CalificadorEstadisticasDto
     {
@@ -109,7 +109,7 @@ namespace RubricasApp.Web.DTOs.Calificador
     }
     
     /// <summary>
-    /// Parámetros de consulta para generar el cuaderno calificador
+    /// Parï¿½metros de consulta para generar el cuaderno calificador
     /// </summary>
     public class CalificadorQueryDto
     {
@@ -125,7 +125,7 @@ namespace RubricasApp.Web.DTOs.Calificador
         public bool IncluirInactivos { get; set; } = false;
         
         /// <summary>
-        /// Formato de cálculo para múltiples rúbricas por instrumento
+        /// Formato de cï¿½lculo para mï¿½ltiples rï¿½bricas por instrumento
         /// PROMEDIO, SUMA, MEJOR_NOTA
         /// </summary>
         public string ModoCalculo { get; set; } = "PROMEDIO";

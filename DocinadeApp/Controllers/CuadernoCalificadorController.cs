@@ -1,16 +1,16 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.Services;
-using RubricasApp.Web.Services.CuadernoCalificador;
-using RubricasApp.Web.ViewModels;
-using RubricasApp.Web.Models.Permissions;
-using RubricasApp.Web.Authorization;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
+using DocinadeApp.Services;
+using DocinadeApp.Services.CuadernoCalificador;
+using DocinadeApp.ViewModels;
+using DocinadeApp.Models.Permissions;
+using DocinadeApp.Authorization;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     [Authorize]
     public class CuadernoCalificadorController : BaseController

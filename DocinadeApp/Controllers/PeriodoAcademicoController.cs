@@ -1,10 +1,10 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Services;
-using RubricasApp.Web.ViewModels;
+using DocinadeApp.Data;
+using DocinadeApp.Services;
+using DocinadeApp.ViewModels;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     [Authorize]
     public class PeriodoAcademicoController : BaseController

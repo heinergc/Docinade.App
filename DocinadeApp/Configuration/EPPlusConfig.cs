@@ -1,6 +1,6 @@
-using OfficeOpenXml;
+﻿using OfficeOpenXml;
 
-namespace RubricasApp.Web.Configuration
+namespace DocinadeApp.Configuration
 {
     public static class EPPlusConfig
     {

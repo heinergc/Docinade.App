@@ -1,7 +1,7 @@
-using RubricasApp.Web.Models;
+﻿using DocinadeApp.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace RubricasApp.Web.ViewModels
+namespace DocinadeApp.ViewModels
 {
     public class SeleccionarPeriodoViewModel
     {

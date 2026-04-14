@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using RubricasApp.Web.Data;
+using DocinadeApp.Data;
 
 #nullable disable
 
-namespace RubricasApp.Web.Migrations
+namespace DocinadeApp.Migrations
 {
     [DbContext(typeof(RubricasDbContext))]
     [Migration("20251024044925_ActualizacionBD_Enero2025")]
@@ -158,7 +158,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.Academic.MateriaPeriodo", b =>
+            modelBuilder.Entity("DocinadeApp.Models.Academic.MateriaPeriodo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -210,7 +210,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("MateriaPeriodos");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.Asistencia", b =>
+            modelBuilder.Entity("DocinadeApp.Models.Asistencia", b =>
                 {
                     b.Property<int>("AsistenciaId")
                         .ValueGeneratedOnAdd()
@@ -295,7 +295,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("Asistencias");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.Audit.AuditLog", b =>
+            modelBuilder.Entity("DocinadeApp.Models.Audit.AuditLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -417,7 +417,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("AuditLogs");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.AuditoriaOperacion", b =>
+            modelBuilder.Entity("DocinadeApp.Models.AuditoriaOperacion", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -498,7 +498,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("AuditoriasOperaciones");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.ConfiguracionSistema", b =>
+            modelBuilder.Entity("DocinadeApp.Models.ConfiguracionSistema", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -540,7 +540,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("ConfiguracionesSistema");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.CuadernoCalificador", b =>
+            modelBuilder.Entity("DocinadeApp.Models.CuadernoCalificador", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -583,7 +583,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("CuadernosCalificadores");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.CuadernoInstrumento", b =>
+            modelBuilder.Entity("DocinadeApp.Models.CuadernoInstrumento", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -618,7 +618,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("CuadernoInstrumentos");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.DetalleEvaluacion", b =>
+            modelBuilder.Entity("DocinadeApp.Models.DetalleEvaluacion", b =>
                 {
                     b.Property<int>("IdDetalle")
                         .ValueGeneratedOnAdd()
@@ -650,7 +650,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("DetallesEvaluacion");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.Estudiante", b =>
+            modelBuilder.Entity("DocinadeApp.Models.Estudiante", b =>
                 {
                     b.Property<int>("IdEstudiante")
                         .ValueGeneratedOnAdd()
@@ -708,7 +708,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("Estudiantes");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.EstudianteEmpadronamiento", b =>
+            modelBuilder.Entity("DocinadeApp.Models.EstudianteEmpadronamiento", b =>
                 {
                     b.Property<int>("IdEstudiante")
                         .HasColumnType("int");
@@ -876,7 +876,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("EstudiantesEmpadronamiento");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.EstudianteGrupo", b =>
+            modelBuilder.Entity("DocinadeApp.Models.EstudianteGrupo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -938,7 +938,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("EstudianteGrupos");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.Evaluacion", b =>
+            modelBuilder.Entity("DocinadeApp.Models.Evaluacion", b =>
                 {
                     b.Property<int>("IdEvaluacion")
                         .ValueGeneratedOnAdd()
@@ -993,7 +993,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("Evaluaciones");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.GrupoCalificacion", b =>
+            modelBuilder.Entity("DocinadeApp.Models.GrupoCalificacion", b =>
                 {
                     b.Property<int>("IdGrupo")
                         .ValueGeneratedOnAdd()
@@ -1022,7 +1022,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("GruposCalificacion");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.GrupoEstudiante", b =>
+            modelBuilder.Entity("DocinadeApp.Models.GrupoEstudiante", b =>
                 {
                     b.Property<int>("GrupoId")
                         .ValueGeneratedOnAdd()
@@ -1101,7 +1101,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("GruposEstudiantes");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.GrupoMateria", b =>
+            modelBuilder.Entity("DocinadeApp.Models.GrupoMateria", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1142,7 +1142,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("GrupoMaterias");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.Identity.ApplicationUser", b =>
+            modelBuilder.Entity("DocinadeApp.Models.Identity.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -1269,7 +1269,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.InstrumentoEvaluacion", b =>
+            modelBuilder.Entity("DocinadeApp.Models.InstrumentoEvaluacion", b =>
                 {
                     b.Property<int>("InstrumentoId")
                         .ValueGeneratedOnAdd()
@@ -1301,7 +1301,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("InstrumentosEvaluacion");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.InstrumentoMateria", b =>
+            modelBuilder.Entity("DocinadeApp.Models.InstrumentoMateria", b =>
                 {
                     b.Property<int>("InstrumentoEvaluacionId")
                         .HasColumnType("int");
@@ -1337,7 +1337,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("InstrumentoMaterias");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.InstrumentoRubrica", b =>
+            modelBuilder.Entity("DocinadeApp.Models.InstrumentoRubrica", b =>
                 {
                     b.Property<int>("InstrumentoEvaluacionId")
                         .HasColumnType("int");
@@ -1374,7 +1374,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("InstrumentoRubricas");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.ItemEvaluacion", b =>
+            modelBuilder.Entity("DocinadeApp.Models.ItemEvaluacion", b =>
                 {
                     b.Property<int>("IdItem")
                         .ValueGeneratedOnAdd()
@@ -1409,7 +1409,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("ItemsEvaluacion");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.Materia", b =>
+            modelBuilder.Entity("DocinadeApp.Models.Materia", b =>
                 {
                     b.Property<int>("MateriaId")
                         .ValueGeneratedOnAdd()
@@ -1466,7 +1466,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("Materias");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.MateriaRequisito", b =>
+            modelBuilder.Entity("DocinadeApp.Models.MateriaRequisito", b =>
                 {
                     b.Property<int>("MateriaId")
                         .HasColumnType("int");
@@ -1481,7 +1481,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("MateriaRequisitos");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.NivelCalificacion", b =>
+            modelBuilder.Entity("DocinadeApp.Models.NivelCalificacion", b =>
                 {
                     b.Property<int>("IdNivel")
                         .ValueGeneratedOnAdd()
@@ -1511,7 +1511,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("NivelesCalificacion");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.PeriodoAcademico", b =>
+            modelBuilder.Entity("DocinadeApp.Models.PeriodoAcademico", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1580,7 +1580,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("PeriodosAcademicos");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.Rubrica", b =>
+            modelBuilder.Entity("DocinadeApp.Models.Rubrica", b =>
                 {
                     b.Property<int>("IdRubrica")
                         .ValueGeneratedOnAdd()
@@ -1643,7 +1643,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("Rubricas");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.RubricaNivel", b =>
+            modelBuilder.Entity("DocinadeApp.Models.RubricaNivel", b =>
                 {
                     b.Property<int>("IdRubrica")
                         .HasColumnType("int");
@@ -1663,7 +1663,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("RubricaNiveles");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.TipoGrupoCatalogo", b =>
+            modelBuilder.Entity("DocinadeApp.Models.TipoGrupoCatalogo", b =>
                 {
                     b.Property<int>("IdTipoGrupo")
                         .ValueGeneratedOnAdd()
@@ -1699,7 +1699,7 @@ namespace RubricasApp.Web.Migrations
                     b.ToTable("TiposGrupo");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.ValorRubrica", b =>
+            modelBuilder.Entity("DocinadeApp.Models.ValorRubrica", b =>
                 {
                     b.Property<int>("IdValor")
                         .ValueGeneratedOnAdd()
@@ -1746,7 +1746,7 @@ namespace RubricasApp.Web.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.Identity.ApplicationUser", null)
+                    b.HasOne("DocinadeApp.Models.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1755,7 +1755,7 @@ namespace RubricasApp.Web.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.Identity.ApplicationUser", null)
+                    b.HasOne("DocinadeApp.Models.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1770,7 +1770,7 @@ namespace RubricasApp.Web.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.Identity.ApplicationUser", null)
+                    b.HasOne("DocinadeApp.Models.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1779,28 +1779,28 @@ namespace RubricasApp.Web.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.Identity.ApplicationUser", null)
+                    b.HasOne("DocinadeApp.Models.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.Academic.MateriaPeriodo", b =>
+            modelBuilder.Entity("DocinadeApp.Models.Academic.MateriaPeriodo", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.Materia", "Materia")
+                    b.HasOne("DocinadeApp.Models.Materia", "Materia")
                         .WithMany("Ofertas")
                         .HasForeignKey("MateriaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.PeriodoAcademico", "PeriodoAcademico")
+                    b.HasOne("DocinadeApp.Models.PeriodoAcademico", "PeriodoAcademico")
                         .WithMany()
                         .HasForeignKey("PeriodoAcademicoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.PeriodoAcademico", null)
+                    b.HasOne("DocinadeApp.Models.PeriodoAcademico", null)
                         .WithMany("Ofertas")
                         .HasForeignKey("PeriodoAcademicoId1");
 
@@ -1809,32 +1809,32 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("PeriodoAcademico");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.Asistencia", b =>
+            modelBuilder.Entity("DocinadeApp.Models.Asistencia", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.Estudiante", "Estudiante")
+                    b.HasOne("DocinadeApp.Models.Estudiante", "Estudiante")
                         .WithMany()
                         .HasForeignKey("EstudianteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.GrupoEstudiante", "Grupo")
+                    b.HasOne("DocinadeApp.Models.GrupoEstudiante", "Grupo")
                         .WithMany()
                         .HasForeignKey("GrupoId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.Materia", "Materia")
+                    b.HasOne("DocinadeApp.Models.Materia", "Materia")
                         .WithMany()
                         .HasForeignKey("MateriaId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.Identity.ApplicationUser", "ModificadoPor")
+                    b.HasOne("DocinadeApp.Models.Identity.ApplicationUser", "ModificadoPor")
                         .WithMany()
                         .HasForeignKey("ModificadoPorId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("RubricasApp.Web.Models.Identity.ApplicationUser", "RegistradoPor")
+                    b.HasOne("DocinadeApp.Models.Identity.ApplicationUser", "RegistradoPor")
                         .WithMany()
                         .HasForeignKey("RegistradoPorId")
                         .OnDelete(DeleteBehavior.NoAction);
@@ -1850,9 +1850,9 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("RegistradoPor");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.AuditoriaOperacion", b =>
+            modelBuilder.Entity("DocinadeApp.Models.AuditoriaOperacion", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.Identity.ApplicationUser", "Usuario")
+                    b.HasOne("DocinadeApp.Models.Identity.ApplicationUser", "Usuario")
                         .WithMany()
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -1861,15 +1861,15 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.CuadernoCalificador", b =>
+            modelBuilder.Entity("DocinadeApp.Models.CuadernoCalificador", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.Materia", "Materia")
+                    b.HasOne("DocinadeApp.Models.Materia", "Materia")
                         .WithMany("CuadernosCalificadores")
                         .HasForeignKey("MateriaId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.PeriodoAcademico", "PeriodoAcademico")
+                    b.HasOne("DocinadeApp.Models.PeriodoAcademico", "PeriodoAcademico")
                         .WithMany()
                         .HasForeignKey("PeriodoAcademicoId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1880,15 +1880,15 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("PeriodoAcademico");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.CuadernoInstrumento", b =>
+            modelBuilder.Entity("DocinadeApp.Models.CuadernoInstrumento", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.CuadernoCalificador", "CuadernoCalificador")
+                    b.HasOne("DocinadeApp.Models.CuadernoCalificador", "CuadernoCalificador")
                         .WithMany("CuadernoInstrumentos")
                         .HasForeignKey("CuadernoCalificadorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.Rubrica", "Rubrica")
+                    b.HasOne("DocinadeApp.Models.Rubrica", "Rubrica")
                         .WithMany()
                         .HasForeignKey("RubricaId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1899,21 +1899,21 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("Rubrica");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.DetalleEvaluacion", b =>
+            modelBuilder.Entity("DocinadeApp.Models.DetalleEvaluacion", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.Evaluacion", "Evaluacion")
+                    b.HasOne("DocinadeApp.Models.Evaluacion", "Evaluacion")
                         .WithMany("DetallesEvaluacion")
                         .HasForeignKey("IdEvaluacion")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.ItemEvaluacion", "ItemEvaluacion")
+                    b.HasOne("DocinadeApp.Models.ItemEvaluacion", "ItemEvaluacion")
                         .WithMany("DetallesEvaluacion")
                         .HasForeignKey("IdItem")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.NivelCalificacion", "NivelCalificacion")
+                    b.HasOne("DocinadeApp.Models.NivelCalificacion", "NivelCalificacion")
                         .WithMany("DetallesEvaluacion")
                         .HasForeignKey("IdNivel")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1926,9 +1926,9 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("NivelCalificacion");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.Estudiante", b =>
+            modelBuilder.Entity("DocinadeApp.Models.Estudiante", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.PeriodoAcademico", "PeriodoAcademico")
+                    b.HasOne("DocinadeApp.Models.PeriodoAcademico", "PeriodoAcademico")
                         .WithMany("Estudiantes")
                         .HasForeignKey("PeriodoAcademicoId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1937,31 +1937,31 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("PeriodoAcademico");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.EstudianteEmpadronamiento", b =>
+            modelBuilder.Entity("DocinadeApp.Models.EstudianteEmpadronamiento", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.Estudiante", "Estudiante")
+                    b.HasOne("DocinadeApp.Models.Estudiante", "Estudiante")
                         .WithOne()
-                        .HasForeignKey("RubricasApp.Web.Models.EstudianteEmpadronamiento", "IdEstudiante")
+                        .HasForeignKey("DocinadeApp.Models.EstudianteEmpadronamiento", "IdEstudiante")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Estudiante");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.EstudianteGrupo", b =>
+            modelBuilder.Entity("DocinadeApp.Models.EstudianteGrupo", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.Identity.ApplicationUser", "AsignadoPor")
+                    b.HasOne("DocinadeApp.Models.Identity.ApplicationUser", "AsignadoPor")
                         .WithMany()
                         .HasForeignKey("AsignadoPorId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("RubricasApp.Web.Models.Estudiante", "Estudiante")
+                    b.HasOne("DocinadeApp.Models.Estudiante", "Estudiante")
                         .WithMany()
                         .HasForeignKey("EstudianteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.GrupoEstudiante", "Grupo")
+                    b.HasOne("DocinadeApp.Models.GrupoEstudiante", "Grupo")
                         .WithMany("EstudianteGrupos")
                         .HasForeignKey("GrupoId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1974,20 +1974,20 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("Grupo");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.Evaluacion", b =>
+            modelBuilder.Entity("DocinadeApp.Models.Evaluacion", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.Identity.ApplicationUser", "EvaluadoPor")
+                    b.HasOne("DocinadeApp.Models.Identity.ApplicationUser", "EvaluadoPor")
                         .WithMany("EvaluacionesRealizadas")
                         .HasForeignKey("EvaluadoPorId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("RubricasApp.Web.Models.Estudiante", "Estudiante")
+                    b.HasOne("DocinadeApp.Models.Estudiante", "Estudiante")
                         .WithMany("Evaluaciones")
                         .HasForeignKey("IdEstudiante")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.Rubrica", "Rubrica")
+                    b.HasOne("DocinadeApp.Models.Rubrica", "Rubrica")
                         .WithMany("Evaluaciones")
                         .HasForeignKey("IdRubrica")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -2000,20 +2000,20 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("Rubrica");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.GrupoEstudiante", b =>
+            modelBuilder.Entity("DocinadeApp.Models.GrupoEstudiante", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.Identity.ApplicationUser", "CreadoPor")
+                    b.HasOne("DocinadeApp.Models.Identity.ApplicationUser", "CreadoPor")
                         .WithMany()
                         .HasForeignKey("CreadoPorId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("RubricasApp.Web.Models.TipoGrupoCatalogo", "TipoGrupoCatalogo")
+                    b.HasOne("DocinadeApp.Models.TipoGrupoCatalogo", "TipoGrupoCatalogo")
                         .WithMany("GruposEstudiantes")
                         .HasForeignKey("IdTipoGrupo")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.PeriodoAcademico", "PeriodoAcademico")
+                    b.HasOne("DocinadeApp.Models.PeriodoAcademico", "PeriodoAcademico")
                         .WithMany()
                         .HasForeignKey("PeriodoAcademicoId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -2026,15 +2026,15 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("TipoGrupoCatalogo");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.GrupoMateria", b =>
+            modelBuilder.Entity("DocinadeApp.Models.GrupoMateria", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.GrupoEstudiante", "Grupo")
+                    b.HasOne("DocinadeApp.Models.GrupoEstudiante", "Grupo")
                         .WithMany("GrupoMaterias")
                         .HasForeignKey("GrupoId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.Materia", "Materia")
+                    b.HasOne("DocinadeApp.Models.Materia", "Materia")
                         .WithMany()
                         .HasForeignKey("MateriaId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -2045,21 +2045,21 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("Materia");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.InstrumentoMateria", b =>
+            modelBuilder.Entity("DocinadeApp.Models.InstrumentoMateria", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.InstrumentoEvaluacion", "InstrumentoEvaluacion")
+                    b.HasOne("DocinadeApp.Models.InstrumentoEvaluacion", "InstrumentoEvaluacion")
                         .WithMany("InstrumentoMaterias")
                         .HasForeignKey("InstrumentoEvaluacionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.Materia", "Materia")
+                    b.HasOne("DocinadeApp.Models.Materia", "Materia")
                         .WithMany("InstrumentoMaterias")
                         .HasForeignKey("MateriaId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.PeriodoAcademico", "PeriodoAcademico")
+                    b.HasOne("DocinadeApp.Models.PeriodoAcademico", "PeriodoAcademico")
                         .WithMany()
                         .HasForeignKey("PeriodoAcademicoId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2072,15 +2072,15 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("PeriodoAcademico");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.InstrumentoRubrica", b =>
+            modelBuilder.Entity("DocinadeApp.Models.InstrumentoRubrica", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.InstrumentoEvaluacion", "InstrumentoEvaluacion")
+                    b.HasOne("DocinadeApp.Models.InstrumentoEvaluacion", "InstrumentoEvaluacion")
                         .WithMany("InstrumentoRubricas")
                         .HasForeignKey("InstrumentoEvaluacionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.Rubrica", "Rubrica")
+                    b.HasOne("DocinadeApp.Models.Rubrica", "Rubrica")
                         .WithMany()
                         .HasForeignKey("RubricaId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -2091,9 +2091,9 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("Rubrica");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.ItemEvaluacion", b =>
+            modelBuilder.Entity("DocinadeApp.Models.ItemEvaluacion", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.Rubrica", "Rubrica")
+                    b.HasOne("DocinadeApp.Models.Rubrica", "Rubrica")
                         .WithMany("ItemsEvaluacion")
                         .HasForeignKey("IdRubrica")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2102,15 +2102,15 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("Rubrica");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.MateriaRequisito", b =>
+            modelBuilder.Entity("DocinadeApp.Models.MateriaRequisito", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.Materia", "Materia")
+                    b.HasOne("DocinadeApp.Models.Materia", "Materia")
                         .WithMany("EsRequisitoPara")
                         .HasForeignKey("MateriaId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.Materia", "Requisito")
+                    b.HasOne("DocinadeApp.Models.Materia", "Requisito")
                         .WithMany("Prerequisitos")
                         .HasForeignKey("RequisitoId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -2121,9 +2121,9 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("Requisito");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.NivelCalificacion", b =>
+            modelBuilder.Entity("DocinadeApp.Models.NivelCalificacion", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.GrupoCalificacion", "GrupoCalificacion")
+                    b.HasOne("DocinadeApp.Models.GrupoCalificacion", "GrupoCalificacion")
                         .WithMany("NivelesCalificacion")
                         .HasForeignKey("IdGrupo")
                         .OnDelete(DeleteBehavior.SetNull)
@@ -2132,20 +2132,20 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("GrupoCalificacion");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.Rubrica", b =>
+            modelBuilder.Entity("DocinadeApp.Models.Rubrica", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.Identity.ApplicationUser", "CreadoPor")
+                    b.HasOne("DocinadeApp.Models.Identity.ApplicationUser", "CreadoPor")
                         .WithMany("RubricasCreadas")
                         .HasForeignKey("CreadoPorId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("RubricasApp.Web.Models.GrupoCalificacion", "GrupoCalificacion")
+                    b.HasOne("DocinadeApp.Models.GrupoCalificacion", "GrupoCalificacion")
                         .WithMany("Rubricas")
                         .HasForeignKey("IdGrupo")
                         .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("FK_Rubricas_GruposCalificacion_IdGrupo");
 
-                    b.HasOne("RubricasApp.Web.Models.Identity.ApplicationUser", "ModificadoPor")
+                    b.HasOne("DocinadeApp.Models.Identity.ApplicationUser", "ModificadoPor")
                         .WithMany()
                         .HasForeignKey("ModificadoPorId")
                         .OnDelete(DeleteBehavior.NoAction);
@@ -2157,15 +2157,15 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("ModificadoPor");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.RubricaNivel", b =>
+            modelBuilder.Entity("DocinadeApp.Models.RubricaNivel", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.NivelCalificacion", "NivelCalificacion")
+                    b.HasOne("DocinadeApp.Models.NivelCalificacion", "NivelCalificacion")
                         .WithMany("RubricaNiveles")
                         .HasForeignKey("IdNivel")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.Rubrica", "Rubrica")
+                    b.HasOne("DocinadeApp.Models.Rubrica", "Rubrica")
                         .WithMany("RubricaNiveles")
                         .HasForeignKey("IdRubrica")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2176,21 +2176,21 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("Rubrica");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.ValorRubrica", b =>
+            modelBuilder.Entity("DocinadeApp.Models.ValorRubrica", b =>
                 {
-                    b.HasOne("RubricasApp.Web.Models.ItemEvaluacion", "ItemEvaluacion")
+                    b.HasOne("DocinadeApp.Models.ItemEvaluacion", "ItemEvaluacion")
                         .WithMany("ValoresRubrica")
                         .HasForeignKey("IdItem")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.NivelCalificacion", "NivelCalificacion")
+                    b.HasOne("DocinadeApp.Models.NivelCalificacion", "NivelCalificacion")
                         .WithMany("ValoresRubrica")
                         .HasForeignKey("IdNivel")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RubricasApp.Web.Models.Rubrica", "Rubrica")
+                    b.HasOne("DocinadeApp.Models.Rubrica", "Rubrica")
                         .WithMany("ValoresRubrica")
                         .HasForeignKey("IdRubrica")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -2203,57 +2203,57 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("Rubrica");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.CuadernoCalificador", b =>
+            modelBuilder.Entity("DocinadeApp.Models.CuadernoCalificador", b =>
                 {
                     b.Navigation("CuadernoInstrumentos");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.Estudiante", b =>
+            modelBuilder.Entity("DocinadeApp.Models.Estudiante", b =>
                 {
                     b.Navigation("Evaluaciones");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.Evaluacion", b =>
+            modelBuilder.Entity("DocinadeApp.Models.Evaluacion", b =>
                 {
                     b.Navigation("DetallesEvaluacion");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.GrupoCalificacion", b =>
+            modelBuilder.Entity("DocinadeApp.Models.GrupoCalificacion", b =>
                 {
                     b.Navigation("NivelesCalificacion");
 
                     b.Navigation("Rubricas");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.GrupoEstudiante", b =>
+            modelBuilder.Entity("DocinadeApp.Models.GrupoEstudiante", b =>
                 {
                     b.Navigation("EstudianteGrupos");
 
                     b.Navigation("GrupoMaterias");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.Identity.ApplicationUser", b =>
+            modelBuilder.Entity("DocinadeApp.Models.Identity.ApplicationUser", b =>
                 {
                     b.Navigation("EvaluacionesRealizadas");
 
                     b.Navigation("RubricasCreadas");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.InstrumentoEvaluacion", b =>
+            modelBuilder.Entity("DocinadeApp.Models.InstrumentoEvaluacion", b =>
                 {
                     b.Navigation("InstrumentoMaterias");
 
                     b.Navigation("InstrumentoRubricas");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.ItemEvaluacion", b =>
+            modelBuilder.Entity("DocinadeApp.Models.ItemEvaluacion", b =>
                 {
                     b.Navigation("DetallesEvaluacion");
 
                     b.Navigation("ValoresRubrica");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.Materia", b =>
+            modelBuilder.Entity("DocinadeApp.Models.Materia", b =>
                 {
                     b.Navigation("CuadernosCalificadores");
 
@@ -2266,7 +2266,7 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("Prerequisitos");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.NivelCalificacion", b =>
+            modelBuilder.Entity("DocinadeApp.Models.NivelCalificacion", b =>
                 {
                     b.Navigation("DetallesEvaluacion");
 
@@ -2275,14 +2275,14 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("ValoresRubrica");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.PeriodoAcademico", b =>
+            modelBuilder.Entity("DocinadeApp.Models.PeriodoAcademico", b =>
                 {
                     b.Navigation("Estudiantes");
 
                     b.Navigation("Ofertas");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.Rubrica", b =>
+            modelBuilder.Entity("DocinadeApp.Models.Rubrica", b =>
                 {
                     b.Navigation("Evaluaciones");
 
@@ -2293,7 +2293,7 @@ namespace RubricasApp.Web.Migrations
                     b.Navigation("ValoresRubrica");
                 });
 
-            modelBuilder.Entity("RubricasApp.Web.Models.TipoGrupoCatalogo", b =>
+            modelBuilder.Entity("DocinadeApp.Models.TipoGrupoCatalogo", b =>
                 {
                     b.Navigation("GruposEstudiantes");
                 });

@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace RubricasApp.Web.ViewModels.Conducta
+namespace DocinadeApp.ViewModels.Conducta
 {
     /// <summary>
     /// ViewModel para mostrar la nota de conducta de un estudiante

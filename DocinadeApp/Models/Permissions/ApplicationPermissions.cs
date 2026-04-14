@@ -1,7 +1,7 @@
-using RubricasApp.Web.Models;
+﻿using DocinadeApp.Models;
 using System.ComponentModel;
 
-namespace RubricasApp.Web.Models.Permissions
+namespace DocinadeApp.Models.Permissions
 {
     /// <summary>
     /// Define todos los permisos disponibles en el sistema

@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace RubricasApp.Web.Models
+namespace DocinadeApp.Models
 {
     public class ErrorLog
     {

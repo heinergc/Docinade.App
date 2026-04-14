@@ -1,9 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using RubricasApp.Web.Services.Identity;
-using RubricasApp.Web.Interfaces;
+using DocinadeApp.Services.Identity;
+using DocinadeApp.Interfaces;
 
-namespace RubricasApp.Web.Filters
+namespace DocinadeApp.Filters
 {
     /// <summary>
     /// Filtro para validar que el usuario puede acceder a una entidad específica

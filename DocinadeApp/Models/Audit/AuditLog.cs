@@ -1,4 +1,4 @@
-// Este archivo se mantiene por compatibilidad
+﻿// Este archivo se mantiene por compatibilidad
 // Las clases se han movido a archivos separados para mejor organización:
 
 // AuditLogEntity.cs - Entidad principal AuditLog con campos adicionales
@@ -18,7 +18,7 @@
 
 
 
-namespace RubricasApp.Web.Models.Audit
+namespace DocinadeApp.Models.Audit
 {
     // Alias para compatibilidad hacia atrás
 

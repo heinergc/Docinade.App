@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations;
-using RubricasApp.Web.Models.Identity;
+﻿using System.ComponentModel.DataAnnotations;
+using DocinadeApp.Models.Identity;
 
-namespace RubricasApp.Web.Models
+namespace DocinadeApp.Models
 {
     public class Evaluacion
     {

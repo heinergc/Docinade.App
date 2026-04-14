@@ -1,11 +1,11 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models.Identity;
-using RubricasApp.Web.Models.Permissions;
+using DocinadeApp.Data;
+using DocinadeApp.Models.Identity;
+using DocinadeApp.Models.Permissions;
 using System.Security.Claims;
 
-namespace RubricasApp.Web.Services.Permissions
+namespace DocinadeApp.Services.Permissions
 {
     /// <summary>
     /// Implementación del servicio de permisos

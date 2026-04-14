@@ -1,4 +1,4 @@
-namespace RubricasApp.Web.Models
+﻿namespace DocinadeApp.Models
 {
     /// <summary>
     /// Constantes para las claves de configuración del sistema

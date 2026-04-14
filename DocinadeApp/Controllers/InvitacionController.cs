@@ -1,9 +1,9 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RubricasApp.Web.Services;
-using RubricasApp.Web.Models;
+using DocinadeApp.Services;
+using DocinadeApp.Models;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     public class InvitacionController : Controller
     {

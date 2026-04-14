@@ -1,21 +1,21 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Authorization;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.Models.Identity;
-using RubricasApp.Web.Models.Permissions;
-using RubricasApp.Web.Models.Audit;
-using RubricasApp.Web.Services.Permissions;
-using RubricasApp.Web.Services.Audit;
-using RubricasApp.Web.ViewModels.Admin;
+using DocinadeApp.Authorization;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
+using DocinadeApp.Models.Identity;
+using DocinadeApp.Models.Permissions;
+using DocinadeApp.Models.Audit;
+using DocinadeApp.Services.Permissions;
+using DocinadeApp.Services.Audit;
+using DocinadeApp.ViewModels.Admin;
 using System.Security.Claims;
 using System.Text;
 using OfficeOpenXml;
 
-namespace RubricasApp.Web.Areas.Admin.Controllers
+namespace DocinadeApp.Areas.Admin.Controllers
 {
     /// <summary>
     /// Controlador para administración de permisos

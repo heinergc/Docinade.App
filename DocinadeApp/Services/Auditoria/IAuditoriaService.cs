@@ -1,6 +1,6 @@
-using RubricasApp.Web.Models;
+﻿using DocinadeApp.Models;
 
-namespace RubricasApp.Web.Services.Auditoria
+namespace DocinadeApp.Services.Auditoria
 {
     /// <summary>
     /// Interfaz para el servicio de auditoría

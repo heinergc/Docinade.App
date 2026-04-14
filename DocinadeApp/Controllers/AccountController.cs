@@ -1,19 +1,19 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using RubricasApp.Web.Models.Identity;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.Models.Permissions;
-using RubricasApp.Web.ViewModels.Account;
-using RubricasApp.Web.Services;
+using DocinadeApp.Models.Identity;
+using DocinadeApp.Models;
+using DocinadeApp.Models.Permissions;
+using DocinadeApp.ViewModels.Account;
+using DocinadeApp.Services;
 using System.Text;
 using System.Security.Claims;
-using RubricasApp.Web.Services.Audit;
-using RubricasApp.Web.Models.Audit;
+using DocinadeApp.Services.Audit;
+using DocinadeApp.Models.Audit;
 
 
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     public class AccountController : Controller
     {

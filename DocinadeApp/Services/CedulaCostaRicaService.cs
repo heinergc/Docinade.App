@@ -1,6 +1,6 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 
-namespace RubricasApp.Web.Services
+namespace DocinadeApp.Services
 {
     public class CedulaCostaRicaService : ICedulaCostaRicaService
     {

@@ -1,9 +1,9 @@
-﻿using RubricasApp.Web.Models.Identity;
+﻿using DocinadeApp.Models.Identity;
 using System.ComponentModel.DataAnnotations;
-using RubricasApp.Web.Models.Academic;
-using RubricasApp.Web.Interfaces;
+using DocinadeApp.Models.Academic;
+using DocinadeApp.Interfaces;
 
-namespace RubricasApp.Web.Models
+namespace DocinadeApp.Models
 {
     public class Rubrica : IAuditable, IUserOwned
     {

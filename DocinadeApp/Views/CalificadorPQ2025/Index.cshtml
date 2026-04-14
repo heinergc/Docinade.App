@@ -1,4 +1,4 @@
-@model RubricasApp.Web.DTOs.Calificador.CalificadorQueryDto
+ï»¿@model DocinadeApp.DTOs.Calificador.CalificadorQueryDto
 
 @{
     ViewData["Title"] = "Cuaderno Calificador - Primer Cuatrimestre 2025";
@@ -12,7 +12,7 @@
                     <h4 class="card-title mb-0">
                         <i class="fas fa-table"></i> @ViewData["Title"]
                     </h4>
-                    <small>Generación automática de cuaderno calificador basado en Instrumentos ? Rúbricas</small>
+                    <small>Generaciï¿½n automï¿½tica de cuaderno calificador basado en Instrumentos ? Rï¿½bricas</small>
                 </div>
                 <div class="card-body">
                     
@@ -30,7 +30,7 @@
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle"></i>
                             <strong>Periodo Objetivo Detectado:</strong> @ViewBag.PeriodoObjetivoNombre
-                            <br><small>Este periodo se seleccionará automáticamente como "Primer Cuatrimestre 2025"</small>
+                            <br><small>Este periodo se seleccionarï¿½ automï¿½ticamente como "Primer Cuatrimestre 2025"</small>
                         </div>
                     }
 
@@ -51,10 +51,10 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label asp-for="PeriodoAcademicoId" class="form-label">
-                                        <i class="fas fa-calendar-alt"></i> Período Académico <span class="text-danger">*</span>
+                                        <i class="fas fa-calendar-alt"></i> Perï¿½odo Acadï¿½mico <span class="text-danger">*</span>
                                     </label>
                                     <select asp-for="PeriodoAcademicoId" class="form-select" asp-items="ViewBag.PeriodoAcademicoId" id="periodoSelect">
-                                        <option value="">-- Seleccione un período --</option>
+                                        <option value="">-- Seleccione un perï¿½odo --</option>
                                     </select>
                                     <span asp-validation-for="PeriodoAcademicoId" class="text-danger"></span>
                                 </div>
@@ -63,11 +63,11 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label asp-for="ModoCalculo" class="form-label">
-                                        <i class="fas fa-calculator"></i> Modo de Cálculo
+                                        <i class="fas fa-calculator"></i> Modo de Cï¿½lculo
                                     </label>
                                     <select asp-for="ModoCalculo" class="form-select" asp-items="ViewBag.ModoCalculo">
                                     </select>
-                                    <div class="form-text">Cómo calcular cuando hay múltiples rúbricas por instrumento</div>
+                                    <div class="form-text">Cï¿½mo calcular cuando hay mï¿½ltiples rï¿½bricas por instrumento</div>
                                 </div>
                             </div>
                         </div>
@@ -105,7 +105,7 @@
                                             <i class="fas fa-eye"></i> Vista Previa Columnas
                                         </button>
                                         <button type="button" class="btn btn-outline-info" id="btn-estadisticas">
-                                            <i class="fas fa-chart-bar"></i> Estadísticas
+                                            <i class="fas fa-chart-bar"></i> Estadï¿½sticas
                                         </button>
                                     </div>
                                 </div>
@@ -113,14 +113,14 @@
                         </div>
                     </form>
                     
-                    <!-- Panel de información dinámico -->
+                    <!-- Panel de informaciï¿½n dinï¿½mico -->
                     <div id="info-panel" class="mt-4" style="display: none;">
                         <div class="card border-info">
                             <div class="card-header bg-light">
-                                <h6 class="mb-0"><i class="fas fa-info-circle text-info"></i> Información del Cuaderno</h6>
+                                <h6 class="mb-0"><i class="fas fa-info-circle text-info"></i> Informaciï¿½n del Cuaderno</h6>
                             </div>
                             <div class="card-body" id="info-content">
-                                <!-- Contenido dinámico -->
+                                <!-- Contenido dinï¿½mico -->
                             </div>
                         </div>
                     </div>
@@ -135,7 +135,7 @@
     
     <script>
         $(document).ready(function() {
-            // Inicializar Select2 si está disponible
+            // Inicializar Select2 si estï¿½ disponible
             if (typeof $.fn.select2 !== 'undefined') {
                 $('#materiaSelect, #periodoSelect').select2({
                     placeholder: function() {
@@ -163,7 +163,7 @@
                 var periodoId = $('#periodoSelect').val();
                 
                 if (!materiaId || !periodoId) {
-                    alert('Por favor seleccione una materia y un período académico');
+                    alert('Por favor seleccione una materia y un perï¿½odo acadï¿½mico');
                     return;
                 }
                 
@@ -188,24 +188,24 @@
                         if (response && response.success && Array.isArray(response.data) && response.data.length > 0) {
                             mostrarColumnas(response.data);
                         } else {
-                            $('#info-content').html('<div class="alert alert-warning">No se encontraron instrumentos y rúbricas para esta combinación.</div>');
+                            $('#info-content').html('<div class="alert alert-warning">No se encontraron instrumentos y rï¿½bricas para esta combinaciï¿½n.</div>');
                             $('#info-panel').show();
                         }
                     },
                     error: function(xhr, status, error) {
                         console.error('Error al obtener columnas:', error);
                         console.error('Response text:', xhr.responseText);
-                        alert('Error al obtener la información de columnas: ' + error);
+                        alert('Error al obtener la informaciï¿½n de columnas: ' + error);
                     }
                 });
             });
             
-            // Estadísticas
+            // Estadï¿½sticas
             $('#btn-estadisticas').on('click', function() {
                 var formData = $('#form-generar').serialize();
                 
                 if (!$('#materiaSelect').val() || !$('#periodoSelect').val()) {
-                    alert('Por favor seleccione una materia y un período académico');
+                    alert('Por favor seleccione una materia y un perï¿½odo acadï¿½mico');
                     return;
                 }
                 
@@ -214,22 +214,22 @@
                     type: 'GET',
                     dataType: 'json',
                     success: function(response) {
-                        console.log('Estadísticas response:', response);
+                        console.log('Estadï¿½sticas response:', response);
                         
                         if (response && response.success && response.estadisticas) {
                             mostrarEstadisticas(response.estadisticas);
                         } else {
-                            alert('Error: ' + (response.message || 'No se pudieron obtener estadísticas'));
+                            alert('Error: ' + (response.message || 'No se pudieron obtener estadï¿½sticas'));
                         }
                     },
                     error: function(xhr, status, error) {
-                        console.error('Error al obtener estadísticas:', error);
-                        alert('Error al obtener estadísticas: ' + error);
+                        console.error('Error al obtener estadï¿½sticas:', error);
+                        alert('Error al obtener estadï¿½sticas: ' + error);
                     }
                 });
             });
             
-            // Validación en tiempo real
+            // Validaciï¿½n en tiempo real
             $('#materiaSelect, #periodoSelect').on('change', function() {
                 var materiaId = $('#materiaSelect').val();
                 var periodoId = $('#periodoSelect').val();
@@ -245,14 +245,14 @@
                         dataType: 'json',
                         success: function(response) {
                             if (response && response.success && response.esValido === false) {
-                                $('#info-content').html('<div class="alert alert-warning">La combinación seleccionada no tiene datos válidos.</div>');
+                                $('#info-content').html('<div class="alert alert-warning">La combinaciï¿½n seleccionada no tiene datos vï¿½lidos.</div>');
                                 $('#info-panel').show();
                             } else if (response && response.success && response.esValido === true) {
                                 $('#info-panel').hide();
                             }
                         },
                         error: function(xhr, status, error) {
-                            console.error('Error en validación:', error);
+                            console.error('Error en validaciï¿½n:', error);
                         }
                     });
                 }
@@ -267,7 +267,7 @@
             
             var instrumentos = {};
             
-            // Verificar que columnas es un array válido
+            // Verificar que columnas es un array vï¿½lido
             if (!Array.isArray(columnas)) {
                 console.error('Columnas no es un array:', columnas);
                 $('#info-content').html('<div class="alert alert-danger">Error: Formato de datos incorrecto</div>');
@@ -276,9 +276,9 @@
             }
             
             columnas.forEach(function(col) {
-                // Verificar que col es un objeto válido
+                // Verificar que col es un objeto vï¿½lido
                 if (!col || typeof col !== 'object') {
-                    console.warn('Columna inválida:', col);
+                    console.warn('Columna invï¿½lida:', col);
                     return;
                 }
                 
@@ -322,27 +322,27 @@
         }
         
         function mostrarEstadisticas(stats) {
-            console.log('Mostrando estadísticas:', stats);
+            console.log('Mostrando estadï¿½sticas:', stats);
             
-            // Verificar que stats es un objeto válido
+            // Verificar que stats es un objeto vï¿½lido
             if (!stats || typeof stats !== 'object') {
-                console.error('Estadísticas inválidas:', stats);
-                $('#info-content').html('<div class="alert alert-danger">Error: Estadísticas no válidas</div>');
+                console.error('Estadï¿½sticas invï¿½lidas:', stats);
+                $('#info-content').html('<div class="alert alert-danger">Error: Estadï¿½sticas no vï¿½lidas</div>');
                 $('#info-panel').show();
                 return;
             }
             
-            var html = '<h6>Estadísticas del Cuaderno:</h6>';
+            var html = '<h6>Estadï¿½sticas del Cuaderno:</h6>';
             html += '<div class="row">';
             html += '<div class="col-md-3"><div class="text-center"><h4 class="text-primary">' + (stats.totalEstudiantes || 0) + '</h4><small>Estudiantes</small></div></div>';
             html += '<div class="col-md-3"><div class="text-center"><h4 class="text-success">' + (stats.totalInstrumentos || 0) + '</h4><small>Instrumentos</small></div></div>';
-            html += '<div class="col-md-3"><div class="text-center"><h4 class="text-info">' + (stats.totalRubricas || 0) + '</h4><small>Rúbricas</small></div></div>';
+            html += '<div class="col-md-3"><div class="text-center"><h4 class="text-info">' + (stats.totalRubricas || 0) + '</h4><small>Rï¿½bricas</small></div></div>';
             html += '<div class="col-md-3"><div class="text-center"><h4 class="text-warning">' + (stats.promedioGeneral || 0).toFixed(2) + '</h4><small>Promedio</small></div></div>';
             html += '</div>';
             html += '<hr>';
             html += '<div class="row mt-2">';
-            html += '<div class="col-md-6"><small><i class="fas fa-arrow-up text-success"></i> Nota máxima: <strong>' + (stats.notaMaxima || 0).toFixed(2) + '</strong></small></div>';
-            html += '<div class="col-md-6"><small><i class="fas fa-arrow-down text-danger"></i> Nota mínima: <strong>' + (stats.notaMinima || 0).toFixed(2) + '</strong></small></div>';
+            html += '<div class="col-md-6"><small><i class="fas fa-arrow-up text-success"></i> Nota mï¿½xima: <strong>' + (stats.notaMaxima || 0).toFixed(2) + '</strong></small></div>';
+            html += '<div class="col-md-6"><small><i class="fas fa-arrow-down text-danger"></i> Nota mï¿½nima: <strong>' + (stats.notaMinima || 0).toFixed(2) + '</strong></small></div>';
             html += '</div>';
             html += '<div class="row">';
             html += '<div class="col-md-6"><small><i class="fas fa-check text-success"></i> Con todas las notas: <strong>' + (stats.estudiantesConTodasLasNotas || 0) + '</strong></small></div>';

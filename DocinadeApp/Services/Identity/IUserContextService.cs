@@ -1,6 +1,6 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 
-namespace RubricasApp.Web.Services.Identity
+namespace DocinadeApp.Services.Identity
 {
     public interface IUserContextService
     {

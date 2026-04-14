@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
-using RubricasApp.Web.Services;
+﻿using Microsoft.AspNetCore.Mvc;
+using DocinadeApp.Services;
 
-namespace RubricasApp.Web.ViewComponents
+namespace DocinadeApp.ViewComponents
 {
     /// <summary>
     /// ViewComponent para mostrar el carrusel de sliders activos en el frontend público

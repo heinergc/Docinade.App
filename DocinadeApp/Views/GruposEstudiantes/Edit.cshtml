@@ -1,4 +1,4 @@
-﻿@model RubricasApp.Web.ViewModels.Grupos.EditarGrupoViewModel
+﻿@model DocinadeApp.ViewModels.Grupos.EditarGrupoViewModel
 
 @{
     ViewData["Title"] = $"Editar Grupo: {Model.Codigo}";
@@ -149,10 +149,10 @@
                             <div class="form-group mb-3">
                                 <label asp-for="Estado" class="form-label required">Estado</label>
                                 <select asp-for="Estado" class="form-select" id="Estado">
-                                    <option value="Activo" selected="@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Activo)">Activo</option>
-                                    <option value="Inactivo" selected="@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Inactivo)">Inactivo</option>
-                                    <option value="Cerrado" selected="@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Cerrado)">Cerrado</option>
-                                    <option value="Suspendido" selected="@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Suspendido)">Suspendido</option>
+                                    <option value="Activo" selected="@(Model.Estado == DocinadeApp.Models.EstadoGrupo.Activo)">Activo</option>
+                                    <option value="Inactivo" selected="@(Model.Estado == DocinadeApp.Models.EstadoGrupo.Inactivo)">Inactivo</option>
+                                    <option value="Cerrado" selected="@(Model.Estado == DocinadeApp.Models.EstadoGrupo.Cerrado)">Cerrado</option>
+                                    <option value="Suspendido" selected="@(Model.Estado == DocinadeApp.Models.EstadoGrupo.Suspendido)">Suspendido</option>
                                 </select>
                                 <span asp-validation-for="Estado" class="text-danger"></span>
                                 <div class="form-text" id="estadoHelp">

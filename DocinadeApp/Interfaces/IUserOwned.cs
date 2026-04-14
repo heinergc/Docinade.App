@@ -1,4 +1,4 @@
-namespace RubricasApp.Web.Interfaces
+﻿namespace DocinadeApp.Interfaces
 {
     /// <summary>
     /// Interface para entidades que pertenecen a un usuario específico

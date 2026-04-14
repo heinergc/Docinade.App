@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace RubricasApp.Web.ViewModels.Admin
+namespace DocinadeApp.ViewModels.Admin
 {
     /// <summary>
     /// ViewModel para la vista de rol

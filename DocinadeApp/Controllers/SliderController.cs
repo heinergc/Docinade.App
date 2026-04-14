@@ -1,10 +1,10 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.Services;
+using DocinadeApp.Models;
+using DocinadeApp.Services;
 using System.Security.Claims;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     [Authorize]
     public class SliderController : Controller

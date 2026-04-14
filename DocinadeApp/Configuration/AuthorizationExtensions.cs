@@ -1,9 +1,9 @@
-using Microsoft.AspNetCore.Authorization;
-using RubricasApp.Web.Authorization;
-using RubricasApp.Web.Services.Permissions;
-using RubricasApp.Web.Models.Permissions;
+﻿using Microsoft.AspNetCore.Authorization;
+using DocinadeApp.Authorization;
+using DocinadeApp.Services.Permissions;
+using DocinadeApp.Models.Permissions;
 
-namespace RubricasApp.Web.Configuration
+namespace DocinadeApp.Configuration
 {
     /// <summary>
     /// Extensiones para configurar autorización y permisos en el sistema

@@ -1,8 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
 
-namespace RubricasApp.Web.Utils
+namespace DocinadeApp.Utils
 {
     /// <summary>
     /// Inicializa los datos semilla del módulo de conducta según REA 40862-V21

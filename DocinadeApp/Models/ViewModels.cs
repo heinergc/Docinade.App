@@ -1,6 +1,6 @@
-using RubricasApp.Web.Models;
+﻿using DocinadeApp.Models;
 
-namespace RubricasApp.Web.Models
+namespace DocinadeApp.Models
 {
     // ViewModels para la configuración masiva
     public class ConfigurarRubricaViewModel

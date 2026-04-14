@@ -1,8 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models.Audit;
+﻿using Microsoft.EntityFrameworkCore;
+using DocinadeApp.Data;
+using DocinadeApp.Models.Audit;
 
-namespace RubricasApp.Web.Services.Audit
+namespace DocinadeApp.Services.Audit
 {
     /// <summary>
     /// Implementación del servicio de auditoría

@@ -1,6 +1,6 @@
-using RubricasApp.Web.Models.Identity;
+﻿using DocinadeApp.Models.Identity;
 
-namespace RubricasApp.Web.Interfaces
+namespace DocinadeApp.Interfaces
 {
     /// <summary>
     /// Interface para entidades que requieren auditoría

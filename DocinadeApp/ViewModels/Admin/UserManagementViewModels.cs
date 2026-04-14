@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace RubricasApp.Web.ViewModels.Admin
+namespace DocinadeApp.ViewModels.Admin
 {
     /// <summary>
     /// ViewModel para la vista de usuario
@@ -68,7 +68,7 @@ namespace RubricasApp.Web.ViewModels.Admin
         public DateTime CreatedDate { get; set; }
         public DateTime? LastLoginDate { get; set; }
         public List<string> RolePermissions { get; set; } = new();
-        public Dictionary<string, List<RubricasApp.Web.Models.Permissions.PermissionInfo>> PermissionsByCategory { get; set; } = new();
+        public Dictionary<string, List<DocinadeApp.Models.Permissions.PermissionInfo>> PermissionsByCategory { get; set; } = new();
     }
 
     /// <summary>

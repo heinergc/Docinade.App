@@ -1,9 +1,9 @@
-using System.Text;
+ï»¿using System.Text;
 
-namespace RubricasApp.Web.Middleware
+namespace DocinadeApp.Middleware
 {
     /// <summary>
-    /// Middleware para asegurar que todas las respuestas usen codificación UTF-8
+    /// Middleware para asegurar que todas las respuestas usen codificaciï¿½n UTF-8
     /// </summary>
     public class Utf8EncodingMiddleware
     {
@@ -23,14 +23,14 @@ namespace RubricasApp.Web.Middleware
             {
                 try
                 {
-                    // Configurar Content-Type con UTF-8 si no está establecido
+                    // Configurar Content-Type con UTF-8 si no estï¿½ establecido
                     if (string.IsNullOrEmpty(context.Response.ContentType))
                     {
                         context.Response.ContentType = "text/html; charset=utf-8";
                     }
                     else if (!context.Response.ContentType.Contains("charset", StringComparison.OrdinalIgnoreCase))
                     {
-                        // Agregar charset UTF-8 si no está presente
+                        // Agregar charset UTF-8 si no estï¿½ presente
                         if (context.Response.ContentType.StartsWith("text/", StringComparison.OrdinalIgnoreCase) ||
                             context.Response.ContentType.Contains("application/json", StringComparison.OrdinalIgnoreCase) ||
                             context.Response.ContentType.Contains("application/javascript", StringComparison.OrdinalIgnoreCase))
@@ -80,7 +80,7 @@ namespace RubricasApp.Web.Middleware
     }
 
     /// <summary>
-    /// Extensión para registrar el middleware de UTF-8
+    /// Extensiï¿½n para registrar el middleware de UTF-8
     /// </summary>
     public static class Utf8EncodingMiddlewareExtensions
     {

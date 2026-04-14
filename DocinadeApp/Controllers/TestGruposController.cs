@@ -1,9 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
+ï»¿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
+using DocinadeApp.Data;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     [Authorize]
     public class TestGruposController : Controller
@@ -88,7 +88,7 @@ namespace RubricasApp.Web.Controllers
                     success = true,
                     totalGrupos = totalGrupos,
                     totalEstudiantes = totalEstudiantes,
-                    message = "? Conexión a base de datos funcionando"
+                    message = "? Conexiï¿½n a base de datos funcionando"
                 });
             }
             catch (Exception ex)

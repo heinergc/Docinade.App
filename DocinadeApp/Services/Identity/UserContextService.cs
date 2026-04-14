@@ -1,10 +1,10 @@
-using Microsoft.AspNetCore.Identity;
-using RubricasApp.Web.Models.Identity;
-using RubricasApp.Web.Models.Permissions;
-using RubricasApp.Web.Interfaces;
+﻿using Microsoft.AspNetCore.Identity;
+using DocinadeApp.Models.Identity;
+using DocinadeApp.Models.Permissions;
+using DocinadeApp.Interfaces;
 using System.Security.Claims;
 
-namespace RubricasApp.Web.Services.Identity
+namespace DocinadeApp.Services.Identity
 {
     public class UserContextService : IUserContextService
     {

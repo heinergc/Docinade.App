@@ -1,7 +1,7 @@
-using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using DocinadeApp.Data;
 
-namespace RubricasApp.Web.Services
+namespace DocinadeApp.Services
 {
     public static class DatabaseInitializer
     {

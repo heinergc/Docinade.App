@@ -1,9 +1,9 @@
-using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.ViewModels.Conducta;
+﻿using Microsoft.EntityFrameworkCore;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
+using DocinadeApp.ViewModels.Conducta;
 
-namespace RubricasApp.Web.Services
+namespace DocinadeApp.Services
 {
     public class ConductaService : IConductaService
     {

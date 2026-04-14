@@ -1,10 +1,10 @@
-using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
 using System.Text;
 using ClosedXML.Excel;
 
-namespace RubricasApp.Web.Services.CuadernoCalificador
+namespace DocinadeApp.Services.CuadernoCalificador
 {
     public class CuadernoCalificadorService : ICuadernoCalificadorService
     {

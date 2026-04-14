@@ -1,9 +1,9 @@
-using AutoMapper;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.Models.Academic;
-using RubricasApp.Web.ViewModels.Academic;
+﻿using AutoMapper;
+using DocinadeApp.Models;
+using DocinadeApp.Models.Academic;
+using DocinadeApp.ViewModels.Academic;
 
-namespace RubricasApp.Web.Mapping
+namespace DocinadeApp.Mapping
 {
     public class AcademicMappingProfile : Profile
     {

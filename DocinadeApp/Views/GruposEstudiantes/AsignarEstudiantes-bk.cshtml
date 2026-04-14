@@ -1,4 +1,4 @@
-@model RubricasApp.Web.ViewModels.Grupos.AsignarEstudiantesViewModel
+ï»¿@model DocinadeApp.ViewModels.Grupos.AsignarEstudiantesViewModel
 
 @{
     ViewData["Title"] = $"Asignar Estudiantes - {Model.GrupoCodigo}";
@@ -30,20 +30,20 @@
     </div>
 </div>
 
-<!-- Información del grupo -->
+<!-- Informaciï¿½n del grupo -->
 <div class="row mb-4">
     <div class="col-12">
         <div class="modern-card">
             <div class="card-header bg-info text-white">
                 <h5 class="mb-0">
                     <i class="fas fa-info-circle me-2"></i>
-                    Información del Grupo
+                    Informaciï¿½n del Grupo
                 </h5>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-3">
-                        <strong>Código:</strong>
+                        <strong>Cï¿½digo:</strong>
                         <span class="badge bg-primary fs-6">@Model.GrupoCodigo</span>
                     </div>
                     <div class="col-md-6">
@@ -61,7 +61,7 @@
                         }
                         else
                         {
-                            <span class="text-success">@Model.EstudiantesActuales (Sin límite)</span>
+                            <span class="text-success">@Model.EstudiantesActuales (Sin lï¿½mite)</span>
                         }
                     </div>
                 </div>
@@ -70,7 +70,7 @@
     </div>
 </div>
 
-<!-- Formulario de asignación -->
+<!-- Formulario de asignaciï¿½n -->
 <div class="row">
     <div class="col-12">
         <div class="modern-card">
@@ -102,13 +102,13 @@
                             </div>
                         </div>
 
-                        <!-- Opciones de asignación -->
+                        <!-- Opciones de asignaciï¿½n -->
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label asp-for="MotivoAsignacion" class="form-label">Motivo de Asignación (Opcional)</label>
+                                    <label asp-for="MotivoAsignacion" class="form-label">Motivo de Asignaciï¿½n (Opcional)</label>
                                     <input asp-for="MotivoAsignacion" class="form-control" 
-                                           placeholder="Ej: Asignación inicial, transferencia, etc." maxlength="200" />
+                                           placeholder="Ej: Asignaciï¿½n inicial, transferencia, etc." maxlength="200" />
                                     <span asp-validation-for="MotivoAsignacion" class="text-danger"></span>
                                 </div>
                             </div>
@@ -125,7 +125,7 @@
 
                         <hr>
 
-                        <!-- Selección masiva -->
+                        <!-- Selecciï¿½n masiva -->
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div>
                                 <button type="button" class="btn btn-sm btn-outline-primary" onclick="seleccionarTodos()">
@@ -187,7 +187,7 @@
                                                 @if (estudiante.TieneGrupoPrincipal)
                                                 {
                                                     <span class="badge bg-warning">
-                                                        @(string.IsNullOrEmpty(estudiante.GrupoActual) ? "Sí" : estudiante.GrupoActual)
+                                                        @(string.IsNullOrEmpty(estudiante.GrupoActual) ? "Sï¿½" : estudiante.GrupoActual)
                                                     </span>
                                                 }
                                                 else
@@ -204,7 +204,7 @@
                             </table>
                         </div>
 
-                        <!-- Botones de acción -->
+                        <!-- Botones de acciï¿½n -->
                         <div class="row mt-4">
                             <div class="col-12">
                                 <hr>
@@ -226,7 +226,7 @@
                         <i class="fas fa-users-slash fa-3x text-muted mb-3"></i>
                         <h5 class="text-muted">No hay estudiantes disponibles</h5>
                         <p class="text-muted">
-                            Todos los estudiantes del período académico ya están asignados a este grupo
+                            Todos los estudiantes del perï¿½odo acadï¿½mico ya estï¿½n asignados a este grupo
                             o no hay estudiantes registrados.
                         </p>
                         <a href="@Url.Action("Details", new { id = Model.GrupoId })" class="btn btn-primary">
@@ -267,7 +267,7 @@
                 if (coincide) visibles++;
             });
             
-            // Actualizar contador de checkboxes después del filtro
+            // Actualizar contador de checkboxes despuï¿½s del filtro
             actualizarContador();
         }
         
@@ -336,12 +336,12 @@
             }
         }
         
-        // Inicializar cuando el DOM esté listo
+        // Inicializar cuando el DOM estï¿½ listo
         document.addEventListener('DOMContentLoaded', function() {
-            // ?? CORRECCIÓN: Verificar que el formulario existe antes de agregar event listeners
+            // ?? CORRECCIï¿½N: Verificar que el formulario existe antes de agregar event listeners
             const asignacionForm = document.getElementById('asignacionForm');
             if (asignacionForm) {
-                // Validación del formulario
+                // Validaciï¿½n del formulario
                 asignacionForm.addEventListener('submit', function(e) {
                     const seleccionados = document.querySelectorAll('.checkbox-estudiante:checked').length;
                     
@@ -349,7 +349,7 @@
                         e.preventDefault();
                         if (typeof Swal !== 'undefined') {
                             Swal.fire({
-                                title: 'Sin selección',
+                                title: 'Sin selecciï¿½n',
                                 text: 'Debe seleccionar al menos un estudiante para asignar.',
                                 icon: 'warning'
                             });
@@ -359,17 +359,17 @@
                         return false;
                     }
                     
-                    // Mostrar confirmación
+                    // Mostrar confirmaciï¿½n
                     e.preventDefault();
                     if (typeof Swal !== 'undefined') {
                         Swal.fire({
-                            title: '¿Confirmar asignación?',
-                            text: `Se asignarán ${seleccionados} estudiantes al grupo @Model.GrupoCodigo.`,
+                            title: 'ï¿½Confirmar asignaciï¿½n?',
+                            text: `Se asignarï¿½n ${seleccionados} estudiantes al grupo @Model.GrupoCodigo.`,
                             icon: 'question',
                             showCancelButton: true,
                             confirmButtonColor: '#28a745',
                             cancelButtonColor: '#6c757d',
-                            confirmButtonText: 'Sí, asignar',
+                            confirmButtonText: 'Sï¿½, asignar',
                             cancelButtonText: 'Cancelar'
                         }).then((result) => {
                             if (result.isConfirmed) {
@@ -387,8 +387,8 @@
                             }
                         });
                     } else {
-                        // Fallback si SweetAlert no está disponible
-                        if (confirm(`¿Confirmar asignación de ${seleccionados} estudiantes al grupo @Model.GrupoCodigo?`)) {
+                        // Fallback si SweetAlert no estï¿½ disponible
+                        if (confirm(`ï¿½Confirmar asignaciï¿½n de ${seleccionados} estudiantes al grupo @Model.GrupoCodigo?`)) {
                             asignacionForm.submit();
                         }
                     }

@@ -1,10 +1,10 @@
-using AutoMapper;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.Models.Academic;
-using RubricasApp.Web.Models.ViewModels;
-using RubricasApp.Web.ViewModels.Academic;
+﻿using AutoMapper;
+using DocinadeApp.Models;
+using DocinadeApp.Models.Academic;
+using DocinadeApp.Models.ViewModels;
+using DocinadeApp.ViewModels.Academic;
 
-namespace RubricasApp.Web.Services.Academic
+namespace DocinadeApp.Services.Academic
 {
     public class MateriasService : IMateriasService
     {

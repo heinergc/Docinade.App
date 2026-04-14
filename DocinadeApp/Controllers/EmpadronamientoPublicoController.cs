@@ -1,12 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.ViewModels;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
+using DocinadeApp.ViewModels;
 using System.Text.Json;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     /// <summary>
     /// Controlador para el auto-empadronamiento público de estudiantes

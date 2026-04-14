@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace RubricasApp.Web.Models
+namespace DocinadeApp.Models
 {
     public class CuadernoCalificadorViewModel
     {

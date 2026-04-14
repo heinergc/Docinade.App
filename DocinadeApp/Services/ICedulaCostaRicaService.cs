@@ -1,4 +1,4 @@
-namespace RubricasApp.Web.Services
+﻿namespace DocinadeApp.Services
 {
     public interface ICedulaCostaRicaService
     {

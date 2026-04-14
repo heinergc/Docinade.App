@@ -1,8 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
 
-namespace RubricasApp.Web.Services
+namespace DocinadeApp.Services
 {
     /// <summary>
     /// Implementación del servicio de configuración del sistema

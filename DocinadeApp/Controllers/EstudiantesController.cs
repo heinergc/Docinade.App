@@ -1,15 +1,15 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.Services;
-using RubricasApp.Web.Authorization;
-using RubricasApp.Web.Models.Permissions;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
+using DocinadeApp.Services;
+using DocinadeApp.Authorization;
+using DocinadeApp.Models.Permissions;
 using System.Text.Json;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     public class EstudiantesController : BaseController
     {

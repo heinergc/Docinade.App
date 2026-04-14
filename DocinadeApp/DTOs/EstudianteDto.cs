@@ -1,4 +1,4 @@
-namespace RubricasApp.Web.DTOs
+﻿namespace DocinadeApp.DTOs
 {
     /// <summary>Datos planos de estudiante para listados y selects.</summary>
     public record EstudianteDto(

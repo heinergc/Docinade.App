@@ -1,4 +1,4 @@
-@model RubricasApp.Web.ViewModels.InstitucionDetailsViewModel
+﻿@model DocinadeApp.ViewModels.InstitucionDetailsViewModel
 
 @{
     ViewData["Title"] = "Detalles de Institución";
@@ -186,13 +186,13 @@
                     </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
-                            @if (User.HasClaim("permission", RubricasApp.Web.Models.Permissions.ApplicationPermissions.Instituciones.EDITAR))
+                            @if (User.HasClaim("permission", DocinadeApp.Models.Permissions.ApplicationPermissions.Instituciones.EDITAR))
                             {
                                 <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
                                     <i class="fas fa-edit"></i> Editar Institución
                                 </a>
                             }
-                            @if (User.HasClaim("permission", RubricasApp.Web.Models.Permissions.ApplicationPermissions.Instituciones.ELIMINAR) && Model.Estado)
+                            @if (User.HasClaim("permission", DocinadeApp.Models.Permissions.ApplicationPermissions.Instituciones.ELIMINAR) && Model.Estado)
                             {
                                 <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
                                     <i class="fas fa-trash"></i> Eliminar Institución

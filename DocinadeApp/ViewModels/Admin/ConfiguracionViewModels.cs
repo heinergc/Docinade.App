@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations;
-using RubricasApp.Web.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using DocinadeApp.Models;
 
-namespace RubricasApp.Web.ViewModels.Admin
+namespace DocinadeApp.ViewModels.Admin
 {
     /// <summary>
     /// ViewModel base para las páginas de administración

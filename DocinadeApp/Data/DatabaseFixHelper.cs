@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 
-namespace RubricasApp.Web.Data
+namespace DocinadeApp.Data
 {
     public static class DatabaseFixHelper
     {

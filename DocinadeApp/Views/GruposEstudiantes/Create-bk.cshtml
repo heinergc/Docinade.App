@@ -1,4 +1,4 @@
-@model RubricasApp.Web.ViewModels.Grupos.CrearGrupoViewModel
+ï»¿@model DocinadeApp.ViewModels.Grupos.CrearGrupoViewModel
 
 @{
     ViewData["Title"] = "Crear Grupo";
@@ -31,27 +31,27 @@
             <div class="card-header">
                 <h5 class="mb-0">
                     <i class="fas fa-info-circle me-2"></i>
-                    Información del Grupo
+                    Informaciï¿½n del Grupo
                 </h5>
             </div>
             <div class="card-body">
                 <form asp-action="Create" method="post" id="createGroupForm">
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
                     
-                    <!-- Información básica -->
+                    <!-- Informaciï¿½n bï¿½sica -->
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group mb-3">
-                                <label asp-for="Codigo" class="form-label required">Código del Grupo</label>
+                                <label asp-for="Codigo" class="form-label required">Cï¿½digo del Grupo</label>
                                 <input asp-for="Codigo" class="form-control" placeholder="Ej: 7-1, G1, VIRT-A" maxlength="20" />
                                 <span asp-validation-for="Codigo" class="text-danger"></span>
-                                <div class="form-text">Código único identificador del grupo</div>
+                                <div class="form-text">Cï¿½digo ï¿½nico identificador del grupo</div>
                             </div>
                         </div>
                         <div class="col-md-8">
                             <div class="form-group mb-3">
                                 <label asp-for="Nombre" class="form-label required">Nombre del Grupo</label>
-                                <input asp-for="Nombre" class="form-control" placeholder="Ej: Séptimo Sección 1" maxlength="100" />
+                                <input asp-for="Nombre" class="form-control" placeholder="Ej: Sï¿½ptimo Secciï¿½n 1" maxlength="100" />
                                 <span asp-validation-for="Nombre" class="text-danger"></span>
                                 <div class="form-text">Nombre descriptivo del grupo</div>
                             </div>
@@ -64,7 +64,7 @@
                                 <label asp-for="TipoGrupo" class="form-label required">Tipo de Grupo</label>
                                 <select asp-for="TipoGrupo" class="form-select" id="tipoGrupoSelect">
                                     <option value="">Seleccione un tipo</option>
-                                    <option value="Seccion">Sección</option>
+                                    <option value="Seccion">Secciï¿½n</option>
                                     <option value="Nivel">Nivel</option>
                                     <option value="Modalidad">Modalidad</option>
                                     <option value="Custom">Personalizado</option>
@@ -74,10 +74,10 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label asp-for="Nivel" class="form-label">Nivel Académico</label>
+                                <label asp-for="Nivel" class="form-label">Nivel Acadï¿½mico</label>
                                 <input asp-for="Nivel" class="form-control" placeholder="Ej: SEPTIMO, OCTAVO, VIRTUAL" maxlength="50" />
                                 <span asp-validation-for="Nivel" class="text-danger"></span>
-                                <div class="form-text">Opcional: Especifica el nivel académico</div>
+                                <div class="form-text">Opcional: Especifica el nivel acadï¿½mico</div>
                             </div>
                         </div>
                     </div>
@@ -85,9 +85,9 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label asp-for="PeriodoAcademicoId" class="form-label required">Período Académico</label>
+                                <label asp-for="PeriodoAcademicoId" class="form-label required">Perï¿½odo Acadï¿½mico</label>
                                 <select asp-for="PeriodoAcademicoId" class="form-select" id="periodoSelect">
-                                    <option value="">Seleccione un período</option>
+                                    <option value="">Seleccione un perï¿½odo</option>
                                     @if (ViewBag.PeriodosAcademicos != null)
                                     {
                                         @foreach (var periodo in (List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.PeriodosAcademicos)
@@ -103,19 +103,19 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label asp-for="CapacidadMaxima" class="form-label">Capacidad Máxima</label>
+                                <label asp-for="CapacidadMaxima" class="form-label">Capacidad Mï¿½xima</label>
                                 <input asp-for="CapacidadMaxima" type="number" class="form-control" 
-                                       placeholder="Opcional: Límite de estudiantes" min="1" max="200" />
+                                       placeholder="Opcional: Lï¿½mite de estudiantes" min="1" max="200" />
                                 <span asp-validation-for="CapacidadMaxima" class="text-danger"></span>
-                                <div class="form-text">Dejar vacío para capacidad ilimitada</div>
+                                <div class="form-text">Dejar vacï¿½o para capacidad ilimitada</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="form-group mb-3">
-                        <label asp-for="Descripcion" class="form-label">Descripción</label>
+                        <label asp-for="Descripcion" class="form-label">Descripciï¿½n</label>
                         <textarea asp-for="Descripcion" class="form-control" rows="3" 
-                                  placeholder="Descripción opcional del grupo..." maxlength="500"></textarea>
+                                  placeholder="Descripciï¿½n opcional del grupo..." maxlength="500"></textarea>
                         <span asp-validation-for="Descripcion" class="text-danger"></span>
                         <div class="form-text">
                             <span id="descripcionCounter">0</span>/500 caracteres
@@ -152,7 +152,7 @@
                                     }
                                 </div>
                                 <div class="form-text mt-2">
-                                    Seleccione las materias que estarán asociadas a este grupo
+                                    Seleccione las materias que estarï¿½n asociadas a este grupo
                                 </div>
                             </div>
                         </div>
@@ -168,7 +168,7 @@
                         </div>
                     </div>
 
-                    <!-- Botones de acción -->
+                    <!-- Botones de acciï¿½n -->
                     <div class="row">
                         <div class="col-12">
                             <hr>
@@ -198,7 +198,7 @@
     
     <script>
         $(document).ready(function() {
-            // Contador de caracteres para descripción
+            // Contador de caracteres para descripciï¿½n
             $('#Descripcion').on('input', function() {
                 const length = $(this).val().length;
                 $('#descripcionCounter').text(length);
@@ -222,7 +222,7 @@
                 }
             });
 
-            // Auto-generar nombre basado en tipo y código
+            // Auto-generar nombre basado en tipo y cï¿½digo
             $('#generateNameBtn').click(function() {
                 const codigo = $('#Codigo').val();
                 const tipo = $('#TipoGrupo').val();
@@ -230,8 +230,8 @@
                 
                 if (!codigo || !tipo) {
                     Swal.fire({
-                        title: 'Información faltante',
-                        text: 'Por favor, complete el código y tipo de grupo antes de auto-generar el nombre.',
+                        title: 'Informaciï¿½n faltante',
+                        text: 'Por favor, complete el cï¿½digo y tipo de grupo antes de auto-generar el nombre.',
                         icon: 'warning'
                     });
                     return;
@@ -242,9 +242,9 @@
                 switch(tipo) {
                     case 'Seccion':
                         if (nivel) {
-                            nombreGenerado = `${nivel} Sección ${codigo}`;
+                            nombreGenerado = `${nivel} Secciï¿½n ${codigo}`;
                         } else {
-                            nombreGenerado = `Sección ${codigo}`;
+                            nombreGenerado = `Secciï¿½n ${codigo}`;
                         }
                         break;
                     case 'Nivel':
@@ -280,14 +280,14 @@
                 });
             });
 
-            // Validación en tiempo real del código
+            // Validaciï¿½n en tiempo real del cï¿½digo
             $('#Codigo').on('blur', function() {
                 const codigo = $(this).val();
                 const periodoId = $('#PeriodoAcademicoId').val();
                 
                 if (codigo && periodoId) {
-                    // Aquí podrías implementar validación AJAX para verificar código único
-                    console.log('Validando código único:', codigo, 'en período:', periodoId);
+                    // Aquï¿½ podrï¿½as implementar validaciï¿½n AJAX para verificar cï¿½digo ï¿½nico
+                    console.log('Validando cï¿½digo ï¿½nico:', codigo, 'en perï¿½odo:', periodoId);
                 }
             });
 
@@ -318,7 +318,7 @@
                 }
             });
 
-            // Validación del formulario antes de envío
+            // Validaciï¿½n del formulario antes de envï¿½o
             $('#createGroupForm').on('submit', function(e) {
                 const codigo = $('#Codigo').val().trim();
                 const nombre = $('#Nombre').val().trim();

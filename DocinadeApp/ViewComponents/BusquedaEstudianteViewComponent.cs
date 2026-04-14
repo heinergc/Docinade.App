@@ -1,9 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using RubricasApp.Web.Data;
+using DocinadeApp.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace RubricasApp.Web.ViewComponents
+namespace DocinadeApp.ViewComponents
 {
     public class BusquedaEstudianteViewComponent : ViewComponent
     {

@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Identity;
-using RubricasApp.Web.Models.Identity;
-using RubricasApp.Web.Models.Permissions;
+﻿using Microsoft.AspNetCore.Identity;
+using DocinadeApp.Models.Identity;
+using DocinadeApp.Models.Permissions;
 
-namespace RubricasApp.Web.Services.Identity
+namespace DocinadeApp.Services.Identity
 {
     public class IdentitySeederService
     {

@@ -1,4 +1,4 @@
-namespace RubricasApp.Web.Models
+﻿namespace DocinadeApp.Models
 {
     /// <summary>
     /// Tipos de período académico

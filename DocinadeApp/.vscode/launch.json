@@ -1,4 +1,4 @@
-{
+﻿{
     "version": "0.2.0",
     "configurations": [
         {
@@ -6,7 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "Build ASP.NET Core Project",
-            "program": "${workspaceFolder}/bin/Debug/net8.0/RubricasApp.Web.dll",
+            "program": "${workspaceFolder}/bin/Debug/net8.0/DocinadeApp.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
@@ -31,7 +31,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "Build ASP.NET Core Project",
-            "program": "${workspaceFolder}/bin/Debug/net8.0/RubricasApp.Web.dll",
+            "program": "${workspaceFolder}/bin/Debug/net8.0/DocinadeApp.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
@@ -57,7 +57,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "Build ASP.NET Core Project",
-            "program": "${workspaceFolder}/bin/Debug/net8.0/RubricasApp.Web.dll",
+            "program": "${workspaceFolder}/bin/Debug/net8.0/DocinadeApp.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

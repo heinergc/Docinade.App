@@ -1,9 +1,9 @@
-using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.DTOs.Calificador;
-using RubricasApp.Web.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using DocinadeApp.Data;
+using DocinadeApp.DTOs.Calificador;
+using DocinadeApp.Models;
 
-namespace RubricasApp.Web.Services.Calificador
+namespace DocinadeApp.Services.Calificador
 {
     public class CalificadorService : ICalificadorService
     {

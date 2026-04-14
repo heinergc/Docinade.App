@@ -1,4 +1,4 @@
-@model RubricasApp.Web.ViewModels.Grupos.DeleteTipoGrupoViewModel
+ï»¿@model DocinadeApp.ViewModels.Grupos.DeleteTipoGrupoViewModel
 
 @{
     ViewData["Title"] = $"Eliminar Tipo: {Model.Nombre}";
@@ -34,22 +34,22 @@
     <div class="col-lg-8">
         @if (Model.PuedeEliminar)
         {
-            <!-- Confirmación de eliminación -->
+            <!-- Confirmaciï¿½n de eliminaciï¿½n -->
             <div class="modern-card border-danger">
                 <div class="card-header bg-danger text-white">
                     <h5 class="mb-0">
                         <i class="fas fa-exclamation-triangle me-2"></i>
-                        Confirmar Eliminación
+                        Confirmar Eliminaciï¿½n
                     </h5>
                 </div>
                 <div class="card-body">
                     <div class="alert alert-warning">
                         <i class="fas fa-exclamation-triangle me-2"></i>
-                        <strong>¿Está seguro que desea eliminar este tipo de grupo?</strong>
-                        <br>Esta acción no se puede deshacer.
+                        <strong>ï¿½Estï¿½ seguro que desea eliminar este tipo de grupo?</strong>
+                        <br>Esta acciï¿½n no se puede deshacer.
                     </div>
 
-                    <!-- Información del tipo a eliminar -->
+                    <!-- Informaciï¿½n del tipo a eliminar -->
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <table class="table table-borderless">
@@ -83,7 +83,7 @@
                         </div>
                     </div>
 
-                    <!-- Formulario de confirmación -->
+                    <!-- Formulario de confirmaciï¿½n -->
                     <form asp-action="Delete" method="post" id="deleteForm">
                         <input asp-for="IdTipoGrupo" type="hidden" />
                         
@@ -97,7 +97,7 @@
                                 </a>
                             </div>
                             <button type="submit" class="btn btn-danger" id="confirmDeleteBtn">
-                                <i class="fas fa-trash"></i> Confirmar Eliminación
+                                <i class="fas fa-trash"></i> Confirmar Eliminaciï¿½n
                             </button>
                         </div>
                     </form>
@@ -121,7 +121,7 @@
                         <br>Tiene @Model.CantidadGrupos grupo(s) asociado(s).
                     </div>
 
-                    <!-- Información del tipo -->
+                    <!-- Informaciï¿½n del tipo -->
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <table class="table table-borderless">
@@ -166,7 +166,7 @@
                                 }
                                 @if (Model.CantidadGrupos > Model.GruposAsociados.Count)
                                 {
-                                    <li class="text-muted">... y @(Model.CantidadGrupos - Model.GruposAsociados.Count) más</li>
+                                    <li class="text-muted">... y @(Model.CantidadGrupos - Model.GruposAsociados.Count) mï¿½s</li>
                                 }
                             </ul>
                         </div>
@@ -176,11 +176,11 @@
                         <h6><i class="fas fa-lightbulb me-2"></i>Para eliminar este tipo:</h6>
                         <ol class="mb-0">
                             <li>Elimine o cambie el tipo de todos los grupos asociados</li>
-                            <li>Vuelva a intentar la eliminación</li>
+                            <li>Vuelva a intentar la eliminaciï¿½n</li>
                         </ol>
                     </div>
 
-                    <!-- Botones de acción -->
+                    <!-- Botones de acciï¿½n -->
                     <div class="d-flex justify-content-between">
                         <div>
                             <a href="@Url.Action("Details", new { id = Model.IdTipoGrupo })" class="btn btn-outline-secondary">
@@ -212,18 +212,18 @@
             @if (Model.PuedeEliminar)
             {
                 <text>
-                // Confirmación adicional para eliminación
+                // Confirmaciï¿½n adicional para eliminaciï¿½n
                 $('#deleteForm').on('submit', function(e) {
                     e.preventDefault();
                     
                     Swal.fire({
-                        title: '¿Está completamente seguro?',
-                        text: 'Esta acción eliminará permanentemente el tipo "@Model.Nombre"',
+                        title: 'ï¿½Estï¿½ completamente seguro?',
+                        text: 'Esta acciï¿½n eliminarï¿½ permanentemente el tipo "@Model.Nombre"',
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#dc3545',
                         cancelButtonColor: '#6c757d',
-                        confirmButtonText: 'Sí, eliminar',
+                        confirmButtonText: 'Sï¿½, eliminar',
                         cancelButtonText: 'Cancelar',
                         reverseButtons: true
                     }).then((result) => {

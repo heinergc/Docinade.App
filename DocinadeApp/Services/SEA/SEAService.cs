@@ -1,14 +1,14 @@
-using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.Models.SEA;
-using RubricasApp.Web.Services.CuadernoCalificador;
-using RubricasApp.Web.ViewModels.SEA;
+﻿using Microsoft.EntityFrameworkCore;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
+using DocinadeApp.Models.SEA;
+using DocinadeApp.Services.CuadernoCalificador;
+using DocinadeApp.ViewModels.SEA;
 using System.Text;
 using System.Text.RegularExpressions;
 using ClosedXML.Excel;
 
-namespace RubricasApp.Web.Services.SEA
+namespace DocinadeApp.Services.SEA
 {
     /// <summary>
     /// Implementación del servicio de reportes SEA (Sistema de Evaluación MEP)

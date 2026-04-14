@@ -1,6 +1,6 @@
-using RubricasApp.Web.Models;
+﻿using DocinadeApp.Models;
 
-namespace RubricasApp.Web.Services
+namespace DocinadeApp.Services
 {
     public interface ISliderService
     {

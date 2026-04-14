@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace RubricasApp.Web.Models.ViewModels
+namespace DocinadeApp.Models.ViewModels
 {
     public class MateriaViewModel
     {

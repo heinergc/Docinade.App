@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
-namespace RubricasApp.Web.ViewComponents
+namespace DocinadeApp.ViewComponents
 {
     /// <summary>
     /// ViewComponent para crear select con búsqueda usando Tom Select o Select2

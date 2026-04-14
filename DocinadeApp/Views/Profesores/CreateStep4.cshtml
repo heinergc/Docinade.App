@@ -1,4 +1,4 @@
-@model RubricasApp.Web.ViewModels.ProfesorViewModel
+﻿@model DocinadeApp.ViewModels.ProfesorViewModel
 @{
     ViewData["Title"] = "Nuevo Profesor - Información Académica";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -612,8 +612,8 @@
     <partial name="_ValidationScriptsPartial" />
     
     <script>
-        let formaciones = @Html.Raw(Json.Serialize(Model.FormacionAcademica ?? new List<RubricasApp.Web.ViewModels.ProfesorFormacionAcademicaDto>()));
-        let capacitaciones = @Html.Raw(Json.Serialize(Model.Capacitaciones ?? new List<RubricasApp.Web.ViewModels.ProfesorCapacitacionDto>()));
+        let formaciones = @Html.Raw(Json.Serialize(Model.FormacionAcademica ?? new List<DocinadeApp.ViewModels.ProfesorFormacionAcademicaDto>()));
+        let capacitaciones = @Html.Raw(Json.Serialize(Model.Capacitaciones ?? new List<DocinadeApp.ViewModels.ProfesorCapacitacionDto>()));
 
         // ===== FUNCIONES PARA FORMACIONES ACADÉMICAS =====
         function mostrarModalFormacion() {

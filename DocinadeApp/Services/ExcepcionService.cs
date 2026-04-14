@@ -1,8 +1,8 @@
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
+﻿using DocinadeApp.Data;
+using DocinadeApp.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace RubricasApp.Web.Services
+namespace DocinadeApp.Services
 {
     public class ExcepcionService : IExcepcionService
     {

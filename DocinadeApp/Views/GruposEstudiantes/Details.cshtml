@@ -1,4 +1,4 @@
-﻿@model RubricasApp.Web.ViewModels.Grupos.DetalleGrupoViewModel
+﻿@model DocinadeApp.ViewModels.Grupos.DetalleGrupoViewModel
 
 @{
     ViewData["Title"] = $"Grupo: {Model.Codigo}";
@@ -108,7 +108,7 @@
                     <i class="fas fa-info-circle fa-2x text-secondary"></i>
                 </div>
                 <h3 class="stat-number">
-                    <span class="badge bg-@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Activo ? "success" : Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Inactivo ? "secondary" : "danger")">
+                    <span class="badge bg-@(Model.Estado == DocinadeApp.Models.EstadoGrupo.Activo ? "success" : Model.Estado == DocinadeApp.Models.EstadoGrupo.Inactivo ? "secondary" : "danger")">
                         @Model.EstadoDisplay
                     </span>
                 </h3>
@@ -369,7 +369,7 @@
                                                         </small>
                                                     </div>
                                                     <div>
-                                                        <span class="badge bg-@(materia.Estado == RubricasApp.Web.Models.EstadoAsignacion.Activo ? "success" : "secondary")">
+                                                        <span class="badge bg-@(materia.Estado == DocinadeApp.Models.EstadoAsignacion.Activo ? "success" : "secondary")">
                                                             @materia.EstadoDisplay
                                                         </span>
                                                         <div class="mt-1">

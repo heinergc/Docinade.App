@@ -1,9 +1,9 @@
-services:
+﻿services:
   - type: web
     name: rubricasapp
     env: dotnet
-    buildCommand: dotnet publish RubricasApp.Web.csproj -c Release -o out
-    startCommand: cd out && dotnet RubricasApp.Web.dll
+    buildCommand: dotnet publish DocinadeApp.csproj -c Release -o out
+    startCommand: cd out && dotnet DocinadeApp.dll
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production

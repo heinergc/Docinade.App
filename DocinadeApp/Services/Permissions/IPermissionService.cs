@@ -1,6 +1,6 @@
-using RubricasApp.Web.Models.Permissions;
+﻿using DocinadeApp.Models.Permissions;
 
-namespace RubricasApp.Web.Services.Permissions
+namespace DocinadeApp.Services.Permissions
 {
     /// <summary>
     /// Interfaz para el servicio de permisos

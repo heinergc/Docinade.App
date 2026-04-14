@@ -1,4 +1,4 @@
-namespace RubricasApp.Web.ViewModels.Shared
+﻿namespace DocinadeApp.ViewModels.Shared
 {
     public class PeriodoAcademicoDropdownViewModel
     {

@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
-namespace RubricasApp.Web.Models.Identity
+namespace DocinadeApp.Models.Identity
 {
     /// <summary>
     /// Usuario del sistema con propiedades extendidas para el contexto académico

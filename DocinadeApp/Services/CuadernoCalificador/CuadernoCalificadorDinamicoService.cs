@@ -1,12 +1,12 @@
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.ViewModels;
+using DocinadeApp.Data;
+using DocinadeApp.ViewModels;
 using ClosedXML.Excel;
 using System.Text;
-using RubricasApp.Web.Extensions;
+using DocinadeApp.Extensions;
 
-namespace RubricasApp.Web.Services.CuadernoCalificador
+namespace DocinadeApp.Services.CuadernoCalificador
 {
     public class CuadernoCalificadorDinamicoService : ICuadernoCalificadorDinamicoService
     {

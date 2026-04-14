@@ -1,6 +1,6 @@
-using RubricasApp.Web.Models;
+﻿using DocinadeApp.Models;
 
-namespace RubricasApp.Web.Services.CuadernoCalificador
+namespace DocinadeApp.Services.CuadernoCalificador
 {
     public interface ICuadernoCalificadorService
     {

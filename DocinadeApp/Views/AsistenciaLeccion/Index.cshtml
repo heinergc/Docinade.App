@@ -1,9 +1,9 @@
-@model List<RubricasApp.Web.Models.Leccion>
+﻿@model List<DocinadeApp.Models.Leccion>
 @{
     ViewData["Title"] = "Asistencia por Lección";
     var grupoSeleccionado = ViewBag.GrupoSeleccionado as int?;
     var fechaSeleccionada = ViewBag.FechaSeleccionada as DateTime? ?? DateTime.Today;
-    var grupo = ViewBag.Grupo as RubricasApp.Web.Models.GrupoEstudiante;
+    var grupo = ViewBag.Grupo as DocinadeApp.Models.GrupoEstudiante;
 }
 
 <div class="container-fluid py-4">

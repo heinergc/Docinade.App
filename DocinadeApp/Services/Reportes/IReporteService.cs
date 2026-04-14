@@ -1,16 +1,16 @@
-using RubricasApp.Web.ViewModels.Reportes;
+ï»¿using DocinadeApp.ViewModels.Reportes;
 
-namespace RubricasApp.Web.Services.Reportes
+namespace DocinadeApp.Services.Reportes
 {
     public interface IReporteService
     {
         /// <summary>
-        /// Genera el reporte en árbol completo del sistema de evaluaciones
+        /// Genera el reporte en ï¿½rbol completo del sistema de evaluaciones
         /// </summary>
         Task<ReporteArbolViewModel> GenerarReporteArbolAsync(FiltrosReporte filtros);
         
         /// <summary>
-        /// Ejecuta la consulta jerárquica principal
+        /// Ejecuta la consulta jerï¿½rquica principal
         /// </summary>
         Task<List<DatoJerarquico>> EjecutarConsultaJerarquicaAsync(FiltrosReporte filtros);
         
@@ -25,12 +25,12 @@ namespace RubricasApp.Web.Services.Reportes
         Task<byte[]> ExportarReporteACSVAsync(FiltrosReporte filtros);
         
         /// <summary>
-        /// Obtiene estadísticas rápidas del sistema
+        /// Obtiene estadï¿½sticas rï¿½pidas del sistema
         /// </summary>
         Task<Dictionary<string, object>> ObtenerEstadisticasRapidasAsync();
         
         /// <summary>
-        /// Cuenta el total de nodos en el árbol
+        /// Cuenta el total de nodos en el ï¿½rbol
         /// </summary>
         int ContarNodos(ReporteArbolViewModel reporte);
     }

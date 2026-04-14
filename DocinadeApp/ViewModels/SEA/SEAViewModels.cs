@@ -1,7 +1,7 @@
-using RubricasApp.Web.Models.SEA;
+﻿using DocinadeApp.Models.SEA;
 using System.ComponentModel.DataAnnotations;
 
-namespace RubricasApp.Web.ViewModels.SEA
+namespace DocinadeApp.ViewModels.SEA
 {
     /// <summary>
     /// ViewModel principal para el Reporte SEA por periodo

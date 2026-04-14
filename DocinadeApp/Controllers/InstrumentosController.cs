@@ -1,10 +1,10 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     public class InstrumentosController : Controller
     {

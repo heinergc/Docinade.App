@@ -1,4 +1,4 @@
-@model RubricasApp.Web.ViewModels.Admin.ConfiguracionIndexViewModel
+﻿@model DocinadeApp.ViewModels.Admin.ConfiguracionIndexViewModel
 
 @{
     ViewData["Title"] = "Configuración del Sistema";
@@ -214,14 +214,14 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="alert alert-@(Model.ModoRegistroActual == RubricasApp.Web.Models.ModoRegistroUsuarios.Abierto ? "success" : "warning")" role="alert">
+                            <div class="alert alert-@(Model.ModoRegistroActual == DocinadeApp.Models.ModoRegistroUsuarios.Abierto ? "success" : "warning")" role="alert">
                                 <h6 class="alert-heading">
-                                    <i class="fas fa-@(Model.ModoRegistroActual == RubricasApp.Web.Models.ModoRegistroUsuarios.Abierto ? "unlock" : "lock")"></i>
+                                    <i class="fas fa-@(Model.ModoRegistroActual == DocinadeApp.Models.ModoRegistroUsuarios.Abierto ? "unlock" : "lock")"></i>
                                     Estado actual del registro
                                 </h6>
                                 <p class="mb-0">
                                     El registro de usuarios está actualmente 
-                                    <strong>@(Model.ModoRegistroActual == RubricasApp.Web.Models.ModoRegistroUsuarios.Abierto ? "ABIERTO" : "CERRADO")</strong>
+                                    <strong>@(Model.ModoRegistroActual == DocinadeApp.Models.ModoRegistroUsuarios.Abierto ? "ABIERTO" : "CERRADO")</strong>
                                 </p>
                             </div>
                             
@@ -230,12 +230,12 @@
                                 <div class="mb-3">
                                     <label class="form-label">Modo de Registro</label>
                                     <select name="ModoRegistro" class="form-select" required>
-                                        <option value="@RubricasApp.Web.Models.ModoRegistroUsuarios.Abierto" 
-                                                selected="@(Model.ModoRegistroActual == RubricasApp.Web.Models.ModoRegistroUsuarios.Abierto)">
+                                        <option value="@DocinadeApp.Models.ModoRegistroUsuarios.Abierto" 
+                                                selected="@(Model.ModoRegistroActual == DocinadeApp.Models.ModoRegistroUsuarios.Abierto)">
                                             Abierto - Los usuarios pueden registrarse libremente
                                         </option>
-                                        <option value="@RubricasApp.Web.Models.ModoRegistroUsuarios.Cerrado" 
-                                                selected="@(Model.ModoRegistroActual == RubricasApp.Web.Models.ModoRegistroUsuarios.Cerrado)">
+                                        <option value="@DocinadeApp.Models.ModoRegistroUsuarios.Cerrado" 
+                                                selected="@(Model.ModoRegistroActual == DocinadeApp.Models.ModoRegistroUsuarios.Cerrado)">
                                             Cerrado - Solo administradores pueden crear usuarios
                                         </option>
                                     </select>

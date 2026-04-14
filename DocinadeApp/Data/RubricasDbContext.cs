@@ -1,12 +1,12 @@
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.Models.Identity;
-using RubricasApp.Web.Models.Audit;
-using RubricasApp.Web.Models.Academic;
-using RubricasApp.Web.Models.SEA;
+using DocinadeApp.Models;
+using DocinadeApp.Models.Identity;
+using DocinadeApp.Models.Audit;
+using DocinadeApp.Models.Academic;
+using DocinadeApp.Models.SEA;
 
-namespace RubricasApp.Web.Data
+namespace DocinadeApp.Data
 {
     public class RubricasDbContext : IdentityDbContext<ApplicationUser>
     {

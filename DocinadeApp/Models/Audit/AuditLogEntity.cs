@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace RubricasApp.Web.Models.Audit
+namespace DocinadeApp.Models.Audit
 {
     /// <summary>
     /// Registro de auditoría para seguimiento de acciones de usuarios

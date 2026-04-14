@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace RubricasApp.Web.Models.ViewModels
+namespace DocinadeApp.Models.ViewModels
 {
     public class AsignarInstrumentosVm
     {

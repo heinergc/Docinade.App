@@ -1,4 +1,4 @@
-namespace RubricasApp.Web.ViewModels.Admin
+﻿namespace DocinadeApp.ViewModels.Admin
 {
     /// <summary>
     /// ViewModel base para administración

@@ -1,4 +1,4 @@
-namespace RubricasApp.Web.Models.SEA
+﻿namespace DocinadeApp.Models.SEA
 {
     /// <summary>
     /// Constantes para los componentes de evaluación del sistema SEA del MEP

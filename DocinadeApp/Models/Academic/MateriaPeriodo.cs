@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace RubricasApp.Web.Models.Academic
+namespace DocinadeApp.Models.Academic
 {
     /// <summary>
     /// Representa la oferta de una materia en un período académico específico

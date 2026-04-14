@@ -1,4 +1,4 @@
-@{
+﻿@{
     ViewData["Title"] = "Sistema de Asistencia";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -59,7 +59,7 @@
                                     <option value="">Todos los grupos</option>
                                     @if (ViewBag.Grupos != null)
                                     {
-                                        @foreach (var grupo in (List<RubricasApp.Web.Models.GrupoEstudiante>)ViewBag.Grupos)
+                                        @foreach (var grupo in (List<DocinadeApp.Models.GrupoEstudiante>)ViewBag.Grupos)
                                         {
                                             <option value="@grupo.GrupoId" 
                                                     data-estudiantes="@grupo.EstudianteGrupos.Count"
@@ -123,17 +123,17 @@
                     <h5 class="mb-0">
                         <i class="fas fa-users"></i> 
                         Grupos Disponibles
-                        @if (ViewBag.Grupos != null && ((List<RubricasApp.Web.Models.GrupoEstudiante>)ViewBag.Grupos).Any())
+                        @if (ViewBag.Grupos != null && ((List<DocinadeApp.Models.GrupoEstudiante>)ViewBag.Grupos).Any())
                         {
-                            <span class="badge bg-primary ms-2">@(((List<RubricasApp.Web.Models.GrupoEstudiante>)ViewBag.Grupos).Count)</span>
+                            <span class="badge bg-primary ms-2">@(((List<DocinadeApp.Models.GrupoEstudiante>)ViewBag.Grupos).Count)</span>
                         }
                     </h5>
                 </div>
                 <div class="card-body">
-                    @if (ViewBag.Grupos != null && ((List<RubricasApp.Web.Models.GrupoEstudiante>)ViewBag.Grupos).Any())
+                    @if (ViewBag.Grupos != null && ((List<DocinadeApp.Models.GrupoEstudiante>)ViewBag.Grupos).Any())
                     {
                         <div class="row">
-                            @foreach (var grupo in (List<RubricasApp.Web.Models.GrupoEstudiante>)ViewBag.Grupos)
+                            @foreach (var grupo in (List<DocinadeApp.Models.GrupoEstudiante>)ViewBag.Grupos)
                             {
                                 <div class="col-md-6 col-lg-4 mb-3">
                                     <div class="card border-primary h-100">

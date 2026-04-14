@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace RubricasApp.Web.Models.SEA
+namespace DocinadeApp.Models.SEA
 {
     /// <summary>
     /// Configuración que mapea InstrumentosEvaluacion a componentes del sistema SEA del MEP

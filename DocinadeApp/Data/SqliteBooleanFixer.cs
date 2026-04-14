@@ -1,8 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
+ï»¿using Microsoft.EntityFrameworkCore;
+using DocinadeApp.Data;
 using System.Data;
 
-namespace RubricasApp.Web.Data
+namespace DocinadeApp.Data
 {
     public static class SqliteBooleanFixer
     {
@@ -96,7 +96,7 @@ namespace RubricasApp.Web.Data
         }
         
         /// <summary>
-        /// Convierte explícitamente los valores string boolean a enteros para SQLite
+        /// Convierte explï¿½citamente los valores string boolean a enteros para SQLite
         /// </summary>
         public static int BooleanToSqliteInt(bool value)
         {

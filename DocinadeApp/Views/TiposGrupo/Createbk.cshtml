@@ -1,4 +1,4 @@
-@model RubricasApp.Web.ViewModels.Grupos.CreateTipoGrupoViewModel
+ï»¿@model DocinadeApp.ViewModels.Grupos.CreateTipoGrupoViewModel
 
 @{
     ViewData["Title"] = "Crear Tipo de Grupo";
@@ -36,7 +36,7 @@
             <div class="card-header">
                 <h5 class="mb-0">
                     <i class="fas fa-info-circle me-2"></i>
-                    Información del Tipo de Grupo
+                    Informaciï¿½n del Tipo de Grupo
                 </h5>
             </div>
             <div class="card-body">
@@ -45,7 +45,7 @@
 
                     <div class="form-group mb-3">
                         <label asp-for="Nombre" class="form-label required">Nombre</label>
-                        <input asp-for="Nombre" class="form-control" placeholder="Ej: Sección, Nivel, Modalidad" maxlength="100" />
+                        <input asp-for="Nombre" class="form-control" placeholder="Ej: Secciï¿½n, Nivel, Modalidad" maxlength="100" />
                         <span asp-validation-for="Nombre" class="text-danger"></span>
                         <div class="form-text">Nombre descriptivo del tipo de grupo</div>
                     </div>
@@ -53,7 +53,7 @@
                     <div class="form-group mb-3">
                         <label asp-for="Estado" class="form-label required">Estado</label>
                         <select asp-for="Estado" class="form-select">
-                            @foreach (var estado in ViewBag.EstadosDisponibles as List<RubricasApp.Web.Controllers.EstadoOption>)
+                            @foreach (var estado in ViewBag.EstadosDisponibles as List<DocinadeApp.Controllers.EstadoOption>)
                             {
                                 <option value="@estado.Valor" 
                                         selected="@(Model.Estado == estado.Valor)">
@@ -65,7 +65,7 @@
                         <div class="form-text">Estado inicial del tipo de grupo</div>
                     </div>
 
-                    <!-- Botones de acción -->
+                    <!-- Botones de acciï¿½n -->
                     <div class="row">
                         <div class="col-12">
                             <hr>
@@ -90,7 +90,7 @@
     
     <script>
         $(document).ready(function() {
-            // Validación del formulario
+            // Validaciï¿½n del formulario
             $('#createTipoForm').on('submit', function(e) {
                 const nombre = $('#Nombre').val().trim();
                 

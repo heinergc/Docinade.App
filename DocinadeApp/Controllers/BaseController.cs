@@ -1,12 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.Services;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
+using DocinadeApp.Services;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     public abstract class BaseController : Controller
     {

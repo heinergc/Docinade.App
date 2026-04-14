@@ -1,10 +1,10 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     public class TestImportController : Controller
     {
@@ -430,7 +430,7 @@ namespace RubricasApp.Web.Controllers
                 try
                 {
                     using var scope = HttpContext.RequestServices.CreateScope();
-                    var periodosService = scope.ServiceProvider.GetService<RubricasApp.Web.Services.Academic.IPeriodosAcademicosService>();
+                    var periodosService = scope.ServiceProvider.GetService<DocinadeApp.Services.Academic.IPeriodosAcademicosService>();
 
                     if (periodosService == null)
                     {
@@ -515,14 +515,14 @@ namespace RubricasApp.Web.Controllers
                 diagnostics.Add("✅ AutoMapper is registered correctly");
 
                 // Test mappings
-                var testPeriodo = new RubricasApp.Web.Models.PeriodoAcademico
+                var testPeriodo = new DocinadeApp.Models.PeriodoAcademico
                 {
                     Id = 1,
                     Codigo = "TEST",
                     Nombre = "Test Period",
                     Anio = 2025,
                     Ciclo = "I-2025",
-                    Tipo = RubricasApp.Web.Models.TipoPeriodo.Cuatrimestre,
+                    Tipo = DocinadeApp.Models.TipoPeriodo.Cuatrimestre,
                     NumeroPeriodo = 1,
                     FechaInicio = DateTime.Now,
                     FechaFin = DateTime.Now.AddDays(120),
@@ -532,7 +532,7 @@ namespace RubricasApp.Web.Controllers
 
                 try
                 {
-                    var periodoVm = mapper.Map<RubricasApp.Web.ViewModels.Academic.PeriodoVm>(testPeriodo);
+                    var periodoVm = mapper.Map<DocinadeApp.ViewModels.Academic.PeriodoVm>(testPeriodo);
                     diagnostics.Add($"✅ PeriodoAcademico -> PeriodoVm mapping works: {periodoVm.Nombre}");
                 }
                 catch (Exception mapEx)
@@ -542,7 +542,7 @@ namespace RubricasApp.Web.Controllers
 
                 try
                 {
-                    var periodoListVm = mapper.Map<RubricasApp.Web.ViewModels.Academic.PeriodoListVm>(testPeriodo);
+                    var periodoListVm = mapper.Map<DocinadeApp.ViewModels.Academic.PeriodoListVm>(testPeriodo);
                     diagnostics.Add($"✅ PeriodoAcademico -> PeriodoListVm mapping works: {periodoListVm.Nombre}");
                 }
                 catch (Exception mapEx)

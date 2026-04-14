@@ -1,11 +1,11 @@
-using RubricasApp.Web.ViewModels;
+ï»¿using DocinadeApp.ViewModels;
 
-namespace RubricasApp.Web.Services.CuadernoCalificador
+namespace DocinadeApp.Services.CuadernoCalificador
 {
     public interface ICuadernoCalificadorDinamicoService
     {
         /// <summary>
-        /// Genera el cuaderno calificador dinámicamente basado en las evaluaciones existentes
+        /// Genera el cuaderno calificador dinï¿½micamente basado en las evaluaciones existentes
         /// </summary>
         Task<CuadernoCalificadorDinamicoViewModel> GenerarCuadernoCalificadorAsync(int? materiaId, int? periodoAcademicoId);
         
@@ -15,7 +15,7 @@ namespace RubricasApp.Web.Services.CuadernoCalificador
         Task<List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>> ObtenerMateriasDisponiblesAsync();
         
         /// <summary>
-        /// Obtiene los períodos académicos disponibles para filtrar
+        /// Obtiene los perï¿½odos acadï¿½micos disponibles para filtrar
         /// </summary>
         Task<List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>> ObtenerPeriodosDisponiblesAsync();
         
@@ -25,7 +25,7 @@ namespace RubricasApp.Web.Services.CuadernoCalificador
         Task<byte[]> ExportarCuadernoAExcelAsync(int? materiaId, int? periodoAcademicoId);
         
         /// <summary>
-        /// Obtiene estadísticas rápidas para el dashboard
+        /// Obtiene estadï¿½sticas rï¿½pidas para el dashboard
         /// </summary>
         Task<Dictionary<string, object>> ObtenerEstadisticasRapidasAsync(int? materiaId, int? periodoAcademicoId);
         

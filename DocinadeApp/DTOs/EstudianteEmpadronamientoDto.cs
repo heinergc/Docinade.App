@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace RubricasApp.Web.DTOs
+namespace DocinadeApp.DTOs
 {
     public class EstudianteEmpadronamientoDto
     {

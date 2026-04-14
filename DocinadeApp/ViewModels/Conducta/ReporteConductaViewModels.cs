@@ -1,4 +1,4 @@
-namespace RubricasApp.Web.ViewModels.Conducta
+﻿namespace DocinadeApp.ViewModels.Conducta
 {
     /// <summary>
     /// ViewModel para reportes de conducta

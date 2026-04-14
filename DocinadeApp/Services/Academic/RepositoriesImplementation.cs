@@ -1,11 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
-using RubricasApp.Web.Models.Academic;
-using RubricasApp.Web.Services.Academic;
-using RubricasApp.Web.ViewModels.Academic;
+﻿using Microsoft.EntityFrameworkCore;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
+using DocinadeApp.Models.Academic;
+using DocinadeApp.Services.Academic;
+using DocinadeApp.ViewModels.Academic;
 
-namespace RubricasApp.Web.Services.Academic
+namespace DocinadeApp.Services.Academic
 {
     public class PeriodoAcademicoRepositoryImpl : IPeriodoAcademicoRepository
     {

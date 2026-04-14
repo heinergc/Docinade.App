@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Authorization;
-using RubricasApp.Web.Services.Permissions;
+﻿using Microsoft.AspNetCore.Authorization;
+using DocinadeApp.Services.Permissions;
 using System.Security.Claims;
 
-namespace RubricasApp.Web.Authorization
+namespace DocinadeApp.Authorization
 {
     /// <summary>
     /// Manejador de autorización para requisitos de permisos

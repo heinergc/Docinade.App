@@ -1,6 +1,7 @@
 {
     "chat.tools.terminal.autoApprove": {
         "Test-NetConnection": true,
-        "cls": true
+        "cls": true,
+        "ForEach-Object": true
     }
 }

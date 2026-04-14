@@ -1,4 +1,4 @@
-﻿@model RubricasApp.Web.ViewModels.Grupos.CreateTipoGrupoViewModel
+﻿@model DocinadeApp.ViewModels.Grupos.CreateTipoGrupoViewModel
 
 @{
     ViewData["Title"] = "Crear Tipo de Grupo";
@@ -53,7 +53,7 @@
                     <div class="form-group mb-3">
                         <label asp-for="Estado" class="form-label required">Estado</label>
                         <select asp-for="Estado" class="form-select">
-                            @foreach (var estado in ViewBag.EstadosDisponibles as List<RubricasApp.Web.Controllers.EstadoOption>)
+                            @foreach (var estado in ViewBag.EstadosDisponibles as List<DocinadeApp.Controllers.EstadoOption>)
                             {
                                 <option value="@estado.Valor"
                                         selected="@(Model.Estado == estado.Valor)">

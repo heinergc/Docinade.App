@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace RubricasApp.Web.ViewModels.Account
+namespace DocinadeApp.ViewModels.Account
 {
     public class LoginViewModel
     {

@@ -1,9 +1,9 @@
-using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Interfaces;
-using RubricasApp.Web.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using DocinadeApp.Data;
+using DocinadeApp.Interfaces;
+using DocinadeApp.Models;
 
-namespace RubricasApp.Web.Extensions
+namespace DocinadeApp.Extensions
 {
     /// <summary>
     /// Extension methods for DbContext to handle SQL Server execution strategy properly

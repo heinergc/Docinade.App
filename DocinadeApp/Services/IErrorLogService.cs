@@ -1,8 +1,8 @@
-using RubricasApp.Web.Models;
+﻿using DocinadeApp.Models;
 using System;
 using System.Threading.Tasks;
 
-namespace RubricasApp.Web.Services
+namespace DocinadeApp.Services
 {
     public interface IErrorLogService
     {

@@ -1,4 +1,4 @@
-namespace RubricasApp.Web.ViewModels
+﻿namespace DocinadeApp.ViewModels
 {
     /// <summary>
     /// ViewModel para la generación del Curriculum Vitae de profesores

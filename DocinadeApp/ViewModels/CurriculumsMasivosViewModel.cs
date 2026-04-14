@@ -1,4 +1,4 @@
-namespace RubricasApp.Web.ViewModels
+﻿namespace DocinadeApp.ViewModels
 {
     /// <summary>
     /// ViewModel para generación masiva de currículums

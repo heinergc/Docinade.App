@@ -1,4 +1,4 @@
-﻿@model RubricasApp.Web.ViewModels.Grupos.EditTipoGrupoViewModel
+﻿@model DocinadeApp.ViewModels.Grupos.EditTipoGrupoViewModel
 
 @{
     ViewData["Title"] = $"Editar Tipo: {Model.Nombre}";
@@ -65,7 +65,7 @@
                         <div class="form-group">
                             <label asp-for="Estado" class="form-label required">Estado</label>
                             <select asp-for="Estado" class="form-control form-select">
-                                @foreach (var estado in ViewBag.EstadosDisponibles as List<RubricasApp.Web.Controllers.EstadoOption>)
+                                @foreach (var estado in ViewBag.EstadosDisponibles as List<DocinadeApp.Controllers.EstadoOption>)
                                 {
                                     <option value="@estado.Valor"
                                             selected="@(Model.Estado == estado.Valor)">

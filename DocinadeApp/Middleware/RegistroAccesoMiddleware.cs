@@ -1,6 +1,6 @@
-using RubricasApp.Web.Services;
+﻿using DocinadeApp.Services;
 
-namespace RubricasApp.Web.Middleware
+namespace DocinadeApp.Middleware
 {
     public class RegistroAccesoMiddleware
     {

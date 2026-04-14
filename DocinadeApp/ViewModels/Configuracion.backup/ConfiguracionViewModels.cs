@@ -1,7 +1,7 @@
-using RubricasApp.Web.Models;
+﻿using DocinadeApp.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace RubricasApp.Web.ViewModels.Configuracion
+namespace DocinadeApp.ViewModels.Configuracion
 {
     /// <summary>
     /// ViewModel para la página principal de configuración

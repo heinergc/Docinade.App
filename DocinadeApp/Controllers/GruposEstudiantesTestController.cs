@@ -1,10 +1,10 @@
-using Microsoft.AspNetCore.Mvc;
+ï»¿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     [Authorize]
     public class GruposEstudiantesTestController : Controller
@@ -27,11 +27,11 @@ namespace RubricasApp.Web.Controllers
             {
                 _logger.LogInformation("?? Iniciando prueba de acceso a grupos...");
 
-                // Verificar conexión a la base de datos
+                // Verificar conexiï¿½n a la base de datos
                 var canConnect = await _context.Database.CanConnectAsync();
-                _logger.LogInformation($"? Conexión DB: {canConnect}");
+                _logger.LogInformation($"? Conexiï¿½n DB: {canConnect}");
 
-                // Consulta básica sin includes para probar
+                // Consulta bï¿½sica sin includes para probar
                 var gruposBasicos = await _context.GruposEstudiantes.ToListAsync();
                 _logger.LogInformation($"? Grupos encontrados: {gruposBasicos.Count}");
 
@@ -69,9 +69,9 @@ namespace RubricasApp.Web.Controllers
             {
                 var resultados = new List<string>();
 
-                // Test 1: Conexión básica
+                // Test 1: Conexiï¿½n bï¿½sica
                 var canConnect = await _context.Database.CanConnectAsync();
-                resultados.Add($"?? Conexión DB: {(canConnect ? "? OK" : "? FALLO")}");
+                resultados.Add($"?? Conexiï¿½n DB: {(canConnect ? "? OK" : "? FALLO")}");
 
                 // Test 2: Contar grupos
                 var countGrupos = await _context.GruposEstudiantes.CountAsync();
@@ -96,9 +96,9 @@ namespace RubricasApp.Web.Controllers
                     }
                 }
 
-                // Test 5: Períodos académicos
+                // Test 5: Perï¿½odos acadï¿½micos
                 var periodos = await _context.PeriodosAcademicos.CountAsync();
-                resultados.Add($"?? Períodos académicos: {periodos}");
+                resultados.Add($"?? Perï¿½odos acadï¿½micos: {periodos}");
 
                 // Test 6: Estudiantes
                 var estudiantes = await _context.Estudiantes.CountAsync();

@@ -1,8 +1,8 @@
-@model RubricasApp.Web.DTOs.Calificador.CuadernoCalificadorDto
+ï»¿@model DocinadeApp.DTOs.Calificador.CuadernoCalificadorDto
 
 @{
     ViewData["Title"] = $"Cuaderno Calificador - {Model.MateriaNombre}";
-    var query = ViewBag.Query as RubricasApp.Web.DTOs.Calificador.CalificadorQueryDto;
+    var query = ViewBag.Query as DocinadeApp.DTOs.Calificador.CalificadorQueryDto;
 }
 
 <div class="container-fluid">
@@ -41,7 +41,7 @@
                 </div>
             </div>
 
-            <!-- Estadísticas rápidas -->
+            <!-- Estadï¿½sticas rï¿½pidas -->
             <div class="row mb-3">
                 <div class="col-md-3">
                     <div class="card border-primary">
@@ -134,7 +134,7 @@
                                                 }
                                                 else
                                                 {
-                                                    <span class="text-muted">—</span>
+                                                    <span class="text-muted">ï¿½</span>
                                                 }
                                             </td>
                                         }
@@ -174,19 +174,19 @@
                 </div>
             </div>
 
-            <!-- Información adicional -->
+            <!-- Informaciï¿½n adicional -->
             <div class="row mt-3">
                 <div class="col-md-6">
                     <div class="card border-info">
                         <div class="card-header bg-info text-white py-2">
-                            <h6 class="mb-0"><i class="fas fa-info-circle"></i> Información del Cálculo</h6>
+                            <h6 class="mb-0"><i class="fas fa-info-circle"></i> Informaciï¿½n del Cï¿½lculo</h6>
                         </div>
                         <div class="card-body py-2">
                             <small>
-                                <strong>Modo de cálculo:</strong> @(query?.ModoCalculo ?? "PROMEDIO")<br>
+                                <strong>Modo de cï¿½lculo:</strong> @(query?.ModoCalculo ?? "PROMEDIO")<br>
                                 <strong>Valor por defecto:</strong> @(query?.ValorPorDefecto.ToString("F2") ?? "0.00")<br>
-                                <strong>Incluye inactivos:</strong> @(query?.IncluirInactivos == true ? "Sí" : "No")<br>
-                                <strong>Fórmula:</strong> Total = ?(Calificación_Instrumento × Ponderación_%)
+                                <strong>Incluye inactivos:</strong> @(query?.IncluirInactivos == true ? "Sï¿½" : "No")<br>
+                                <strong>Fï¿½rmula:</strong> Total = ?(Calificaciï¿½n_Instrumento ï¿½ Ponderaciï¿½n_%)
                             </small>
                         </div>
                     </div>
@@ -201,7 +201,7 @@
                                 <span class="text-success"><i class="fas fa-square"></i></span> ? 70: Excelente<br>
                                 <span class="text-warning"><i class="fas fa-square"></i></span> 60-69: Bueno<br>
                                 <span class="text-danger"><i class="fas fa-square"></i></span> 1-59: Insuficiente<br>
-                                <span class="text-muted"><i class="fas fa-square"></i></span> 0: Sin calificación
+                                <span class="text-muted"><i class="fas fa-square"></i></span> 0: Sin calificaciï¿½n
                             </small>
                         </div>
                     </div>
@@ -214,7 +214,7 @@
 @section Scripts {
     <script>
         $(document).ready(function() {
-            // Función de impresión
+            // Funciï¿½n de impresiï¿½n
             $('#btn-print').on('click', function() {
                 window.print();
             });
@@ -232,7 +232,7 @@
             // Tooltip para encabezados largos
             $('th[title]').tooltip();
             
-            // Mensaje de éxito si todo está correcto
+            // Mensaje de ï¿½xito si todo estï¿½ correcto
             @if (Model.Filas.Any())
             {
                 <text>

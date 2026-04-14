@@ -1,14 +1,14 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.DTOs.Calificador;
-using RubricasApp.Web.Services.Calificador;
+using DocinadeApp.Data;
+using DocinadeApp.DTOs.Calificador;
+using DocinadeApp.Services.Calificador;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Text.Json;
 
-namespace RubricasApp.Web.Controllers
+namespace DocinadeApp.Controllers
 {
     [Authorize]
     public class CalificadorPQ2025Controller : Controller

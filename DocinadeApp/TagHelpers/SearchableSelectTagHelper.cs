@@ -1,11 +1,11 @@
-using Microsoft.AspNetCore.Html;
+﻿using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using System.Text.Encodings.Web;
 
-namespace RubricasApp.Web.TagHelpers
+namespace DocinadeApp.TagHelpers
 {
     /// <summary>
     /// TagHelper para crear select con búsqueda usando Tom Select o Select2

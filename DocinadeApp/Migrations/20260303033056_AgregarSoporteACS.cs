@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace RubricasApp.Web.Migrations
+namespace DocinadeApp.Migrations
 {
     /// <inheritdoc />
     public partial class AgregarSoporteACS : Migration

@@ -1,8 +1,8 @@
-using RubricasApp.Web.Models;
+﻿using DocinadeApp.Models;
 using System.Net;
 using System.Net.Mail;
 
-namespace RubricasApp.Web.Services
+namespace DocinadeApp.Services
 {
     /// <summary>
     /// Implementación del servicio de correo electrónico con SMTP para el Sistema de Rúbricas.

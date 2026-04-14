@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace RubricasApp.Web.DTOs
+namespace DocinadeApp.DTOs
 {
     /// <summary>Datos de evaluación para listados y reportes.</summary>
     public record EvaluacionDto(

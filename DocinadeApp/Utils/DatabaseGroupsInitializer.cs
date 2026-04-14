@@ -1,7 +1,7 @@
-using Microsoft.EntityFrameworkCore;
-using RubricasApp.Web.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using DocinadeApp.Data;
 
-namespace RubricasApp.Web.Utils
+namespace DocinadeApp.Utils
 {
     public static class DatabaseGroupsInitializer
     {
@@ -141,7 +141,7 @@ namespace RubricasApp.Web.Utils
             try
             {
                 // Verificar si ya hay datos
-                var existingGroups = await context.Set<RubricasApp.Web.Models.GrupoEstudiante>().AnyAsync();
+                var existingGroups = await context.Set<DocinadeApp.Models.GrupoEstudiante>().AnyAsync();
                 if (existingGroups)
                 {
                     Console.WriteLine("Ya existen grupos, no se insertan datos de ejemplo.");

@@ -1,4 +1,4 @@
-@model RubricasApp.Web.ViewModels.Grupos.EditTipoGrupoViewModel
+ï»¿@model DocinadeApp.ViewModels.Grupos.EditTipoGrupoViewModel
 
 @{
     ViewData["Title"] = $"Editar Tipo: {Model.Nombre}";
@@ -49,7 +49,7 @@
                     <div class="form-group mb-3">
                         <label class="form-label">ID del Tipo</label>
                         <input value="@Model.IdTipoGrupo" class="form-control" readonly />
-                        <div class="form-text">Identificador único del tipo de grupo</div>
+                        <div class="form-text">Identificador ï¿½nico del tipo de grupo</div>
                     </div>
 
                     <div class="form-group mb-3">
@@ -62,7 +62,7 @@
                     <div class="form-group mb-3">
                         <label asp-for="Estado" class="form-label required">Estado</label>
                         <select asp-for="Estado" class="form-select">
-                            @foreach (var estado in ViewBag.EstadosDisponibles as List<RubricasApp.Web.Controllers.EstadoOption>)
+                            @foreach (var estado in ViewBag.EstadosDisponibles as List<DocinadeApp.Controllers.EstadoOption>)
                             {
                                 <option value="@estado.Valor" 
                                         selected="@(Model.Estado == estado.Valor)">
@@ -76,10 +76,10 @@
                     <div class="form-group mb-3">
                         <label class="form-label">Fecha de Registro</label>
                         <input value="@Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm")" class="form-control" readonly />
-                        <div class="form-text">Fecha de creación del tipo de grupo</div>
+                        <div class="form-text">Fecha de creaciï¿½n del tipo de grupo</div>
                     </div>
 
-                    <!-- Botones de acción -->
+                    <!-- Botones de acciï¿½n -->
                     <div class="row">
                         <div class="col-12">
                             <hr>
@@ -109,7 +109,7 @@
     
     <script>
         $(document).ready(function() {
-            // Validación del formulario
+            // Validaciï¿½n del formulario
             $('#editTipoForm').on('submit', function(e) {
                 const nombre = $('#Nombre').val().trim();
                 

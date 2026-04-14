@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations;
-using RubricasApp.Web.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using DocinadeApp.Models;
 
-namespace RubricasApp.Web.ViewModels.Grupos
+namespace DocinadeApp.ViewModels.Grupos
 {
     // ViewModel para la lista principal
     public class TipoGrupoListViewModel

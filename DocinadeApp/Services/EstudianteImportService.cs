@@ -1,10 +1,10 @@
-using System.Data;
+﻿using System.Data;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
-using RubricasApp.Web.Data;
-using RubricasApp.Web.Models;
+using DocinadeApp.Data;
+using DocinadeApp.Models;
 
-namespace RubricasApp.Web.Services
+namespace DocinadeApp.Services
 {
     public class EstudianteImportService : IEstudianteImportService
     {

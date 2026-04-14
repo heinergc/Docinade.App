@@ -1,4 +1,4 @@
-@model RubricasApp.Web.ViewModels.Grupos.EditarGrupoViewModel
+﻿@model DocinadeApp.ViewModels.Grupos.EditarGrupoViewModel
 
 @{
     ViewData["Title"] = $"Editar Grupo: {Model.Codigo}";
@@ -73,10 +73,10 @@
                                 <label asp-for="TipoGrupo" class="form-label required">Tipo de Grupo</label>
                                 <select asp-for="TipoGrupo" class="form-select" id="tipoGrupoSelect">
                                     <option value="">Seleccione un tipo</option>
-                                    <option value="Seccion" selected="@(Model.TipoGrupo == RubricasApp.Web.Models.TipoGrupo.Seccion)">Secci�n</option>
-                                    <option value="Nivel" selected="@(Model.TipoGrupo == RubricasApp.Web.Models.TipoGrupo.Nivel)">Nivel</option>
-                                    <option value="Modalidad" selected="@(Model.TipoGrupo == RubricasApp.Web.Models.TipoGrupo.Modalidad)">Modalidad</option>
-                                    <option value="Custom" selected="@(Model.TipoGrupo == RubricasApp.Web.Models.TipoGrupo.Custom)">Personalizado</option>
+                                    <option value="Seccion" selected="@(Model.TipoGrupo == DocinadeApp.Models.TipoGrupo.Seccion)">Secci�n</option>
+                                    <option value="Nivel" selected="@(Model.TipoGrupo == DocinadeApp.Models.TipoGrupo.Nivel)">Nivel</option>
+                                    <option value="Modalidad" selected="@(Model.TipoGrupo == DocinadeApp.Models.TipoGrupo.Modalidad)">Modalidad</option>
+                                    <option value="Custom" selected="@(Model.TipoGrupo == DocinadeApp.Models.TipoGrupo.Custom)">Personalizado</option>
                                 </select>
                                 <span asp-validation-for="TipoGrupo" class="text-danger"></span>
                             </div>
@@ -136,10 +136,10 @@
                             <div class="form-group mb-3">
                                 <label asp-for="Estado" class="form-label required">Estado</label>
                                 <select asp-for="Estado" class="form-select" id="estadoSelect">
-                                    <option value="Activo" selected="@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Activo)">Activo</option>
-                                    <option value="Inactivo" selected="@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Inactivo)">Inactivo</option>
-                                    <option value="Cerrado" selected="@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Cerrado)">Cerrado</option>
-                                    <option value="Suspendido" selected="@(Model.Estado == RubricasApp.Web.Models.EstadoGrupo.Suspendido)">Suspendido</option>
+                                    <option value="Activo" selected="@(Model.Estado == DocinadeApp.Models.EstadoGrupo.Activo)">Activo</option>
+                                    <option value="Inactivo" selected="@(Model.Estado == DocinadeApp.Models.EstadoGrupo.Inactivo)">Inactivo</option>
+                                    <option value="Cerrado" selected="@(Model.Estado == DocinadeApp.Models.EstadoGrupo.Cerrado)">Cerrado</option>
+                                    <option value="Suspendido" selected="@(Model.Estado == DocinadeApp.Models.EstadoGrupo.Suspendido)">Suspendido</option>
                                 </select>
                                 <span asp-validation-for="Estado" class="text-danger"></span>
                                 <div class="form-text" id="estadoHelp">

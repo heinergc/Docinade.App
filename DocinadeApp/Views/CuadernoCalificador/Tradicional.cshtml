@@ -1,4 +1,4 @@
-@model List<RubricasApp.Web.Models.CuadernoCalificador>
+ï»¿@model List<DocinadeApp.Models.CuadernoCalificador>
 
 @{
     ViewData["Title"] = "Cuadernos Calificadores Tradicionales";
@@ -21,7 +21,7 @@
         </div>
         <div class="col-auto">
             <a href="@Url.Action("Index")" class="btn btn-primary">
-                <i class="fas fa-table me-1"></i> Cuaderno Dinámico
+                <i class="fas fa-table me-1"></i> Cuaderno Dinï¿½mico
             </a>
             <a href="@Url.Action("Crear")" class="btn btn-success">
                 <i class="fas fa-plus"></i> Nuevo Cuaderno
@@ -40,9 +40,9 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Período Académico</label>
+                    <label class="form-label">Perï¿½odo Acadï¿½mico</label>
                     <select name="periodoAcademicoId" class="form-select" asp-items="ViewBag.Periodos">
-                        <option value="">-- Todos los períodos --</option>
+                        <option value="">-- Todos los perï¿½odos --</option>
                     </select>
                 </div>
                 <div class="col-md-4 d-flex align-items-end">
@@ -73,7 +73,7 @@
                                 <i class="fas fa-book-open"></i> @(cuaderno.Materia?.Nombre ?? "Materia no asignada")
                             </p>
                             <p class="text-muted mb-1">
-                                <i class="fas fa-calendar"></i> @(cuaderno.PeriodoAcademico?.Nombre ?? "Período no asignado")
+                                <i class="fas fa-calendar"></i> @(cuaderno.PeriodoAcademico?.Nombre ?? "Perï¿½odo no asignado")
                             </p>
                             <p class="text-muted">
                                 <i class="fas fa-clock"></i> @cuaderno.FechaCreacion.ToString("dd/MM/yyyy")

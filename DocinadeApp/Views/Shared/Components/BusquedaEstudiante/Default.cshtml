@@ -1,4 +1,4 @@
-@model RubricasApp.Web.ViewComponents.BusquedaEstudianteViewModel
+ï»¿@model DocinadeApp.ViewComponents.BusquedaEstudianteViewModel
 
 <div class="mb-3">
     <label for="@Model.SelectId" class="form-label">@Model.Label</label>
@@ -26,7 +26,7 @@
     </div>
 </div>
 
-<!-- Modal de Búsqueda -->
+<!-- Modal de Bï¿½squeda -->
 <div class="modal fade" id="@Model.ModalId" tabindex="-1" aria-labelledby="@(Model.ModalId)Label" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -45,18 +45,18 @@
                         <input type="text" 
                                class="form-control" 
                                id="txtBusqueda@(Model.ModalId.Replace("modal", ""))" 
-                               placeholder="Escriba nombre, apellido o identificación..."
+                               placeholder="Escriba nombre, apellido o identificaciï¿½n..."
                                autocomplete="off">
                         <button class="btn btn-outline-secondary" 
                                 type="button" 
                                 id="btnLimpiar@(Model.ModalId.Replace("modal", ""))"
-                                title="Limpiar búsqueda">
+                                title="Limpiar bï¿½squeda">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
                     <div class="form-text">
                         <i class="fas fa-info-circle"></i>
-                        Escriba al menos 2 caracteres para iniciar la búsqueda
+                        Escriba al menos 2 caracteres para iniciar la bï¿½squeda
                     </div>
                 </div>
                 
@@ -72,12 +72,12 @@
                                 <th width="10%">ID</th>
                                 <th width="25%">Apellidos</th>
                                 <th width="25%">Nombre</th>
-                                <th width="20%">Identificación</th>
-                                <th width="20%">Institución</th>
+                                <th width="20%">Identificaciï¿½n</th>
+                                <th width="20%">Instituciï¿½n</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Resultados dinámicos -->
+                            <!-- Resultados dinï¿½micos -->
                         </tbody>
                     </table>
                 </div>
@@ -86,14 +86,14 @@
                      class="alert alert-info text-center" 
                      style="display: none;">
                     <i class="fas fa-info-circle me-2"></i>
-                    Utilice el campo de búsqueda para encontrar estudiantes
+                    Utilice el campo de bï¿½squeda para encontrar estudiantes
                 </div>
                 
                 <div id="mensajeSinResultados@(Model.ModalId.Replace("modal", ""))" 
                      class="alert alert-warning text-center" 
                      style="display: none;">
                     <i class="fas fa-exclamation-triangle me-2"></i>
-                    No se encontraron estudiantes que coincidan con la búsqueda
+                    No se encontraron estudiantes que coincidan con la bï¿½squeda
                 </div>
                 
                 <div id="mensajeError@(Model.ModalId.Replace("modal", ""))" 
@@ -121,7 +121,7 @@
 @section Scripts {
     <script src="~/js/components/busqueda-estudiante.js" asp-append-version="true"></script>
     <script>
-        // Inicializar el componente cuando se carga la página
+        // Inicializar el componente cuando se carga la pï¿½gina
         document.addEventListener('DOMContentLoaded', function() {
             if (typeof initBusquedaEstudiante === 'function') {
                 initBusquedaEstudiante({
