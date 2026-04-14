@@ -12,6 +12,8 @@ SOMEE_CREDENTIALS.md
 DB/RubricasDBBK
 *.bak
 *.sqbpro
+*.rar
+*.zip
 DOCS/*.backup*
 
 # User-specific files
