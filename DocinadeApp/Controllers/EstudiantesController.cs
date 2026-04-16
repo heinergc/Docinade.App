@@ -179,7 +179,7 @@ namespace DocinadeApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [RequirePermission(ApplicationPermissions.Estudiantes.CREAR)]
-        public async Task<IActionResult> Create([Bind("Nombre,Apellidos,NumeroId,DireccionCorreo,Institucion,Grupos,Año,PeriodoAcademicoId")] Estudiante estudiante)
+        public async Task<IActionResult> Create([Bind("Nombre,Apellidos,NumeroId,DireccionCorreo,Institucion,Grupos,Anio,PeriodoAcademicoId")] Estudiante estudiante)
         {
             try
             {

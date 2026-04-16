@@ -38,7 +38,7 @@ namespace DocinadeApp.Models
         public string? Grupos { get; set; }
         
         [Required(ErrorMessage = "El año es requerido")]
-        [Range(2020, 2035, ErrorMessage = "El año debe estar entre 2020 y 2035")]
+        [Range(2020, 2100, ErrorMessage = "El año debe estar entre 2020 y 2100")]
         [Display(Name = "Año")]
         public int Anio { get; set; }
         

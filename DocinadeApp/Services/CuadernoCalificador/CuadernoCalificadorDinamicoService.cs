@@ -113,6 +113,11 @@ namespace DocinadeApp.Services.CuadernoCalificador
                 viewModel.EstudiantesCalificaciones = await ProcesarCalificacionesEstudiantesAsync(
                     estudiantes, viewModel.Instrumentos, evaluaciones);
 
+                viewModel.EstudiantesRegulares = viewModel.EstudiantesCalificaciones
+                    .Where(e => !e.RequiereACS).ToList();
+                viewModel.EstudiantesACS = viewModel.EstudiantesCalificaciones
+                    .Where(e => e.RequiereACS).ToList();
+
                 viewModel.EstudiantesConEvaluaciones = viewModel.EstudiantesCalificaciones.Count(e => e.NotasPorInstrumento.Any());
 
                 // 5. Generar estad�sticas
@@ -224,7 +229,9 @@ namespace DocinadeApp.Services.CuadernoCalificador
                     EstudianteId = estudiante.IdEstudiante,
                     NumeroIdentificacion = estudiante.NumeroId,
                     NombreCompleto = $"{estudiante.Apellidos}, {estudiante.Nombre}",
-                    CorreoElectronico = estudiante.DireccionCorreo ?? ""
+                    CorreoElectronico = estudiante.DireccionCorreo ?? "",
+                    RequiereACS = estudiante.TipoAdecuacion == "Significativa",
+                    TipoAdecuacion = estudiante.TipoAdecuacion ?? "NoPresenta"
                 };
 
                 decimal notaFinalAcumulada = 0;
